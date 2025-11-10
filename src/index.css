@@ -1,0 +1,59 @@
+/* Cylinders background for Auth pages */
+.cylinder1,
+.cylinder2,
+.cylinder3,
+.cylinder4 {
+    position: absolute;         /* position within AuthLayout (relative) */
+    z-index: 0;                 /* behind the content (which is z-10) */
+    pointer-events: none;       /* don't block clicks */
+    border-radius: 100px;       /* pill/cylinder shape */
+    background: linear-gradient(180deg, rgb(101, 255, 196), rgb(66, 170, 255), rgb(21, 94, 236));
+    filter: blur(6px);          /* soft glow similar to the video */
+    opacity: 0.35;              /* subtle but visible */
+}
+
+.cylinder1 {
+    width: 220px;
+    height: 350px;
+    transform: rotate(-45deg);
+    bottom: 170px;
+    left: 130px;
+}
+
+.cylinder2 {
+    width: 240px;
+    height: 700px;
+    transform: rotate(-45deg);
+    top: -300px;
+    right: 120px;
+    z-index: -1;
+}
+
+.cylinder3 {
+    width: 220px;
+    height: 190px;
+    transform: rotate(40deg);
+    bottom: 60px;
+    right: 60px;
+}
+
+.cylinder4 {
+    width: 120px;
+    height: 200px;
+    transform: rotate(-45deg);
+    top: 140px;
+    left: 40px;
+}
+
+/* Custom cursor visibility control */
+body.custom-cursor {
+    cursor: none;
+}
+body.custom-cursor a,
+body.custom-cursor button,
+body.custom-cursor [role="button"],
+body.custom-cursor input,
+body.custom-cursor textarea,
+body.custom-cursor select {
+    cursor: none;
+}

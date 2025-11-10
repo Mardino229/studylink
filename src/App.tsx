@@ -1,0 +1,74 @@
+
+import './App.css'
+import {
+    BrowserRouter as Router,
+    Routes,
+    Route
+} from "react-router-dom"
+import Landing from "./pages/authPage/landing.tsx";
+import Login from "./pages/authPage/login.tsx";
+import Register from "./pages/authPage/register.tsx";
+import ConfirmAccount from "./pages/authPage/confirmAccount.tsx";
+import ResetPassword from "./pages/authPage/resetPassword.tsx";
+import CompleteProfile from "./pages/authPage/completeProfile.tsx";
+import Home from "./pages/appPage/Home.tsx";
+import AppLayout from "./layout/AppLayout.tsx";
+import {ScrollToTop} from "./components/common/ScrollToTop.tsx";
+import RequireAuth from "./context/RequireAuth.tsx";
+import MyCourse from "./pages/appPage/Course.tsx";
+import SummaryList from "./pages/appPage/SummaryList.tsx";
+import Summary from "./pages/appPage/Summary.tsx";
+import Exams from "./pages/appPage/Exams.tsx";
+import Chat from "./pages/appPage/Chat.tsx";
+import Profile from "./pages/appPage/Profile.tsx";
+import Settings from "./pages/appPage/Settings.tsx";
+import About from "./pages/authPage/about.tsx";
+import SettingsProfile from "./pages/appPage/SettingsProfile.tsx";
+import SettingsSubscription from "./pages/appPage/SettingsSubscription.tsx";
+import SettingsPayments from "./pages/appPage/SettingsPayments.tsx";
+import SettingsAnnouncements from "./pages/appPage/SettingsAnnouncements.tsx";
+import SettingsFeedback from "./pages/appPage/SettingsFeedback.tsx";
+
+function App() {
+
+  return (
+      <Router>
+          <ScrollToTop />
+          <Routes>
+              <Route path="/" element={<Landing/>} />
+              <Route path="/register" element={<Register/>} />
+              <Route path="/login" element={<Login/>} />
+              <Route path="/confirm" element={<ConfirmAccount/>} />
+              <Route path="/reset-password" element={<ResetPassword/>} />
+              <Route path="/about" element={<About/>} />
+              {/*<Route element={<PersistLogin/>}>*/}
+                  {/*<Route element={<RequireAuth/>}>*/}
+                  {/*<Route path="quickmessage/*" element={<UserRoutes/>} />*/}
+                  {/*</Route>*/}
+              {/*</Route>*/}
+              {/*<Route element={<RequireAuth/>}>*/}
+                  <Route element={<AppLayout />}>
+                      <Route path="/complete-profile" element={<CompleteProfile/>} />
+                      <Route path="/home" element={<Home />} />
+                      <Route path="/my-summaries" element={<SummaryList />} />
+                      <Route path="/my-summaries/summary" element={<Summary />} />
+                      <Route path="/my-courses" element={<MyCourse />} />
+                      <Route path="/library-summary" element={<Home />} />
+                      <Route path="/exams" element={<Exams />} />
+                      <Route path="/chat" element={<Chat />} />
+                      <Route path="/profile" element={<Profile />} />
+                      <Route path="/settings" element={<Settings />} />
+                      <Route path="/settings/profile" element={<SettingsProfile />} />
+                      <Route path="/settings/subscription" element={<SettingsSubscription />} />
+                      <Route path="/settings/payments" element={<SettingsPayments />} />
+                      <Route path="/settings/announcements" element={<SettingsAnnouncements />} />
+                      <Route path="/settings/feedback" element={<SettingsFeedback />} />
+                  </Route>
+              {/*</Route>*/}
+          </Routes>
+      </Router>
+  )
+}
+
+export default App
+

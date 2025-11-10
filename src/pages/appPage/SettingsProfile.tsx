@@ -1,0 +1,56 @@
+import { useState } from "react";
+import PageMeta from "../../components/common/PageMeta";
+import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
+import { useUser } from "../../components/layout/userContext.tsx";
+
+export default function SettingsProfile() {
+  const { user, setUser } = useUser();
+  const [firstName, setFirstName] = useState(user?.first_name || "");
+  const [lastName, setLastName] = useState(user?.last_name || "");
+  const [email, setEmail] = useState(user?.email || "");
+  const [saving, setSaving] = useState(false);
+
+  async function onSave(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      // Mock local update only; backend handled elsewhere
+      setUser?.({ ...(user || {}), first_name: firstName, last_name: lastName, email });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <>
+      <PageMeta title="Paramètres • Profil" description="Modifier vos informations personnelles" />
+      <PageBreadcrumb pageTitle="Modifier le profil" />
+
+      <section className="p-6 rounded-lg border border-border bg-card max-w-2xl">
+        <form onSubmit={onSave} className="space-y-5">
+          <div>
+            <label className="block text-sm text-foreground/70 mb-1">Prénom</label>
+            <input value={firstName} onChange={(e)=> setFirstName(e.target.value)}
+                   className="w-full rounded-md border border-border bg-background text-foreground px-3 py-2" required />
+          </div>
+          <div>
+            <label className="block text-sm text-foreground/70 mb-1">Nom</label>
+            <input value={lastName} onChange={(e)=> setLastName(e.target.value)}
+                   className="w-full rounded-md border border-border bg-background text-foreground px-3 py-2" required />
+          </div>
+          <div>
+            <label className="block text-sm text-foreground/70 mb-1">E-mail</label>
+            <input type="email" value={email} onChange={(e)=> setEmail(e.target.value)}
+                   className="w-full rounded-md border border-border bg-background text-foreground px-3 py-2" required />
+          </div>
+          <div className="flex items-center gap-2">
+            <button type="submit" disabled={saving}
+                    className="px-4 py-2 rounded-md bg-foreground text-background disabled:opacity-60">
+              {saving ? "Enregistrement..." : "Enregistrer"}
+            </button>
+          </div>
+        </form>
+      </section>
+    </>
+  );
+}

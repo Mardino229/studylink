@@ -1,0 +1,270 @@
+import {useMutation} from '@tanstack/react-query';
+import {axiosClient} from "./api.ts";
+import {toast} from "sonner";
+import {useNavigate} from "react-router-dom";
+import {useUser} from "../components/layout/userContext.tsx";
+import type {LoginFormRequest, RegisterFormRequest, ValidationError} from "./type.ts";
+
+
+const useLogin = () => {
+    const navigate = useNavigate();
+    const {setUser} = useUser();
+    const {mutate, isPending} = useMutation({
+        mutationFn: async (data: LoginFormRequest) =>{
+            const response = await axiosClient.post('auth/login', data)
+            console.log(response.data.user)
+            setUser(response.data.user)
+            console.log(response.data)
+            return {
+                success: true,
+                user: response.data.user,
+            };
+        },
+        onSuccess: (data) => {
+
+            toast.success('Connexion réussie', {
+                description: "Welcome back !",
+            });
+
+            if (data.user.is_active) {
+                if (data.user.study_level_id === null) {
+                navigate('/complete-profile');
+                } else {
+                    navigate(`/home`);
+                }
+            } else {
+                navigate(`/confirm`);
+            }
+        },
+        onError: (error) => {
+            console.error(error);
+            const err = error as unknown as {
+                response: {
+                    data: {
+                        detail: string
+                    },
+                    status: number,
+                };
+            }
+            if (err.response.status === 403) {
+                const err = error as unknown as {
+                    response: {
+                        data: {
+                            detail: {
+                                message: string,
+                                email: string
+                            }
+                        },
+                        status: number,
+                    };
+                }
+                toast.error("Please validate your account", {
+                    description: err.response.data.detail.message,
+                });
+                navigate(`/confirm?email=${err.response.data.detail.email}`);
+            } else {
+                toast.error("Connexion failed", {
+                    description: err.response.data.detail,
+                });
+            }
+            return {
+                success: false,
+                message: error.message,
+            };
+        },
+    })
+    return { mutate, isPending };
+}
+
+const useRegister = () => {
+
+    const navigate = useNavigate();
+
+    return useMutation({
+            mutationFn: async (data: RegisterFormRequest) =>{
+                const response = await axiosClient.post('/auth/register', data)
+                toast.success(response.data.message, {
+                    description: "We have received a code to verify your account.",
+                })
+                navigate(`/confirm?email=${data.email}`);
+
+            },
+            onSuccess: () => {
+
+            },
+            onError: (error) => {
+                console.error(error);
+                const err = error as unknown as {
+                    response: {
+                        data: {
+                            detail: string
+                        },
+                        status: number,
+                    };
+                }
+                console.log(err.response.status === 422)
+                if (err.response.status === 422) {
+                    const err = error as unknown as {
+                        response: {
+                            data: {
+                                detail:  ValidationError[]
+                            }
+                        };
+                    }
+                    toast.error("Inscription failed", {
+                        description: `${err.response.data.detail[0].loc[1]}: ${err.response.data.detail[0].msg}`,
+                    })
+                } else {
+                    toast.error("Inscription failed", {
+                        description: err.response.data.detail,
+                    })
+                }
+            },
+        }
+    );
+}
+
+const useVerify = () => {
+    const navigate = useNavigate();
+    return useMutation({
+        mutationFn: async (data: { email: string|null; otp: string; }) =>{
+            const response = await axiosClient.post('/auth/verify-otp', data)
+            toast.success(response.data.detail, {
+                description: "Your account have been verified",
+            })
+        },
+        onSuccess: () => {
+            navigate(`/login`);
+        },
+        onError: (error) => {
+            const err = error as unknown as {
+                response: {
+                    data: {
+                        detail: string
+                    },
+                    status: number,
+                };
+            }
+            console.log(err.response.status === 422)
+            if (err.response.status === 422) {
+                const err = error as unknown as {
+                    response: {
+                        data: {
+                            detail:  ValidationError[]
+                        }
+                    };
+                }
+                toast.error("Validation failed", {
+                    description: `${err.response.data.detail[0].loc[1]}: ${err.response.data.detail[0].msg}`,
+                })
+            } else {
+                toast.error("Validation failed", {
+                    description: err.response.data.detail,
+                })
+            }
+        },
+    })
+}
+
+const useLogout = () => {
+    const navigate = useNavigate();
+    const {setUser} = useUser();
+    return useMutation({
+        mutationFn: async () => {
+            await axiosClient.post('/auth/logout ');
+            setUser({})
+            toast.success("Logout successful")
+        },
+        onSuccess: () => {
+            navigate(`/`);
+        }
+    });
+};
+
+const useRequestPassword = () => {
+    return useMutation({
+        mutationFn: async (data: {to_email: string}) => {
+            const response = await axiosClient.post('/auth/request-password-reset', data);
+            toast.success(response.data.message, {
+                description: "We've sent a reset password link to your email",
+            })
+        },
+        onSuccess: () => {
+
+        },
+        onError: (error) => {
+            console.error(error);
+            const err = error as unknown as {
+                response: {
+                    data: {
+                        detail: string
+                    },
+                    status: number,
+                };
+            }
+            console.log(err.response.status === 422)
+            if (err.response.status === 422) {
+                const err = error as unknown as {
+                    response: {
+                        data: {
+                            detail:  ValidationError[]
+                        }
+                    };
+                }
+                toast.error("Password Request failed", {
+                    description: `${err.response.data.detail[0].loc[1]}: ${err.response.data.detail[0].msg}`,
+                })
+            } else {
+                toast.error("Password Request failed", {
+                    description: err.response.data.detail,
+                })
+            }
+        }
+    });
+};
+
+const useResetPassword = () => {
+    const navigate = useNavigate();
+
+    return useMutation({
+        mutationFn: async (data: {token: string|null, password: string, confirmPassword: string}) => {
+            const response = await axiosClient.post('/auth/reset-password', data);
+            toast.success(response.data.message, {
+                description: "You can log you in with your new password",
+            })
+        },
+        onSuccess: () => {
+            navigate(`/login`);
+        },
+        onError: (error) => {
+            console.error(error);
+            const err = error as unknown as {
+                response: {
+                    data: {
+                        detail: string
+                    },
+                    status: number,
+                };
+            }
+            console.log(err.response.status === 422)
+            if (err.response.status === 422) {
+                const err = error as unknown as {
+                    response: {
+                        data: {
+                            detail:  ValidationError[]
+                        }
+                    };
+                }
+                toast.error("Password Reset failed", {
+                    description: `${err.response.data.detail[0].loc[1]}: ${err.response.data.detail[0].msg}`,
+                })
+            } else {
+                toast.error("Password Reset failed", {
+                    description: err.response.data.detail,
+                })
+            }
+        }
+    });
+};
+
+export { useLogin, useRegister, useVerify, useLogout, useRequestPassword, useResetPassword };
