@@ -1,10 +1,90 @@
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
-import Book from "../../components/courses/book.tsx";
 import Button from "../../components/ui/button/Button.tsx";
-import {PlusIcon} from "../../icons";
+import { PlusIcon } from "../../icons";
+import * as Dialog from "@radix-ui/react-dialog";
+import { useEffect, useState } from "react";
+import { Input } from "../../components/ui/input.tsx";
+import { ModernBookCover, BookHeader, BookTitle } from "../../components/ui/modern-book-cover.tsx";
+import { BookIcon, Pencil, Trash2 } from "lucide-react";
 
 export default function MyCourse() {
+    const [open, setOpen] = useState(false);
+    const [title, setTitle] = useState("");
+    const [color, setColor] = useState<
+        "slate"|"gray"|"zinc"|"neutral"|"stone"|"red"|"orange"|"amber"|"yellow"|"lime"|"green"|"emerald"|"teal"|"cyan"|"sky"|"blue"|"indigo"|"violet"|"purple"|"fuchsia"|"pink"|"rose"
+    >("emerald");
+    type Course = { id: string; title: string; color: typeof color };
+    const [courses, setCourses] = useState<Course[]>([]);
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [toasts, setToasts] = useState<{ id: string; message: string; type: "success"|"info"|"error" }[]>([]);
+
+    const pushToast = (message: string, type: "success"|"info"|"error" = "success") => {
+        const id = `${Date.now()}-${Math.random().toString(36).slice(2,6)}`;
+        setToasts((t) => [...t, { id, message, type }]);
+        setTimeout(() => {
+            setToasts((t) => t.filter(x => x.id !== id));
+        }, 2500);
+    };
+
+    // Load from localStorage on mount
+    useEffect(() => {
+        try {
+            const raw = localStorage.getItem("studylink_courses");
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) {
+                    setCourses(parsed);
+                }
+            }
+        } catch {}
+    }, []);
+
+    // Save to localStorage on change
+    useEffect(() => {
+        try {
+            localStorage.setItem("studylink_courses", JSON.stringify(courses));
+        } catch {}
+    }, [courses]);
+
+    const onCreate = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!title.trim()) return;
+        if (editingId) {
+            setCourses((prev) => prev.map(c => c.id === editingId ? { ...c, title: title.trim(), color } : c));
+            pushToast("Cours mis à jour", "success");
+        } else {
+            const id = `${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
+            setCourses((prev) => [{ id, title: title.trim(), color }, ...prev]);
+            pushToast("Cours créé", "success");
+        }
+        setTitle("");
+        setColor("emerald");
+        setEditingId(null);
+        setOpen(false);
+    };
+
+    const startCreate = () => {
+        setTitle("");
+        setColor("emerald");
+        setEditingId(null);
+        setOpen(true);
+    };
+
+    const startEdit = (course: Course) => {
+        setTitle(course.title);
+        setColor(course.color);
+        setEditingId(course.id);
+        setOpen(true);
+    };
+
+    const removeCourse = (id: string) => {
+        const target = courses.find(c => c.id === id);
+        const ok = window.confirm(`Supprimer le cours${target ? ` "${target.title}"` : ""} ?`);
+        if (!ok) return;
+        setCourses(prev => prev.filter(c => c.id !== id));
+        pushToast("Cours supprimé", "success");
+    };
 
     return (
         <>
@@ -52,17 +132,88 @@ export default function MyCourse() {
                             className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-200 bg-transparent py-2.5 pl-12 pr-14 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[430px]"
                         />
                     </div>
-                    <Button
-                        size="sm"
-                        variant="outline"
-                        // onClick={openModal}
-                        startIcon={<PlusIcon className="size-5" />}
-                    >
-                        Créer un cours
-                    </Button>
+                    <Dialog.Root open={open} onOpenChange={setOpen}>
+                        <Dialog.Trigger asChild>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                startIcon={<PlusIcon className="size-5" />}
+                                onClick={startCreate}
+                            >
+                                Créer un cours
+                            </Button>
+                        </Dialog.Trigger>
+                        <Dialog.Portal>
+                            <Dialog.Overlay className="fixed inset-0 bg-black/40 z-40 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0" />
+                            <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl border border-border bg-card p-6 shadow-xl focus:outline-none">
+                                <Dialog.Title className="text-lg font-semibold text-foreground">{editingId ? "Modifier le cours" : "Nouveau cours"}</Dialog.Title>
+                                <form onSubmit={onCreate} className="mt-4 space-y-4">
+                                    <div>
+                                        <label className="block text-sm text-foreground/70 mb-1">Titre du cours</label>
+                                        <Input value={title} onChange={(e)=> setTitle(e.target.value)} placeholder="Ex: Mathématiques" required />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm text-foreground/70 mb-1">Couleur</label>
+                                        <select value={color} onChange={(e)=> setColor(e.target.value as any)} className="w-full rounded-md border border-border bg-background text-foreground px-3 py-2">
+                                            {[
+                                                "emerald","teal","orange","blue","green","rose","red","amber","indigo","violet","purple","pink","cyan","sky","lime","zinc","slate","gray","neutral","stone","yellow"
+                                            ].map((c)=> (
+                                                <option key={c} value={c}>{c}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="flex justify-end gap-2 pt-2">
+                                        <button type="button" onClick={()=> setOpen(false)} className="px-4 py-2 rounded-md border border-border bg-background text-foreground">Annuler</button>
+                                        <button type="submit" className="px-4 py-2 rounded-md bg-foreground text-background">{editingId ? "Enregistrer" : "Créer"}</button>
+                                    </div>
+                                </form>
+                            </Dialog.Content>
+                        </Dialog.Portal>
+                    </Dialog.Root>
                 </div>
             </div>
-                <Book/>
+
+                {/* Compteur */}
+                <div className="text-sm text-foreground/70">Total cours: <span className="font-medium text-foreground">{courses.length}</span></div>
+
+                {/* Liste dynamique des cours */}
+                <div className="flex flex-wrap sm:gap-8 gap-5 sm:justify-start justify-center ">
+                    {courses.length === 0 ? (
+                        <p className="text-sm text-foreground/60">Aucun cours pour le moment. Créez votre premier cours.</p>
+                    ) : (
+                        courses.map((c) => (
+                            <div key={c.id} className="flex flex-col items-center">
+                                <ModernBookCover size="sm" color={c.color as any}>
+                                    <BookHeader>
+                                        <BookIcon size={20} />
+                                    </BookHeader>
+                                    <BookTitle>{c.title}</BookTitle>
+                                </ModernBookCover>
+                                <div className="mt-2 flex gap-2">
+                                    <button onClick={()=> startEdit(c)} className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border border-border text-foreground hover:bg-card">
+                                        <Pencil className="w-3.5 h-3.5" /> Modifier
+                                    </button>
+                                    <button onClick={()=> removeCourse(c.id)} className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border border-border text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10">
+                                        <Trash2 className="w-3.5 h-3.5" /> Supprimer
+                                    </button>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+
+                {/* Toasts */}
+                <div className="fixed bottom-4 right-4 z-50 space-y-2">
+                    {toasts.map(t => (
+                        <div key={t.id} className={`min-w-[240px] rounded-md px-4 py-2 text-sm shadow-lg border 
+                            ${t.type === 'success' ? 'bg-emerald-600 text-white border-emerald-500' : ''}
+                            ${t.type === 'info' ? 'bg-blue-600 text-white border-blue-500' : ''}
+                            ${t.type === 'error' ? 'bg-red-600 text-white border-red-500' : ''}
+                        `}>
+                            {t.message}
+                        </div>
+                    ))}
+                </div>
             </div>
         </>
     );
