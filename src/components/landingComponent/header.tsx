@@ -11,6 +11,7 @@ export default function Header() {
     const [activeSection, setActiveSection] = useState<string>(hash || "#");
 
     const [scrolled, setScrolled] = useState(false);
+    const [mobileOpen, setMobileOpen] = useState(false);
     useEffect(() => {
         const onScroll = () => {
             const y = window.scrollY;
@@ -95,7 +96,7 @@ export default function Header() {
             className={`fixed top-0 left-0 right-0 z-50 w-full backdrop-blur-md ${scrolled ? 'bg-background/90 border-b border-border' : 'bg-background/80'}`}
         >
             <div
-                className="container cursor-pointer mx-auto flex items-center justify-between whitespace-nowrap px-4 sm:px-6 lg:px-8 py-4"
+                className="container cursor-pointer mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4"
             >
                 <div className="flex items-center gap-3 text-foreground">
                     <svg className="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 48 48"
@@ -146,12 +147,73 @@ export default function Header() {
                     </motion.div>
                     <Link
                         to={"/register"}
-                        className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-base font-bold shadow-lg hover:shadow-xl transition-shadow duration-300"
+                        className="hidden md:flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-base font-bold shadow-lg hover:shadow-xl transition-shadow duration-300"
                     >
                         <span className="truncate">Start Free Trial</span>
                     </Link>
+                    <button
+                        type="button"
+                        aria-label="Toggle menu"
+                        className="md:hidden inline-flex items-center justify-center rounded-md p-2 text-foreground hover:bg-foreground/5 focus:outline-none"
+                        onClick={() => setMobileOpen((v) => !v)}
+                    >
+                        {mobileOpen ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-7 w-7"><path fillRule="evenodd" d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 1 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06z" clipRule="evenodd"/></svg>
+                        ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-7 w-7"><path fillRule="evenodd" d="M3.75 5.25a.75.75 0 0 1 .75-.75h15a.75.75 0 0 1 0 1.5H4.5a.75.75 0 0 1-.75-.75zm0 6a.75.75 0 0 1 .75-.75h15a.75.75 0 0 1 0 1.5H4.5a.75.75 0 0 1-.75-.75zm0 6a.75.75 0 0 1 .75-.75h15a.75.75 0 0 1 0 1.5H4.5a.75.75 0 0 1-.75-.75z" clipRule="evenodd"/></svg>
+                        )}
+                    </button>
                 </div>
             </div>
+            {mobileOpen && (
+                <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.2 }}
+                    className="md:hidden border-t border-border bg-background"
+                >
+                    <div className="px-4 sm:px-6 lg:px-8 py-3 space-y-3">
+                        <a
+                            href="#"
+                            className={`block text-base ${isHomeActive ? 'text-foreground' : 'text-foreground/70'} hover:text-foreground`}
+                            onClick={(e) => { handleSmoothClick(e, '#'); setMobileOpen(false); }}
+                        >
+                            Home
+                        </a>
+                        <a
+                            href="#key-features"
+                            className={`block text-base ${isFeaturesActive ? 'text-foreground' : 'text-foreground/70'} hover:text-foreground`}
+                            onClick={(e) => { handleSmoothClick(e, '#key-features'); setMobileOpen(false); }}
+                        >
+                            Key Features
+                        </a>
+                        <a
+                            href="#testimonials"
+                            className={`block text-base ${isTestimonialsActive ? 'text-foreground' : 'text-foreground/70'} hover:text-foreground`}
+                            onClick={(e) => { handleSmoothClick(e, '#testimonials'); setMobileOpen(false); }}
+                        >
+                            Testimonials
+                        </a>
+                        <div className="pt-2 flex items-center gap-4">
+                            <Link
+                                to="/login"
+                                className="text-base text-foreground/70 hover:text-foreground"
+                                onClick={() => setMobileOpen(false)}
+                            >
+                                Log In
+                            </Link>
+                            <Link
+                                to="/register"
+                                className="inline-flex items-center justify-center rounded-full h-11 px-5 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-semibold shadow-lg"
+                                onClick={() => setMobileOpen(false)}
+                            >
+                                Start Free Trial
+                            </Link>
+                        </div>
+                    </div>
+                </motion.div>
+            )}
         </motion.header>
         {/* Spacer to prevent content from being hidden under the fixed header */}
         <div aria-hidden className="h-16" />

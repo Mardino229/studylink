@@ -56,7 +56,7 @@ export default function Hero() {
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.7, ease: "easeOut" }}
                             viewport={{ once: true, amount: 0.6 }}
-                            className={`text-4xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tighter ${HERO_BG ? "text-white" : "text-foreground"} whitespace-nowrap overflow-visible max-w-none`}
+                            className={`text-4xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tighter ${HERO_BG ? "text-white" : "text-foreground"} break-words`}
                         >
                             {displayText}
                             <span className={`ml-1 inline-block w-0.5 h-7 align-middle ${HERO_BG?"bg-white/90":"bg-foreground/80"} animate-pulse`} />
