@@ -4,6 +4,7 @@ import {toast} from "sonner";
 import {useNavigate} from "react-router-dom";
 import {useUser} from "../components/layout/userContext.tsx";
 import type {LoginFormRequest, RegisterFormRequest, ValidationError} from "./type.ts";
+import type {AxiosError} from "axios";
 
 
 const useLogin = () => {
@@ -38,6 +39,16 @@ const useLogin = () => {
         },
         onError: (error) => {
             console.error(error);
+
+            const axiosError = error as AxiosError;
+
+            if (!axiosError.response) {
+                toast.error("login failed", {
+                    description: "Service unavailable. Please try again later.",
+                });
+                return;
+            }
+
             const err = error as unknown as {
                 response: {
                     data: {
@@ -81,47 +92,60 @@ const useRegister = () => {
     const navigate = useNavigate();
 
     return useMutation({
-            mutationFn: async (data: RegisterFormRequest) =>{
-                const response = await axiosClient.post('/auth/register', data)
-                toast.success(response.data.message, {
-                    description: "We have received a code to verify your account.",
-                })
-                navigate(`/confirm?email=${data.email}`);
+        mutationFn: async (data: RegisterFormRequest) => {
+            const response = await axiosClient.post('/auth/register', data)
+            toast.success(response.data.message, {
+                description: "We have received a code to verify your account.",
+            })
+            navigate(`/confirm?email=${data.email}`);
+        },
+        onSuccess: () => {
+            // Optionnel: vous pouvez mettre du code ici si nécessaire
+        },
+        onError: (error) => {
+            console.error(error);
 
-            },
-            onSuccess: () => {
+            const axiosError = error as AxiosError;
 
-            },
-            onError: (error) => {
-                console.error(error);
-                const err = error as unknown as {
+            if (!axiosError.response) {
+                toast.error("Inscription failed", {
+                    description: "Service unavailable. Please try again later.",
+                });
+                return;
+            }
+
+            // Si on arrive ici, on a une réponse du serveur
+            const err = error as unknown as {
+                response: {
+                    data: {
+                        detail: string | ValidationError[]
+                    },
+                    status: number,
+                };
+            };
+
+            if (err.response.status === 422) {
+                const validationErr = error as unknown as {
                     response: {
                         data: {
-                            detail: string
-                        },
-                        status: number,
+                            detail: ValidationError[]
+                        }
                     };
-                }
-                console.log(err.response.status === 422)
-                if (err.response.status === 422) {
-                    const err = error as unknown as {
-                        response: {
-                            data: {
-                                detail:  ValidationError[]
-                            }
-                        };
-                    }
-                    toast.error("Inscription failed", {
-                        description: `${err.response.data.detail[0].loc[1]}: ${err.response.data.detail[0].msg}`,
-                    })
-                } else {
-                    toast.error("Inscription failed", {
-                        description: err.response.data.detail,
-                    })
-                }
-            },
-        }
-    );
+                };
+                toast.error("Inscription failed", {
+                    description: `${validationErr.response.data.detail[0].loc[1]}: ${validationErr.response.data.detail[0].msg}`,
+                });
+            } else {
+                toast.error("Inscription failed", {
+                    description: typeof err.response.data.detail === 'string'
+                        ? err.response.data.detail
+                        : "An error occurred",
+                });
+            }
+
+
+        },
+    });
 }
 
 const useVerify = () => {
@@ -137,6 +161,16 @@ const useVerify = () => {
             navigate(`/login`);
         },
         onError: (error) => {
+
+            const axiosError = error as AxiosError;
+
+            if (!axiosError.response) {
+                toast.error("Operation failed", {
+                    description: "Service unavailable. Please try again later.",
+                });
+                return;
+            }
+
             const err = error as unknown as {
                 response: {
                     data: {
@@ -177,6 +211,15 @@ const useLogout = () => {
         },
         onSuccess: () => {
             navigate(`/`);
+        },
+        onError: (error) => {
+            const axiosError = error as AxiosError;
+            if (!axiosError.response) {
+                toast.error("Logout failed", {
+                    description: "Service unavailable. Please try again later.",
+                });
+                return;
+            }
         }
     });
 };
@@ -194,6 +237,16 @@ const useRequestPassword = () => {
         },
         onError: (error) => {
             console.error(error);
+
+            const axiosError = error as AxiosError;
+
+            if (!axiosError.response) {
+                toast.error("Operation failed", {
+                    description: "Service unavailable. Please try again later.",
+                });
+                return;
+            }
+
             const err = error as unknown as {
                 response: {
                     data: {
@@ -238,6 +291,16 @@ const useResetPassword = () => {
         },
         onError: (error) => {
             console.error(error);
+
+            const axiosError = error as AxiosError;
+
+            if (!axiosError.response) {
+                toast.error("Operation failed", {
+                    description: "Service unavailable. Please try again later.",
+                });
+                return;
+            }
+
             const err = error as unknown as {
                 response: {
                     data: {
@@ -266,5 +329,6 @@ const useResetPassword = () => {
         }
     });
 };
+
 
 export { useLogin, useRegister, useVerify, useLogout, useRequestPassword, useResetPassword };

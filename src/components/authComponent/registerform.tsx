@@ -20,8 +20,8 @@ export default function RegisterForm() {
     const register = useRegister();
 
     const registerSchema = z.object({
-        email: z.email({ message: "Invalid email address" })
-            .regex(/^[\w.-]+@uottawa\.com$/, { message: "Email must be @uottawa.com" }),
+        email: z.email({ message: "Invalid email address" }),
+            // .regex(/^[\w.-]+@uottawa\.com$/, { message: "Email must be @uottawa.com" }),
         password: z.string()
             .min(8, { message: "Password must be at least 8 characters" })
             .regex(/[A-Z]/, { message: "Password must contain an uppercase letter" })
