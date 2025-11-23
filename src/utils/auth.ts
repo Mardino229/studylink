@@ -43,7 +43,7 @@ const useLogin = () => {
             const axiosError = error as AxiosError;
 
             if (!axiosError.response) {
-                toast.error("login failed", {
+                toast.error("Login failed", {
                     description: "Service unavailable. Please try again later.",
                 });
                 return;
