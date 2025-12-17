@@ -20,9 +20,31 @@ export default function Profile() {
   // Mocks simples pour l'affichage (en attendant les données backend)
   const plan = useMemo(() => ({
     name: "Standard",
-    trial: false,
+    trial: true,
+    startDate: new Date().toISOString(),
+    endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
     credits: { used: 42, total: 100 },
   }), []);
+
+  const { statusLabel, daysLeftText } = useMemo(() => {
+    const now = new Date();
+    const end = plan.endDate ? new Date(plan.endDate) : null;
+    let label = plan.trial ? "Phase d'essai" : "Abonnement actif";
+    let daysText = "";
+    if (end && !isNaN(end.getTime())) {
+      const diffMs = end.getTime() - now.getTime();
+      const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+      if (days < 0) {
+        label = plan.trial ? "Essai expiré" : "Abonnement expiré";
+        daysText = "Expiré";
+      } else if (days === 0) {
+        daysText = "Expire aujourd'hui";
+      } else {
+        daysText = `${days} jour${days > 1 ? "s" : ""} restant${days > 1 ? "s" : ""}`;
+      }
+    }
+    return { statusLabel: label, daysLeftText: daysText };
+  }, [plan]);
 
   const progression = useMemo(() => ({
     overall: 68, // progression globale en %
@@ -147,6 +169,12 @@ export default function Profile() {
               <div>
                 <div className="text-xs text-gray-500">Plan actuel</div>
                 <div className="font-medium">{plan.name}{plan.trial ? " (Essai)" : ""}</div>
+                <div className="mt-1 text-xs">
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full mr-2 ${plan.trial ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}`}>
+                    {statusLabel}
+                  </span>
+                  <span className="text-gray-600 dark:text-gray-400">{daysLeftText}</span>
+                </div>
               </div>
               <div className="text-xs text-gray-500">{plan.credits.used}/{plan.credits.total} crédits</div>
             </div>

@@ -28,6 +28,17 @@ import SettingsSubscription from "./pages/appPage/SettingsSubscription.tsx";
 import SettingsPayments from "./pages/appPage/SettingsPayments.tsx";
 import SettingsAnnouncements from "./pages/appPage/SettingsAnnouncements.tsx";
 import SettingsFeedback from "./pages/appPage/SettingsFeedback.tsx";
+import Statistics from "./pages/appPage/Statistics.tsx";
+import AdminHome from "./pages/admin/AdminHome.tsx";
+import AdminLayout from "./layout/admin/AdminLayout.tsx";
+import Users from "./pages/admin/Users.tsx";
+import Subscriptions from "./pages/admin/Subscriptions.tsx";
+import Plans from "./pages/admin/Plans.tsx";
+import Payments from "./pages/admin/Payments.tsx";
+import Announcements from "./pages/admin/Announcements.tsx";
+import Feedbacks from "./pages/admin/Feedbacks.tsx";
+import Reports from "./pages/admin/Reports.tsx";
+import AdminSettings from "./pages/admin/Settings.tsx";
 
 function App() {
 
@@ -41,6 +52,17 @@ function App() {
               <Route path="/confirm" element={<ConfirmAccount/>} />
               <Route path="/reset-password" element={<ResetPassword/>} />
               <Route path="/about" element={<About/>} />
+              <Route element={<AdminLayout />}>
+                  <Route path="/admin/home" element={<AdminHome/>} />
+                  <Route path="/admin/users" element={<Users/>} />
+                  <Route path="/admin/subscriptions" element={<Subscriptions/>} />
+                  <Route path="/admin/plans" element={<Plans/>} />
+                  <Route path="/admin/payments" element={<Payments/>} />
+                  <Route path="/admin/announcements" element={<Announcements/>} />
+                  <Route path="/admin/feedbacks" element={<Feedbacks/>} />
+                  <Route path="/admin/reports" element={<Reports/>} />
+                  <Route path="/admin/settings" element={<AdminSettings/>} />
+              </Route>
               {/*<Route element={<PersistLogin/>}>*/}
                   {/*<Route element={<RequireAuth/>}>*/}
                   {/*<Route path="quickmessage/*" element={<UserRoutes/>} />*/}
@@ -55,6 +77,7 @@ function App() {
                       <Route path="/my-courses" element={<MyCourse />} />
                       <Route path="/library-summary" element={<Home />} />
                       <Route path="/exams" element={<Exams />} />
+                      <Route path="/statistics" element={<Statistics />} />
                       <Route path="/chat" element={<Chat />} />
                       <Route path="/profile" element={<Profile />} />
                       <Route path="/settings" element={<Settings />} />
@@ -71,4 +94,5 @@ function App() {
 }
 
 export default App
+
 

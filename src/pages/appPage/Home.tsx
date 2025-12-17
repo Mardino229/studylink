@@ -9,6 +9,7 @@ import Button from "../../components/ui/button/Button.tsx";
 import UpcomingSchedule from "../../components/dashboard/UpcomingSchedule.tsx";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
+import Calendar from "../../components/dashboard/Calendar.tsx";
 
 export default function Home() {
     const {user} = useUser();
@@ -157,6 +158,12 @@ export default function Home() {
 
             <div className="col-span-12 xl:col-span-7">
                 <div className="space-y-8">
+                    <motion.div
+                        variants={fadeUp}
+                        className="p-6 rounded-lg border border-border bg-card shadow-sm"
+                    >
+                        <Calendar />
+                    </motion.div>
                     <motion.div
                         variants={fadeUp}
                         className="p-6 rounded-lg border border-border bg-card shadow-sm"

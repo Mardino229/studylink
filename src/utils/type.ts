@@ -27,6 +27,7 @@ export type User = {
     email?: string;
     receiver?: string;
     is_active?: boolean;
+    is_admin?: boolean;
     other_program?: boolean;
     study_level_id?: number | null;
     faculty_id?: number | null;

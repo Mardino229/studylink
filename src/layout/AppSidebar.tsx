@@ -44,6 +44,11 @@ const navItems: NavItem[] = [
         icon: <TableIcon />,
         path: "/exams"
     },
+    {
+        name: "Statistics",
+        icon: <PieChartIcon />,
+        path: "/statistics"
+    },
   {
     icon: <AI />,
     name: "Study buddy ia",
