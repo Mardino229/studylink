@@ -68,9 +68,10 @@ function App() {
                   {/*<Route path="quickmessage/*" element={<UserRoutes/>} />*/}
                   {/*</Route>*/}
               {/*</Route>*/}
-              {/*<Route element={<RequireAuth/>}>*/}
+              <Route element={<RequireAuth/>}>
+                  <Route path="/complete-profile" element={<CompleteProfile/>} />
+
                   <Route element={<AppLayout />}>
-                      <Route path="/complete-profile" element={<CompleteProfile/>} />
                       <Route path="/home" element={<Home />} />
                       <Route path="/my-summaries" element={<SummaryList />} />
                       <Route path="/my-summaries/summary" element={<Summary />} />
@@ -87,7 +88,7 @@ function App() {
                       <Route path="/settings/announcements" element={<SettingsAnnouncements />} />
                       <Route path="/settings/feedback" element={<SettingsFeedback />} />
                   </Route>
-              {/*</Route>*/}
+              </Route>
           </Routes>
       </Router>
   )

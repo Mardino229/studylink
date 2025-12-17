@@ -48,7 +48,7 @@ export default function Hero() {
             style={HERO_BG ? { backgroundImage: `url(${HERO_BG})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
         >
             {HERO_BG && <div className="absolute inset-0 bg-black/40" />}
-            <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 min-h-[92vh] flex items-center">
+            <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 min-h-[66vh] flex items-center">
                 <div className="grid grid-cols-1 gap-12 items-center">
                     <div className="text-center lg:text-left max-w-4xl mx-auto lg:mx-0">
                         <motion.h1
