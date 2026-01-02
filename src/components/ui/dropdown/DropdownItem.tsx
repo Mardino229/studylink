@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 interface DropdownItemProps {
   tag?: "a" | "button";
   to?: string;
-  onClick?: () => void;
+  onClick?: (event: React.MouseEvent) => void;
   onItemClick?: () => void;
   baseClassName?: string;
   className?: string;
@@ -26,7 +26,7 @@ export const DropdownItem: React.FC<DropdownItemProps> = ({
     if (tag === "button") {
       event.preventDefault();
     }
-    if (onClick) onClick();
+    if (onClick) onClick(event);
     if (onItemClick) onItemClick();
   };
 

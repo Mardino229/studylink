@@ -18,7 +18,7 @@ export default function Faq() {
                             <div className="relative size-6 ml-4">
                                 <svg
                                     className="h-6 w-6 text-foreground/60 transition-transform duration-300 group-open:rotate-180"
-                                    fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    fill="none" stroke="currentColor" stroke-linecap="round" strokeLinejoin="round"
                                     stroke-width="2" viewBox="0 0 24 24">
                                     <path d="m6 9 6 6 6-6"></path>
                                 </svg>
@@ -34,7 +34,7 @@ export default function Faq() {
                             <div className="relative size-6 ml-4">
                                 <svg
                                     className="h-6 w-6 text-foreground/60 transition-transform duration-300 group-open:rotate-180"
-                                    fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    fill="none" stroke="currentColor" stroke-linecap="round" strokeLinejoin="round"
                                     stroke-width="2" viewBox="0 0 24 24">
                                     <path d="m6 9 6 6 6-6"></path>
                                 </svg>
@@ -50,7 +50,7 @@ export default function Faq() {
                             <div className="relative size-6 ml-4">
                                 <svg
                                     className="h-6 w-6 text-foreground/60 transition-transform duration-300 group-open:rotate-180"
-                                    fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    fill="none" stroke="currentColor" stroke-linecap="round" strokeLinejoin="round"
                                     stroke-width="2" viewBox="0 0 24 24">
                                     <path d="m6 9 6 6 6-6"></path>
                                 </svg>
@@ -67,7 +67,7 @@ export default function Faq() {
                             <div className="relative size-6 ml-4">
                                 <svg
                                     className="h-6 w-6 text-foreground/60 transition-transform duration-300 group-open:rotate-180"
-                                    fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    fill="none" stroke="currentColor" stroke-linecap="round" strokeLinejoin="round"
                                     stroke-width="2" viewBox="0 0 24 24">
                                     <path d="m6 9 6 6 6-6"></path>
                                 </svg>
@@ -84,7 +84,7 @@ export default function Faq() {
                             <div className="relative size-6 ml-4">
                                 <svg
                                     className="h-6 w-6 text-foreground/60 transition-transform duration-300 group-open:rotate-180"
-                                    fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    fill="none" stroke="currentColor" stroke-linecap="round" strokeLinejoin="round"
                                     stroke-width="2" viewBox="0 0 24 24">
                                     <path d="m6 9 6 6 6-6"></path>
                                 </svg>

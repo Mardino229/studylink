@@ -25,11 +25,10 @@ export default function SummaryTabs() {
                         return (
                             <button
                                 key={tab.id}
-                                className={`flex items-center gap-2 pb-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${
-                                    activeTab === tab.id
-                                        ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
-                                }`}
+                                className={`flex items-center gap-2 pb-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${activeTab === tab.id
+                                    ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+                                    }`}
                                 onClick={() => setActiveTab(tab.id)}
                             >
                                 <IconComponent className="w-4 h-4" />
@@ -66,7 +65,7 @@ export default function SummaryTabs() {
                                     </li>
                                 </ul>
                             </div>
-                            
+
                             <div className="space-y-4">
                                 <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                                     Résumé détaillé
@@ -81,10 +80,10 @@ export default function SummaryTabs() {
                         </div>
                     </div>
                 )}
-                
+
                 {activeTab === "flashcards" && (
                     <div className="p-2">
-                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-12 md:mb-24">
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
                             Flashcards de révision
                         </h2>
                         <div className="flex items-center mb-6 justify-center">
@@ -92,21 +91,16 @@ export default function SummaryTabs() {
                         </div>
                     </div>
                 )}
-                
+
                 {activeTab === "quiz" && (
                     <div className="sm:p-6 p-2">
                         <Quiz />
                     </div>
                 )}
-                
+
                 {activeTab === "ai" && (
-                    <div className="sm:p-6 p-3">
-                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                            Posez vos questions à l'IA
-                        </h2>
-                        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg text-center">
-                            <PreviewUseAutoScroll />
-                        </div>
+                    <div className="w-full h-full">
+                        <PreviewUseAutoScroll />
                     </div>
                 )}
             </div>
