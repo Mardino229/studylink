@@ -42,6 +42,11 @@ export default function PasswordResetForm() {
     };
 
     return (
+        <>
+        <div className="cylinder1"></div>
+        <div className="cylinder2"></div>
+        <div className="cylinder3"></div>
+        <div className="cylinder4"></div>
         <FormLayout title="Reset your password" description="Enter a new password for reset your password.">
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -92,5 +97,6 @@ export default function PasswordResetForm() {
                 <Link className="font-medium text-[var(--primary-color)] hover:text-blue-700" to="/login">Log in</Link>
             </p>
         </FormLayout>
+        </>
     );
 }
