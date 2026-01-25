@@ -2,9 +2,33 @@ import { useState, useEffect } from "react";
 import QuestionCard from "./QuestionCard.tsx";
 import QuizNavigation from "./QuizNavigation.tsx";
 import QuizResults from "./QuizResults.tsx";
-import { quizData } from "./quiz-types.ts";
+import type { Quiz as QuizType, QuizQuestion } from "../../../utils/summary.ts";
 
-export default function Quiz() {
+interface QuizProps {
+    quizzes: QuizType[];
+}
+
+export default function Quiz({ quizzes }: QuizProps) {
+    // Extraire toutes les questions de tous les quizzes
+    const quizData: QuizQuestion[] = quizzes.flatMap(quiz => quiz.questions);
+    
+    // Si aucun quiz n'est disponible, afficher un message
+    if (!quizzes || quizzes.length === 0 || quizData.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+                <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 max-w-md">
+                    <div className="text-6xl mb-4">📝</div>
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                        Aucun quiz disponible
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400">
+                        Les quiz n'ont pas encore été générés pour ce résumé. Veuillez réessayer plus tard.
+                    </p>
+                </div>
+            </div>
+        );
+    }
+    
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState<string>("");
     const [textAnswer, setTextAnswer] = useState("");
@@ -39,7 +63,7 @@ export default function Quiz() {
     const handleNext = () => {
         // Sauvegarder la réponse
         const answer = currentQuestionData.type === "mcq" ? selectedAnswer : textAnswer;
-        setAnswers(prev => ({ ...prev, [currentQuestionData.id]: answer }));
+        setAnswers(prev => ({ ...prev, [currentQuestion]: answer }));
 
         if (isLastQuestion) {
             handleFinishQuiz();
@@ -54,7 +78,7 @@ export default function Quiz() {
     const handlePrevious = () => {
         if (currentQuestion > 0) {
             setCurrentQuestion(prev => prev - 1);
-            const prevAnswer = answers[quizData[currentQuestion - 1].id] || "";
+            const prevAnswer = answers[currentQuestion - 1] || "";
             
             if (quizData[currentQuestion - 1].type === "mcq") {
                 setSelectedAnswer(prevAnswer);
@@ -76,19 +100,19 @@ export default function Quiz() {
         // Ajouter la réponse actuelle
         const currentAnswer = currentQuestionData.type === "mcq" ? selectedAnswer : textAnswer;
         if (currentAnswer) {
-            finalAnswers[currentQuestionData.id] = currentAnswer;
+            finalAnswers[currentQuestion] = currentAnswer;
         }
 
-        quizData.forEach(question => {
-            const userAnswer = finalAnswers[question.id];
+        quizData.forEach((question, index) => {
+            const userAnswer = finalAnswers[index];
             if (question.type === "mcq") {
-                const correctOption = question.options?.find(opt => opt.isCorrect);
-                if (correctOption && userAnswer === correctOption.id) {
+                if (userAnswer && userAnswer === question.correct_answer) {
                     finalScore++;
                 }
             } else {
-                if (userAnswer && question.correctAnswer && 
-                    userAnswer.toLowerCase().trim() === question.correctAnswer.toLowerCase().trim()) {
+                // Pour les questions ouvertes, on peut faire une validation simple
+                if (userAnswer && question.answer && 
+                    userAnswer.toLowerCase().includes(question.answer.toLowerCase().substring(0, 50))) {
                     finalScore++;
                 }
             }
@@ -145,7 +169,7 @@ export default function Quiz() {
             {/* Show result summary after quiz is finished, replacing quiz content */}
             {quizFinished && (
                 <div className="mt-8">
-                    <QuizResults score={score} total={quizData.length} answers={answers} onRestart={handleRestart} onOpenRecap={() => setShowRecapDrawer(true)} />
+                    <QuizResults score={score} total={quizData.length} answers={answers} questions={quizData} onRestart={handleRestart} onOpenRecap={() => setShowRecapDrawer(true)} />
                 </div>
             )}
 
@@ -171,6 +195,7 @@ export default function Quiz() {
                                     score={score}
                                     total={quizData.length}
                                     answers={answers}
+                                    questions={quizData}
                                     onRestart={handleRestart}
                                     showOnlySummary
                                     onCloseRecap={() => setShowRecapDrawer(false)}

@@ -31,27 +31,20 @@ const navItems: NavItem[] = [
     path: "/home"
   },
     {
-        name: "Summary",
+        name: "My course",
         icon: <ListIcon />,
-        subItems: [
-            { name: "My courses", path: "/my-courses", pro: false },
-            { name: "My summaries", path: "/my-summaries", pro: false },
-            { name: "Summary Library", path: "/library-summary", pro: false }
-        ],
+        path: "/my-courses"
     },
     {
-        name: "Test and Exams",
+        name: "Exam Library",
         icon: <TableIcon />,
-        subItems: [
-            { name: "My exams", path: "/exams", pro: false },
-            { name: "Exam Library", path: "/exam-library", pro: false },
-        ],
+        path: "/exam-library"
     },
-    {
-        name: "Statistics",
-        icon: <PieChartIcon />,
-        path: "/statistics"
-    },
+    // {
+    //     name: "Statistics",
+    //     icon: <PieChartIcon />,
+    //     path: "/statistics"
+    // },
   {
     icon: <AI />,
     name: "Study buddy ia",

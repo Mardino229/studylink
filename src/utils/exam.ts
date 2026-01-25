@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { axiosPrivate } from "./api.ts";
+import { useAxiosPrivate } from "../hoooks/useAxiosPrivate";
 import { toast } from "sonner";
-import type { AxiosError } from "axios";
+import { type AxiosError } from "axios";
 import type { BankExamMeta } from "../types/exams";
 import { z } from "zod";
 
@@ -18,10 +18,11 @@ export const examSchema = z.object({
 export type ExamFormValues = z.infer<typeof examSchema>;
 
 export const useGetExams = () => {
+    const axiosPrivate = useAxiosPrivate();
     return useQuery({
-        queryKey: ["exams"],
+        queryKey: ["exam-library"],
         queryFn: async () => {
-            const response = await axiosPrivate.get<BankExamMeta[]>("/exams");
+            const response = await axiosPrivate.get<BankExamMeta[]>("/exam-library");
             return response.data;
         },
     });
@@ -29,6 +30,7 @@ export const useGetExams = () => {
 
 export const useCreateExam = () => {
     const queryClient = useQueryClient();
+    const axiosPrivate = useAxiosPrivate();
     return useMutation({
         mutationFn: async ({ title, faculty, program, year, file }: { title: string; faculty?: string; program?: string; year?: string; file: File }) => {
             const formData = new FormData();
@@ -38,7 +40,7 @@ export const useCreateExam = () => {
             if (year) formData.append("year", year);
             formData.append("file", file);
 
-            const response = await axiosPrivate.post("/exams", formData, {
+            const response = await axiosPrivate.post("/exam-library", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -46,7 +48,7 @@ export const useCreateExam = () => {
             return response.data;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["exams"] });
+            queryClient.invalidateQueries({ queryKey: ["exam-library"] });
             toast.success("Examen uploadé avec succès");
         },
         onError: (error) => {

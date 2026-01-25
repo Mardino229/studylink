@@ -2,7 +2,6 @@ import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
 import Button from "../../components/ui/button/Button.tsx";
 import { PlusIcon } from "../../icons";
-import { Modal } from "../../components/ui/modal/index.tsx";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select.tsx";
 import { useState } from "react";
 import { Input } from "../../components/ui/input.tsx";
@@ -16,6 +15,7 @@ import { RotatingLines } from "react-loader-spinner";
 import { Dropdown } from "../../components/ui/dropdown/Dropdown.tsx";
 import { DropdownItem } from "../../components/ui/dropdown/DropdownItem.tsx";
 import { useNavigate } from "react-router-dom";
+import {Modal} from "../../components/ui/modal";
 
 export default function MyCourse() {
     const [open, setOpen] = useState(false);
@@ -65,7 +65,7 @@ export default function MyCourse() {
 
     const startEdit = (course: Course) => {
         setEditingId(course.id);
-        form.reset({ course_name: course.course_name, course_color: course.course_color as any });
+        form.reset({ course_name: course.course_name, course_color: course.course_color as "emerald" | "teal" | "orange" | "blue" | "green" | "rose" | "red" | "amber" | "indigo" | "violet" | "purple" | "pink" | "cyan" | "sky" | "lime" | "zinc" | "slate" | "gray" | "neutral" | "stone" | "yellow" | undefined });
         setOpen(true);
         setActiveDropdownId(null);
     };
@@ -124,7 +124,7 @@ export default function MyCourse() {
                             <input
                                 type="text"
                                 placeholder="Search by name"
-                                className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-200 bg-transparent py-2.5 pl-12 pr-14 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[430px]"
+                                className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-200 bg-transparent py-2.5 pl-12 pr-14 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring focus:ring-brand-500/10  dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[430px]"
                             />
                         </div>
                         <Button

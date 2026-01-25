@@ -1,5 +1,6 @@
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
+import Button from "../../components/ui/button/Button.tsx";
 
 export default function SettingsSubscription() {
   const plans = [
@@ -72,9 +73,9 @@ export default function SettingsSubscription() {
                   </li>
                 ))}
               </ul>
-              <button className="mt-6 w-full rounded-md bg-foreground text-background py-2.5 text-sm font-medium hover:opacity-90">
+              <Button size={"sm"} className="mt-6 w-full rounded-lg text-sm font-medium hover:opacity-90">
                 {p.cta}
-              </button>
+              </Button>
             </div>
           ))}
         </div>

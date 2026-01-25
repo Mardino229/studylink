@@ -1,5 +1,5 @@
-import useAuth from "./useAuth.ts";
-import {axiosClient} from "../utils/api.ts";
+import { axiosPrivate } from "../utils/api.ts";
+import {useQueryClient} from "@tanstack/react-query";
 
 export interface ApiError {
     response?: {
@@ -12,17 +12,17 @@ export interface ApiError {
 
 const useRefreshToken = () => {
 
-    const {setAuth} = useAuth();
+    const queryClient = useQueryClient();
 
     return async () => {
         try {
-            const response = await axiosClient.post(
-                '/refresh-token',
+            const response = await axiosPrivate.post(
+                'auth/refresh',
                 {},
             );
-            setAuth(response.data.user);
+            await queryClient.invalidateQueries({ queryKey: ['user'] });
             console.log(response)
-            return response.data.body.accessToken;
+            return
         } catch (err) {
             const error = err as ApiError;
             console.log(error);
@@ -33,4 +33,4 @@ const useRefreshToken = () => {
     }
 }
 
-export default  useRefreshToken;
+export default useRefreshToken;

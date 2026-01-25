@@ -1,20 +1,22 @@
 import { useState } from "react";
 import { CheckCircle, XCircle, ArrowLeft, RotateCcw, Eye } from "lucide-react";
 
-import { quizData, getQuestionResult } from "./quiz-types.ts";
+import { getQuestionResult } from "./quiz-types.ts";
+import type { QuizQuestion } from "../../../utils/summary.ts";
 import Button from "../../ui/button/Button.tsx";
 
 interface QuizResultsProps {
     score: number;
     total: number;
     answers: Record<number, string>;
+    questions: QuizQuestion[];
     onRestart: () => void;
     onOpenRecap?: () => void; // optional prop to open external recap drawer
     showOnlySummary?: boolean; // when true, render only the recap view
     onCloseRecap?: () => void; // callback to close external recap drawer
 }
 
-export default function QuizResults({ score, total, answers, onRestart, onOpenRecap, showOnlySummary, onCloseRecap }: QuizResultsProps) {
+export default function QuizResults({ score, total, answers, questions, onRestart, onOpenRecap, showOnlySummary, onCloseRecap }: QuizResultsProps) {
     const [showSummary, setShowSummary] = useState(false);
     const percentage = Math.round((score / total) * 100);
 
@@ -37,11 +39,11 @@ export default function QuizResults({ score, total, answers, onRestart, onOpenRe
 
                 {/* Liste des questions */}
                 <div className="space-y-4">
-                    {quizData.map((question, index) => {
-                        const result = getQuestionResult(question, answers[question.id] || "");
+                    {questions.map((question, index) => {
+                        const result = getQuestionResult(question, answers[index] || "");
                         return (
                             <div 
-                                key={question.id} 
+                                key={index} 
                                 className={`p-6 rounded-2xl border-2 transition-all ${
                                     result.isCorrect 
                                         ? 'border-green-200 bg-green-50 dark:bg-green-900/10 dark:border-green-800' 

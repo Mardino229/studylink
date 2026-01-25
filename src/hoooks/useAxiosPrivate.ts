@@ -1,11 +1,11 @@
 
-import {useEffect} from "react";
+import { useEffect } from "react";
 import useRefreshToken from "./useRefreshToken.ts";
-import useAuth from "./useAuth.ts";
-import {axiosPrivate} from "../utils/api.ts";
+import { axiosPrivate } from "../utils/api.ts";
+import {useUser} from "../components/layout/userContext.tsx";
 
 export const useAxiosPrivate = () => {
-    const { auth } = useAuth();
+    const { user } = useUser();
     const refresh = useRefreshToken();
 
     useEffect(() => {
@@ -14,10 +14,9 @@ export const useAxiosPrivate = () => {
             response => response,
             async (error) => {
                 const prevRequest = error?.config;
-                if ((error?.response?.status === 401 || error?.response?.status=== 403)  && !prevRequest?.sent) {
+                if ((error?.response?.status === 401 || error?.response?.status === 403) && !prevRequest?.sent) {
                     prevRequest.sent = true;
-                    const newAccessToken = await refresh();
-                    prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+                    await refresh();
                     return axiosPrivate(prevRequest);
                 }
                 return Promise.reject(error);
@@ -27,7 +26,7 @@ export const useAxiosPrivate = () => {
         return () => {
             axiosPrivate.interceptors.response.eject(responseIntercept);
         }
-    }, [auth, refresh])
+    }, [user, refresh])
 
     return axiosPrivate;
 }

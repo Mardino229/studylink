@@ -20,6 +20,10 @@ import {
     SelectValue
 } from "../ui/select.tsx";
 
+type CompleteProfileFormData = CompleteProfileRequest & {
+    program_name?: string;
+};
+
 export default function CompleteProfileForm() {
     // const [studyLevels, setstudyLevels] = useState([]);
     // const [faculties, setFaculties] = useState([]);
@@ -37,7 +41,7 @@ export default function CompleteProfileForm() {
         program_name: z.string().optional(),
     }).superRefine((val, ctx) => {
         // Validation conditionnelle selon le niveau d'étude et l'option "Autres"
-        const studyLevelId = val.study_level_id;
+        // const studyLevelId = val.study_level_id;
         // La détection graduate se fait plus bas via effet; ici on valide à partir des champs visibles:
         const isGrad = (isGraduate);
         const otherSelected = val.program_id === OTHER_VALUE || useOtherProgram;
@@ -105,7 +109,7 @@ export default function CompleteProfileForm() {
                 return prog.faculty_id === parseInt(faculty)
             }))
         }
-    }, [form.watch("faculty_id")]);
+    }, [form, programs.data]);
 
     // Déterminer si le niveau sélectionné est "Études supérieures"
     useEffect(() => {
@@ -134,7 +138,7 @@ export default function CompleteProfileForm() {
             // Vider le nom libre si on revient sur une sélection
             form.setValue("program_name", form.getValues("program_name"));
         }
-    }, [form.watch("program_id")]);
+    }, [form]);
 
     if (studyLevels.isPending || faculties.isPending) {
         return (
@@ -152,13 +156,12 @@ export default function CompleteProfileForm() {
     }
 
 
-    const onSubmit = (data: CompleteProfileRequest) => {
+    const onSubmit = (data: CompleteProfileFormData) => {
         const payload: CompleteProfileRequest = {
             first_name: data.first_name,
             last_name: data.last_name,
             study_level_id: data.study_level_id,
-            other_program: isGraduate || useOtherProgram || data.program_id === OTHER_VALUE,
-            program_name: (isGraduate || useOtherProgram || data.program_id === OTHER_VALUE) ? data.program_name : undefined,
+            other_program: (isGraduate || useOtherProgram || data.program_id === OTHER_VALUE) && data.program_name ? data.program_name : undefined,
             faculty_id: isGraduate ? undefined : data.faculty_id,
             program_id: (isGraduate || useOtherProgram || data.program_id === OTHER_VALUE) ? undefined : data.program_id,
         };
