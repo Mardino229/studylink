@@ -7,7 +7,17 @@ export interface ValidationError {
 }
 
 export type CompleteProfileRequest = {
-    first_name: string; last_name: string; study_level_id: string; faculty_id?: string; program_id?: string; other_program?: boolean; program_name?: string
+    first_name: string; last_name: string; study_level_id: string; faculty_id?: string; program_id?: string; other_program?: string;
+}
+
+export type UpdateProfileRequest = {
+    first_name: string;
+    last_name: string;
+    email: string;
+    study_level_id?: string;
+    faculty_id?: string;
+    program_id?: string;
+    other_program?: string;
 }
 
 export type LoginFormRequest = {
@@ -28,10 +38,13 @@ export type User = {
     receiver?: string;
     is_active?: boolean;
     is_admin?: boolean;
-    other_program?: boolean;
+    other_program?: string;
     study_level_id?: number | null;
     faculty_id?: number | null;
     program_id?: number | null;
+    program?: {name: string};
+    faculty?: {name: string};
+    study_level?: {name: string};
 }
 
 export type UserContextProps = {
