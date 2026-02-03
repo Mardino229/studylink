@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
 import Button from "../../components/ui/button/Button.tsx";
-import { Modal } from "../../components/ui/modal";
+import { Modal } from "../../components/ui/modal/index.tsx";
 import { Input } from "../../components/ui/input.tsx";
 import { Label } from "../../components/ui/label.tsx";
 import { RotatingLines } from "react-loader-spinner";
@@ -12,13 +12,6 @@ import { PlusIcon } from "../../icons";
 import { FileText } from "lucide-react";
 import { useGetExams, useCreateExam, examSchema, type ExamFormValues } from "../../utils/exam.ts";
 import { ExamCard } from "../../components/ui/exam-card.tsx";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "../../components/ui/select.tsx";
 
 export default function ExamLibrary() {
     const { data: exams = [], isLoading } = useGetExams();
@@ -28,9 +21,9 @@ export default function ExamLibrary() {
 
     // Filter state
     const [searchQuery, setSearchQuery] = useState("");
-    const [selectedFaculty, setSelectedFaculty] = useState("all");
-    const [selectedProgram, setSelectedProgram] = useState("all");
-    const [selectedYear, setSelectedYear] = useState("all");
+    const [selectedFaculty, setSelectedFaculty] = useState("");
+    const [selectedProgram, setSelectedProgram] = useState("");
+    const [selectedYear, setSelectedYear] = useState("");
 
     // Form
     const {
@@ -49,9 +42,9 @@ export default function ExamLibrary() {
 
     const filteredExams = exams.filter(exam => {
         const matchesSearch = exam.title.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesFaculty = selectedFaculty === "all" || !selectedFaculty || exam.faculty === selectedFaculty;
-        const matchesProgram = selectedProgram === "all" || !selectedProgram || exam.program === selectedProgram;
-        const matchesYear = selectedYear === "all" || !selectedYear || exam.year === selectedYear;
+        const matchesFaculty = !selectedFaculty || exam.faculty === selectedFaculty;
+        const matchesProgram = !selectedProgram || exam.program === selectedProgram;
+        const matchesYear = !selectedYear || exam.year === selectedYear;
         return matchesSearch && matchesFaculty && matchesProgram && matchesYear;
     });
 
@@ -129,35 +122,30 @@ export default function ExamLibrary() {
                         />
                     </div>
                     <div className="flex gap-2 overflow-x-auto pb-2 lg:pb-0">
-                        <Select value={selectedFaculty} onValueChange={setSelectedFaculty}>
-                            <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Toutes les facultés" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">Toutes les facultés</SelectItem>
-                                {faculties.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
-
-                        <Select value={selectedProgram} onValueChange={setSelectedProgram}>
-                            <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Tous les programmes" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">Tous les programmes</SelectItem>
-                                {programs.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
-
-                        <Select value={selectedYear} onValueChange={setSelectedYear}>
-                            <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Toutes les années" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">Toutes les années</SelectItem>
-                                {years.map(y => <SelectItem key={y} value={y}>{y}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
+                        <select
+                            value={selectedFaculty}
+                            onChange={(e) => setSelectedFaculty(e.target.value)}
+                            className="h-11 rounded-lg border border-gray-200 bg-transparent px-3 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none focus:ring focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800"
+                        >
+                            <option value="">Toutes les facultés</option>
+                            {faculties.map(f => <option key={f} value={f}>{f}</option>)}
+                        </select>
+                        <select
+                            value={selectedProgram}
+                            onChange={(e) => setSelectedProgram(e.target.value)}
+                            className="h-11 rounded-lg border border-gray-200 bg-transparent px-3 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none focus:ring focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800"
+                        >
+                            <option value="">Tous les programmes</option>
+                            {programs.map(p => <option key={p} value={p}>{p}</option>)}
+                        </select>
+                        <select
+                            value={selectedYear}
+                            onChange={(e) => setSelectedYear(e.target.value)}
+                            className="h-11 rounded-lg border border-gray-200 bg-transparent px-3 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none focus:ring focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800"
+                        >
+                            <option value="">Toutes les années</option>
+                            {years.map(y => <option key={y} value={y}>{y}</option>)}
+                        </select>
                     </div>
                 </div>
 

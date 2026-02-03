@@ -40,8 +40,6 @@ import Feedbacks from "./pages/admin/Feedbacks.tsx";
 import Reports from "./pages/admin/Reports.tsx";
 import AdminSettings from "./pages/admin/Settings.tsx";
 import ExamLibrary from "./pages/appPage/ExamLibrary.tsx";
-import UserProfiles from "./pages/appPage/UserProfiles.tsx";
-import PaymentListPage from './pages/appPage/PaymentListPage.tsx';
 
 function App() {
 
@@ -66,33 +64,35 @@ function App() {
                     <Route path="/admin/reports" element={<Reports />} />
                     <Route path="/admin/settings" element={<AdminSettings />} />
                 </Route>
+                {/*<Route element={<PersistLogin/>}>*/}
                 {/*<Route element={<RequireAuth/>}>*/}
                 {/*<Route path="quickmessage/*" element={<UserRoutes/>} />*/}
                 {/*</Route>*/}
-                    <Route element={<RequireAuth/>}>
-                        <Route path="/complete-profile" element={<CompleteProfile />} />
-                        <Route element={<AppLayout />}>
-                            <Route path="/home" element={<Home />} />
-                            <Route path="/my-summaries" element={<SummaryList />} />
-                            <Route path="/my-summaries/summary" element={<Summary />} />
-                            <Route path="/my-courses" element={<MyCourse />} />
-                            <Route path="/my-courses/:courseId/:courseName/summaries" element={<SummaryList />} />
-                            <Route path="/my-courses/:courseId/:courseName/summaries/:summaryId" element={<Summary />} />
-                            <Route path="/library-summary" element={<Home />} />
-                            <Route path="/exams" element={<Exams />} />
-                            <Route path="/exam-library" element={<ExamLibrary />} />
-                            <Route path="/statistics" element={<Statistics />} />
-                            <Route path="/chat" element={<Chat />} />
-                            <Route path="/profile" element={<UserProfiles />} />
-                            <Route path="/settings" element={<Settings />} />
-                            <Route path="/settings/profile" element={<SettingsProfile />} />
-                            <Route path="/settings/subscription" element={<SettingsSubscription />} />
-                            <Route path="/settings/payments" element={<PaymentListPage />} />
-                            <Route path="/settings/announcements" element={<SettingsAnnouncements />} />
-                            <Route path="/settings/feedback" element={<SettingsFeedback />} />
-                        </Route>
-                    </Route>
+                {/*</Route>*/}
+                {/*<Route element={<RequireAuth/>}>*/}
+                <Route path="/complete-profile" element={<CompleteProfile />} />
 
+                <Route element={<AppLayout />}>
+                    <Route path="/home" element={<Home />} />
+                    <Route path="/my-summaries" element={<SummaryList />} />
+                    <Route path="/my-summaries/summary" element={<Summary />} />
+                    <Route path="/my-courses" element={<MyCourse />} />
+                    <Route path="/my-courses/:courseId/:courseName/summaries" element={<SummaryList />} />
+                    <Route path="/my-courses/:courseId/:courseName/summaries/:summaryId" element={<Summary />} />
+                    <Route path="/library-summary" element={<Home />} />
+                    <Route path="/exams" element={<Exams />} />
+                    <Route path="/exam-library" element={<ExamLibrary />} />
+                    <Route path="/statistics" element={<Statistics />} />
+                    <Route path="/chat" element={<Chat />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/settings" element={<Settings />} />
+                    <Route path="/settings/profile" element={<SettingsProfile />} />
+                    <Route path="/settings/subscription" element={<SettingsSubscription />} />
+                    <Route path="/settings/payments" element={<SettingsPayments />} />
+                    <Route path="/settings/announcements" element={<SettingsAnnouncements />} />
+                    <Route path="/settings/feedback" element={<SettingsFeedback />} />
+                </Route>
+                {/*</Route>*/}
             </Routes>
         </Router>
     )

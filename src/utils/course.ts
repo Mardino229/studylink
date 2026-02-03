@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {axiosPrivate} from "./api.ts";
 import { toast } from "sonner";
 import { z } from "zod";
 import type { AxiosError } from "axios";
-import {useAxiosPrivate} from "../hoooks/useAxiosPrivate.ts";
 
 export const courseSchema = z.object({
     course_name: z.string().min(1, "Title is required"),
@@ -16,13 +16,12 @@ export type CourseFormRequest = z.infer<typeof courseSchema>;
 export type Course = {
     id: string;
     course_name: string;
-    course_color: "emerald" | "teal" | "orange" | "blue" | "green" | "rose" | "red" | "amber" | "indigo" | "violet" | "purple" | "pink" | "cyan" | "sky" | "lime" | "zinc" | "slate" | "gray" | "neutral" | "stone" | "yellow" | "fuchsia" | undefined;
+    course_color: string;
     created_at?: string;
     updated_at?: string;
 };
 
 export const useGetCourses = () => {
-    const axiosPrivate = useAxiosPrivate();
     return useQuery({
         queryKey: ["courses"],
         queryFn: async () => {
@@ -34,7 +33,6 @@ export const useGetCourses = () => {
 
 export const useCreateCourse = () => {
     const queryClient = useQueryClient();
-    const axiosPrivate = useAxiosPrivate();
     return useMutation({
         mutationFn: async (data: CourseFormRequest) => {
             const response = await axiosPrivate.post("/courses", data);
@@ -55,7 +53,6 @@ export const useCreateCourse = () => {
 
 export const useUpdateCourse = () => {
     const queryClient = useQueryClient();
-    const axiosPrivate = useAxiosPrivate();
     return useMutation({
         mutationFn: async ({ id, data }: { id: string; data: CourseFormRequest }) => {
             const response = await axiosPrivate.patch(`/courses/${id}`, data);
@@ -76,7 +73,6 @@ export const useUpdateCourse = () => {
 
 export const useDeleteCourse = () => {
     const queryClient = useQueryClient();
-    const axiosPrivate = useAxiosPrivate();
     return useMutation({
         mutationFn: async (id: string) => {
             await axiosPrivate.delete(`/courses/${id}`);

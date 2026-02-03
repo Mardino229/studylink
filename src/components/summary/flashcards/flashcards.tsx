@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence, useMotionValue, useTransform, type PanInfo } from "framer-motion";
 import { ChevronLeft, ChevronRight, RotateCcw, Lightbulb } from "lucide-react";
 import { cn } from "../../../lib/utils";
-import type { Flashcard as FlashcardType } from "../../../utils/summary.ts";
 
 // --- Types ---
 interface FlashcardData {
@@ -12,9 +11,39 @@ interface FlashcardData {
 	category?: string;
 }
 
-interface FlashcardsProps {
-	flashcards: FlashcardType[];
-}
+// --- Mock Data ---
+const cardsData: FlashcardData[] = [
+	{
+		id: 1,
+		question: "Quelle est la capitale de la France ?",
+		answer: "Paris",
+		category: "Géographie",
+	},
+	{
+		id: 2,
+		question: "Combien font 15 × 8 ?",
+		answer: "120",
+		category: "Mathématiques",
+	},
+	{
+		id: 3,
+		question: "Qui a écrit 'Les Misérables' ?",
+		answer: "Victor Hugo",
+		category: "Littérature",
+	},
+	{
+		id: 4,
+		question: "Quelle est la formule chimique de l'eau ?",
+		answer: "H₂O",
+		category: "Chimie",
+	},
+	{
+		id: 5,
+		question: "En quelle année a eu la Révolution française ?",
+		answer: "1789",
+		category: "Histoire",
+	},
+];
 
 // --- Components ---
 
@@ -178,39 +207,11 @@ const Card = ({
 	);
 };
 
-export const StackPreview = ({ flashcards }: FlashcardsProps) => {
-	// Convertir les flashcards de l'API en format FlashcardData
-	const cardsData: FlashcardData[] = flashcards.map(fc => ({
-		id: fc.id,
-		question: fc.question,
-		answer: fc.answer,
-		category: undefined
-	}));
-
+export const StackPreview = () => {
 	const [cards, setCards] = useState<FlashcardData[]>(cardsData);
 	const [direction, setDirection] = useState(0); // 1 for right, -1 for left
 
-	// Mettre à jour les cartes quand les flashcards changent
-	useEffect(() => {
-		const newCardsData = flashcards.map(fc => ({
-			id: fc.id,
-			question: fc.question,
-			answer: fc.answer,
-			category: undefined
-		}));
-		setCards(newCardsData);
-	}, [flashcards]);
-
-	// Si pas de flashcards, afficher un message
-	if (flashcards.length === 0) {
-		return (
-			<div className="flex flex-col items-center justify-center py-16">
-				<p className="text-gray-500 dark:text-gray-400">Aucune flashcard disponible pour ce résumé.</p>
-			</div>
-		);
-	}
-
-	const handleSwipe = useCallback((_dir: "left" | "right") => {
+	const handleSwipe = useCallback((dir: "left" | "right") => {
 		// Always move right (positive direction) for next card
 		setDirection(1);
 		setCards((prev) => {
@@ -270,7 +271,7 @@ export const StackPreview = ({ flashcards }: FlashcardsProps) => {
 							key={card.id}
 							data={card}
 							index={index}
-							total={cards.length}
+							total={cardsData.length}
 							active={index === 0}
 							onSwipe={handleSwipe}
 							direction={direction}
@@ -291,15 +292,15 @@ export const StackPreview = ({ flashcards }: FlashcardsProps) => {
 
 				<div className="flex flex-col items-center gap-1">
 					<span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-						{cards.length > 0 ? cards[0].id : 0} / {cards.length}
+						{cards[0].id} / {cardsData.length}
 					</span>
 					<div className="flex gap-1">
-						{cards.map((_, idx) => (
+						{cardsData.map((_, idx) => (
 							<div
 								key={idx}
 								className={cn(
 									"w-1.5 h-1.5 rounded-full transition-colors duration-300",
-									idx === (cards.length > 0 ? cards[0].id - 1 : 0)
+									idx === cards[0].id - 1
 										? "bg-blue-500"
 										: "bg-slate-200 dark:bg-slate-700"
 								)}
