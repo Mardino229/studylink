@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 const useAutoScroll = (enabled: boolean, deps: any[]) => {
-    const listRef = useRef<HTMLUListElement>(null);
+    const listRef = useRef<HTMLElement>(null);
 
     useEffect(() => {
         if (enabled && listRef.current) {
@@ -16,7 +16,7 @@ const useAutoScroll = (enabled: boolean, deps: any[]) => {
 
 export default useAutoScroll;
 
-export function autoScrollListRef(list: HTMLUListElement) {
+export function autoScrollListRef(list: HTMLElement) {
     let shouldAutoScroll = true;
     let touchStartY = 0;
     let lastScrollTop = 0;

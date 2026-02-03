@@ -42,7 +42,10 @@ const navItems: NavItem[] = [
     {
         name: "Test and Exams",
         icon: <TableIcon />,
-        path: "/exams"
+        subItems: [
+            { name: "My exams", path: "/exams", pro: false },
+            { name: "Exam Library", path: "/exam-library", pro: false },
+        ],
     },
     {
         name: "Statistics",

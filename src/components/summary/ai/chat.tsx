@@ -1,157 +1,249 @@
-
 import { useState, useRef, useEffect, type KeyboardEvent } from "react";
-import {autoScrollListRef} from "./use-auto-scroll.tsx";
-import Button from "../../ui/button/Button.tsx";
-import {SendIcon} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Send, Bot, User, Sparkles, Eraser } from "lucide-react";
+import { autoScrollListRef } from "./use-auto-scroll";
+import { cn } from "../../../lib/utils";
 
 interface Message {
+    id: string;
     sender: "user" | "ai";
     text: string;
+    timestamp: Date;
 }
 
-const PreviewUseAutoScroll = () => {
+const SUGGESTED_QUESTIONS = [
+    "Explique-moi ce concept",
+    "Donne-moi un exemple",
+    "Quels sont les points clés ?",
+    "Crée un quiz",
+];
+
+const Chat = () => {
     const [messages, setMessages] = useState<Message[]>([
-        { sender: "ai", text: "Welcome to the chat!" },
+        {
+            id: "welcome",
+            sender: "ai",
+            text: "Bonjour ! Je suis ton tuteur IA. Comment puis-je t'aider à approfondir ce cours aujourd'hui ?",
+            timestamp: new Date()
+        },
     ]);
     const [input, setInput] = useState("");
-
+    const [isTyping, setIsTyping] = useState(false);
     const typingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-    const sendMessage = () => {
-        const trimmedInput = input.trim();
-        if (trimmedInput === "") {
-            return;
+    // Handle auto-scroll with proper cleanup
+    useEffect(() => {
+        if (scrollContainerRef.current) {
+            const cleanup = autoScrollListRef(scrollContainerRef.current);
+            return cleanup;
         }
+    }, []);
 
-        const userMessage: Message = { sender: "user", text: trimmedInput };
+    const sendMessage = (text: string = input) => {
+        const trimmedInput = text.trim();
+        if (trimmedInput === "") return;
+
+        const userMessage: Message = {
+            id: Date.now().toString(),
+            sender: "user",
+            text: trimmedInput,
+            timestamp: new Date()
+        };
+
         setMessages((prev) => [...prev, userMessage]);
         setInput("");
+        setIsTyping(true);
 
         // Simulate AI response
-        const aiResponse = `Sint nisi eu cillum nulla officia incididunt irure laboris enim cillum cupidatat occaecat. 
-Duis adipisicing veniam exercitation quis anim. Exercitation consectetur tempor et consectetur dolor. 
-Cupidatat culpa eiusmod ex enim occaecat dolor sunt. Et et commodo qui ipsum nostrud ut et incididunt est cupidatat excepteur laborum. 
-Anim ullamco aliqua ad sit sint cupidatat esse esse.`;
+        setTimeout(() => {
+            const aiResponseText = `Voici une réponse simulée pour : "${trimmedInput}". En contexte éducatif, je t'expliquerais les concepts clés avec des exemples pertinents. N'hésite pas à me demander plus de détails !`;
+            simulateTyping(aiResponseText);
+        }, 1000);
+    };
 
-        // Break down the AI response into words
-        const words = aiResponse.split(" ");
+    const simulateTyping = (fullText: string) => {
+        const words = fullText.split(" ");
         let currentWordIndex = 0;
+        const messageId = (Date.now() + 1).toString();
 
-        // Add a placeholder AI message first, so we have something to update
-        const newAiMessageIndex = messages.length + 1; // next index after user's message
-        setMessages((prev) => [...prev, { sender: "ai", text: "" }]);
+        setMessages((prev) => [
+            ...prev,
+            { id: messageId, sender: "ai", text: "", timestamp: new Date() }
+        ]);
 
-        // Type out each word at a fixed interval
         typingIntervalRef.current = setInterval(() => {
             setMessages((prevMessages) => {
-                // Ensure the AI message exists
-                if (!prevMessages[newAiMessageIndex]) {
-                    return prevMessages;
-                }
-
-                // Update the AI message with the next word
                 const updatedMessages = [...prevMessages];
-                const currentAiMessage = updatedMessages[newAiMessageIndex];
+                const msgIndex = updatedMessages.findIndex(m => m.id === messageId);
 
-                currentAiMessage.text +=
-                    (currentAiMessage.text ? " " : "") + words[currentWordIndex];
+                if (msgIndex === -1) return prevMessages;
 
-                currentWordIndex++;
+                const currentMsg = updatedMessages[msgIndex];
+                const nextWord = words[currentWordIndex];
 
-                // If we've reached the end of all words, clear the interval
-                if (currentWordIndex >= words.length) {
-                    if (typingIntervalRef.current) {
-                        clearInterval(typingIntervalRef.current);
-                        typingIntervalRef.current = null;
-                    }
-                }
+                if (!nextWord) return prevMessages;
 
+                currentMsg.text += (currentMsg.text ? " " : "") + nextWord;
                 return updatedMessages;
             });
-        }, 100); // 100ms per word
+
+            currentWordIndex++;
+            if (currentWordIndex >= words.length) {
+                if (typingIntervalRef.current) {
+                    clearInterval(typingIntervalRef.current);
+                    setIsTyping(false);
+                }
+            }
+        }, 30);
     };
 
     const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === "Enter") {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
             sendMessage();
         }
     };
 
+    const clearChat = () => {
+        setMessages([]);
+        setIsTyping(false);
+        if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
+    };
+
     useEffect(() => {
         return () => {
-            // Cleanup if component unmounts
-            if (typingIntervalRef.current) {
-                clearInterval(typingIntervalRef.current);
-            }
+            if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
         };
     }, []);
 
     return (
-        <div className="max-w-6xl  mx-auto bg-white dark:bg-neutral-800 border border-neutral-400/20 rounded-xl">
+        <div className="flex flex-col h-[65vh] w-full bg-white dark:bg-slate-900">
+            {/* Minimal Header */}
+            {/*<div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm z-10">*/}
+            {/*    <div className="flex items-center gap-2">*/}
+            {/*        <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Tuteur IA</span>*/}
+            {/*        <span className="px-1.5 py-0.5 text-[10px] font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded-full">Beta</span>*/}
+            {/*    </div>*/}
+            {/*    <button*/}
+            {/*        onClick={clearChat}*/}
+            {/*        className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"*/}
+            {/*        title="Effacer la conversation"*/}
+            {/*    >*/}
+            {/*        <Eraser className="w-4 h-4" />*/}
+            {/*    </button>*/}
+            {/*</div>*/}
 
-            <h2 className="text-2xl rounded-t-3xl p-4 text-white bg-gray-800 border-b-2 font-semibold  text-left">
-                Your ai tutor
-            </h2>
-            <MessageList messages={messages} />
-            <div className="px-4 pb-4 flex space-x-2">
-                <input
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={handleKeyPress}
-                    placeholder="Type your message..."
-                    className="rounded-lg p-4 bg-neutral-400/20 border border-neutral-400/20 w-full placeholder:text-neutral-400"
-                />
-                <Button
-                    onClick={sendMessage}
-                    className=" px-4"
-                >
-                    <SendIcon />
-                </Button>
+            {/* Messages Area */}
+            <div className="flex-1 overflow-y-auto px-4 sm:p-6 scroll-smooth" ref={scrollContainerRef}>
+                <div className="max-w-3xl mx-auto space-y-6">
+                    {messages.length === 0 && (
+                        <div className="flex flex-col items-center justify-center py-20 opacity-50">
+                            <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
+                                <Bot className="w-6 h-6 text-slate-400" />
+                            </div>
+                            <p className="text-slate-500 font-medium">Comment puis-je vous aider ?</p>
+                        </div>
+                    )}
+
+                    <AnimatePresence initial={false}>
+                        {messages.map((msg) => (
+                            <motion.div
+                                key={msg.id}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className={cn(
+                                    "flex gap-4",
+                                    msg.sender === "user" ? "justify-end" : "justify-start"
+                                )}
+                            >
+                                {/* AI Avatar */}
+                                {msg.sender === "ai" && (
+                                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-500/10 flex items-center justify-center border border-gray-500/20 mt-1">
+                                        <Bot className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                                    </div>
+                                )}
+
+                                {/* Message Content */}
+                                <div className={cn(
+                                    "max-w-[85%] sm:max-w-[75%] text-sm sm:text-base leading-relaxed",
+                                    msg.sender === "user"
+                                        ? "bg-slate-100 dark:bg-slate-800 px-5 py-3 rounded-3xl rounded-tr-sm text-slate-800 dark:text-slate-100"
+                                        : "px-1 py-1 text-slate-700 dark:text-slate-200"
+                                )}>
+                                    {msg.text}
+                                </div>
+
+                                {/* User Avatar (Optional, usually ChatGPT doesn't show user avatar, just bubble) */}
+                                {/* Keeping it minimal as per request */}
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
+
+                    {isTyping && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="flex items-center gap-3"
+                        >
+                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-500/10 flex items-center justify-center border border-gray-500/20">
+                                <Bot className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                            </div>
+                            <div className="flex gap-1">
+                                <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                                <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                                <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                            </div>
+                        </motion.div>
+                    )}
+                </div>
+            </div>
+
+            {/* Input Area */}
+            <div className="p-4 bg-white dark:bg-slate-900">
+                <div className="max-w-3xl mx-auto">
+                    {/* Suggestions */}
+                    {messages.length < 2 && (
+                        <div className="grid grid-cols-2 gap-2 mb-4">
+                            {SUGGESTED_QUESTIONS.map((q, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => sendMessage(q)}
+                                    className="text-left px-4 py-3 text-xs sm:text-sm text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors truncate"
+                                >
+                                    {q}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+
+                    <div className="relative flex items-center">
+                        <input
+                            type="text"
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={handleKeyPress}
+                            placeholder="Envoyer un message..."
+                            className="w-full py-3.5 pl-5 pr-12 bg-transparent border border-slate-300 dark:border-slate-700 rounded-full focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 focus:shadow-sm transition-all placeholder:text-slate-400 text-slate-700 dark:text-slate-200"
+                        />
+                        <button
+                            onClick={() => sendMessage()}
+                            disabled={!input.trim() || isTyping}
+                            className="absolute right-2 p-2 bg-slate-900 dark:bg-slate-100 hover:opacity-90 disabled:opacity-20 disabled:hover:opacity-20 text-white dark:text-slate-900 rounded-full transition-all"
+                        >
+                            <Send className="w-4 h-4" />
+                        </button>
+                    </div>
+                    <div className="text-center mt-2">
+                        <p className="text-[10px] text-slate-400">
+                            L'IA peut faire des erreurs. Envisagez de vérifier les informations importantes.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     );
 };
 
-interface MessageListProps {
-    messages: Message[];
-}
-
-const MessageList = ({ messages }: MessageListProps) => {
-    return (
-        <ul
-            ref={autoScrollListRef}
-            className="px-4 pt-2 h-[calc(44vh)] sm:h-[calc(40vh)] overflow-y-auto mb-4 space-y-2 rounded-md"
-        >
-            {messages.map((msg, index) => (
-                <MessageItem key={`${index}-${msg.sender}-${msg.text}`} message={msg} />
-            ))}
-        </ul>
-    );
-};
-
-interface MessageItemProps {
-    message: Message;
-}
-
-const MessageItem = ({ message }: MessageItemProps) => {
-    return (
-        <li
-            className={`flex w-full ${
-                message.sender === "user" ? "justify-end" : "justify-start"
-            }`}
-        >
-            <p
-                className={`p-3 rounded-lg text-justify max-w-xl break-words ${ 
-                    message.sender === "user"
-                        ? "bg-primary text-white" 
-                        : "bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-neutral-200" 
-                }`}
-            >
-                {message.text}
-            </p>
-        </li>
-    );
-};
-
-export default PreviewUseAutoScroll;
+export default Chat;

@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useSidebar } from "../../context/SidebarContext";
+import { LayoutDashboard, Users, BadgeCheck, Layers, CreditCard, Megaphone, MessageSquare, BarChart3, Settings as SettingsIcon } from "lucide-react";
 
 export default function AdminSidebar() {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
@@ -7,20 +8,20 @@ export default function AdminSidebar() {
   const isActive = (path: string) => location.pathname.startsWith(path);
 
   const items = [
-    { name: "Overview", path: "/admin/home" },
-    { name: "Users", path: "/admin/users" },
-    { name: "Subscriptions", path: "/admin/subscriptions" },
-    { name: "Plans", path: "/admin/plans" },
-    { name: "Payments", path: "/admin/payments" },
-    { name: "Announcements", path: "/admin/announcements" },
-    { name: "Feedbacks", path: "/admin/feedbacks" },
-    { name: "Reports", path: "/admin/reports" },
-    { name: "Settings", path: "/admin/settings" },
+    { name: "Overview", path: "/admin/home", icon: LayoutDashboard },
+    { name: "Users", path: "/admin/users", icon: Users },
+    { name: "Subscriptions", path: "/admin/subscriptions", icon: BadgeCheck },
+    { name: "Plans", path: "/admin/plans", icon: Layers },
+    { name: "Payments", path: "/admin/payments", icon: CreditCard },
+    { name: "Announcements", path: "/admin/announcements", icon: Megaphone },
+    { name: "Feedbacks", path: "/admin/feedbacks", icon: MessageSquare },
+    { name: "Reports", path: "/admin/reports", icon: BarChart3 },
+    { name: "Settings", path: "/admin/settings", icon: SettingsIcon },
   ];
 
   return (
     <aside
-      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
+      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200/60 dark:border-gray-800/60 bg-white/70 dark:bg-gray-900/60 backdrop-blur-sm shadow-sm
         ${isExpanded || isMobileOpen ? "w-[290px]" : isHovered ? "w-[290px]" : "w-[90px]"}
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0`}
@@ -40,10 +41,10 @@ export default function AdminSidebar() {
             <li key={it.name}>
               <Link
                 to={it.path}
-                className={`menu-item group ${isActive(it.path) ? "menu-item-active" : "menu-item-inactive"}`}
+                className={`menu-item group ${isActive(it.path) ? "menu-item-active border-l-2 border-brand-500 pl-4" : "menu-item-inactive"}`}
               >
-                <span className="menu-item-icon-size">
-                  <span className={`inline-block w-2 h-2 rounded-full ${isActive(it.path) ? "bg-blue-500" : "bg-gray-400"}`} />
+                <span className={`menu-item-icon-size ${isActive(it.path) ? "menu-item-icon-active" : "menu-item-icon-inactive"}`}>
+                  <it.icon />
                 </span>
                 {(isExpanded || isHovered || isMobileOpen) && (
                   <span className="menu-item-text">{it.name}</span>
