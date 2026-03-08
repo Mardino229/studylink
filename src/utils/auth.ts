@@ -1,24 +1,25 @@
-import {useMutation} from '@tanstack/react-query';
-import {axiosClient} from "./api.ts";
-import {toast} from "sonner";
-import {useNavigate} from "react-router-dom";
-import {useUser} from "../components/layout/userContext.tsx";
-import type {LoginFormRequest, RegisterFormRequest, ValidationError} from "./type.ts";
-import type {AxiosError} from "axios";
+import { useMutation } from '@tanstack/react-query';
+import { axiosClient } from "./api.ts";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../components/layout/userContext.tsx";
+import type { LoginFormRequest, RegisterFormRequest, ValidationError } from "./type.ts";
+import type { AxiosError } from "axios";
 
 
 const useLogin = () => {
     const navigate = useNavigate();
-    const {setUser} = useUser();
-    const {mutate, isPending} = useMutation({
-        mutationFn: async (data: LoginFormRequest) =>{
+    const { setUser } = useUser();
+    const { mutate, isPending } = useMutation({
+        mutationFn: async (data: LoginFormRequest) => {
             const response = await axiosClient.post('auth/login', data)
-            console.log(response.data.user)
-            setUser(response.data.user)
+            const userData = response.data.data.user;
+            console.log(userData)
+            setUser(userData)
             console.log(response.data)
             return {
                 success: true,
-                user: response.data.user,
+                user: userData,
             };
         },
         onSuccess: (data) => {
@@ -28,8 +29,10 @@ const useLogin = () => {
             });
 
             if (data.user.is_active) {
-                if (data.user.study_level_id === null) {
-                navigate('/complete-profile');
+                if (data.user.role?.name === 'admin') {
+                    navigate('/admin/home');
+                } else if (data.user.study_level_id === null) {
+                    navigate('/complete-profile');
                 } else {
                     navigate(`/home`);
                 }
@@ -151,9 +154,9 @@ const useRegister = () => {
 const useVerify = () => {
     const navigate = useNavigate();
     return useMutation({
-        mutationFn: async (data: { email: string|null; otp: string; }) =>{
+        mutationFn: async (data: { email: string | null; otp: string; }) => {
             const response = await axiosClient.post('/auth/verify-otp', data)
-            toast.success(response.data.detail, {
+            toast.success(response.data.message, {
                 description: "Your account have been verified",
             })
         },
@@ -184,7 +187,7 @@ const useVerify = () => {
                 const err = error as unknown as {
                     response: {
                         data: {
-                            detail:  ValidationError[]
+                            detail: ValidationError[]
                         }
                     };
                 }
@@ -202,7 +205,7 @@ const useVerify = () => {
 
 const useLogout = () => {
     const navigate = useNavigate();
-    const {setUser} = useUser();
+    const { setUser } = useUser();
     return useMutation({
         mutationFn: async () => {
             await axiosClient.post('/auth/logout ');
@@ -226,7 +229,7 @@ const useLogout = () => {
 
 const useRequestPassword = () => {
     return useMutation({
-        mutationFn: async (data: {to_email: string}) => {
+        mutationFn: async (data: { to_email: string }) => {
             const response = await axiosClient.post('/auth/request-password-reset', data);
             toast.success(response.data.message, {
                 description: "We've sent a reset password link to your email",
@@ -260,7 +263,7 @@ const useRequestPassword = () => {
                 const err = error as unknown as {
                     response: {
                         data: {
-                            detail:  ValidationError[]
+                            detail: ValidationError[]
                         }
                     };
                 }
@@ -280,7 +283,7 @@ const useResetPassword = () => {
     const navigate = useNavigate();
 
     return useMutation({
-        mutationFn: async (data: {token: string|null, password: string, confirmPassword: string}) => {
+        mutationFn: async (data: { token: string | null, password: string, confirmPassword: string }) => {
             const response = await axiosClient.post('/auth/reset-password', data);
             toast.success(response.data.message, {
                 description: "You can log you in with your new password",
@@ -314,7 +317,7 @@ const useResetPassword = () => {
                 const err = error as unknown as {
                     response: {
                         data: {
-                            detail:  ValidationError[]
+                            detail: ValidationError[]
                         }
                     };
                 }

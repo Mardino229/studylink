@@ -1,24 +1,25 @@
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import {toast} from "sonner";
-import {useUser} from "../components/layout/userContext.tsx";
-import {useNavigate} from "react-router-dom";
-import type {CompleteProfileRequest, UpdateProfileRequest, ValidationError} from "./type.ts";
-import {useAxiosPrivate} from "../hoooks/useAxiosPrivate.ts";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useUser } from "../components/layout/userContext.tsx";
+import { useNavigate } from "react-router-dom";
+import type { CompleteProfileRequest, UpdateProfileRequest, ValidationError, User } from "./type.ts";
+import { useAxiosPrivate } from "../hoooks/useAxiosPrivate.ts";
 
 
 const useMe = () => {
-    const {setUser} = useUser();
+    const { setUser } = useUser();
     const axiosPrivate = useAxiosPrivate();
 
-    const {data: me, isPending, isError} = useQuery({
-        queryFn: async () =>{
-            const response = await axiosPrivate.get('user/me')
-            console.log(response.data.user)
-            setUser(response.data.user)
+    const { data: me, isPending, isError } = useQuery({
+        queryFn: async () => {
+            const response = await axiosPrivate.get<{ data: { user: User } }>('user/me')
+            const userData = response.data.data.user;
+            console.log(userData)
+            setUser(userData)
             toast('Welcome back !');
             return {
                 success: true,
-                user: response.data.user,
+                user: userData,
             };
         },
         queryKey: ['user'],
@@ -30,65 +31,66 @@ const useMe = () => {
 const useCompleteProfile = () => {
 
     const navigate = useNavigate();
-    const {setUser} = useUser();
+    const { setUser } = useUser();
     const axiosPrivate = useAxiosPrivate();
 
     return useMutation({
-            mutationFn: async (data: CompleteProfileRequest) =>{
-                const response = await axiosPrivate.patch('/user/complete-profile', data)
-                setUser(response.data)
-                toast.success(response.data.message, {
-                    description: "Profile completed successfully",
-                })
-            },
-            onSuccess: () => {
-                navigate(`/home`);
-            },
-            onError: (error) => {
-                console.error(error);
+        mutationFn: async (data: CompleteProfileRequest) => {
+            const response = await axiosPrivate.patch<{ data: { user: User }, message: string }>('/user/complete-profile', data)
+            const userData = response.data.data.user;
+            setUser(userData)
+            toast.success(response.data.message, {
+                description: "Profile completed successfully",
+            })
+        },
+        onSuccess: () => {
+            navigate(`/home`);
+        },
+        onError: (error) => {
+            console.error(error);
+            const err = error as unknown as {
+                response: {
+                    data: {
+                        detail: string
+                    },
+                    status: number,
+                };
+            }
+            console.log(err.response.status === 422)
+            if (err.response.status === 422) {
                 const err = error as unknown as {
                     response: {
                         data: {
-                            detail: string
-                        },
-                        status: number,
+                            detail: ValidationError[]
+                        }
                     };
                 }
-                console.log(err.response.status === 422)
-                if (err.response.status === 422) {
-                    const err = error as unknown as {
-                        response: {
-                            data: {
-                                detail:  ValidationError[]
-                            }
-                        };
-                    }
-                    toast.error("Operation failed", {
-                        description: `${err.response.data.detail[0].loc[1]}: ${err.response.data.detail[0].msg}`,
-                    })
-                } else {
-                    toast.error("Operation failed", {
-                        description: err.response.data.detail,
-                    })
-                }
-            },
-        }
+                toast.error("Operation failed", {
+                    description: `${err.response.data.detail[0].loc[1]}: ${err.response.data.detail[0].msg}`,
+                })
+            } else {
+                toast.error("Operation failed", {
+                    description: err.response.data.detail,
+                })
+            }
+        },
+    }
     );
 }
 
 const useUpdateProfile = () => {
-    const {setUser} = useUser();
+    const { setUser } = useUser();
     const axiosPrivate = useAxiosPrivate();
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: async (data: UpdateProfileRequest) => {
-            const response = await axiosPrivate.put('/user/update', data);
-            return response.data;
+            const response = await axiosPrivate.patch<{ data: { user: User } }>('/user/update-profile', data);
+            return response.data.data.user;
         },
-        onSuccess: (data) => {
-            setUser(data);
-            queryClient.invalidateQueries({queryKey: ['user']});
+        onSuccess: (userData) => {
+            setUser(userData);
+            queryClient.invalidateQueries({ queryKey: ['user'] });
             toast.success("Profile updated successfully", {
                 description: "Your information has been updated",
             });
@@ -125,4 +127,4 @@ const useUpdateProfile = () => {
 }
 
 
-export { useMe, useCompleteProfile, useUpdateProfile } ;
+export { useMe, useCompleteProfile, useUpdateProfile };

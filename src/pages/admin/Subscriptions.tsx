@@ -1,121 +1,102 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
-import { mockSubscriptions, idToUser, idToPlan, type AdminSubscription } from "./adminMock";
-import { toast } from "sonner";
-import { Search, Calendar, CheckCircle2, XCircle } from "lucide-react";
+import ComponentCard from "../../components/common/ComponentCard.tsx";
+import Select from "../../components/form/Select.tsx";
+import SubscriptionsTable from "../../components/table/AdminTables/SubscriptionsTable.tsx";
+import { useGetAdminSubscriptions } from "../../utils/admin";
 
 export default function Subscriptions() {
-  const initials = (fullName: string) => fullName.split(" ").map(n => n[0] || "").join("").slice(0,2).toUpperCase();
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<string>("all");
-  const [rows, setRows] = useState<AdminSubscription[]>(mockSubscriptions);
+  const [byPage, setByPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const filtered = useMemo(() => {
-    return rows.filter((s) => {
-      const qmatch = q.trim().length === 0 || idToUser(s.userId).toLowerCase().includes(q.toLowerCase()) || idToPlan(s.planId).toLowerCase().includes(q.toLowerCase());
-      const st = status === "all" || s.status === status;
-      return qmatch && st;
-    });
-  }, [rows, q, status]);
+  const skip = (currentPage - 1) * byPage;
 
-  const setSubStatus = (id: string, next: AdminSubscription["status"]) => {
-    setRows((rs) => rs.map((r) => (r.id === id ? { ...r, status: next } : r)));
-    toast.success("Statut d'abonnement mis à jour");
+  const { data: paginatedData, isLoading, isError } = useGetAdminSubscriptions(skip, byPage);
+
+  const statusOptions = [
+    { value: "all", label: "Tous les statuts" },
+    { value: "active", label: "Actif" },
+    { value: "past_due", label: "En retard" },
+    { value: "canceled", label: "Annulé" },
+    { value: "incomplete", label: "Incomplet" },
+  ];
+
+  const pageOptions = [
+    { value: 5, label: "5" },
+    { value: 10, label: "10" },
+    { value: 20, label: "20" },
+    { value: 50, label: "50" },
+  ];
+
+
+  const handlePageSizeChange = (val: string) => {
+    setByPage(parseInt(val));
+    setCurrentPage(1);
   };
 
-  return (
-    <div className="space-y-6">
-      <PageMeta title="Admin - Abonnements" description="Gestion des abonnements" />
-      <PageBreadcrumb pageTitle="Abonnements" />
-      <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
-        <div className="flex flex-col gap-4 mb-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-3">
-            <h2 className="text-xl font-semibold gradient-text">Abonnements</h2>
-            <span className="text-sm text-foreground/60">• {filtered.length} résultats</span>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-500 dark:text-gray-400" />
-              <input value={q} onChange={(e)=>setQ(e.target.value)} placeholder="Rechercher (user/plan)..." className="h-10 pl-9 pr-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-white/5 backdrop-blur-sm focus:ring-3 focus:ring-brand-500/10 focus:border-brand-300 outline-none text-sm" />
-            </div>
-            <select value={status} onChange={(e)=>setStatus(e.target.value)} className="h-10 px-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-white/5 backdrop-blur-sm text-sm">
-              <option value="all">Tous</option>
-              <option value="active">Actif</option>
-              <option value="past_due">En retard</option>
-              <option value="canceled">Annulé</option>
-            </select>
-          </div>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
-            <thead>
-            <tr className="text-left border-b border-gray-200/60 dark:border-gray-800/60 bg-gray-50/60 dark:bg-white/[0.02]">
-              <th className="py-2 pr-4">Utilisateur</th>
-              <th className="py-2 pr-4">Plan</th>
-              <th className="py-2 pr-4">Statut</th>
-              <th className="py-2 pr-4">Renouvellement</th>
-              <th className="py-2 pr-4">Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            {filtered.map((s) => (
-              <tr key={s.id} className="border-b border-gray-200/60 dark:border-gray-800/60 hover:bg-gray-50/60 dark:hover:bg-white/5 transition-colors">
-                <td className="py-3 pr-4">
-                  <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 flex items-center justify-center text-xs font-semibold">
-                      {initials(idToUser(s.userId))}
-                    </div>
-                    <span className="text-foreground font-medium">{idToUser(s.userId)}</span>
-                  </div>
-                </td>
-                <td className="py-3 pr-4">
-                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md border text-xs bg-brand-50 text-brand-600 border-brand-200 dark:bg-brand-500/10 dark:text-brand-400 dark:border-brand-400/30">
-                    {idToPlan(s.planId)}
-                  </span>
-                </td>
-                <td className="py-3 pr-4">
-                  <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md border text-xs ${
-                    s.status === "active"
-                      ? "bg-green-50 text-green-600 border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-400/30"
-                      : s.status === "past_due"
-                      ? "bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-400/30"
-                      : "bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-400/30"
-                  }`}>
-                    {s.status}
-                  </span>
-                </td>
-                <td className="py-3 pr-4">
-                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md border text-xs bg-gray-50 text-gray-700 border-gray-200 dark:bg-white/5 dark:text-gray-300 dark:border-gray-700">
-                    <Calendar className="size-3.5" />
-                    {s.renewAt}
-                  </span>
-                </td>
-                <td className="py-3 pr-4">
-                  <div className="flex flex-wrap gap-2">
-                    {s.status !== "active" && (
-                      <button onClick={()=>setSubStatus(s.id, "active")} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-green-200 bg-green-50 hover:bg-green-100 text-green-700 dark:border-green-400/30 dark:bg-green-500/10 dark:text-green-400">
-                        <CheckCircle2 className="size-4" />
-                        Activer
-                      </button>
-                    )}
-                    {s.status !== "canceled" && (
-                      <button onClick={()=>setSubStatus(s.id, "canceled")} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 dark:border-red-400/30 dark:bg-red-500/10 dark:text-red-400">
-                        <XCircle className="size-4" />
-                        Annuler
-                      </button>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {filtered.length === 0 && (
-              <tr><td colSpan={5} className="py-6 text-center text-foreground/60">Aucun résultat</td></tr>
-            )}
-            </tbody>
-          </table>
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center p-12 text-center">
+        <div className="max-w-md">
+          <p className="text-red-500 font-medium">Erreur lors du chargement des abonnements.</p>
+          <p className="text-sm text-gray-500 mt-1">Veuillez vérifier votre connexion ou votre accès administrateur.</p>
         </div>
       </div>
+    );
+  }
+
+  return (
+    <div>
+      <PageMeta title="Admin - Abonnements" description="Gestion des abonnements" />
+      <PageBreadcrumb pageTitle="Abonnements" />
+
+      <ComponentCard title="Liste des abonnements">
+        <div className="flex flex-col gap-4 mb-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-wrap items-center gap-3">
+            <Select
+              options={pageOptions}
+              defaultValue={byPage.toString()}
+              placeholder="Entrée par page"
+              onChange={handlePageSizeChange}
+              className="w-32"
+            />
+            <Select
+              options={statusOptions}
+              defaultValue={status}
+              placeholder="Filtrer par statut"
+              onChange={(val) => setStatus(val)}
+              className="w-48"
+            />
+          </div>
+
+          <div className="relative">
+            <span className="absolute -translate-y-1/2 pointer-events-none left-4 top-1/2">
+              <svg className="fill-gray-500 dark:fill-gray-400" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fillRule="evenodd" clipRule="evenodd" d="M3.04175 9.37363C3.04175 5.87693 5.87711 3.04199 9.37508 3.04199C12.8731 3.04199 15.7084 5.87693 15.7084 9.37363C15.7084 12.8703 12.8731 15.7053 9.37508 15.7053C5.87711 15.7053 3.04175 12.8703 3.04175 9.37363ZM9.37508 1.54199C5.04902 1.54199 1.54175 5.04817 1.54175 9.37363C1.54175 13.6991 5.04902 17.2053 9.37508 17.2053C11.2674 17.2053 13.003 16.5344 14.357 15.4176L17.177 18.238C17.4699 18.5309 17.9448 18.5309 18.2377 18.238C18.5306 17.9451 18.5306 17.4703 18.2377 17.1774L15.418 14.3573C16.5365 13.0033 17.2084 11.2669 17.2084 9.37363C17.2084 5.04817 13.7011 1.54199 9.37508 1.54199Z" />
+              </svg>
+            </span>
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Rechercher un utilisateur ou un plan..."
+              className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-200 bg-transparent py-2.5 pl-12 pr-14 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[430px]"
+            />
+          </div>
+        </div>
+
+        <SubscriptionsTable
+          subscriptions={paginatedData?.items || []}
+          total={paginatedData?.total || 0}
+          isLoading={isLoading}
+          searchTerm={q}
+          itemsPerPage={byPage}
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+        />
+      </ComponentCard>
     </div>
   );
 }

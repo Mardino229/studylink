@@ -1,116 +1,102 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
-import { mockUsers, type AdminUser } from "./adminMock";
 import { toast } from "sonner";
-import { Search, CheckCircle2, XCircle } from "lucide-react";
+import ComponentCard from "../../components/common/ComponentCard.tsx";
+import Select from "../../components/form/Select.tsx";
+import UsersTable from "../../components/table/AdminTables/UsersTable.tsx";
+import { useGetAdminUsers } from "../../utils/admin";
+import { Loader2 } from "lucide-react";
 
 export default function Users() {
-  const initials = (fullName: string) => fullName.split(" ").map(n => n[0] || "").join("").slice(0,2).toUpperCase();
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<string>("all");
-  const [rows, setRows] = useState<AdminUser[]>(mockUsers);
+  const [byPage, setByPage] = useState(10);
+  const [skip] = useState(0);
 
-  const filtered = useMemo(() => {
-    return rows.filter((u) => {
-      const matchQ = q.trim().length === 0 || `${u.name} ${u.email}`.toLowerCase().includes(q.toLowerCase());
-      const matchStatus = status === "all" || u.status === status;
-      return matchQ && matchStatus;
+  const { data, isLoading, isError } = useGetAdminUsers(skip, 500); // Fetching more for client-side filtering/paging in this simple version
+
+  const statusOptions = [
+    { value: "all", label: "Tous les statuts" },
+    { value: "active", label: "Actif" },
+    { value: "inactive", label: "Inactif" },
+  ];
+
+  const pageOptions = [
+    { value: 5, label: "5" },
+    { value: 10, label: "10" },
+    { value: 20, label: "20" },
+    { value: 50, label: "50" },
+  ];
+
+  const setUserStatus = (id: number, next: boolean) => {
+    // In a real app, this would be a mutation: useUpdateUserStatus.mutate({ id, is_active: next })
+    toast.info("La mise à jour du statut n'est pas encore implémentée côté API", {
+      description: `ID: ${id}, Nouveau statut: ${next ? "Actif" : "Inactif"}`
     });
-  }, [rows, q, status]);
-
-  const setUserStatus = (id: string, next: AdminUser["status"]) => {
-    setRows((rs) => rs.map((r) => (r.id === id ? { ...r, status: next } : r)));
-    toast.success("Statut mis à jour");
   };
 
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center p-12">
+        <p className="text-red-500">Erreur lors du chargement des utilisateurs.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
+    <div>
       <PageMeta title="Admin - Utilisateurs" description="Gestion des utilisateurs" />
       <PageBreadcrumb pageTitle="Utilisateurs" />
-      <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
+
+      <ComponentCard title="Liste des utilisateurs">
         <div className="flex flex-col gap-4 mb-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-3">
-            <h2 className="text-xl font-semibold gradient-text">Liste des utilisateurs</h2>
-            <span className="text-sm text-foreground/60">• {filtered.length} résultats</span>
+          <div className="flex flex-wrap items-center gap-3">
+            <Select
+              options={pageOptions}
+              defaultValue={byPage.toString()}
+              placeholder="Entrée par page"
+              onChange={(val) => setByPage(parseInt(val))}
+              className="w-32"
+            />
+            <Select
+              options={statusOptions}
+              defaultValue={status}
+              placeholder="Filtrer par statut"
+              onChange={(val) => setStatus(val)}
+              className="w-48"
+            />
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-500 dark:text-gray-400" />
-              <input value={q} onChange={(e)=>setQ(e.target.value)} placeholder="Rechercher..." className="h-10 pl-9 pr-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-white/5 backdrop-blur-sm focus:ring-3 focus:ring-brand-500/10 focus:border-brand-300 outline-none text-sm" />
-            </div>
-            <select value={status} onChange={(e)=>setStatus(e.target.value)} className="h-10 px-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-white/5 backdrop-blur-sm text-sm">
-              <option value="all">Tous les statuts</option>
-              <option value="active">Actif</option>
-              <option value="pending">En attente</option>
-              <option value="blocked">Bloqué</option>
-            </select>
+
+          <div className="relative">
+            <span className="absolute -translate-y-1/2 pointer-events-none left-4 top-1/2">
+              <svg className="fill-gray-500 dark:fill-gray-400" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fillRule="evenodd" clipRule="evenodd" d="M3.04175 9.37363C3.04175 5.87693 5.87711 3.04199 9.37508 3.04199C12.8731 3.04199 15.7084 5.87693 15.7084 9.37363C15.7084 12.8703 12.8731 15.7053 9.37508 15.7053C5.87711 15.7053 3.04175 12.8703 3.04175 9.37363ZM9.37508 1.54199C5.04902 1.54199 1.54175 5.04817 1.54175 9.37363C1.54175 13.6991 5.04902 17.2053 9.37508 17.2053C11.2674 17.2053 13.003 16.5344 14.357 15.4176L17.177 18.238C17.4699 18.5309 17.9448 18.5309 18.2377 18.238C18.5306 17.9451 18.5306 17.4703 18.2377 17.1774L15.418 14.3573C16.5365 13.0033 17.2084 11.2669 17.2084 9.37363C17.2084 5.04817 13.7011 1.54199 9.37508 1.54199Z" />
+              </svg>
+            </span>
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Rechercher par nom ou email..."
+              className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-200 bg-transparent py-2.5 pl-12 pr-14 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[430px]"
+            />
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
-            <thead>
-              <tr className="text-left border-b border-gray-200/60 dark:border-gray-800/60 bg-gray-50/60 dark:bg-white/[0.02]">
-                <th className="py-2 pr-4">Nom</th>
-                <th className="py-2 pr-4 hidden md:table-cell">Email</th>
-                <th className="py-2 pr-4">Statut</th>
-                <th className="py-2 pr-4">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((u) => (
-                <tr key={u.id} className="border-b border-gray-200/60 dark:border-gray-800/60 hover:bg-gray-50/60 dark:hover:bg-white/5 transition-colors">
-                  <td className="py-3 pr-4">
-                    <div className="flex items-center gap-3">
-                      <div className="h-8 w-8 rounded-full bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 flex items-center justify-center text-xs font-semibold">
-                        {initials(u.name)}
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-foreground font-medium">{u.name}</span>
-                        <span className="text-xs text-foreground/60 md:hidden">{u.email}</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="py-3 pr-4 hidden md:table-cell text-foreground/80">{u.email}</td>
-                  <td className="py-3 pr-4">
-                    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md border text-xs ${
-                      u.status === "active"
-                        ? "bg-green-50 text-green-600 border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-400/30"
-                        : u.status === "pending"
-                        ? "bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-400/30"
-                        : "bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-400/30"
-                    }`}>
-                      {u.status}
-                    </span>
-                  </td>
-                  <td className="py-3 pr-4">
-                    <div className="flex flex-wrap gap-2">
-                      {u.status !== "active" && (
-                        <button onClick={()=>setUserStatus(u.id, "active")} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-green-200 bg-green-50 hover:bg-green-100 text-green-700 dark:border-green-400/30 dark:bg-green-500/10 dark:text-green-400">
-                          <CheckCircle2 className="size-4" />
-                          Activer
-                        </button>
-                      )}
-                      {u.status !== "blocked" && (
-                        <button onClick={()=>setUserStatus(u.id, "blocked")} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 dark:border-red-400/30 dark:bg-red-500/10 dark:text-red-400">
-                          <XCircle className="size-4" />
-                          Bloquer
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {filtered.length === 0 && (
-                <tr>
-                  <td colSpan={4} className="py-6 text-center text-foreground/60">Aucun résultat</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+        {isLoading ? (
+          <div className="flex items-center justify-center p-12">
+            <Loader2 className="animate-spin size-8 text-brand-500" />
+          </div>
+        ) : (
+          <UsersTable
+            users={data?.users || []}
+            searchTerm={q}
+            statusFilter={status}
+            itemsPerPage={byPage}
+            onSetStatus={setUserStatus}
+          />
+        )}
+      </ComponentCard>
     </div>
   );
 }

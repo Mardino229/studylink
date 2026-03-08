@@ -9,64 +9,58 @@ import {
 import Badge from "../../ui/badge/Badge";
 import { useState, useMemo } from "react";
 import Button from "../../ui/button/Button.tsx";
-import { useGetPayments } from "../../../utils/payment.ts";
-import {Loader} from "lucide-react";
+import { useGetTransactions } from "../../../utils/subscription.ts";
+import { Loader } from "lucide-react";
+import type { Transaction } from "../../../utils/type.ts";
 
 interface HistoryPaymentTableOneProps {
   searchTerm?: string;
   itemsPerPage?: number;
 }
 
-export default function HistoryPaymentTableOne({ 
-  searchTerm = "", 
-  itemsPerPage = 10 
+export default function HistoryPaymentTableOne({
+  searchTerm = "",
+  itemsPerPage = 10
 }: HistoryPaymentTableOneProps) {
   const [currentPage, setCurrentPage] = useState(1);
-  
-  // Récupérer les paiements via l'API
-  const { isLoading, isError, data: payments } = useGetPayments();
+  const skip = (currentPage - 1) * itemsPerPage;
 
-  // Filter payments based on search term
-  const filteredPayments = useMemo(() => {
-    if (!payments) return [];
-    if (!searchTerm) return payments;
-    
+  // Récupérer les transactions via l'API (avec pagination backend)
+  const { isLoading, isError, data } = useGetTransactions(itemsPerPage, skip);
+
+  const transactions = data?.items || [];
+  const totalItems = data?.total || 0;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  // Filter transactions based on search term (client-side for now as API doesn't support complex search yet)
+  const filteredTransactions = useMemo(() => {
+    if (!searchTerm) return transactions;
+
     const lowerSearchTerm = searchTerm.toLowerCase();
-    return payments.filter((payment) =>
-      payment.id.toLowerCase().includes(lowerSearchTerm) ||
-      payment.plan.toLowerCase().includes(lowerSearchTerm) ||
-      payment.method.toLowerCase().includes(lowerSearchTerm) ||
-      payment.status.toLowerCase().includes(lowerSearchTerm)
+    return transactions.filter((t: Transaction) =>
+      t.id.toString().includes(lowerSearchTerm) ||
+      (t.plan?.name || "").toLowerCase().includes(lowerSearchTerm) ||
+      t.status.toLowerCase().includes(lowerSearchTerm)
     );
-  }, [payments, searchTerm]);
+  }, [transactions, searchTerm]);
 
-  // Paginate filtered payments
-  const paginatedPayments = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return filteredPayments.slice(startIndex, endIndex);
-  }, [filteredPayments, currentPage, itemsPerPage]);
-
-  const totalPages = Math.ceil(filteredPayments.length / itemsPerPage);
-  
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
       <div className="max-w-full overflow-x-auto">
-        <div className={payments && payments.length !== 0 ? "" : "h-[calc(100vh-28rem)] flex items-center justify-center"}>
+        <div className={transactions && transactions.length !== 0 ? "" : "h-64 flex items-center justify-center"}>
           {isLoading ? (
-            <Loader className="h-64" />
+            <Loader className="animate-spin h-8 w-8 text-blue-500" />
           ) : isError ? (
             <p className="text-center py-8 text-gray-500 dark:text-gray-400">
-              Erreur lors du chargement des paiements
+              Erreur lors du chargement des transactions
             </p>
-          ) : !payments || payments.length === 0 ? (
+          ) : transactions.length === 0 ? (
             <p className="text-center py-8 font-medium text-gray-800 dark:text-white/90">
-              Aucun paiement enregistré
+              Aucune transaction enregistrée
             </p>
           ) : (
             <>
               <Table>
-                {/* Table Header */}
                 <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
                   <TableRow>
                     <TableCell
@@ -99,42 +93,32 @@ export default function HistoryPaymentTableOne({
                     >
                       Statut
                     </TableCell>
-                    <TableCell
-                      isHeader
-                      className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                    >
-                      Méthode
-                    </TableCell>
                   </TableRow>
                 </TableHeader>
 
-                {/* Table Body */}
                 <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                   {
-                    paginatedPayments.map((payment) => (
-                      <TableRow key={payment.id}>
+                    filteredTransactions.map((t) => (
+                      <TableRow key={t.id}>
                         <TableCell className="px-5 py-4 sm:px-6 text-start text-gray-500 text-theme-sm dark:text-gray-400">
-                          {payment.date}
+                          {t.payment_date ? new Date(t.payment_date).toLocaleDateString() : "En attente"}
                         </TableCell>
                         <TableCell className="px-4 py-3 font-mono text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                          {payment.id}
+                          #{t.id}
                         </TableCell>
                         <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                          {payment.plan}
+                          {t.plan?.name || "N/A"} ({t.billing_type === "monthly" ? "Mensuel" : "Annuel"})
                         </TableCell>
                         <TableCell className="px-4 py-3 font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                          {payment.amount}
+                          {t.amount} {t.currency.toUpperCase()}
                         </TableCell>
                         <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                           <Badge
                             size="sm"
-                            color={payment.status === "Payé" ? "success" : "warning"}
+                            color={t.status === "completed" ? "success" : t.status === "pending" ? "warning" : "error"}
                           >
-                            {payment.status}
+                            {t.status === "completed" ? "Payé" : t.status === "pending" ? "En attente" : "Échec"}
                           </Badge>
-                        </TableCell>
-                        <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                          {payment.method}
                         </TableCell>
                       </TableRow>
                     ))
@@ -151,12 +135,14 @@ export default function HistoryPaymentTableOne({
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
+                      size="sm"
                       onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                       disabled={currentPage === 1}
                     >
                       Précédent
                     </Button>
                     <Button
+                      size="sm"
                       onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                       disabled={currentPage === totalPages}
                     >

@@ -1,15 +1,15 @@
 
-import {Navigate, Outlet, useLocation} from "react-router-dom";
-import {useUser} from "../components/layout/userContext.tsx";
-import {axiosPrivate} from "../utils/api.ts";
-import {useEffect, useState} from "react";
-import {Loader} from "lucide-react";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useUser } from "../components/layout/userContext.tsx";
+import { axiosPrivate } from "../utils/api.ts";
+import { useEffect, useState } from "react";
+import { Loader } from "lucide-react";
 
 
 
 const RequireAuth = () => {
 
-    const {user, setUser} = useUser();
+    const { user, setUser } = useUser();
     const [isLoading, setIsLoading] = useState(true);
 
     const location = useLocation();
@@ -20,9 +20,10 @@ const RequireAuth = () => {
         const verifyRefreshToken = async () => {
             try {
                 const response = await axiosPrivate.get('user/me')
-                console.log(response.data)
+                const userData = response.data.data.user;
+                console.log(userData)
                 if (isMounted) {
-                    setUser(response.data)
+                    setUser(userData)
                     setIsLoading(false);
                 }
             } catch (error) {
@@ -32,7 +33,7 @@ const RequireAuth = () => {
                 }
             }
         }
-        
+
         if (!user?.email) {
             verifyRefreshToken();
         } else {

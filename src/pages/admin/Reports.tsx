@@ -1,15 +1,22 @@
-import { useMemo, useState } from "react";
+import { useState, useMemo } from "react";
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
 import Chart from "react-apexcharts";
 import type { ApexOptions } from "apexcharts";
 import { mockPayments, mockSubscriptions } from "./adminMock";
-import { TrendingUp, BarChart3 } from "lucide-react";
+import ComponentCard from "../../components/common/ComponentCard.tsx";
+import Select from "../../components/form/Select.tsx";
 
 export default function Reports() {
   const [period, setPeriod] = useState<string>("12m");
 
-  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const periodOptions = [
+    { value: "3m", label: "3 mois" },
+    { value: "6m", label: "6 mois" },
+    { value: "12m", label: "12 mois" },
+  ];
+
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const revenueSeries = useMemo(() => {
     const data = new Array(12).fill(0);
     mockPayments.forEach(p => {
@@ -31,7 +38,7 @@ export default function Reports() {
   const subsSeries = useMemo(() => {
     const data = new Array(12).fill(0);
     mockSubscriptions.forEach(() => {
-      const idx = Math.floor(Math.random()*12);
+      const idx = Math.floor(Math.random() * 12);
       data[idx] += 1;
     });
     return [{ name: "Abonnements", data }];
@@ -50,28 +57,22 @@ export default function Reports() {
       <PageMeta title="Admin - Rapports" description="Statistiques et rapports" />
       <PageBreadcrumb pageTitle="Rapports" />
 
-      <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="size-5 text-emerald-500" />
-            <h2 className="text-xl font-semibold gradient-text">Revenus</h2>
-          </div>
-          <select value={period} onChange={(e)=>setPeriod(e.target.value)} className="h-10 px-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-white/5 backdrop-blur-sm text-sm">
-            <option value="3m">3 mois</option>
-            <option value="6m">6 mois</option>
-            <option value="12m">12 mois</option>
-          </select>
+      <ComponentCard title="Revenus">
+        <div className="flex justify-end mb-4">
+          <Select
+            options={periodOptions}
+            defaultValue={period}
+            placeholder="Période"
+            onChange={(val) => setPeriod(val)}
+            className="w-32"
+          />
         </div>
         <Chart options={revenueOptions} series={revenueSeries} type="area" height={280} />
-      </div>
+      </ComponentCard>
 
-      <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
-        <div className="flex items-center gap-2 mb-4">
-          <BarChart3 className="size-5 text-blue-500" />
-          <h2 className="text-xl font-semibold gradient-text">Nouveaux abonnements</h2>
-        </div>
+      <ComponentCard title="Nouveaux abonnements">
         <Chart options={subsOptions} series={subsSeries} type="bar" height={280} />
-      </div>
+      </ComponentCard>
     </div>
   );
 }

@@ -1,26 +1,33 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
-import { mockFeedbacks, idToUser, type AdminFeedback } from "./adminMock";
+import { mockFeedbacks, type AdminFeedback } from "./adminMock";
 import { toast } from "sonner";
-import { Search, CheckCircle2, RotateCcw, MessageSquare } from "lucide-react";
+import ComponentCard from "../../components/common/ComponentCard.tsx";
+import Select from "../../components/form/Select.tsx";
+import FeedbacksTable from "../../components/table/AdminTables/FeedbacksTable.tsx";
 
 export default function Feedbacks() {
-  const initials = (fullName: string) => fullName.split(" ").map(n => n[0] || "").join("").slice(0,2).toUpperCase();
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<string>("all");
   const [rows, setRows] = useState<AdminFeedback[]>(mockFeedbacks);
+  const [byPage, setByPage] = useState(10);
 
-  const filtered = useMemo(() => {
-    return rows.filter((f) => {
-      const qmatch = q.trim().length === 0 || idToUser(f.userId).toLowerCase().includes(q.toLowerCase()) || f.subject.toLowerCase().includes(q.toLowerCase());
-      const st = status === "all" || f.status === status;
-      return qmatch && st;
-    });
-  }, [rows, q, status]);
+  const statusOptions = [
+    { value: "all", label: "Tous" },
+    { value: "open", label: "Ouverts" },
+    { value: "resolved", label: "Résolus" },
+  ];
+
+  const pageOptions = [
+    { value: 5, label: "5" },
+    { value: 10, label: "10" },
+    { value: 20, label: "20" },
+    { value: 50, label: "50" },
+  ];
 
   const setFbStatus = (id: string, next: AdminFeedback["status"]) => {
-    setRows((rs) => rs.map((r) => (r.id === id ? { ...r, status: next } : r)));
+    setRows((rs: AdminFeedback[]) => rs.map((r: AdminFeedback) => (r.id === id ? { ...r, status: next } : r)));
     toast.success("Statut du feedback mis à jour");
   };
 
@@ -28,67 +35,49 @@ export default function Feedbacks() {
     <div className="space-y-6">
       <PageMeta title="Admin - Feedbacks" description="Gestion des retours utilisateurs" />
       <PageBreadcrumb pageTitle="Feedbacks" />
-      <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
-        <div className="flex flex-col gap-4 mb-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-3">
-            <MessageSquare className="size-5 text-blue-500" />
-            <h2 className="text-xl font-semibold gradient-text">Feedbacks</h2>
-            <span className="text-sm text-foreground/60">• {filtered.length} résultats</span>
+
+      <ComponentCard title="Liste des feedbacks">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <Select
+              options={pageOptions}
+              defaultValue={byPage.toString()}
+              placeholder="Entrée par page"
+              onChange={(val) => setByPage(parseInt(val))}
+              className="w-32"
+            />
+            <Select
+              options={statusOptions}
+              defaultValue={status}
+              placeholder="Filtrer par statut"
+              onChange={(val) => setStatus(val)}
+              className="w-48"
+            />
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-500 dark:text-gray-400" />
-              <input value={q} onChange={(e)=>setQ(e.target.value)} placeholder="Rechercher (utilisateur/sujet)..." className="h-10 pl-9 pr-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-white/5 backdrop-blur-sm focus:ring-3 focus:ring-brand-500/10 focus:border-brand-300 outline-none text-sm" />
-            </div>
-            <select value={status} onChange={(e)=>setStatus(e.target.value)} className="h-10 px-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-white/5 backdrop-blur-sm text-sm">
-              <option value="all">Tous</option>
-              <option value="open">Ouverts</option>
-              <option value="resolved">Résolus</option>
-            </select>
+
+          <div className="relative">
+            <span className="absolute -translate-y-1/2 pointer-events-none left-4 top-1/2">
+              <svg className="fill-gray-500 dark:fill-gray-400" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fillRule="evenodd" clipRule="evenodd" d="M3.04175 9.37363C3.04175 5.87693 5.87711 3.04199 9.37508 3.04199C12.8731 3.04199 15.7084 5.87693 15.7084 9.37363C15.7084 12.8703 12.8731 15.7053 9.37508 15.7053C5.87711 15.7053 3.04175 12.8703 3.04175 9.37363ZM9.37508 1.54199C5.04902 1.54199 1.54175 5.04817 1.54175 9.37363C1.54175 13.6991 5.04902 17.2053 9.37508 17.2053C11.2674 17.2053 13.003 16.5344 14.357 15.4176L17.177 18.238C17.4699 18.5309 17.9448 18.5309 18.2377 18.238C18.5306 17.9451 18.5306 17.4703 18.2377 17.1774L15.418 14.3573C16.5365 13.0033 17.2084 11.2669 17.2084 9.37363C17.2084 5.04817 13.7011 1.54199 9.37508 1.54199Z" />
+              </svg>
+            </span>
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Rechercher par utilisateur ou sujet..."
+              className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-200 bg-transparent py-2.5 pl-12 pr-14 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[430px]"
+            />
           </div>
         </div>
-        <div className="space-y-3">
-          {filtered.map(f => (
-            <div key={f.id} className="p-4 rounded-lg border border-gray-200/60 dark:border-gray-800/60 bg-white/70 dark:bg-white/5 backdrop-blur-sm hover:bg-gray-50/60 dark:hover:bg-white/10 transition-colors">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-full bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 flex items-center justify-center text-xs font-semibold">
-                    {initials(idToUser(f.userId))}
-                  </div>
-                  <div>
-                    <div className="text-sm text-foreground/60">{idToUser(f.userId)} • {f.createdAt}</div>
-                    <h3 className="font-semibold text-foreground">{f.subject}</h3>
-                  </div>
-                </div>
-                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md border text-xs ${
-                  f.status === "resolved"
-                    ? "bg-green-50 text-green-600 border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-400/30"
-                    : "bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-400/30"
-                }`}>
-                  {f.status}
-                </span>
-              </div>
-              <p className="mt-2 text-sm text-foreground/80 whitespace-pre-wrap">{f.message}</p>
-              <div className="mt-3 flex gap-2">
-                {f.status !== "resolved" ? (
-                  <button onClick={()=>setFbStatus(f.id, "resolved")} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-green-200 bg-green-50 hover:bg-green-100 text-green-700 dark:border-green-400/30 dark:bg-green-500/10 dark:text-green-400">
-                    <CheckCircle2 className="size-4" />
-                    Marquer résolu
-                  </button>
-                ) : (
-                  <button onClick={()=>setFbStatus(f.id, "open")} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-700 dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-400">
-                    <RotateCcw className="size-4" />
-                    Rouvrir
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-          {filtered.length === 0 && (
-            <div className="text-sm text-foreground/60 text-center py-6">Aucun feedback</div>
-          )}
-        </div>
-      </div>
+
+        <FeedbacksTable
+          feedbacks={rows}
+          searchTerm={q}
+          statusFilter={status}
+          itemsPerPage={byPage}
+          onSetStatus={setFbStatus}
+        />
+      </ComponentCard>
     </div>
   );
 }

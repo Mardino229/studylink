@@ -19,9 +19,7 @@ const LayoutContent: React.FC = () => {
       >
         <AppHeader />
         <div className="px-4 py-6 mx-auto max-w-(--breakpoint-2xl) md:px-6 md:py-8">
-          <div className="rounded-2xl border border-gray-200/60 dark:border-gray-800/60 bg-white/70 dark:bg-gray-900/60 backdrop-blur-sm shadow-sm p-4 md:p-6">
-            <Outlet />
-          </div>
+          <Outlet />
         </div>
       </div>
     </div>

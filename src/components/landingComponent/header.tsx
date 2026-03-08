@@ -2,7 +2,6 @@ import {Link, useLocation} from "react-router-dom";
 import { motion } from "framer-motion";
 import { useEffect, useState, useCallback } from "react";
 import ThemeToggle from "../common/ThemeToggle";
-import * as events from "node:events";
 
 
 export default function Header() {

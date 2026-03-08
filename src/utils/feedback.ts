@@ -14,13 +14,13 @@ export const useCreateFeedback = () => {
 
   return useMutation({
     mutationFn: async (data: FeedbackRequest) => {
-      const response = await axiosPrivate.post("/feedbacks", data);
-      return response.data;
+      const response = await axiosPrivate.post<{ data: any }>("/feedbacks", data);
+      return response.data.data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["feedbacks"] });
       toast.success("Merci pour votre retour !", {
-        description: data.message || "Votre avis a été envoyé avec succès",
+        description: "Votre avis a été envoyé avec succès",
       });
     },
     onError: (error) => {

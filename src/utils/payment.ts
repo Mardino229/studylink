@@ -16,13 +16,13 @@ export interface Payment {
 
 export const useGetPayments = () => {
   const axiosPrivate = useAxiosPrivate();
-  
+
   return useQuery({
     queryKey: ["payments"],
     queryFn: async () => {
       try {
-        const response = await axiosPrivate.get<{ body: Payment[] }>("/payments");
-        return response.data.body || [];
+        const response = await axiosPrivate.get<{ data: Payment[] }>("/payments");
+        return response.data.data || [];
       } catch (error) {
         const axiosError = error as AxiosError<{ detail?: string; message?: string }>;
         toast.error("Erreur lors du chargement des paiements", {
