@@ -23,6 +23,19 @@ export const useGetMySubscriptions = () => {
     });
 };
 
+export const useGetMyActiveSubscription = () => {
+    const axiosPrivate = useAxiosPrivate();
+    return useQuery({
+        queryKey: ["my-active-subscription"],
+        queryFn: async () => {
+            const response = await axiosPrivate.get<{ success: boolean; data: Subscription }>(
+                "/subscriptions/active"
+            );
+            return response.data.data;
+        },
+    });
+};
+
 export const useCreateCheckout = () => {
     const axiosPrivate = useAxiosPrivate();
     return useMutation({

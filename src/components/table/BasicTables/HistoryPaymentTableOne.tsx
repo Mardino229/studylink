@@ -56,7 +56,7 @@ export default function HistoryPaymentTableOne({
             </p>
           ) : transactions.length === 0 ? (
             <p className="text-center py-8 font-medium text-gray-800 dark:text-white/90">
-              Aucune transaction enregistrée
+              Aucune transaction effectuée
             </p>
           ) : (
             <>

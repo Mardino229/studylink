@@ -3,9 +3,8 @@ import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
 import Button from "../../components/ui/button/Button.tsx";
 import { useGetPlans } from "../../utils/plan";
 import {
-  useGetMySubscriptions,
   useCreateCheckout,
-  useCancelSubscription
+ useGetMyActiveSubscription
 } from "../../utils/subscription";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { useState } from "react";
@@ -14,11 +13,9 @@ import Badge from "../../components/ui/badge/Badge";
 export default function SettingsSubscription() {
   const [billingType, setBillingType] = useState<"monthly" | "annual">("monthly");
   const { data: plans, isLoading: isLoadingPlans, isError: isErrorPlans } = useGetPlans();
-  const { data: subscriptions, isLoading: isLoadingSubs } = useGetMySubscriptions();
+  const { data: activeSubscription, isLoading: isLoadingSub } = useGetMyActiveSubscription();
   const createCheckout = useCreateCheckout();
-  const cancelSubscription = useCancelSubscription();
-
-  const activeSubscription = subscriptions?.find(s => s.status === "active");
+  // const cancelSubscription = useCancelSubscription();
 
   const handleChoosePlan = async (planId: number) => {
     try {
@@ -39,11 +36,11 @@ export default function SettingsSubscription() {
     }
   };
 
-  const handleCancel = async (id: number) => {
-    if (window.confirm("Êtes-vous sûr de vouloir annuler votre abonnement ?")) {
-      await cancelSubscription.mutateAsync(id);
-    }
-  };
+  // const handleCancel = async (id: number) => {
+  //   if (window.confirm("Êtes-vous sûr de vouloir annuler votre abonnement ?")) {
+  //     await cancelSubscription.mutateAsync(id);
+  //   }
+  // };
 
   if (isErrorPlans) {
     return (
@@ -63,7 +60,7 @@ export default function SettingsSubscription() {
         <div className="p-6 rounded-2xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] shadow-sm">
           <h2 className="text-xl font-bold text-gray-800 dark:text-white/90">Statut de l'abonnement</h2>
 
-          {isLoadingSubs ? (
+          {isLoadingSub ? (
             <div className="mt-4 flex items-center gap-2 text-blue-500">
               <Loader2 className="animate-spin size-5" />
               <span>Chargement du statut...</span>
@@ -75,24 +72,24 @@ export default function SettingsSubscription() {
                   <CheckCircle2 className="text-green-600 size-6" />
                   <div>
                     <h3 className="font-semibold text-green-900 dark:text-green-400">
-                      Plan {activeSubscription.plan?.name || "Actif"} — {activeSubscription.billing_type === "monthly" ? "Mensuel" : "Annuel"}
+                      Plan {activeSubscription.plan?.name || "Actif"} — {activeSubscription.plan?.price === 0 ? "Gratuit" : activeSubscription.billing_type === "monthly" ? "Mensuel" : "Annuel"}
                     </h3>
-                    <p className="text-sm text-green-700/80 dark:text-green-400/60">
+                    {activeSubscription.end_date && <p className="text-sm text-green-700/80 dark:text-green-400/60">
                       Prochaine facturation : {new Date(activeSubscription.end_date).toLocaleDateString()}
-                    </p>
+                    </p>}
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <Badge color="success">Actif</Badge>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-red-500 border-red-200 hover:bg-red-50 dark:border-red-900/30 dark:hover:bg-red-900/20"
-                    onClick={() => handleCancel(activeSubscription.id)}
-                    disabled={cancelSubscription.isPending}
-                  >
-                    {cancelSubscription.isPending ? <Loader2 className="animate-spin size-4" /> : "Annuler l'abonnement"}
-                  </Button>
+                  {/*<Button*/}
+                  {/*  variant="outline"*/}
+                  {/*  size="sm"*/}
+                  {/*  className="text-red-500 border-red-200 hover:bg-red-50 dark:border-red-900/30 dark:hover:bg-red-900/20"*/}
+                  {/*  onClick={() => handleCancel(activeSubscription.id)}*/}
+                  {/*  disabled={cancelSubscription.isPending}*/}
+                  {/*>*/}
+                  {/*  {cancelSubscription.isPending ? <Loader2 className="animate-spin size-4" /> : "Annuler l'abonnement"}*/}
+                  {/*</Button>*/}
                 </div>
               </div>
             </div>
@@ -192,16 +189,16 @@ export default function SettingsSubscription() {
                     <div className="mt-8">
                       <Button
                         size="md"
-                        className={`w-full rounded-xl font-bold transition-all ${activeSubscription?.plan_id === p.id && activeSubscription.billing_type === billingType
+                        className={`w-full rounded-xl font-bold transition-all ${activeSubscription?.plan_id === p.id && (activeSubscription.plan?.price===0 || activeSubscription.billing_type === billingType)
                           ? "bg-green-500 hover:bg-green-600 cursor-default"
                           : createCheckout.isPending
                             ? "opacity-70 pointer-events-none"
                             : "hover:scale-[1.02] active:scale-[0.98]"
                           }`}
                         onClick={() => handleChoosePlan(p.id)}
-                        disabled={activeSubscription?.plan_id === p.id && activeSubscription.billing_type === billingType}
+                        disabled={activeSubscription?.plan_id === p.id && (activeSubscription.plan?.price===0 || activeSubscription.billing_type === billingType)}
                       >
-                        {activeSubscription?.plan_id === p.id && activeSubscription.billing_type === billingType ? (
+                        {activeSubscription?.plan?.id === p.id && (activeSubscription.plan?.price===0 || activeSubscription.billing_type === billingType) ? (
                           "Plan actuel"
                         ) : createCheckout.isPending ? (
                           <Loader2 className="animate-spin size-5 mx-auto" />

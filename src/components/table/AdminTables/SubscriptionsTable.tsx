@@ -8,7 +8,7 @@ import {
 import Badge from "../../ui/badge/Badge";
 import Button from "../../ui/button/Button.tsx";
 import { type Subscription } from "../../../utils/type";
-import { Calendar, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { Calendar, Loader2 } from "lucide-react";
 
 interface SubscriptionsTableProps {
     searchTerm?: string;
@@ -104,7 +104,7 @@ export default function SubscriptionsTable({
                                                         {s.plan_name}
                                                     </Badge>
                                                     <span className="text-xs mt-1 text-gray-500">
-                                                        {s.billing_type === "monthly" ? "Mensuel" : "Annuel"}
+                                                        { s.plan?.price===0 ? "" : s.billing_type === "monthly" ? "Mensuel" : "Annuel"}
                                                     </span>
                                                 </div>
                                             </TableCell>
@@ -128,10 +128,10 @@ export default function SubscriptionsTable({
                                                         <Calendar className="size-3.5" />
                                                         <span>{formatDate(s.start_date)}</span>
                                                     </div>
-                                                    <div className="flex items-center gap-1.5 font-medium">
+                                                    {s.end_date&&<div className="flex items-center gap-1.5 font-medium">
                                                         <Calendar className="size-4" />
                                                         <span>{formatDate(s.end_date)}</span>
-                                                    </div>
+                                                    </div>}
                                                 </div>
                                             </TableCell>
                                            

@@ -13,6 +13,12 @@ export default function UserDropdown() {
     setIsOpen(!isOpen);
   }
 
+  const initials = (first: string | null, last: string | null) => {
+    const f = first?.[0] || "";
+    const l = last?.[0] || "";
+    return (f + l).toUpperCase() || "?";
+  };
+
   function closeDropdown() {
     setIsOpen(false);
   }
@@ -23,7 +29,9 @@ export default function UserDropdown() {
         className="flex items-center text-gray-700 dropdown-toggle dark:text-gray-400"
       >
         <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
-          <img src="/images/user/owner.jpg" alt="User" />
+          <div className="h-11 w-11 rounded-full bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 flex items-center justify-center text-xs font-semibold">
+            {initials(user?.first_name || null, user?.last_name || null)}
+          </div>
         </span>
 
         <span className="block mr-1 font-medium text-theme-sm">{user?.first_name}</span>
@@ -54,10 +62,10 @@ export default function UserDropdown() {
       >
         <div>
           <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            Musharof Chowdhury
+            {`${user?.first_name || " "} ${user?.last_name || " "}`.trim()}
           </span>
           <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-            randomuser@pimjo.com
+            {user?.email}
           </span>
         </div>
 
