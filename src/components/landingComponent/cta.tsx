@@ -50,9 +50,9 @@ export default function Cta() {
                         <Link
                             to="/register"
                             onClick={fireConfetti}
-                            className="flex mx-auto min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-14 px-8 bg-white text-blue-600 text-lg font-bold shadow-lg hover:bg-white/90 transition-colors duration-300"
+                            className="flex mx-auto max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-14 px-8 bg-white text-blue-600 text-lg font-bold shadow-lg hover:bg-white/90 transition-colors duration-300"
                         >
-                            <span className="truncate">Start Your Free Trial Now</span>
+                            <span className="truncate">Start Now</span>
                         </Link>
                         {animData && LottieComp && (
                             <div className="w-40 h-40 sm:w-48 sm:h-48 mx-auto">

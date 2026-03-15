@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import QuestionCard from "./QuestionCard.tsx";
 import QuizNavigation from "./QuizNavigation.tsx";
 import QuizResults from "./QuizResults.tsx";
+import QuizHeader from "./QuizHeader.tsx";
 import type { Quiz as QuizType, QuizQuestion } from "../../../utils/summary.ts";
 
 interface QuizProps {
@@ -147,6 +148,10 @@ export default function Quiz({ quizzes }: QuizProps) {
             {/* Quiz questions and navigation only if not finished */}
             {!quizFinished && (
                 <>
+                    <QuizHeader
+                        currentQuestion={currentQuestion}
+                        totalQuestions={quizData.length}
+                    />
                     <QuestionCard
                         question={currentQuestionData}
                         selectedAnswer={selectedAnswer}

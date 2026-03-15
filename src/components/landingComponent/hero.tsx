@@ -44,6 +44,7 @@ export default function Hero() {
 
     return (
         <section
+            id="home"
             className="relative min-h-[80vh] py-28 sm:py-32 bg-background"
             style={HERO_BG ? { backgroundImage: `url(${HERO_BG})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
         >
@@ -101,12 +102,12 @@ export default function Hero() {
                                 variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}
                                 transition={{ type: "spring", stiffness: 300, damping: 18 }}
                             >
-                                <Link
-                                    to="/about"
+                                <a
+                                    href="/#key-features"
                                     className={`flex w-full sm:w-auto min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-14 px-8 ${HERO_BG?"bg-white text-black hover:bg-white/90":"bg-foreground text-background"} text-lg font-bold shadow-lg hover:shadow-xl transition-shadow duration-300`}
                                 >
                                     <span className="truncate">En savoir plus</span>
-                                </Link>
+                                </a>
                             </motion.div>
                         </motion.div>
                     </div>

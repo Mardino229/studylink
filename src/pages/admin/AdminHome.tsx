@@ -4,11 +4,37 @@ import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
 import Chart from "react-apexcharts";
 import type { ApexOptions } from "apexcharts";
 import ComponentCard from "../../components/common/ComponentCard.tsx";
-import { Users, CreditCard, Activity, ArrowRight } from "lucide-react";
+import { Users, CreditCard, Activity, ArrowRight, Loader2 } from "lucide-react";
+import { useGetAdminDashboard } from "../../utils/admin.ts";
 
 export default function AdminHome() {
-  // Mock charts data
-  const activitySeries = [{ name: "Activité", data: [3, 5, 2, 8, 6, 9, 7, 10, 8, 12, 9, 11] }];
+  const { data, isLoading, isError } = useGetAdminDashboard();
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <PageMeta title="Admin" description="Panneau d'administration" />
+        <PageBreadcrumb pageTitle="Tableau de bord" />
+        <div className="flex h-64 items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-brand-500" />
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <div className="space-y-6">
+        <PageMeta title="Admin" description="Panneau d'administration" />
+        <PageBreadcrumb pageTitle="Tableau de bord" />
+        <div className="flex h-64 items-center justify-center">
+          <p className="text-red-500">Erreur lors du chargement des données du tableau de bord.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const activitySeries = data.charts?.activity || [{ name: "Activité", data: [] }];
   const activityOptions: ApexOptions = {
     chart: { type: "line", sparkline: { enabled: true } },
     stroke: { width: 2, curve: "smooth" },
@@ -16,7 +42,7 @@ export default function AdminHome() {
     tooltip: { enabled: true },
   };
 
-  const revenueSeries = [{ name: "Revenus", data: [120, 150, 170, 160, 210, 230, 250, 240, 280, 300, 320, 350] }];
+  const revenueSeries = data.charts?.revenue || [{ name: "Revenus", data: [] }];
   const revenueOptions: ApexOptions = {
     chart: { type: "area", sparkline: { enabled: true } },
     stroke: { width: 2, curve: "smooth" },
@@ -40,7 +66,7 @@ export default function AdminHome() {
           </div>
           <div>
             <p className="text-sm text-gray-500 dark:text-gray-400 font-medium text-theme-xs">Utilisateurs</p>
-            <h4 className="mt-1 text-2xl font-bold text-gray-800 dark:text-white/90">1,254</h4>
+            <h4 className="mt-1 text-2xl font-bold text-gray-800 dark:text-white/90">{data.kpis?.totalUsers || 0}</h4>
           </div>
           <div className="mt-4 h-16">
             <Chart options={activityOptions} series={activitySeries} type="line" height="100%" />
@@ -55,7 +81,7 @@ export default function AdminHome() {
           </div>
           <div>
             <p className="text-sm text-gray-500 dark:text-gray-400 font-medium text-theme-xs">Abonnements actifs</p>
-            <h4 className="mt-1 text-2xl font-bold text-gray-800 dark:text-white/90">842</h4>
+            <h4 className="mt-1 text-2xl font-bold text-gray-800 dark:text-white/90">{data.kpis?.activeSubscriptions || 0}</h4>
           </div>
           <div className="mt-4 h-16">
             <Chart options={activityOptions} series={activitySeries} type="line" height="100%" />
@@ -70,7 +96,7 @@ export default function AdminHome() {
           </div>
           <div>
             <p className="text-sm text-gray-500 dark:text-gray-400 font-medium text-theme-xs">Revenus mensuels</p>
-            <h4 className="mt-1 text-2xl font-bold text-gray-800 dark:text-white/90">12,850 €</h4>
+            <h4 className="mt-1 text-2xl font-bold text-gray-800 dark:text-white/90">{data.kpis?.monthlyRevenue?.toLocaleString() || 0} €</h4>
           </div>
           <div className="mt-4 h-16">
             <Chart options={revenueOptions} series={revenueSeries} type="area" height="100%" />
@@ -82,15 +108,65 @@ export default function AdminHome() {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         <div className="xl:col-span-2 space-y-6">
           <ComponentCard title="Utilisateurs récents" desc="Dernières inscriptions sur la plateforme">
-            <div className="h-64 flex items-center justify-center border-2 border-dashed border-gray-100 dark:border-gray-800 rounded-xl">
-              <p className="text-sm text-gray-500 dark:text-gray-400">Aucune donnée pour le moment.</p>
-            </div>
+            {data.recentUsers && data.recentUsers.length > 0 ? (
+              <div className="space-y-4">
+                {data.recentUsers.map((user) => (
+                  <div key={user.id} className="flex items-center gap-4 border-b border-gray-100 dark:border-gray-800 pb-4 last:border-0 last:pb-0">
+                    <div className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 font-medium">
+                      {user.avatar ? (
+                        <img src={user.avatar} alt={user.firstName} className="h-full w-full rounded-full object-cover" />
+                      ) : (
+                        <span className="uppercase">{user.firstName?.charAt(0) || ""}{user.lastName?.charAt(0) || ""}</span>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                        {user.firstName} {user.lastName}
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
+                    </div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                      {new Date(user.createdAt).toLocaleDateString()}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="h-64 flex items-center justify-center border-2 border-dashed border-gray-100 dark:border-gray-800 rounded-xl">
+                <p className="text-sm text-gray-500 dark:text-gray-400">Aucune donnée pour le moment.</p>
+              </div>
+            )}
           </ComponentCard>
 
           <ComponentCard title="Dernières transactions" desc="Historique des paiements récents">
-            <div className="h-64 flex items-center justify-center border-2 border-dashed border-gray-100 dark:border-gray-800 rounded-xl">
-              <p className="text-sm text-gray-500 dark:text-gray-400">Aucune donnée pour le moment.</p>
-            </div>
+            {data.recentTransactions && data.recentTransactions.length > 0 ? (
+              <div className="space-y-4">
+                {data.recentTransactions.map((tx) => (
+                  <div key={tx.id} className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-4 last:border-0 last:pb-0">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                        {tx.user?.name}
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{tx.planName}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">{tx.amount} €</p>
+                      <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                        tx.status === 'completed' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' :
+                        tx.status === 'pending' ? 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400' :
+                        'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400'
+                      }`}>
+                        {tx.status === 'completed' ? 'Complété' : tx.status === 'pending' ? 'En attente' : 'Échoué'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="h-64 flex items-center justify-center border-2 border-dashed border-gray-100 dark:border-gray-800 rounded-xl">
+                <p className="text-sm text-gray-500 dark:text-gray-400">Aucune donnée pour le moment.</p>
+              </div>
+            )}
           </ComponentCard>
         </div>
 
@@ -99,20 +175,25 @@ export default function AdminHome() {
             <div className="mb-6">
               <Chart options={activityOptions} series={activitySeries} type="line" height={100} />
             </div>
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="h-2 w-2 rounded-full bg-brand-500" />
-                <p className="text-sm text-gray-600 dark:text-gray-400">Maintenance terminée à 04:00</p>
+            {data.systemActivity && data.systemActivity.length > 0 ? (
+              <div className="space-y-4">
+                {data.systemActivity.map((activity) => {
+                  let bgColorClass = 'bg-brand-500';
+                  if (activity.color === 'emerald') bgColorClass = 'bg-emerald-500';
+                  if (activity.color === 'amber') bgColorClass = 'bg-amber-500';
+                  if (activity.color === 'red') bgColorClass = 'bg-red-500';
+                  
+                  return (
+                    <div key={activity.id} className="flex items-center gap-3">
+                      <div className={`h-2 w-2 rounded-full ${bgColorClass}`} />
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{activity.message}</p>
+                    </div>
+                  );
+                })}
               </div>
-              <div className="flex items-center gap-3">
-                <div className="h-2 w-2 rounded-full bg-emerald-500" />
-                <p className="text-sm text-gray-600 dark:text-gray-400">Nouveau plan créé : Premium Plus</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="h-2 w-2 rounded-full bg-amber-500" />
-                <p className="text-sm text-gray-600 dark:text-gray-400">Sauvegarde automatique réussie</p>
-              </div>
-            </div>
+            ) : (
+              <p className="text-sm text-gray-500 dark:text-gray-400">Aucune activité récente.</p>
+            )}
           </ComponentCard>
 
           <ComponentCard title="Accès rapides">

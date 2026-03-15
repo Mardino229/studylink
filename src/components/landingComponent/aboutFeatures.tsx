@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 
 export default function AboutFeatures() {
   return (
-    <section className="py-20 sm:py-28 bg-background" id="about-features">
+    <section className="py-20 sm:py-28 bg-background" id="key-features">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Intro (About) */}
         <div className="text-center max-w-3xl mx-auto">

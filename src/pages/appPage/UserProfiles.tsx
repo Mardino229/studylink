@@ -1,26 +1,39 @@
-import PageMeta from "../../components/common/PageMeta.tsx";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
+import PageMeta from "../../components/common/PageMeta.tsx";
+import { useUser } from "../../utils/user.ts";
 import UserMetaCard from "../../components/UserProfile/UserMetaCard.tsx";
 import UserInfoCard from "../../components/UserProfile/UserInfoCard.tsx";
-
+import PasswordChangeCard from "../../components/common/PasswordChangeCard.tsx";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 export default function UserProfiles() {
+  const navigate = useNavigate();
+
   return (
-    <>
-      <PageMeta
-        title="React.js Profile Dashboard | TailAdmin - Next.js Admin Dashboard Template"
-        description="This is React.js Profile Dashboard page for TailAdmin - React.js Tailwind CSS Admin Dashboard Template"
-      />
-      <PageBreadcrumb pageTitle="Profile" />
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
-        <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-7">
-          Profil
-        </h3>
+    <div className="space-y-6">
+      <PageMeta title="Mon Profil" description="Gérez vos paramètres de profil" />
+      <PageBreadcrumb pageTitle="Mon Profil" />
+
+      <div className="flex items-center gap-4">
+        <button
+          onClick={() => navigate("/settings")}
+          className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700 transition-colors"
+        >
+          <ArrowLeft size={16} className="sm:w-[18px] sm:h-[18px]" />
+          <span>Retour aux paramètres</span>
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="space-y-6">
-          <UserMetaCard />
-          <UserInfoCard />
+            <UserMetaCard />
+            <UserInfoCard />
+        </div>
+        <div>
+            <PasswordChangeCard />
         </div>
       </div>
-    </>
+    </div>
   );
 }

@@ -7,8 +7,24 @@ import type {
     PaginatedSubscriptions,
     SubscriptionPlanRequest,
     Announcement,
-    AnnouncementRequest
+    AnnouncementRequest,
+    AdminDashboardResponse
 } from "./type.ts";
+
+// --- Dashboard ---
+
+export const useGetAdminDashboard = () => {
+    const axiosPrivate = useAxiosPrivate();
+    return useQuery({
+        queryKey: ["admin", "dashboard"],
+        queryFn: async () => {
+            const response = await axiosPrivate.get<{ data: AdminDashboardResponse }>(
+                `/admin/dashboard`
+            );
+            return response.data.data;
+        },
+    });
+};
 
 // --- Users ---
 

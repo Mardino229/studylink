@@ -26,7 +26,7 @@ export default function Header() {
         window.addEventListener('scroll', onScroll, { passive: true });
 
         // Scrollspy: observe sections in view
-        const ids = ["key-features", "testimonials"]; // home is handled by scroll position
+        const ids = ["key-features", "how-it-works", "pricing", "testimonials", "faq"]; // home is handled by scroll position
         const elements = ids
             .map((id) => document.getElementById(id))
             .filter((el): el is HTMLElement => Boolean(el));
@@ -65,9 +65,12 @@ export default function Header() {
         };
     }, [activeSection]);
 
-    const isHomeActive = activeSection === "#";
+    const isHomeActive = activeSection === "#" || activeSection === "#home";
     const isFeaturesActive = activeSection === "#key-features";
+    const isHowItWorksActive = activeSection === "#how-it-works";
+    const isPricingActive = activeSection === "#pricing";
     const isTestimonialsActive = activeSection === "#testimonials";
+    const isFaqActive = activeSection === "#faq";
 
     const handleSmoothClick = useCallback((e: any, targetHash: string) => {
         e.preventDefault();
@@ -127,11 +130,38 @@ export default function Header() {
                     <motion.a
                         whileHover={{ y: -2 }}
                         className="group relative inline-block text-foreground/70 hover:text-foreground text-base font-medium"
+                        href="#how-it-works"
+                        onClick={(e) => handleSmoothClick(e, "#how-it-works")}
+                    >
+                        How It Works
+                        <span className={`pointer-events-none absolute left-0 -bottom-1 block h-[2px] w-full origin-left bg-gradient-to-r from-blue-500 to-purple-600 transition-transform duration-300 ${isHowItWorksActive ? 'scale-x-100' : 'scale-x-0'} group-hover:scale-x-100`} />
+                    </motion.a>
+                    <motion.a
+                        whileHover={{ y: -2 }}
+                        className="group relative inline-block text-foreground/70 hover:text-foreground text-base font-medium"
+                        href="#pricing"
+                        onClick={(e) => handleSmoothClick(e, "#pricing")}
+                    >
+                        Pricing
+                        <span className={`pointer-events-none absolute left-0 -bottom-1 block h-[2px] w-full origin-left bg-gradient-to-r from-blue-500 to-purple-600 transition-transform duration-300 ${isPricingActive ? 'scale-x-100' : 'scale-x-0'} group-hover:scale-x-100`} />
+                    </motion.a>
+                    <motion.a
+                        whileHover={{ y: -2 }}
+                        className="group relative inline-block text-foreground/70 hover:text-foreground text-base font-medium"
                         href="#testimonials"
                         onClick={(e) => handleSmoothClick(e, "#testimonials")}
                     >
                         Testimonials
                         <span className={`pointer-events-none absolute left-0 -bottom-1 block h-[2px] w-full origin-left bg-gradient-to-r from-blue-500 to-purple-600 transition-transform duration-300 ${isTestimonialsActive ? 'scale-x-100' : 'scale-x-0'} group-hover:scale-x-100`} />
+                    </motion.a>
+                    <motion.a
+                        whileHover={{ y: -2 }}
+                        className="group relative inline-block text-foreground/70 hover:text-foreground text-base font-medium"
+                        href="#faq"
+                        onClick={(e) => handleSmoothClick(e, "#faq")}
+                    >
+                        FAQ
+                        <span className={`pointer-events-none absolute left-0 -bottom-1 block h-[2px] w-full origin-left bg-gradient-to-r from-blue-500 to-purple-600 transition-transform duration-300 ${isFaqActive ? 'scale-x-100' : 'scale-x-0'} group-hover:scale-x-100`} />
                     </motion.a>
                 </nav>
                 <div className="flex items-center gap-4">
@@ -189,11 +219,32 @@ export default function Header() {
                             Key Features
                         </a>
                         <a
+                            href="#how-it-works"
+                            className={`block text-base ${isHowItWorksActive ? 'text-foreground' : 'text-foreground/70'} hover:text-foreground`}
+                            onClick={(e) => { handleSmoothClick(e, '#how-it-works'); setMobileOpen(false); }}
+                        >
+                            How It Works
+                        </a>
+                        <a
+                            href="#pricing"
+                            className={`block text-base ${isPricingActive ? 'text-foreground' : 'text-foreground/70'} hover:text-foreground`}
+                            onClick={(e) => { handleSmoothClick(e, '#pricing'); setMobileOpen(false); }}
+                        >
+                            Pricing
+                        </a>
+                        <a
                             href="#testimonials"
                             className={`block text-base ${isTestimonialsActive ? 'text-foreground' : 'text-foreground/70'} hover:text-foreground`}
                             onClick={(e) => { handleSmoothClick(e, '#testimonials'); setMobileOpen(false); }}
                         >
                             Testimonials
+                        </a>
+                        <a
+                            href="#faq"
+                            className={`block text-base ${isFaqActive ? 'text-foreground' : 'text-foreground/70'} hover:text-foreground`}
+                            onClick={(e) => { handleSmoothClick(e, '#faq'); setMobileOpen(false); }}
+                        >
+                            FAQ
                         </a>
                         <div className="pt-2 flex items-center gap-4">
                             <Link

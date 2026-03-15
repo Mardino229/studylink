@@ -3,7 +3,7 @@
 export default function Smart() {
 
     return (
-        <section className="py-20 sm:py-28 bg-background">
+        <section className="py-20 sm:py-28 bg-background" id="how-it-works">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid lg:grid-cols-2 gap-12 items-center">
                     <div className="order-2 lg:order-1">

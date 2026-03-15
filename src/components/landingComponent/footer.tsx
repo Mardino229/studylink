@@ -1,5 +1,7 @@
 
 
+import { Link } from "react-router-dom";
+
 export default function Footer() {
 
     return (
@@ -20,15 +22,15 @@ export default function Footer() {
                         <div>
                             <h3 className="text-base font-semibold text-foreground">Platform</h3>
                             <ul className="mt-4 space-y-2">
-                                <li><a className="hover:text-foreground transition-colors" href="#">Features</a></li>
-                                <li><a className="hover:text-foreground transition-colors" href="#">Pricing</a></li>
-                                <li><a className="hover:text-foreground transition-colors" href="#">Dashboard</a></li>
+                                <li><a className="hover:text-foreground transition-colors" href="#key-features">Features</a></li>
+                                <li><a className="hover:text-foreground transition-colors" href="#pricing">Pricing</a></li>
+                                <li><Link className="hover:text-foreground transition-colors" to="/login">Dashboard</Link></li>
                             </ul>
                         </div>
                         <div>
                             <h3 className="text-base font-semibold text-foreground">Company</h3>
                             <ul className="mt-4 space-y-2">
-                                <li><a className="hover:text-foreground transition-colors" href="#">About Us</a></li>
+                                <li><Link className="hover:text-foreground transition-colors" to="/about">About Us</Link></li>
                                 <li><a className="hover:text-foreground transition-colors" href="#">Careers</a></li>
                                 <li><a className="hover:text-foreground transition-colors" href="#">Contact</a></li>
                             </ul>

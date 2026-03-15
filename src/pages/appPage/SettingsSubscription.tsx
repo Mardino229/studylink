@@ -6,11 +6,13 @@ import {
   useCreateCheckout,
  useGetMyActiveSubscription
 } from "../../utils/subscription";
-import { Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Loader2, CheckCircle2, XCircle, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import Badge from "../../components/ui/badge/Badge";
 
 export default function SettingsSubscription() {
+  const navigate = useNavigate();
   const [billingType, setBillingType] = useState<"monthly" | "annual">("monthly");
   const { data: plans, isLoading: isLoadingPlans, isError: isErrorPlans } = useGetPlans();
   const { data: activeSubscription, isLoading: isLoadingSub } = useGetMyActiveSubscription();
@@ -55,7 +57,17 @@ export default function SettingsSubscription() {
       <PageMeta title="Paramètres • Abonnement" description="Gérer votre plan d’abonnement" />
       <PageBreadcrumb pageTitle="Mon Abonnement" />
 
-      <section className="space-y-8">
+      <div className="pt-6">
+        <button
+          onClick={() => navigate("/settings")}
+          className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700 transition-colors"
+        >
+          <ArrowLeft size={16} className="sm:w-[18px] sm:h-[18px]" />
+          <span>Retour aux paramètres</span>
+        </button>
+      </div>
+
+      <section className="space-y-8 pt-6">
         {/* Current Subscription Status */}
         <div className="p-6 rounded-2xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] shadow-sm">
           <h2 className="text-xl font-bold text-gray-800 dark:text-white/90">Statut de l'abonnement</h2>

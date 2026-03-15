@@ -5,20 +5,36 @@ import { PlusIcon } from "../../icons";
 import Button from "../../components/ui/button/Button.tsx";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Modal } from "../../components/ui/modal/index.tsx";
+import { Modal } from "../../components/ui/modal";
 import { useGetCourses } from "../../utils/course.ts";
 import { useGetSummaries, useCreateSummary, useUpdateSummary, useDeleteSummary } from "../../utils/summary.ts";
 import { Input } from "../../components/ui/input.tsx";
 import { Label } from "../../components/ui/label.tsx";
 import { RotatingLines } from "react-loader-spinner";
 import { ArrowLeft, FileText } from "lucide-react";
+import { StepTracker } from "../../components/summary/stepper.tsx";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "../../components/ui/form.tsx";
+import { z } from "zod";
+
+// Schéma de validation avec Zod pour le formulaire de création de résumé
+const summarySchema = z.object({
+    summary_name: z.string().min(1, "Le nom du résumé est requis").min(3, "Le nom doit contenir au moins 3 caractères"),
+    file: z.instanceof(File, { message: "Veuillez sélectionner un fichier" })
+        .refine((file) => file.size <= 10 * 1024 * 1024, "Le fichier ne doit pas dépasser 10 Mo")
+        .refine(
+            (file) => ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/msword", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "application/vnd.ms-powerpoint"].includes(file.type),
+            "Format de fichier non supporté. Utilisez PDF, DOC, DOCX, PPT ou PPTX"
+        ),
+});
+
+type SummaryFormData = z.infer<typeof summarySchema>;
 
 export default function SummaryList() {
     const [open, setOpen] = useState(false);
-    const [summaryName, setSummaryName] = useState("");
-    const [file, setFile] = useState<File | null>(null);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-    const [summaryToDelete, setSummaryToDelete] = useState<string | null>(null);
+    const [summaryToDelete, setSummaryToDelete] = useState<number | null>(null);
     const navigate = useNavigate();
     const { courseId, courseName } = useParams();
     const { data: courses } = useGetCourses();
@@ -30,31 +46,39 @@ export default function SummaryList() {
 
     const currentCourseName = courseName ? decodeURIComponent(courseName) : courses?.find(c => c.id === courseId)?.course_name;
 
-    async function handleCreateSummary(e: React.FormEvent) {
-        e.preventDefault();
-        if (!summaryName.trim() || !file || !courseId) return;
+    // Configuration de React Hook Form avec Zod
+    const form = useForm<SummaryFormData>({
+        resolver: zodResolver(summarySchema),
+        defaultValues: {
+            summary_name: "",
+            file: undefined,
+        },
+    });
 
-        createSummary.mutate({ title: summaryName, courseId, file }, {
+    // Gestion de la soumission du formulaire
+    const onSubmit = (data: SummaryFormData) => {
+        if (!courseId) return;
+
+        createSummary.mutate({ title: data.summary_name, courseId, file: data.file }, {
             onSuccess: () => {
                 setOpen(false);
-                setSummaryName("");
-                setFile(null);
+                form.reset();
             }
         });
     }
 
-    const handleRename = (id: string, newTitle: string) => {
-        updateSummary.mutate({ id, summary_name: newTitle });
+    const handleRename = (id: number, newTitle: string) => {
+        updateSummary.mutate({ id: id.toString(), summary_name: newTitle });
     };
 
-    const handleDelete = (id: string) => {
+    const handleDelete = (id: number) => {
         setSummaryToDelete(id);
         setDeleteModalOpen(true);
     };
 
     const confirmDelete = () => {
         if (summaryToDelete) {
-            deleteSummary.mutate(summaryToDelete, {
+            deleteSummary.mutate(summaryToDelete.toString(), {
                 onSuccess: () => {
                     setDeleteModalOpen(false);
                     setSummaryToDelete(null);
@@ -108,7 +132,7 @@ export default function SummaryList() {
                             <input
                                 type="text"
                                 placeholder="Rechercher par nom..."
-                                className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-200 bg-transparent py-2.5 pl-12 pr-14 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[430px]"
+                                className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-200 bg-transparent py-2.5 pl-12 pr-14 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[430px]"
                             />
                         </div>
 
@@ -125,51 +149,95 @@ export default function SummaryList() {
                             <div className="text-lg font-semibold text-foreground mb-4">
                                 Créer un résumé
                             </div>
-                            <form onSubmit={handleCreateSummary} className="space-y-4">
-                                <div>
-                                    <Label className="mb-1.5">Cours</Label>
-                                    <Input
-                                        className="form-input block w-full appearance-none cursor-not-allowed rounded-lg border border-gray-300 px-3 py-3 placeholder-gray-400 shadow-sm focus:border-[var(--primary-color)] focus:outline-none focus:ring-[var(--primary-color)] sm:text-sm"
-                                        value={currentCourseName || "Chargement..."}
-                                        disabled
+                            <Form {...form}>
+                                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                                    <div>
+                                        <Label className="mb-1.5">Cours</Label>
+                                        <Input
+                                            className="form-input block w-full appearance-none cursor-not-allowed rounded-lg border border-gray-300 px-3 py-3 placeholder-gray-400 shadow-sm focus:border-[var(--primary-color)] focus:outline-none focus:ring-[var(--primary-color)] sm:text-sm"
+                                            value={currentCourseName || "Chargement..."}
+                                            disabled
+                                        />
+                                    </div>
+                                    
+                                    <FormField
+                                        control={form.control}
+                                        name="summary_name"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Nom du résumé</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        className="form-input block w-full appearance-none rounded-lg border border-gray-300 px-3 py-3 placeholder-gray-400 shadow-sm focus:border-[var(--primary-color)] focus:outline-none focus:ring-[var(--primary-color)] sm:text-sm"
+                                                        placeholder="Ex: Chapitre 3 - Thermodynamique"
+                                                        disabled={createSummary.isPending}
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
                                     />
-                                </div>
-                                <div>
-                                    <Label className="mb-1.5">Nom du résumé</Label>
-                                    <Input
-                                        className="form-input block w-full appearance-none rounded-lg border border-gray-300 px-3 py-3 placeholder-gray-400 shadow-sm focus:border-[var(--primary-color)] focus:outline-none focus:ring-[var(--primary-color)] sm:text-sm"
-                                        value={summaryName}
-                                        onChange={(e) => setSummaryName(e.target.value)}
-                                        placeholder="Ex: Chapitre 3 - Thermodynamique"
-                                        required
+                                    
+                                    <FormField
+                                        control={form.control}
+                                        name="file"
+                                        render={({ field: { value, onChange, ...fieldProps } }) => (
+                                            <FormItem>
+                                                <FormLabel>Fichier</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="file"
+                                                        accept=".pdf,.doc,.docx,.ppt,.pptx"
+                                                        onChange={(e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (file) onChange(file);
+                                                        }}
+                                                        className="file:mr-3 file:rounded file:border-0 file:px-2 file:bg-gray-100 p-3 dark:bg-gray-900"
+                                                        disabled={createSummary.isPending}
+                                                        {...fieldProps}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
                                     />
-                                </div>
-                                <div>
-                                    <Label className="mb-1.5">Fichier</Label>
-                                    <Input
-                                        type="file"
-                                        accept=".pdf,.doc,.docx,.ppt,.pptx/*"
-                                        onChange={(e) => setFile(e.target.files?.[0] || null)}
-                                        className="file:mr-3 file:rounded file:border-0 file:px-2 file:bg-gray-100 p-3 dark:bg-gray-900"
-                                        required
-                                    />
-                                </div>
-                                <div className="flex justify-end gap-2 pt-2">
-                                    <button type="button" onClick={() => setOpen(false)} className="px-4 py-2 rounded-md border border-border bg-background text-foreground">Annuler</button>
-                                    <button type="submit" disabled={createSummary.isPending} className="px-4 py-2 rounded-md bg-primary text-background disabled:opacity-50 flex items-center justify-center min-w-[100px]">
-                                        {createSummary.isPending ? (
-                                            <RotatingLines
-                                                visible={true}
-                                                strokeWidth="5"
-                                                width="20"
-                                                strokeColor="#ffffff"
-                                                animationDuration="0.75"
-                                                ariaLabel="rotating-lines-loading"
-                                            />
-                                        ) : "Générer"}
-                                    </button>
-                                </div>
-                            </form>
+                                    
+                                    {/* Stepper de progression - affiché uniquement pendant la création */}
+                                    { courseId && (
+                                        <div className="pt-2">
+                                            <StepTracker courseId={courseId} />
+                                        </div>
+                                    )}
+                                    
+                                    <div className="flex justify-end gap-2 pt-2">
+                                        <button 
+                                            type="button" 
+                                            onClick={() => setOpen(false)} 
+                                            className="px-4 py-2 rounded-md border border-border bg-background text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+                                            disabled={createSummary.isPending}
+                                        >
+                                            {createSummary.isPending ? "Traitement..." : "Annuler"}
+                                        </button>
+                                        <button 
+                                            type="submit" 
+                                            disabled={createSummary.isPending} 
+                                            className="px-4 py-2 rounded-md bg-primary text-background disabled:opacity-50 flex items-center justify-center min-w-[100px]"
+                                        >
+                                            {createSummary.isPending ? (
+                                                <RotatingLines
+                                                    visible={true}
+                                                    strokeWidth="5"
+                                                    width="20"
+                                                    strokeColor="#ffffff"
+                                                    animationDuration="0.75"
+                                                    ariaLabel="rotating-lines-loading"
+                                                />
+                                            ) : "Générer"}
+                                        </button>
+                                    </div>
+                                </form>
+                            </Form>
                         </Modal>
 
                         <Modal isOpen={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} className="max-w-md p-6">
@@ -231,9 +299,9 @@ export default function SummaryList() {
                             <SummaryCard
                                 key={summary.id}
                                 title={summary.summary_name}
-                                date={summary.created_at ? new Date(summary.created_at).toLocaleDateString() : "Récemment"}
-                                type={summary.type || "Résumé"}
-                                isUpdating={updateSummary.isPending && updateSummary.variables?.id === summary.id}
+                                date={summary.generation_date ? new Date(summary.generation_date).toLocaleDateString() : "Récemment"}
+                                
+                                isUpdating={updateSummary.isPending && updateSummary.variables?.id === summary.id.toString()}
                                 onClick={() => navigate(`/my-courses/${courseId}/${encodeURIComponent(currentCourseName || courseName || '')}/summaries/${summary.id}`)}
                                 onRename={(newTitle) => handleRename(summary.id, newTitle)}
                                 onDelete={() => handleDelete(summary.id)}

@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
 import PageMeta from "../../components/common/PageMeta.tsx";
 import ComponentCard from "../../components/common/ComponentCard.tsx";
@@ -6,6 +8,7 @@ import Select from "../../components/form/Select.tsx";
 import HistoryPaymentTableOne from "../../components/table/BasicTables/HistoryPaymentTableOne.tsx";
 
 export default function PaymentListPage() {
+    const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState("");
     const [byPage, setByPage] = useState(10);
     const listPage = [2, 5, 10, 20, 50];
@@ -25,7 +28,17 @@ export default function PaymentListPage() {
             <PageMeta title="Historique des paiements" description="Consultez votre historique de paiements" />
             <PageBreadcrumb pageTitle="Historique des paiements" />
             
-            <div className="space-y-6">
+            <div className="pt-6">
+                <button
+                    onClick={() => navigate("/settings")}
+                    className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700 transition-colors"
+                >
+                    <ArrowLeft size={16} className="sm:w-[18px] sm:h-[18px]" />
+                    <span>Retour aux paramètres</span>
+                </button>
+            </div>
+
+            <div className="space-y-6 pt-6">
                 <ComponentCard title="Liste des paiements">
                     <div className="flex gap-4 flex-wrap justify-between">
                         <div>

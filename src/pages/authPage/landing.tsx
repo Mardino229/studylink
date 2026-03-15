@@ -22,7 +22,7 @@ export default function Landing() {
                     <main className="flex-1">
                         <Hero />
 
-                        <section className="px-4 md:px-6 border-y border-gray-200/60 dark:border-gray-800/60 bg-white">
+                        {/* <section className="px-4 md:px-6 border-y border-gray-200/60 dark:border-gray-800/60 bg-white">
                             <div className="mx-auto max-w-(--breakpoint-2xl) py-10">
                                 <p className="text-center text-xs uppercase tracking-wide text-foreground/60 mb-6">Ils nous font confiance</p>
                                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6 items-center">
@@ -34,7 +34,7 @@ export default function Landing() {
                                     <div className="h-8 flex items-center justify-center text-gray-500 dark:text-gray-400">Logo</div>
                                 </div>
                             </div>
-                        </section>
+                        </section> */}
 
                         <AboutFeatures />
 

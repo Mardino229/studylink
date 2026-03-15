@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useUser } from "../components/layout/userContext.tsx";
 import { useNavigate } from "react-router-dom";
-import type { CompleteProfileRequest, UpdateProfileRequest, ValidationError, User } from "./type.ts";
+import type { CompleteProfileRequest, UpdateProfileRequest, UpdatePasswordRequest, ValidationError, User } from "./type.ts";
 import { useAxiosPrivate } from "../hoooks/useAxiosPrivate.ts";
 
 
@@ -127,4 +127,64 @@ const useUpdateProfile = () => {
 }
 
 
-export { useMe, useCompleteProfile, useUpdateProfile };
+const useRequestPasswordOTP = () => {
+    const axiosPrivate = useAxiosPrivate();
+
+    return useMutation({
+        mutationFn: async () => {
+            const response = await axiosPrivate.post<{ message: string }>('/user/request-change-password-otp');
+            return response.data;
+        },
+        onSuccess: (data) => {
+            toast.success(data.message || "Un code OTP a été envoyé à votre email.");
+        },
+        onError: (error) => {
+            console.error(error);
+            toast.error("Échec de l'envoi de l'OTP");
+        },
+    });
+}
+
+const useUpdatePassword = () => {
+    const axiosPrivate = useAxiosPrivate();
+
+    return useMutation({
+        mutationFn: async (data: UpdatePasswordRequest) => {
+            const response = await axiosPrivate.post<{ message: string }>('/user/change-password', data);
+            return response.data;
+        },
+        onSuccess: (data: { message: string }) => {
+            toast.success(data.message || "Mot de passe mis à jour avec succès");
+        },
+        onError: (error) => {
+            console.error(error);
+            const err = error as unknown as {
+                response: {
+                    data: {
+                        detail: string | ValidationError[]
+                    },
+                    status: number,
+                };
+            }
+            if (err.response.status === 422) {
+                const validationErr = error as unknown as {
+                    response: {
+                        data: {
+                            detail: ValidationError[]
+                        }
+                    };
+                }
+                toast.error("Erreur de validation", {
+                    description: `${validationErr.response.data.detail[0].loc[1]}: ${validationErr.response.data.detail[0].msg}`,
+                })
+            } else {
+                const errDetail = err.response.data.detail as string;
+                toast.error("Échec de la mise à jour", {
+                    description: errDetail,
+                })
+            }
+        },
+    });
+}
+
+export { useMe, useCompleteProfile, useUpdateProfile, useRequestPasswordOTP, useUpdatePassword, useUser };

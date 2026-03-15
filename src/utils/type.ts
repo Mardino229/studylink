@@ -20,6 +20,13 @@ export type UpdateProfileRequest = {
     other_program?: string;
 }
 
+export type UpdatePasswordRequest = {
+    current_password: string;
+    new_password: string;
+    confirm_new_password: string;
+    otp_code: string;
+}
+
 export type LoginFormRequest = {
     email: string;
     password: string;
@@ -183,3 +190,40 @@ export type UserContextProps = {
     user?: User;
     setUser: Dispatch<SetStateAction<User>>;
 };
+
+export interface AdminDashboardResponse {
+    kpis: {
+        totalUsers: number;
+        activeSubscriptions: number;
+        monthlyRevenue: number;
+    };
+    charts: {
+        activity: Array<{ name: string; data: number[] }>;
+        revenue: Array<{ name: string; data: number[] }>;
+    };
+    recentUsers: Array<{
+        id: string | number;
+        firstName: string;
+        lastName: string;
+        email: string;
+        avatar?: string;
+        createdAt: string;
+    }>;
+    recentTransactions: Array<{
+        id: string | number;
+        user: {
+            id: string | number;
+            name: string;
+        };
+        amount: number;
+        planName: string;
+        status: string;
+        date: string;
+    }>;
+    systemActivity: Array<{
+        id: string | number;
+        message: string;
+        date: string;
+        color: string;
+    }>;
+}

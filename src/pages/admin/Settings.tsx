@@ -4,6 +4,7 @@ import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
 import { toast } from "sonner";
 import ComponentCard from "../../components/common/ComponentCard.tsx";
 import Button from "../../components/ui/button/Button.tsx";
+import PasswordChangeCard from "../../components/common/PasswordChangeCard.tsx";
 
 export default function AdminSettings() {
   const [maintenance, setMaintenance] = useState(false);
@@ -69,6 +70,8 @@ export default function AdminSettings() {
           </div>
         </ComponentCard>
       </div>
+
+      <PasswordChangeCard />
 
       <div className="flex justify-end">
         <Button onClick={save}>

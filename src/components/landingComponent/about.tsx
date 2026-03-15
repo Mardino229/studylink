@@ -33,7 +33,7 @@ export default function About() {
             className="mt-8"
           >
             <Link
-              to="/about"
+              to="/#key-features"
               className="inline-flex items-center justify-center rounded-full h-12 px-6 bg-foreground text-background text-sm font-semibold shadow-md hover:shadow-lg transition-shadow"
             >
               En savoir plus

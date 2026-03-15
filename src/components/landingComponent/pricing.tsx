@@ -1,5 +1,6 @@
 
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { useGetPlans } from "../../utils/plan";
 import { Loader2 } from "lucide-react";
 
@@ -55,11 +56,12 @@ export default function Pricing() {
                                 <p className="mt-1 text-xs text-foreground/50">
                                     Ou {plan.annual_price}€ /an
                                 </p>
-                                <button
+                                <Link
+                                    to="/register"
                                     className="mt-8 w-full flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-base font-bold shadow-lg hover:shadow-xl transition-shadow duration-300"
                                 >
                                     Commencer
-                                </button>
+                                </Link>
                                 <ul className="mt-8 space-y-4 text-foreground/70">
                                     {plan.benefits_description.map((benefit, bIndex) => (
                                         <li key={bIndex} className="flex items-center gap-3">

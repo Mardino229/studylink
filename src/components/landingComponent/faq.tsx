@@ -3,7 +3,7 @@
 export default function Faq() {
 
     return (
-        <section className="py-20 sm:py-28 bg-muted">
+        <section className="py-20 sm:py-28 bg-muted" id="faq">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center">
                     <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">Frequently Asked
