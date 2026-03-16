@@ -9,6 +9,13 @@ import ReactMarkdown from "react-markdown";
 import Mermaid from "../ui/Mermaid.tsx";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
+import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
+import remarkEmoji from "remark-emoji";
+import remarkToc from "remark-toc";
+import rehypeSlug from "rehype-slug";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypeRaw from "rehype-raw";
 import "katex/dist/katex.min.css";
 
 interface SummaryTabsProps {
@@ -59,8 +66,8 @@ export default function SummaryTabs({ summary }: SummaryTabsProps) {
                             {summary.content_markdown ? (
                                 <div className="prose dark:prose-invert max-w-none">
                                     <ReactMarkdown
-                                        remarkPlugins={[remarkMath]}
-                                        rehypePlugins={[rehypeKatex]}
+                                        remarkPlugins={[remarkMath, remarkGfm, remarkBreaks, remarkEmoji, [remarkToc, { heading: "sommaire|toc|table of contents" }]]}
+                                        rehypePlugins={[rehypeKatex, rehypeSlug, rehypeAutolinkHeadings, rehypeRaw]}
                                         components={{
                                             code({ node, className, children, ...props }: any) {
                                                 const match = /language-(\w+)/.exec(className || "");

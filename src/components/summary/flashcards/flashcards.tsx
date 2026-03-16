@@ -7,6 +7,7 @@ import type { Flashcard as FlashcardType } from "../../../utils/summary.ts";
 // --- Types ---
 interface FlashcardData {
 	id: number;
+	displayIndex: number;
 	question: string;
 	answer: string;
 	category?: string;
@@ -121,7 +122,7 @@ const Card = ({
 								{data.category || "Général"}
 							</span>
 							<span className="text-xs font-medium text-slate-400">
-								{data.id} / {total}
+								{data.displayIndex} / {total}
 							</span>
 						</div>
 
@@ -154,7 +155,7 @@ const Card = ({
 								Réponse
 							</span>
 							<span className="text-xs font-medium">
-								{data.id} / {total}
+								{data.displayIndex} / {total}
 							</span>
 						</div>
 
@@ -180,8 +181,9 @@ const Card = ({
 
 export const StackPreview = ({ flashcards }: FlashcardsProps) => {
 	// Convertir les flashcards de l'API en format FlashcardData
-	const cardsData: FlashcardData[] = flashcards.map(fc => ({
+	const cardsData: FlashcardData[] = flashcards.map((fc, index) => ({
 		id: fc.id,
+		displayIndex: index + 1,
 		question: fc.question,
 		answer: fc.answer,
 		category: undefined
@@ -192,8 +194,9 @@ export const StackPreview = ({ flashcards }: FlashcardsProps) => {
 
 	// Mettre à jour les cartes quand les flashcards changent
 	useEffect(() => {
-		const newCardsData = flashcards.map(fc => ({
+		const newCardsData = flashcards.map((fc, index) => ({
 			id: fc.id,
+			displayIndex: index + 1,
 			question: fc.question,
 			answer: fc.answer,
 			category: undefined
@@ -291,7 +294,7 @@ export const StackPreview = ({ flashcards }: FlashcardsProps) => {
 
 				<div className="flex flex-col items-center gap-1">
 					<span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-						{cards.length > 0 ? cards[0].id : 0} / {cards.length}
+						{cards.length > 0 ? cards[0].displayIndex : 0} / {cards.length}
 					</span>
 					<div className="flex gap-1">
 						{cards.map((_, idx) => (
@@ -299,7 +302,7 @@ export const StackPreview = ({ flashcards }: FlashcardsProps) => {
 								key={idx}
 								className={cn(
 									"w-1.5 h-1.5 rounded-full transition-colors duration-300",
-									idx === (cards.length > 0 ? cards[0].id - 1 : 0)
+									idx === (cards.length > 0 ? cards[0].displayIndex - 1 : 0)
 										? "bg-blue-500"
 										: "bg-slate-200 dark:bg-slate-700"
 								)}

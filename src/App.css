@@ -969,3 +969,41 @@ span.flatpickr-weekday,
 .simplebar-scrollbar.simplebar-visible:before {
     @apply opacity-100;
 }
+
+/* Markdown Table Styling */
+.prose table {
+    @apply w-full border-collapse border border-gray-200 dark:border-gray-800 my-6;
+}
+
+.prose th {
+    @apply border border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-white/[0.05] px-4 py-3 text-left font-semibold text-gray-900 dark:text-white/90;
+}
+
+.prose td {
+    @apply border border-gray-200 dark:border-gray-800 px-4 py-3 text-gray-700 dark:text-gray-300;
+}
+
+.prose tr:nth-child(even) {
+    @apply bg-gray-50/30 dark:bg-white/[0.02];
+}
+
+/* Transform horizontal rules into section spacers */
+.prose hr {
+    @apply h-8 my-4 border-none opacity-0;
+}
+
+/* Styling for heading anchor links (rehype-autolink-headings) */
+.prose h1 > a,
+.prose h2 > a,
+.prose h3 > a,
+.prose h4 > a {
+    @apply no-underline ml-2 opacity-0 transition-opacity;
+    content: "#";
+}
+
+.prose h1:hover > a,
+.prose h2:hover > a,
+.prose h3:hover > a,
+.prose h4:hover > a {
+    @apply opacity-30 hover:opacity-100 dark:text-white;
+}

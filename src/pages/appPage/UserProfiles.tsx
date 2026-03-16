@@ -1,6 +1,5 @@
 import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
 import PageMeta from "../../components/common/PageMeta.tsx";
-import { useUser } from "../../utils/user.ts";
 import UserMetaCard from "../../components/UserProfile/UserMetaCard.tsx";
 import UserInfoCard from "../../components/UserProfile/UserInfoCard.tsx";
 import PasswordChangeCard from "../../components/common/PasswordChangeCard.tsx";
