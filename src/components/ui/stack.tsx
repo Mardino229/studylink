@@ -46,7 +46,7 @@ function CardRotate({
     );
 }
 
-type CardData = { id: number; content: ReactNode };
+type CardData = { id: string; content: ReactNode };
 
 export default function Stack({
                                   randomRotation = false,
@@ -63,14 +63,14 @@ export default function Stack({
     animationConfig?: { stiffness: number; damping: number };
     cardWidth?: number;
     cardHeight?: number;
-    onSendToBack?: (id: number) => void;
+    onSendToBack?: (id: string) => void;
 }) {
     const [internalCards, setInternalCards] = useState(cardsData);
     
     // Utilise les cardes passées en props ou l'état interne
     const cards = onSendToBack ? cardsData : internalCards;
 
-    const sendToBack = (id: number | string) => {
+    const sendToBack = (id: string | string) => {
         if (onSendToBack) {
             onSendToBack(id as number);
         } else {

@@ -81,7 +81,7 @@ export const useDeleteAdminPlan = () => {
     const axiosPrivate = useAxiosPrivate();
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async (id: number | string) => {
+        mutationFn: async (id: string | string) => {
             const response = await axiosPrivate.delete<{ message: string }>(
                 `/admin/subscription-plans/${id}`
             );
@@ -101,7 +101,7 @@ export const useUpdateAdminPlan = () => {
     const axiosPrivate = useAxiosPrivate();
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ id, data }: { id: number | string; data: Partial<SubscriptionPlanRequest> }) => {
+        mutationFn: async ({ id, data }: { id: string | string; data: Partial<SubscriptionPlanRequest> }) => {
             const response = await axiosPrivate.patch<{ message: string; data: SubscriptionPlan }>(
                 `/admin/subscription-plans/${id}`,
                 data
@@ -174,7 +174,7 @@ export const useUpdateAdminAnnouncement = () => {
     const axiosPrivate = useAxiosPrivate();
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ id, data }: { id: number | string; data: Partial<AnnouncementRequest> }) => {
+        mutationFn: async ({ id, data }: { id: string | string; data: Partial<AnnouncementRequest> }) => {
             const response = await axiosPrivate.patch<{ message: string; data: Announcement }>(
                 `/admin/announcements-surveys/${id}`,
                 data
@@ -195,7 +195,7 @@ export const useDeleteAdminAnnouncement = () => {
     const axiosPrivate = useAxiosPrivate();
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async (id: number | string) => {
+        mutationFn: async (id: string | string) => {
             const response = await axiosPrivate.delete<{ message: string }>(
                 `/admin/announcements-surveys/${id}`
             );

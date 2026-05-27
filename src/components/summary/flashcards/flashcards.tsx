@@ -6,7 +6,7 @@ import type { Flashcard as FlashcardType } from "../../../utils/summary.ts";
 
 // --- Types ---
 interface FlashcardData {
-	id: number;
+	id: string;
 	displayIndex: number;
 	question: string;
 	answer: string;

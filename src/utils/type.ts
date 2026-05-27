@@ -53,21 +53,21 @@ export type User = {
     program_id?: number | null;
     other_program?: string | null;
     role?: Role;
-    study_level?: { id: number; name: string } | null;
-    faculty?: { id: number; name: string } | null;
-    program?: { id: number; name: string } | null;
+    study_level?: { id: string; name: string } | null;
+    faculty?: { id: string; name: string } | null;
+    program?: { id: string; name: string } | null;
 }
 
 export interface AdminUser {
-    id: number;
+    id: string;
     email: string;
     first_name: string | null;
     last_name: string | null;
     is_active: boolean;
     role: Role;
-    faculty?: { id: number; name: string } | null;
-    study_level?: { id: number; name: string } | null;
-    program?: { id: number; name: string } | null;
+    faculty?: { id: string; name: string } | null;
+    study_level?: { id: string; name: string } | null;
+    program?: { id: string; name: string } | null;
     other_program?: string | null;
 }
 
@@ -79,7 +79,7 @@ export interface AdminUsersResponse {
 }
 
 export interface SubscriptionPlan {
-    id: number;
+    id: string;
     name: string;
     price: string | number;
     annual_price: string | number;
@@ -96,13 +96,13 @@ export interface SubscriptionPlanRequest {
 }
 
 export interface Subscription {
-    id: number;
-    user_id: number;
+    id: string;
+    user_id: string;
     user_first_name?: string;
     user_last_name?: string;
     user_email?: string;
     plan_name?: string;
-    plan_id: number;
+    plan_id: string;
     plan?: SubscriptionPlan;
     billing_type: "monthly" | "annual";
     status: "active" | "canceled" | "past_due";
@@ -120,8 +120,8 @@ export interface PaginatedSubscriptions {
 }
 
 export interface Transaction {
-    id: number;
-    user_id: number;
+    id: string;
+    user_id: string;
     user_first_name: string;
     user_last_name: string;
     user_email: string;
@@ -133,7 +133,7 @@ export interface Transaction {
     status: "pending" | "completed" | "failed" | "refunded";
     stripe_session_id: string;
     stripe_payment_intent_id?: string | null;
-    subscription_id: number | null;
+    subscription_id: string | null;
     payment_date: string | null;
     created_at: string;
     updated_at: string;
@@ -156,19 +156,19 @@ export interface TransactionStats {
 
 export interface CheckoutResponse {
     checkout_url: string;
-    transaction_id: number;
+    transaction_id: string;
     stripe_session_id: string;
 }
 
 export interface CheckoutRequest {
-    plan_id: number;
+    plan_id: string;
     billing_type: "monthly" | "annual";
     success_url: string;
     cancel_url: string;
 }
 
 export interface Announcement {
-    id: number;
+    id: string;
     title: string;
     content: string;
     url: string | null;
@@ -202,7 +202,7 @@ export interface AdminDashboardResponse {
         revenue: Array<{ name: string; data: number[] }>;
     };
     recentUsers: Array<{
-        id: string | number;
+        id: string;
         firstName: string;
         lastName: string;
         email: string;
@@ -210,9 +210,9 @@ export interface AdminDashboardResponse {
         createdAt: string;
     }>;
     recentTransactions: Array<{
-        id: string | number;
+        id: string;
         user: {
-            id: string | number;
+            id: string;
             name: string;
         };
         amount: number;
@@ -221,7 +221,7 @@ export interface AdminDashboardResponse {
         date: string;
     }>;
     systemActivity: Array<{
-        id: string | number;
+        id: string;
         message: string;
         date: string;
         color: string;

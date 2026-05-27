@@ -138,7 +138,7 @@ export default function UserMetaCard() {
     const faculty = form.watch("faculty_id");
     if (faculty) {
       setProgramsByFaculty(programs.data?.filter(prog => {
-        return prog.faculty_id === parseInt(faculty)
+        return prog.faculty_id === faculty
       }))
     }
   }, [form, programs.data]);

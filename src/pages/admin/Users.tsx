@@ -29,7 +29,7 @@ export default function Users() {
     { value: 50, label: "50" },
   ];
 
-  const setUserStatus = (id: number, next: boolean) => {
+  const setUserStatus = (id: string, next: boolean) => {
     // In a real app, this would be a mutation: useUpdateUserStatus.mutate({ id, is_active: next })
     toast.info("La mise à jour du statut n'est pas encore implémentée côté API", {
       description: `ID: ${id}, Nouveau statut: ${next ? "Actif" : "Inactif"}`

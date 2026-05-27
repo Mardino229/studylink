@@ -9,7 +9,7 @@ import {
 import Badge from "../../ui/badge/Badge";
 
 interface Order {
-  id: number;
+  id: string;
   user: {
     image: string;
     name: string;

@@ -17,7 +17,7 @@ interface UsersTableProps {
     statusFilter?: string;
     itemsPerPage?: number;
     users: AdminUser[];
-    onSetStatus: (id: number, next: boolean) => void;
+    onSetStatus: (id: string, next: boolean) => void;
 }
 
 export default function UsersTable({

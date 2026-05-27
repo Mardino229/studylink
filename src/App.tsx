@@ -43,6 +43,8 @@ import UserProfiles from "./pages/appPage/UserProfiles.tsx";
 import PaymentListPage from './pages/appPage/PaymentListPage.tsx';
 import PaymentSuccess from './pages/appPage/PaymentSuccess.tsx';
 import PaymentCancel from './pages/appPage/PaymentCancel.tsx';
+import Workspaces from './pages/appPage/Workspaces.tsx';
+import WorkspaceNotebook from './pages/appPage/WorkspaceNotebook.tsx';
 
 function App() {
 
@@ -61,6 +63,8 @@ function App() {
                     <Route path="/complete-profile" element={<CompleteProfile />} />
                     <Route element={<AppLayout />}>
                         <Route path="/home" element={<Home />} />
+                        <Route path="/workspaces" element={<Workspaces />} />
+                        <Route path="/workspaces/notebook/:notebookId" element={<WorkspaceNotebook />} />
                         <Route path="/my-summaries" element={<SummaryList />} />
                         <Route path="/my-summaries/summary" element={<Summary />} />
                         <Route path="/my-courses" element={<MyCourse />} />

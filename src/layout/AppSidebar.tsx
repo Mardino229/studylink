@@ -30,31 +30,14 @@ const navItems: NavItem[] = [
     name: "Dashboard",
     path: "/home"
   },
-    {
-        name: "Summary",
-        icon: <ListIcon />,
-        subItems: [
-            { name: "My courses", path: "/my-courses", pro: false },
-            { name: "My summaries", path: "/my-summaries", pro: false },
-            { name: "Summary Library", path: "/library-summary", pro: false }
-        ],
-    },
-    {
-        name: "Test and Exams",
-        icon: <TableIcon />,
-        subItems: [
-            { name: "My exams", path: "/exams", pro: false },
-            { name: "Exam Library", path: "/exam-library", pro: false },
-        ],
-    },
-    {
-        name: "Statistics",
-        icon: <PieChartIcon />,
-        path: "/statistics"
-    },
+  {
+    icon: <ListIcon />,
+    name: "Workspaces",
+    path: "/workspaces"
+  },
   {
     icon: <AI />,
-    name: "Study buddy ia",
+    name: "Chat Assistant",
     path: "/chat",
   },
   {
@@ -62,19 +45,11 @@ const navItems: NavItem[] = [
     name: "User Profile",
     path: "/profile",
   },
-    {
+  {
     icon: <SettingsIcon />,
     name: "Settings",
     path: "/settings",
   },
-  // {
-  //   name: "Pages",
-  //   icon: <PageIcon />,
-  //   subItems: [
-  //     { name: "Blank Page", path: "/blank", pro: false },
-  //     { name: "404 Error", path: "/error-404", pro: false },
-  //   ],
-  // },
 ];
 
 const othersItems: NavItem[] = [

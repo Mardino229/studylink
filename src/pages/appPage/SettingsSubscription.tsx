@@ -38,7 +38,7 @@ export default function SettingsSubscription() {
     }
   };
 
-  // const handleCancel = async (id: number) => {
+  // const handleCancel = async (id: string) => {
   //   if (window.confirm("Êtes-vous sûr de vouloir annuler votre abonnement ?")) {
   //     await cancelSubscription.mutateAsync(id);
   //   }

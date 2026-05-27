@@ -11,7 +11,7 @@ import Badge from "../../ui/badge/Badge";
 
 interface AnnouncementsTableProps {
     announcements: Announcement[];
-    onRemove: (id: number) => void;
+    onRemove: (id: string) => void;
     onEdit: (item: Announcement) => void;
 }
 

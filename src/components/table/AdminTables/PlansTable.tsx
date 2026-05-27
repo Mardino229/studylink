@@ -10,7 +10,7 @@ import { Trash2, Pencil } from "lucide-react";
 
 interface PlansTableProps {
     plans: SubscriptionPlan[];
-    onRemove: (id: number) => void;
+    onRemove: (id: string) => void;
     onEdit: (plan: SubscriptionPlan) => void;
 }
 

@@ -120,7 +120,7 @@ export default function CompleteProfileForm() {
     const isGraduate = selectedLevel?.name?.toLowerCase().includes("études supérieures") ?? false;
 
     const programsByFaculty = facultyId
-        ? programs.data?.filter(prog => prog.faculty_id === parseInt(facultyId))
+        ? programs.data?.filter(prog => prog.faculty_id === facultyId)
         : [];
 
     const useOtherProgram = isGraduate || programId === OTHER_VALUE;

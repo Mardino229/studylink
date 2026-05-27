@@ -34,7 +34,7 @@ type SummaryFormData = z.infer<typeof summarySchema>;
 export default function SummaryList() {
     const [open, setOpen] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-    const [summaryToDelete, setSummaryToDelete] = useState<number | null>(null);
+    const [summaryToDelete, setSummaryToDelete] = useState<string | null>(null);
     const navigate = useNavigate();
     const { courseId, courseName } = useParams();
     const { data: courses } = useGetCourses();
@@ -67,11 +67,11 @@ export default function SummaryList() {
         });
     }
 
-    const handleRename = (id: number, newTitle: string) => {
+    const handleRename = (id: string, newTitle: string) => {
         updateSummary.mutate({ id: id.toString(), summary_name: newTitle });
     };
 
-    const handleDelete = (id: number) => {
+    const handleDelete = (id: string) => {
         setSummaryToDelete(id);
         setDeleteModalOpen(true);
     };

@@ -2,19 +2,19 @@ import { useQuery } from "@tanstack/react-query";
 import { axiosClient } from "./api.ts";
 
 export type StudyLevel = {
-    id: number;
+    id: string;
     name: string;
 }
 
 export type Faculty = {
-    id: number;
+    id: string;
     name: string;
 }
 
 export type Program = {
-    id: number;
+    id: string;
     name: string;
-    faculty_id?: number;
+    faculty_id?: string;
 }
 
 const StudyLevels = () => {
@@ -53,7 +53,7 @@ const Programs = () => {
     return { data, isPending, isError };
 }
 
-const ProgramsByFaculty = (id: number) => {
+const ProgramsByFaculty = (id: string) => {
     const { data, isPending, isError } = useQuery({
         queryFn: async (): Promise<Program[]> => {
             const response = await axiosClient.get<{ data: Program[] }>(`school/programs/${id}`)

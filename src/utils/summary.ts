@@ -4,8 +4,8 @@ import { AxiosError } from "axios";
 import { useAxiosPrivate } from "../hoooks/useAxiosPrivate.ts";
 
 export type Flashcard = {
-    id: number;
-    summary_id: number;
+    id: string;
+    summary_id: string;
     question: string;
     answer: string;
 };
@@ -21,14 +21,14 @@ export type QuizQuestion = {
 
 export type Quiz = {
     quiz_name: string;
-    id: number;
+    id: string;
     questions: QuizQuestion[];
 };
 
 export type Summary = {
-    id: number;
+    id: string;
     summary_name: string;
-    course_id: number;
+    course_id: string;
     document_url?: string;
     content_markdown?: string;
     generation_date?: string;
