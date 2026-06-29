@@ -1,56 +1,109 @@
+import { motion } from "framer-motion";
+import { BookOpen, Bot, HelpCircle, Layers, BookMarked, Zap } from "lucide-react";
 
+const USE_CASES = [
+    {
+        icon: BookOpen,
+        color: "bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400",
+        quote: "J'importe mes slides de cours et j'obtiens un résumé condensé en 30 secondes. Je révise l'essentiel sans relire 80 pages.",
+        label: "Résumés IA",
+        sub: "À partir de PDF, DOCX ou PPTX",
+    },
+    {
+        icon: Layers,
+        color: "bg-purple-50 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400",
+        quote: "Les flashcards générées reprennent exactement les termes de mon prof. En 10 minutes de révision par jour, je mémorise tout.",
+        label: "Flashcards",
+        sub: "Questions-réponses personnalisées",
+    },
+    {
+        icon: HelpCircle,
+        color: "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400",
+        quote: "Je génère un quiz de 10 questions avant chaque intra. Le score instantané me montre exactement où je bloque.",
+        label: "Quiz IA",
+        sub: "Auto-évaluation avant les examens",
+    },
+    {
+        icon: BookMarked,
+        color: "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400",
+        quote: "La bibliothèque d'épreuves me permet de m'entraîner sur les vrais sujets des années passées — avec les corrigés inclus en Pro.",
+        label: "Bibliothèque d'épreuves",
+        sub: "Épreuves filtrées par cours",
+    },
+    {
+        icon: Bot,
+        color: "bg-cyan-50 text-cyan-600 dark:bg-cyan-500/10 dark:text-cyan-400",
+        quote: "Je colle une photo d'un exercice dans le chat et l'IA m'explique la démarche en s'appuyant sur mes propres notes de cours.",
+        label: "Chat IA",
+        sub: "Basé sur vos documents",
+    },
+    {
+        icon: Zap,
+        color: "bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400",
+        quote: "J'ai acheté le pack Standard à 7,99 $. Ça m'a tenu toute une session sans avoir à m'abonner — parfait pour les périodes d'examens.",
+        label: "Packs de jetons",
+        sub: "Payez à la demande, sans engagement",
+    },
+];
 
 export default function Testimonial() {
-
     return (
-        <section className="py-20 sm:py-28 bg-background" id="testimonials">
+        <section className="py-20 sm:py-28 bg-muted/40" id="testimonials">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center">
-                    <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">What Our Students
-                        Say</h2>
-                    <p className="mt-4 text-lg text-foreground/70 max-w-2xl mx-auto">Thousands of students have transformed
-                        their learning experience with StudyLink.</p>
-                </div>
-                <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div className="bg-card border border-border p-8 rounded-2xl shadow-lg flex flex-col items-start">
-                        <p className="text-foreground/70 flex-1">"StudyLink has transformed my study habits. I'm more
-                            organized and productive than ever before. The scheduling feature is a lifesaver!"</p>
-                        <div className="mt-6 flex items-center gap-4">
-                            <img alt="Photo of Sarah M." className="size-12 rounded-full object-cover"
-                                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWyJhOmZM1Hg7-RoPIV8IgfraZpNTnEFq6ekuo8ACgE_Qv2ZsWQFfAWb1rYven3HT5lhgv-OHflLo3Nv9BIKSj_54kw7_BPmRGOf6HO5Dd_6mLnqWsFp-OgS5ZcM4O3r82evT-wLg5fgDLncwlwShNppl-Jd1M2KSMYuSP_yOopJVl_teJWhMUluDDMUOsvan5MGOp1G-eQMHcu-ghKIwlkzN-Jo2cgJ_EsLCm_CTjZS5FkiSRWDfQ51Kf66xVXzDboW6zwsCF7nzr"/>
-                            <div>
-                                <p className="font-bold text-foreground">Sarah M.</p>
-                                <p className="text-sm text-foreground/60">University Student</p>
+                <motion.div
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={{ once: true, amount: 0.5 }}
+                    variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
+                    className="text-center max-w-3xl mx-auto"
+                >
+                    <motion.p
+                        variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } }}
+                        className="text-xs font-semibold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-3"
+                    >
+                        Cas d'usage
+                    </motion.p>
+                    <motion.h2
+                        variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
+                        className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground"
+                    >
+                        Ce que vous pouvez faire avec StudyLink
+                    </motion.h2>
+                    <motion.p
+                        variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
+                        className="mt-4 text-lg text-foreground/70"
+                    >
+                        Des usages concrets pour chaque étape de votre révision.
+                    </motion.p>
+                </motion.div>
+
+                <motion.div
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={{ once: true, amount: 0.1 }}
+                    variants={{ hidden: {}, show: { transition: { staggerChildren: 0.09, delayChildren: 0.08 } } }}
+                    className="mt-14 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                >
+                    {USE_CASES.map(({ icon: Icon, color, quote, label, sub }) => (
+                        <motion.div
+                            key={label}
+                            variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } }}
+                            className="flex flex-col rounded-2xl border border-border bg-card p-7 shadow-sm hover:shadow-md transition-shadow"
+                        >
+                            <div className={`mb-5 flex h-11 w-11 items-center justify-center rounded-xl ${color}`}>
+                                <Icon size={20} />
                             </div>
-                        </div>
-                    </div>
-                    <div className="bg-card border border-border p-8 rounded-2xl shadow-lg flex flex-col items-start">
-                        <p className="text-foreground/70 flex-1">"The collaboration tools are fantastic. Working with my
-                            classmates has never been easier. We can share notes and work on projects seamlessly."</p>
-                        <div className="mt-6 flex items-center gap-4">
-                            <img alt="Photo of David L." className="size-12 rounded-full object-cover"
-                                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-J-uZfN6RDcFDC-5kD49dGSWTlhzOBmqvaX-SjBhkDT9bayKstWnMZYvVx4NMoBKekwu1ngrd-WLVq5KiGQd9Um2r-oi2foUj0bh0xkcU4TtsaMAwNRvtw-ghlG30Ix4TIaUMgDWEXZz8Rm_dEXnzL5aPz1jfnKvQFe8YWH2W14JbP1DUVFkodICRc5Vr3SNRfeO9XVqcV_gvPeSoWexQdU48TK80YN183Aor6Q9fXoLTGj0XzyTSHXG9zu9VKnHVHLlZL3Uih6P8"/>
-                            <div>
-                                <p className="font-bold text-foreground">David L.</p>
-                                <p className="text-sm text-foreground/60">High School Student</p>
+                            <p className="flex-1 text-foreground/70 text-sm leading-relaxed italic">
+                                "{quote}"
+                            </p>
+                            <div className="mt-6 pt-5 border-t border-border">
+                                <p className="font-bold text-foreground text-sm">{label}</p>
+                                <p className="text-xs text-foreground/50 mt-0.5">{sub}</p>
                             </div>
-                        </div>
-                    </div>
-                    <div className="bg-card border border-border p-8 rounded-2xl shadow-lg flex flex-col items-start">
-                        <p className="text-foreground/70 flex-1">"I love the progress tracking feature. It helps me stay
-                            motivated and focused on my goals. Seeing my improvements over time is incredibly
-                            rewarding."</p>
-                        <div className="mt-6 flex items-center gap-4">
-                            <img alt="Photo of Emily R." className="size-12 rounded-full object-cover"
-                                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAEfFuprHbZREg9SnI7-mAkkg5wpsCtFJIqpcWAK8ra1Ix-f1RfzuIkWwAkw0ejSzmUnATBEw48yWOO9ajtRp0SGH3Lvc6CwxsEJRKWGK-uhdHwc5imzvCB_aWnjdR0kI1VfcmNQwQyM2iPwtQPLUvdwf8jFbphxrBHEZacwRgHQplkCNfRtEvprpVo3z9-lcrZhQLWKzXQ-JdjFv7pGK0cl07KwGQKK8Rr7aZ9dnxb00whOEzOecmg50GhgRdr5PkmiDfB_1rcQkQ"/>
-                            <div>
-                                <p className="font-bold text-foreground">Emily R.</p>
-                                <p className="text-sm text-foreground/60">College Student</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                        </motion.div>
+                    ))}
+                </motion.div>
             </div>
         </section>
-    )
+    );
 }

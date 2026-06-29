@@ -8,8 +8,6 @@ interface FlashcardsTabProps {
     flashcards?: PaginatedResponse<ArtefactFlashcard>;
     isLoadingFlashcards: boolean;
     isGenerating: boolean;
-    flashcardCount: number;
-    setFlashcardCount: (count: number) => void;
     openGenerationModal: (type: 'flashcards') => void;
     handleDelete: (message: string, onDelete: () => Promise<unknown>) => void;
     deleteFlashcard: { mutateAsync: (args: { notebookId: string; flashcardId: string }) => Promise<unknown> };
@@ -21,8 +19,6 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
     flashcards,
     isLoadingFlashcards,
     isGenerating,
-    flashcardCount,
-    setFlashcardCount,
     openGenerationModal,
     handleDelete,
     deleteFlashcard,
@@ -36,7 +32,11 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
     const flashcardBatchesList = flashcards?.items ?? [];
 
     useEffect(() => {
-        if (!selectedFlashcardBatchId && flashcardBatchesList.length > 0) {
+        if (flashcardBatchesList.length === 0) {
+            setSelectedFlashcardBatchId(null);
+            return;
+        }
+        if (!selectedFlashcardBatchId || !flashcardBatchesList.some((b) => b.id === selectedFlashcardBatchId)) {
             setSelectedFlashcardBatchId(flashcardBatchesList[0].id);
         }
     }, [flashcardBatchesList, selectedFlashcardBatchId]);
@@ -68,17 +68,6 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
                     </button>
                 </div>
                 
-                <div className="flex items-center justify-between gap-2 pt-1 border-t border-border/40">
-                    <span className="text-xs font-medium text-foreground/75">Nombre de cartes :</span>
-                    <input
-                        type="number"
-                        min={1}
-                        max={50}
-                        value={flashcardCount}
-                        onChange={(e) => setFlashcardCount(Number(e.target.value) || 10)}
-                        className="w-16 rounded-lg border border-border bg-background px-2 py-1 text-xs text-foreground focus:border-brand-500 focus:outline-none dark:border-gray-800"
-                    />
-                </div>
             </div>
 
             {/* Sidebar Item List */}
@@ -114,9 +103,6 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
                                     e.stopPropagation();
                                     handleDelete('Supprimer ce lot de flashcards ?', async () => {
                                         await deleteFlashcard.mutateAsync({ notebookId, flashcardId: batch.id });
-                                        if (selectedFlashcardBatchId === batch.id) {
-                                            setSelectedFlashcardBatchId(null);
-                                        }
                                     });
                                 }}
                                 className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg text-gray-400 opacity-0 group-hover:opacity-100 focus:opacity-100 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all"
@@ -138,7 +124,7 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
 
     return (
         <div className='h-full'>
-            <div className="flex h-full sm:p-4 p-1 py-3 w-full gap-4 overflow-hidden relative">
+            <div className="flex h-full sm:p-4 p-1 w-full gap-4 overflow-hidden relative">
                 {/* Mobile Drawer */}
                 <AnimatePresence>
                     {sidebarOpen && (
@@ -211,7 +197,6 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
                             <button
                                 onClick={() => handleDelete('Supprimer ce lot de flashcards ?', async () => {
                                     await deleteFlashcard.mutateAsync({ notebookId, flashcardId: selectedFlashcardBatch.id });
-                                    setSelectedFlashcardBatchId(null);
                                 })}
                                 className="inline-flex items-center gap-1 text-xs text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-950/20 dark:hover:bg-red-950/40 px-2.5 py-1.5 rounded-full font-medium transition-all"
                             >
@@ -222,9 +207,9 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
                     </div>
 
                     {/* Main Content (StackPreview / Empty State) */}
-                    <div className="flex-1 overflow-y-auto p-2 sm:p-6 scroll-smooth flex items-center justify-center">
+                    <div className="flex-1 overflow-y-auto p-4 sm:p-6 scroll-smooth">
                         {selectedFlashcards.length > 0 ? (
-                            <div className="w-full max-w-2xl">
+                            <div className="w-full pt-10 max-w-2xl">
                                 <StackPreview flashcards={selectedFlashcards} />
                             </div> 
                         ) : (

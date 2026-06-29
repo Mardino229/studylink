@@ -4,7 +4,7 @@ import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
 import Chart from "react-apexcharts";
 import type { ApexOptions } from "apexcharts";
 import ComponentCard from "../../components/common/ComponentCard.tsx";
-import { Users, CreditCard, Activity, ArrowRight, Loader2 } from "lucide-react";
+import { Users, CreditCard, Activity, ArrowRight, Loader2, Zap, BadgeCheck, TrendingUp } from "lucide-react";
 import { useGetAdminDashboard } from "../../utils/admin.ts";
 
 export default function AdminHome() {
@@ -42,12 +42,14 @@ export default function AdminHome() {
     tooltip: { enabled: true },
   };
 
-  const revenueSeries = data.charts?.revenue || [{ name: "Revenus", data: [] }];
+  const revenueSeries = data.charts?.revenue?.length
+    ? data.charts.revenue
+    : [{ name: "Revenus total", data: [] }];
   const revenueOptions: ApexOptions = {
     chart: { type: "area", sparkline: { enabled: true } },
     stroke: { width: 2, curve: "smooth" },
-    fill: { opacity: 0.2 },
-    colors: ["#10b981"],
+    fill: { opacity: 0.15 },
+    colors: ["#3b82f6", "#f59e0b", "#10b981"],
     tooltip: { enabled: true },
   };
 
@@ -104,6 +106,108 @@ export default function AdminHome() {
         </div>
       </div>
 
+      {/* KPIs — revenus détaillés */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
+              <BadgeCheck className="size-5" />
+            </div>
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Revenus abonnements (mois)</p>
+          </div>
+          <h4 className="text-2xl font-bold text-gray-800 dark:text-white/90">
+            {data.kpis?.monthlySubscriptionRevenue?.toLocaleString() ?? '—'} $
+          </h4>
+        </div>
+
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400">
+              <Zap className="size-5" />
+            </div>
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Revenus jetons (mois)</p>
+          </div>
+          <h4 className="text-2xl font-bold text-gray-800 dark:text-white/90">
+            {data.kpis?.monthlyTokenRevenue?.toLocaleString() ?? '—'} $
+          </h4>
+        </div>
+
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400">
+              <TrendingUp className="size-5" />
+            </div>
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Jetons consommés (total)</p>
+          </div>
+          <h4 className="text-2xl font-bold text-gray-800 dark:text-white/90">
+            {data.kpis?.totalTokensSpent?.toLocaleString() ?? '—'}
+          </h4>
+        </div>
+      </div>
+
+      {/* Token analytics */}
+      {data.tokenAnalytics && (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* Pack sales */}
+          <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+            <div className="border-b border-gray-100 px-5 py-4 dark:border-gray-800">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Ventes de packs de jetons</h3>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 dark:bg-gray-800/60">
+                  <tr>
+                    <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 dark:text-gray-400">Pack</th>
+                    <th className="px-4 py-2.5 text-center text-xs font-semibold text-gray-500 dark:text-gray-400">Jetons</th>
+                    <th className="px-4 py-2.5 text-center text-xs font-semibold text-gray-500 dark:text-gray-400">Ventes</th>
+                    <th className="px-4 py-2.5 text-right text-xs font-semibold text-gray-500 dark:text-gray-400">Revenus</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                  {data.tokenAnalytics.packsSold.map(p => (
+                    <tr key={p.packName} className="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
+                      <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">{p.packName}</td>
+                      <td className="px-4 py-3 text-center text-gray-500 dark:text-gray-400">🪙 {p.tokens}</td>
+                      <td className="px-4 py-3 text-center text-gray-900 dark:text-white">{p.salesCount}</td>
+                      <td className="px-4 py-3 text-right font-semibold text-emerald-600 dark:text-emerald-400">{p.revenue.toFixed(2)} $</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Consumption breakdown */}
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+            <h3 className="mb-4 text-sm font-semibold text-gray-900 dark:text-white">Consommation par type</h3>
+            <div className="space-y-3">
+              {[
+                { label: 'Artefacts (résumés, quiz…)', data: data.tokenAnalytics.consumption.artefact, color: 'bg-blue-500' },
+                { label: 'Corrigés', data: data.tokenAnalytics.consumption.corrige, color: 'bg-amber-500' },
+                { label: 'Chat RAG', data: data.tokenAnalytics.consumption.chat, color: 'bg-violet-500' },
+              ].map(({ label, data: d, color }) => {
+                const c = data.tokenAnalytics!.consumption;
+                const total = ((c.artefact?.tokensSpent ?? 0) + (c.corrige?.tokensSpent ?? 0) + (c.chat?.tokensSpent ?? 0)) || 1;
+                const pct = d ? Math.round((d.tokensSpent / total) * 100) : 0;
+                return (
+                  <div key={label}>
+                    <div className="mb-1 flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
+                      <span>{label}</span>
+                      <span className="font-semibold">
+                        {d ? `${d.tokensSpent.toLocaleString()} 🪙 · ${d.count} actions · ${pct}%` : '—'}
+                      </span>
+                    </div>
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+                      <div className={`h-full rounded-full ${color}`} style={{ width: `${pct}%` }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Content sections */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         <div className="xl:col-span-2 space-y-6">
@@ -147,10 +251,14 @@ export default function AdminHome() {
                       <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                         {tx.user?.name}
                       </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{tx.planName}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 truncate flex items-center gap-1.5">
+                        {tx.type === 'token_pack' ? '🪙' : '📋'} {tx.label}
+                      </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">{tx.amount} €</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {tx.amount} {tx.currency?.toUpperCase() ?? '$'}
+                      </p>
                       <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
                         tx.status === 'completed' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' :
                         tx.status === 'pending' ? 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400' :
@@ -204,6 +312,10 @@ export default function AdminHome() {
               </Link>
               <Link to="/admin/subscriptions" className="flex items-center justify-between p-3 rounded-xl border border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-colors group">
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Abonnements</span>
+                <ArrowRight className="size-4 text-gray-400 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link to="/admin/token-packs" className="flex items-center justify-between p-3 rounded-xl border border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-colors group">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Packs de jetons</span>
                 <ArrowRight className="size-4 text-gray-400 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link to="/admin/announcements" className="flex items-center justify-between p-3 rounded-xl border border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-colors group">

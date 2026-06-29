@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useSidebar } from "../../context/SidebarContext";
-import { LayoutDashboard, Users, BadgeCheck, Layers, CreditCard, Megaphone, MessageSquare, BarChart3, Settings as SettingsIcon } from "lucide-react";
+import { LayoutDashboard, Users, BadgeCheck, Layers, CreditCard, Megaphone, MessageSquare, BarChart3, Settings as SettingsIcon, BookMarked, Zap } from "lucide-react";
 
 export default function AdminSidebar() {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
@@ -12,7 +12,9 @@ export default function AdminSidebar() {
     { name: "Users", path: "/admin/users", icon: Users },
     { name: "Subscriptions", path: "/admin/subscriptions", icon: BadgeCheck },
     { name: "Plans", path: "/admin/plans", icon: Layers },
+    { name: "Jetons", path: "/admin/token-packs", icon: Zap },
     { name: "Payments", path: "/admin/payments", icon: CreditCard },
+    { name: "Épreuves", path: "/admin/exam-library", icon: BookMarked },
     { name: "Announcements", path: "/admin/announcements", icon: Megaphone },
     { name: "Feedbacks", path: "/admin/feedbacks", icon: MessageSquare },
     { name: "Reports", path: "/admin/reports", icon: BarChart3 },

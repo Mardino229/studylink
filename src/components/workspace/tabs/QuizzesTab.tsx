@@ -9,8 +9,6 @@ interface QuizzesTabProps {
     quizzes?: PaginatedResponse<ArtefactQuiz>;
     isLoadingQuizzes: boolean;
     isGenerating: boolean;
-    quizCount: number;
-    setQuizCount: (count: number) => void;
     openGenerationModal: (type: 'quiz') => void;
     handleDelete: (message: string, onDelete: () => Promise<unknown>) => void;
     deleteQuiz: { mutateAsync: (args: { notebookId: string; quizId: string }) => Promise<unknown> };
@@ -22,8 +20,6 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
     quizzes,
     isLoadingQuizzes,
     isGenerating,
-    quizCount,
-    setQuizCount,
     openGenerationModal,
     handleDelete,
     deleteQuiz,
@@ -37,7 +33,11 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
     const quizzesList = quizzes?.items ?? [];
 
     useEffect(() => {
-        if (!selectedQuizId && quizzesList.length > 0) {
+        if (quizzesList.length === 0) {
+            setSelectedQuizId(null);
+            return;
+        }
+        if (!selectedQuizId || !quizzesList.some((q) => q.id === selectedQuizId)) {
             setSelectedQuizId(quizzesList[0].id);
         }
     }, [quizzesList, selectedQuizId]);
@@ -78,17 +78,6 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
                     </button>
                 </div>
 
-                <div className="flex items-center justify-between gap-2 pt-1 border-t border-border/40">
-                    <span className="text-xs font-medium text-foreground/75">Nb. de questions :</span>
-                    <input
-                        type="number"
-                        min={1}
-                        max={20}
-                        value={quizCount}
-                        onChange={(e) => setQuizCount(Number(e.target.value) || 5)}
-                        className="w-16 rounded-lg border border-border bg-background px-2 py-1 text-xs text-foreground focus:border-brand-500 focus:outline-none dark:border-gray-800"
-                    />
-                </div>
             </div>
 
             {/* Sidebar Item List */}
@@ -124,9 +113,6 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
                                     e.stopPropagation();
                                     handleDelete('Supprimer ce quiz ?', async () => {
                                         await deleteQuiz.mutateAsync({ notebookId, quizId: quiz.id });
-                                        if (selectedQuizId === quiz.id) {
-                                            setSelectedQuizId(null);
-                                        }
                                     });
                                 }}
                                 className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg text-gray-400 opacity-0 group-hover:opacity-100 focus:opacity-100 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all"
@@ -221,7 +207,6 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
                             <button
                                 onClick={() => handleDelete('Supprimer ce quiz ?', async () => {
                                     await deleteQuiz.mutateAsync({ notebookId, quizId: selectedQuiz.id });
-                                    setSelectedQuizId(null);
                                 })}
                                 className="inline-flex items-center gap-1 text-xs text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-950/20 dark:hover:bg-red-950/40 px-2.5 py-1.5 rounded-full font-medium transition-all"
                             >

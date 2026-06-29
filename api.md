@@ -1,116 +1,158 @@
-# Intégration — Changement de mot de passe avec OTP
+# Frontend Guide - Folder and Notebook Actions
 
-Ce document explique comment intégrer la fonctionnalité de changement de mot de passe sécurisé par OTP depuis le frontend.
+This guide documents the endpoints to create folders, assign notebooks to folders, move notebooks, remove notebooks from folders, and list notebooks in a folder with pagination.
 
----
+## Base URL
 
-## Vue d'ensemble du flux
+`/api/v1`
 
-```
-[Utilisateur clique "Changer mon mot de passe"]
-        │
-        ▼
-[1] POST /api/v1/user/request-change-password-otp
-        │  ← L'utilisateur doit être connecté (JWT)
-        │  → Un OTP à 5 chiffres est envoyé à son adresse email
-        │
-        ▼
-[Afficher un formulaire : mot de passe actuel + nouveau mot de passe + champ OTP]
-        │
-        ▼
-[2] POST /api/v1/user/change-password
-        │  ← Corps JSON : current_password, new_password, confirm_new_password, otp_code
-        │  → Mot de passe changé, OTP invalidé
-```
+## Auth
 
----
+All endpoints require authentication.
 
-## Endpoint 1 — Demander l'OTP
+Use cookie auth (current backend behavior) and ensure requests are sent with credentials.
 
-### Requête
 
-```
-POST /api/v1/user/request-change-password-otp
-Authorization: Bearer <access_token>
+## 1) Folder endpoints
+
+### Create folder
+
+- Method: `POST`
+- URL: `/folders`
+- Body:
+
+```json
+{
+  "name": "My Folder",
+  "description": "Optional description"
+}
 ```
 
-Pas de corps (body). L'utilisateur est identifié via le token JWT.
+### List folders (paginated)
 
-### Réponse — succès `200 OK`
+- Method: `GET`
+- URL: `/folders?page=1&per_page=20`
+
+### Update folder
+
+- Method: `PUT`
+- URL: `/folders/{folder_id}`
+- Body:
+
+```json
+{
+  "name": "New Folder Name",
+  "description": "Updated description"
+}
+```
+
+### Delete folder
+
+- Method: `DELETE`
+- URL: `/folders/{folder_id}`
+
+## 2) Notebook endpoints related to folders
+
+### Create notebook directly in a folder
+
+- Method: `POST`
+- URL: `/notebooks`
+- Body:
+
+```json
+{
+  "name": "Notebook A",
+  "description": "Optional",
+  "folder_id": "11111111-2222-3333-4444-555555555555"
+}
+```
+
+### Move notebook to another folder
+
+- Method: `PATCH`
+- URL: `/notebooks/{notebook_id}`
+- Body:
+
+```json
+{
+  "folder_id": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+}
+```
+
+### Remove notebook from folder
+
+- Method: `PATCH`
+- URL: `/notebooks/{notebook_id}`
+- Body:
+
+```json
+{
+  "folder_id": null
+}
+```
+
+### List notebooks filtered by folder (existing endpoint)
+
+- Method: `GET`
+- URL: `/notebooks?folder_id={folder_id}&page=1&per_page=20`
+
+### List notebooks without any folder
+
+- Method: `GET`
+- URL: `/notebooks/unassigned?page=1&per_page=20`
+
+## 3) Dedicated endpoint: notebooks of one folder (paginated)
+
+This is the new endpoint added for frontend convenience.
+
+### Get notebooks from a folder
+
+- Method: `GET`
+- URL: `/folders/{folder_id}/notebooks?page=1&per_page=20`
+
+### Example response
 
 ```json
 {
   "success": true,
-  "message": "OTP sent to your email. Please use it to confirm your password change.",
-  "data": null
+  "message": "Folder notebooks retrieved successfully",
+  "data": {
+    "items": [
+      {
+        "id": "5edeb66d-2fd2-4d5f-8b17-a051f9c8d458",
+        "name": "Notebook A",
+        "description": "Optional",
+        "folder_id": "11111111-2222-3333-4444-555555555555",
+        "user_id": "f82e2f52-3d66-4f61-99f5-f7c64de8b6c0",
+        "created_at": "2026-05-29T09:10:00",
+        "updated_at": "2026-05-29T09:10:00"
+      }
+    ],
+    "pagination": {
+      "total": 42,
+      "page": 1,
+      "per_page": 20,
+      "total_pages": 3
+    }
+  }
 }
 ```
 
-### Comportement attendu côté frontend
+## 4) Frontend implementation pattern
 
-- Appeler cet endpoint au moment où l'utilisateur souhaite changer son mot de passe.
-- Afficher un message de confirmation : _"Un code OTP a été envoyé à votre adresse email."_
-- Afficher le formulaire permettant de saisir le code OTP, le mot de passe actuel et le nouveau mot de passe.
+### Suggested actions
 
----
-
-## Endpoint 2 — Changer le mot de passe
-
-### Requête
-
-```
-POST /api/v1/user/change-password
-Authorization: Bearer <access_token>
-Content-Type: application/json
-```
-
-**Corps (JSON) :**
-
-| Champ                  | Type     | Obligatoire | Description                           |
-|------------------------|----------|-------------|---------------------------------------|
-| `current_password`     | `string` | ✅           | Mot de passe actuel de l'utilisateur  |
-| `new_password`         | `string` | ✅           | Nouveau mot de passe souhaité         |
-| `confirm_new_password` | `string` | ✅           | Confirmation du nouveau mot de passe  |
-| `otp_code`             | `string` | ✅           | Code OTP reçu par email               |
-
-**Exemple :**
-
-```json
-{
-  "current_password": "MonAncienMdp123",
-  "new_password": "MonNouveauMdp456!",
-  "confirm_new_password": "MonNouveauMdp456!",
-  "otp_code": "84921"
-}
-```
-
-### Réponse — succès `200 OK`
-
-```json
-{
-  "success": true,
-  "message": "Password changed successfully",
-  "data": null
-}
-```
-
-### Erreurs possibles
-
-| Status | `detail`                                          | Cause                                              |
-|--------|---------------------------------------------------|----------------------------------------------------|
-| `400`  | `"Current password is incorrect"`                 | Le mot de passe actuel est erroné                  |
-| `400`  | `"Invalid or expired OTP"`                        | L'OTP est incorrect ou l'étape 1 n'a pas été faite |
-| `400`  | `"New passwords do not match"`                    | `new_password` ≠ `confirm_new_password`            |
-| `400`  | `"New password must be different from the current password"` | Le nouveau mot de passe est identique à l'ancien |
-| `401`  | `"Not authenticated"`                             | Token JWT absent ou expiré                         |
+1. Load folders: `GET /folders`
+2. User selects folder: call `GET /folders/{folder_id}/notebooks?page=1&per_page=20`
+3. User drags notebook to another folder: call `PATCH /notebooks/{notebook_id}` with new `folder_id`
+4. User removes notebook from folder: call `PATCH /notebooks/{notebook_id}` with `folder_id: null`
+5. Refresh affected folder lists
 
 
+## 5) Error cases to handle
 
----
+- `404 Folder not found`
+- `403 Not enough permissions`
+- Validation errors on UUID/payload
 
-## Notes importantes
-
-- L'OTP est à **usage unique**. Une fois le mot de passe changé, il est invalidé.
-- Si l'utilisateur n'a pas reçu son OTP, il doit rappeler l'endpoint `request-change-password-otp` pour en générer un nouveau.
-- Les deux endpoints nécessitent que l'utilisateur soit **authentifié** (cookie `access_token` ou header `Authorization: Bearer <token>`).
-- Il n'y a pas de délai d'expiration configuré sur l'OTP côté base de données. Pour une sécurité renforcée en production, discutez avec le backend de l'ajout d'une expiration (ex. 10 minutes).
+Show user-friendly toasts and keep local UI state consistent.

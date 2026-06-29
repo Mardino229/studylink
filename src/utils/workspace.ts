@@ -111,6 +111,32 @@ export const useGetNotebooks = (folderId?: string | null, options: PaginationOpt
     });
 };
 
+export const useGetUnassignedNotebooks = (options: PaginationOptions = {}) => {
+    const axiosPrivate = useAxiosPrivate();
+    return useQuery({
+        queryKey: ["notebooks", "unassigned", options.page ?? 1, options.perPage ?? 20],
+        queryFn: async () => {
+            const params = buildPaginationParams(options);
+            const response = await axiosPrivate.get<{ data: PaginatedResponse<Notebook> }>(`/notebooks/unassigned?${params}`);
+            return response.data.data;
+        },
+    });
+};
+
+export const useGetFolderNotebooks = (folderId: string | null, options: PaginationOptions = {}) => {
+    const axiosPrivate = useAxiosPrivate();
+    return useQuery({
+        queryKey: ["folder-notebooks", folderId, options.page ?? 1, options.perPage ?? 20],
+        queryFn: async () => {
+            if (!folderId) return { items: [], pagination: { total: 0, page: 1, per_page: 20, total_pages: 1 } };
+            const params = buildPaginationParams(options);
+            const response = await axiosPrivate.get<{ data: PaginatedResponse<Notebook> }>(`/folders/${folderId}/notebooks?${params}`);
+            return response.data.data;
+        },
+        enabled: !!folderId,
+    });
+};
+
 export const useGetNotebook = (notebookId?: string) => {
     const axiosPrivate = useAxiosPrivate();
     return useQuery({
@@ -133,6 +159,7 @@ export const useCreateNotebook = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["notebooks"] });
+            queryClient.invalidateQueries({ queryKey: ["folder-notebooks"] });
             toast.success("Notebook créé avec succès");
         },
         onError: (error) => {
@@ -146,13 +173,14 @@ export const useUpdateNotebook = () => {
     const queryClient = useQueryClient();
     const axiosPrivate = useAxiosPrivate();
     return useMutation({
-        mutationFn: async ({ id, data }: { id: string; data: Partial<{ name: string; description: string }> }) => {
+        mutationFn: async ({ id, data }: { id: string; data: Partial<{ name: string; description: string; folder_id: string | null }> }) => {
             const response = await axiosPrivate.patch<{ data: Notebook }>(`/notebooks/${id}`, data);
             return response.data.data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["notebooks"] });
             queryClient.invalidateQueries({ queryKey: ["notebook"] });
+            queryClient.invalidateQueries({ queryKey: ["folder-notebooks"] });
             toast.success("Notebook mis à jour");
         },
         onError: (error) => {
@@ -171,6 +199,7 @@ export const useDeleteNotebook = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["notebooks"] });
+            queryClient.invalidateQueries({ queryKey: ["folder-notebooks"] });
             toast.success("Notebook supprimé");
         },
         onError: (error) => {
@@ -379,9 +408,10 @@ export const useGenerateSummary = () => {
     const axiosPrivate = useAxiosPrivate();
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ notebookId, title, sourceIds, themeIds }: { notebookId: string; title: string; sourceIds?: string[]; themeIds?: string[] }) => {
+        mutationFn: async ({ notebookId, title, language, sourceIds, themeIds }: { notebookId: string; title: string; language?: string; sourceIds?: string[]; themeIds?: string[] }) => {
             const response = await axiosPrivate.post<{ data: ArtefactSummary }>(`/notebooks/${notebookId}/artefacts/summaries`, {
                 title,
+                language,
                 source_ids: sourceIds,
                 theme_ids: themeIds,
             });
@@ -389,6 +419,7 @@ export const useGenerateSummary = () => {
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["artefact-summaries", variables.notebookId] });
+            queryClient.invalidateQueries({ queryKey: ["token-balance"] });
             toast.success("Résumé généré");
         },
         onError: (error) => {
@@ -416,10 +447,11 @@ export const useGenerateFlashcards = () => {
     const axiosPrivate = useAxiosPrivate();
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ notebookId, title, count = 10, sourceIds, themeIds }: { notebookId: string; title: string; count?: number; sourceIds?: string[]; themeIds?: string[] }) => {
+        mutationFn: async ({ notebookId, title, language, count = 10, sourceIds, themeIds }: { notebookId: string; title: string; language?: string; count?: number; sourceIds?: string[]; themeIds?: string[] }) => {
             const params = new URLSearchParams({ count: count.toString() });
             const response = await axiosPrivate.post<{ data: ArtefactFlashcard }>(`/notebooks/${notebookId}/artefacts/flashcards?${params}`, {
                 title,
+                language,
                 source_ids: sourceIds,
                 theme_ids: themeIds,
             });
@@ -427,6 +459,7 @@ export const useGenerateFlashcards = () => {
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["artefact-flashcards", variables.notebookId] });
+            queryClient.invalidateQueries({ queryKey: ["token-balance"] });
             toast.success("Flashcards générées");
         },
         onError: (error) => {
@@ -454,10 +487,11 @@ export const useGenerateQuiz = () => {
     const axiosPrivate = useAxiosPrivate();
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ notebookId, title, count = 5, sourceIds, themeIds }: { notebookId: string; title: string; count?: number; sourceIds?: string[]; themeIds?: string[] }) => {
+        mutationFn: async ({ notebookId, title, language, count = 5, sourceIds, themeIds }: { notebookId: string; title: string; language?: string; count?: number; sourceIds?: string[]; themeIds?: string[] }) => {
             const params = new URLSearchParams({ count: count.toString() });
             const response = await axiosPrivate.post<{ data: ArtefactQuiz }>(`/notebooks/${notebookId}/artefacts/quizzes?${params}`, {
                 title,
+                language,
                 source_ids: sourceIds,
                 theme_ids: themeIds,
             });
@@ -465,6 +499,7 @@ export const useGenerateQuiz = () => {
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["artefact-quizzes", variables.notebookId] });
+            queryClient.invalidateQueries({ queryKey: ["token-balance"] });
             toast.success("Quiz généré");
         },
         onError: (error) => {
@@ -504,9 +539,10 @@ export const useGeneratePodcast = () => {
     const axiosPrivate = useAxiosPrivate();
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ notebookId, title, sourceIds, themeIds }: { notebookId: string; title: string; sourceIds?: string[]; themeIds?: string[] }) => {
+        mutationFn: async ({ notebookId, title, language, sourceIds, themeIds }: { notebookId: string; title: string; language?: string; sourceIds?: string[]; themeIds?: string[] }) => {
             const response = await axiosPrivate.post<{ data: ArtefactPodcast }>(`/notebooks/${notebookId}/artefacts/podcasts`, {
                 title,
+                language,
                 source_ids: sourceIds,
                 theme_ids: themeIds,
             });
@@ -514,6 +550,7 @@ export const useGeneratePodcast = () => {
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["artefact-podcasts", variables.notebookId] });
+            queryClient.invalidateQueries({ queryKey: ["token-balance"] });
             toast.success("Podcast généré");
         },
         onError: (error) => {

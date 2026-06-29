@@ -38,7 +38,7 @@ export default function HistoryPaymentTableOne({
 
     const lowerSearchTerm = searchTerm.toLowerCase();
     return transactions.filter((t: Transaction) =>
-      t.id.toString().includes(lowerSearchTerm) ||
+      t.transaction_type.toString().includes(lowerSearchTerm) ||
       (t.plan?.name || "").toLowerCase().includes(lowerSearchTerm) ||
       t.status.toLowerCase().includes(lowerSearchTerm)
     );
@@ -63,6 +63,12 @@ export default function HistoryPaymentTableOne({
               <Table>
                 <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
                   <TableRow>
+                    {/*<TableCell
+                      isHeader
+                      className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                    >
+                      ID
+                    </TableCell> */}
                     <TableCell
                       isHeader
                       className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
@@ -73,7 +79,7 @@ export default function HistoryPaymentTableOne({
                       isHeader
                       className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                     >
-                      ID
+                      Type
                     </TableCell>
                     <TableCell
                       isHeader
@@ -100,14 +106,17 @@ export default function HistoryPaymentTableOne({
                   {
                     filteredTransactions.map((t) => (
                       <TableRow key={t.id}>
+                        {/* <TableCell className="px-4 py-3 font-mono text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                          #{t.id}
+                        </TableCell> */}
                         <TableCell className="px-5 py-4 sm:px-6 text-start text-gray-500 text-theme-sm dark:text-gray-400">
                           {t.payment_date ? new Date(t.payment_date).toLocaleDateString() : "En attente"}
                         </TableCell>
-                        <TableCell className="px-4 py-3 font-mono text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                          #{t.id}
+                        <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                          {t.transaction_type === "subscription" ? "Abonnement" : "Pack de jetons"}
                         </TableCell>
                         <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                          {t.plan?.name || "N/A"} ({t.billing_type === "monthly" ? "Mensuel" : "Annuel"})
+                          {t.plan?.name || "N/A"} ({t.billing_type ? t.billing_type === "monthly" ? "Mensuel" : "Annuel" : "N/A"})
                         </TableCell>
                         <TableCell className="px-4 py-3 font-medium text-gray-800 text-theme-sm dark:text-white/90">
                           {t.amount} {t.currency.toUpperCase()}

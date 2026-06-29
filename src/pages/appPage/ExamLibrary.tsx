@@ -1,278 +1,267 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import PageMeta from "../../components/common/PageMeta";
-import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
-import Button from "../../components/ui/button/Button.tsx";
-import { Modal } from "../../components/ui/modal/index.tsx";
-import { Input } from "../../components/ui/input.tsx";
-import { Label } from "../../components/ui/label.tsx";
-import { RotatingLines } from "react-loader-spinner";
-import { PlusIcon } from "../../icons";
-import { FileText } from "lucide-react";
-import { useGetExams, useCreateExam, examSchema, type ExamFormValues } from "../../utils/exam.ts";
-import { ExamCard } from "../../components/ui/exam-card.tsx";
+import React, { useState } from 'react';
+import axios from 'axios';
+import { toast } from 'sonner';
+import { BookOpen, Download, FileText, Lock, Search, Unlock } from 'lucide-react';
+import PageMeta from '../../components/common/PageMeta';
+import PageBreadcrumb from '../../components/common/PageBreadCrumb';
+import { useGetCourses, useGetExams } from '../../utils/exam';
+import { useAxiosPrivate } from '../../hoooks/useAxiosPrivate';
+import type { ExamItem, ExamSession, ExamType } from '../../types/exams';
+
+const SESSION_LABELS: Record<ExamSession, string> = {
+    fall: 'Automne',
+    winter: 'Hiver',
+    summer: 'Été',
+};
+const TYPE_LABELS: Record<ExamType, string> = {
+    midterm: 'Intra',
+    final: 'Final',
+    quiz: 'Quiz',
+    other: 'Autre',
+};
+const TYPE_COLORS: Record<ExamType, string> = {
+    midterm: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+    final: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+    quiz: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+    other: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
+};
 
 export default function ExamLibrary() {
-    const { data: exams = [], isLoading } = useGetExams();
-    const createExam = useCreateExam();
+    const axiosPrivate = useAxiosPrivate();
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [courseId, setCourseId] = useState('');
+    const [academicYear, setAcademicYear] = useState('');
+    const [session, setSession] = useState<ExamSession | ''>('');
+    const [examType, setExamType] = useState<ExamType | ''>('');
 
-    // Filter state
-    const [searchQuery, setSearchQuery] = useState("");
-    const [selectedFaculty, setSelectedFaculty] = useState("");
-    const [selectedProgram, setSelectedProgram] = useState("");
-    const [selectedYear, setSelectedYear] = useState("");
+    const [appliedFilters, setAppliedFilters] = useState<{
+        courseId: string;
+        academicYear: string;
+        session: ExamSession | '';
+        examType: ExamType | '';
+    }>({ courseId: '', academicYear: '', session: '', examType: '' });
 
-    // Form
-    const {
-        register,
-        handleSubmit,
-        reset,
-        formState: { errors },
-    } = useForm<ExamFormValues>({
-        resolver: zodResolver(examSchema),
+    const [downloading, setDownloading] = useState<string | null>(null);
+
+    const { data: courses = [] } = useGetCourses();
+    const { data: exams = [], isLoading } = useGetExams({
+        is_validated: true,
+        course_id: appliedFilters.courseId || undefined,
+        academic_year: appliedFilters.academicYear ? Number(appliedFilters.academicYear) : undefined,
+        session: (appliedFilters.session || undefined) as ExamSession | undefined,
+        exam_type: (appliedFilters.examType || undefined) as ExamType | undefined,
+        limit: 100,
     });
 
-    // Derived state for filters
-    const faculties = Array.from(new Set(exams.map(e => e.faculty).filter(Boolean))) as string[];
-    const programs = Array.from(new Set(exams.map(e => e.program).filter(Boolean))) as string[];
-    const years = Array.from(new Set(exams.map(e => e.year).filter(Boolean))) as string[];
+    const handleSearch = () => setAppliedFilters({ courseId, academicYear, session, examType });
 
-    const filteredExams = exams.filter(exam => {
-        const matchesSearch = exam.title.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesFaculty = !selectedFaculty || exam.faculty === selectedFaculty;
-        const matchesProgram = !selectedProgram || exam.program === selectedProgram;
-        const matchesYear = !selectedYear || exam.year === selectedYear;
-        return matchesSearch && matchesFaculty && matchesProgram && matchesYear;
-    });
+    const handleReset = () => {
+        setCourseId(''); setAcademicYear(''); setSession(''); setExamType('');
+        setAppliedFilters({ courseId: '', academicYear: '', session: '', examType: '' });
+    };
 
-    const onSubmit = (data: ExamFormValues) => {
-        const fileToUpload = data.file instanceof FileList ? data.file[0] : data.file;
+    const hasActiveFilters = appliedFilters.courseId || appliedFilters.academicYear || appliedFilters.session || appliedFilters.examType;
 
-        createExam.mutate({
-            title: data.title,
-            faculty: data.faculty,
-            program: data.program,
-            year: data.year,
-            file: fileToUpload as File
-        }, {
-            onSuccess: () => {
-                reset();
-                setIsModalOpen(false);
+    const downloadFile = async (examId: string, type: 'exam' | 'solution', name: string) => {
+        const key = `${examId}-${type}`;
+        setDownloading(key);
+        try {
+            const url = type === 'exam' ? `/exam-library/${examId}/download` : `/exam-library/${examId}/solution`;
+            const response = await axiosPrivate.get(url, { responseType: 'blob' });
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${name}.pdf`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                if (error.response?.status === 402) {
+                    toast.error('Abonnement requis', { description: 'Un abonnement actif est nécessaire pour accéder à ce corrigé.' });
+                } else if (error.response?.status === 403) {
+                    toast.error('Accès refusé', { description: "Cette épreuve n'est pas encore disponible." });
+                } else if (error.response?.status === 404) {
+                    toast.error('Corrigé indisponible', { description: "Aucun corrigé n'est disponible pour cette épreuve." });
+                } else {
+                    toast.error('Erreur lors du téléchargement');
+                }
             }
-        });
+        } finally {
+            setDownloading(null);
+        }
     };
 
     return (
         <>
-            <PageMeta
-                title="Exam Library"
-                description="Browse and upload exams."
-            />
-            <PageBreadcrumb
-                pageTitle="Exam Library"
-                items={[
-                    { label: "Test and Exams", path: "/exams" }
-                ]}
-            />
+            <PageMeta title="Bibliothèque d'épreuves" description="Parcourir et télécharger les épreuves et corrigés" />
+            <PageBreadcrumb pageTitle="Bibliothèque d'épreuves" />
 
-            <div className="space-y-6 pt-8">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                        Bibliothèque d'examens
-                    </h2>
-                    <Button
-                        size="sm"
-                        variant="primary"
-                        startIcon={<PlusIcon className="size-5" />}
-                        onClick={() => setIsModalOpen(true)}
-                    >
-                        <span>Uploader un examen</span>
-                    </Button>
-                </div>
-
-                {/* Search and Filters */}
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
-                    <div className="relative flex-1">
-                        <span className="absolute -translate-y-1/2 pointer-events-none left-4 top-1/2">
-                            <svg
-                                className="fill-gray-500 dark:fill-gray-400"
-                                width="20"
-                                height="20"
-                                viewBox="0 0 20 20"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    fillRule="evenodd"
-                                    clipRule="evenodd"
-                                    d="M3.04175 9.37363C3.04175 5.87693 5.87711 3.04199 9.37508 3.04199C12.8731 3.04199 15.7084 5.87693 15.7084 9.37363C15.7084 12.8703 12.8731 15.7053 9.37508 15.7053C5.87711 15.7053 3.04175 12.8703 3.04175 9.37363ZM9.37508 1.54199C5.04902 1.54199 1.54175 5.04817 1.54175 9.37363C1.54175 13.6991 5.04902 17.2053 9.37508 17.2053C11.2674 17.2053 13.003 16.5344 14.357 15.4176L17.177 18.238C17.4699 18.5309 17.9448 18.5309 18.2377 18.238C18.5306 17.9451 18.5306 17.4703 18.2377 17.1774L15.418 14.3573C16.5365 13.0033 17.2084 11.2669 17.2084 9.37363C17.2084 5.04817 13.7011 1.54199 9.37508 1.54199Z"
-                                    fill=""
-                                />
-                            </svg>
-                        </span>
+            <div className="space-y-5 pt-4">
+                {/* Filters */}
+                <div className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900/80">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                        <select
+                            value={courseId}
+                            onChange={(e) => setCourseId(e.target.value)}
+                            className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-800 outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white lg:col-span-2"
+                        >
+                            <option value="">Tous les cours</option>
+                            {courses.map(c => (
+                                <option key={c.id} value={c.id}>{c.code} — {c.name}</option>
+                            ))}
+                        </select>
                         <input
-                            type="text"
-                            placeholder="Rechercher par nom..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-200 bg-transparent py-2.5 pl-12 pr-14 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                            type="number"
+                            placeholder="Année (ex: 2024)"
+                            value={academicYear}
+                            onChange={(e) => setAcademicYear(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                            className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-800 outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                         />
+                        <select
+                            value={session}
+                            onChange={(e) => setSession(e.target.value as ExamSession | '')}
+                            className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-800 outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                        >
+                            <option value="">Toutes les sessions</option>
+                            <option value="fall">Automne</option>
+                            <option value="winter">Hiver</option>
+                            <option value="summer">Été</option>
+                        </select>
+                        <select
+                            value={examType}
+                            onChange={(e) => setExamType(e.target.value as ExamType | '')}
+                            className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-800 outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                        >
+                            <option value="">Tous les types</option>
+                            <option value="midterm">Intra</option>
+                            <option value="final">Final</option>
+                            <option value="quiz">Quiz</option>
+                            <option value="other">Autre</option>
+                        </select>
                     </div>
-                    <div className="flex gap-2 overflow-x-auto pb-2 lg:pb-0">
-                        <select
-                            value={selectedFaculty}
-                            onChange={(e) => setSelectedFaculty(e.target.value)}
-                            className="h-11 rounded-lg border border-gray-200 bg-transparent px-3 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none focus:ring focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800"
+                    <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+                        {hasActiveFilters && (
+                            <button
+                                onClick={handleReset}
+                                className="h-10 w-full rounded-lg border border-gray-200 px-4 text-sm text-gray-500 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 sm:w-auto"
+                            >
+                                Réinitialiser
+                            </button>
+                        )}
+                        <button
+                            onClick={handleSearch}
+                            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 sm:w-auto"
                         >
-                            <option value="">Toutes les facultés</option>
-                            {faculties.map(f => <option key={f} value={f}>{f}</option>)}
-                        </select>
-                        <select
-                            value={selectedProgram}
-                            onChange={(e) => setSelectedProgram(e.target.value)}
-                            className="h-11 rounded-lg border border-gray-200 bg-transparent px-3 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none focus:ring focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800"
-                        >
-                            <option value="">Tous les programmes</option>
-                            {programs.map(p => <option key={p} value={p}>{p}</option>)}
-                        </select>
-                        <select
-                            value={selectedYear}
-                            onChange={(e) => setSelectedYear(e.target.value)}
-                            className="h-11 rounded-lg border border-gray-200 bg-transparent px-3 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none focus:ring focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800"
-                        >
-                            <option value="">Toutes les années</option>
-                            {years.map(y => <option key={y} value={y}>{y}</option>)}
-                        </select>
+                            <Search size={15} />
+                            Rechercher
+                        </button>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {isLoading ? (
-                        <p className="text-sm text-foreground/60 col-span-full">Chargement des examens...</p>
-                    ) : filteredExams.length === 0 ? (
-                        <div className="col-span-full flex flex-col items-center justify-center py-16 sm:py-24">
-                            <div className="flex flex-col items-center gap-4 text-center">
-                                <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-6">
-                                    <FileText size={48} className="text-gray-400 dark:text-gray-600" />
-                                </div>
-                                <div className="space-y-2">
-                                    <p className="text-lg font-medium text-gray-900 dark:text-white">
-                                        Aucun examen trouvé
-                                    </p>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        Essayez de modifier vos filtres ou votre recherche.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    ) : (
-                        filteredExams.map((exam) => (
-                            <ExamCard key={exam.id} exam={exam} />
-                        ))
-                    )}
-                </div>
+                {!isLoading && (
+                    <p className="text-xs text-gray-400 dark:text-gray-500">
+                        {exams.length} épreuve{exams.length !== 1 ? 's' : ''}
+                    </p>
+                )}
 
-                <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} className="max-w-md p-6">
-                    <div className="text-lg font-semibold text-foreground mb-4">
-                        Uploader un examen
+                {isLoading ? (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        {Array.from({ length: 8 }).map((_, i) => (
+                            <div key={i} className="h-52 animate-pulse rounded-2xl bg-gray-100 dark:bg-gray-800" />
+                        ))}
                     </div>
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                        <div>
-                            <Label className="mb-1.5">Nom de l'examen <span className="text-red-500">*</span></Label>
-                            <Input
-                                className="form-input block w-full appearance-none rounded-lg border border-gray-300 px-3 py-3 placeholder-gray-400 shadow-sm focus:border-[var(--primary-color)] focus:outline-none focus:ring-[var(--primary-color)] sm:text-sm"
-                                placeholder="Ex: Physique - 2024 - Final"
-                                {...register("title")}
-                            />
-                            {errors.title && (
-                                <p className="mt-1 text-xs text-red-500">{errors.title.message}</p>
-                            )}
-                            <p className="mt-1 text-xs text-gray-500">
-                                Nomenclature: Matière - Année - Type
-                            </p>
+                ) : exams.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-20 text-center">
+                        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800">
+                            <FileText size={28} className="text-gray-400" />
                         </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <Label className="mb-1.5">Année</Label>
-                                <Input
-                                    className="form-input block w-full appearance-none rounded-lg border border-gray-300 px-3 py-3 placeholder-gray-400 shadow-sm focus:border-[var(--primary-color)] focus:outline-none focus:ring-[var(--primary-color)] sm:text-sm"
-                                    placeholder="Ex: 2024"
-                                    {...register("year")}
-                                />
-                                {errors.year && (
-                                    <p className="mt-1 text-xs text-red-500">{errors.year.message}</p>
-                                )}
-                            </div>
-                            <div>
-                                <Label className="mb-1.5">Faculté</Label>
-                                <Input
-                                    className="form-input block w-full appearance-none rounded-lg border border-gray-300 px-3 py-3 placeholder-gray-400 shadow-sm focus:border-[var(--primary-color)] focus:outline-none focus:ring-[var(--primary-color)] sm:text-sm"
-                                    placeholder="Ex: Sciences"
-                                    {...register("faculty")}
-                                />
-                                {errors.faculty && (
-                                    <p className="mt-1 text-xs text-red-500">{errors.faculty.message}</p>
-                                )}
-                            </div>
-                        </div>
-
-                        <div>
-                            <Label className="mb-1.5">Programme</Label>
-                            <Input
-                                className="form-input block w-full appearance-none rounded-lg border border-gray-300 px-3 py-3 placeholder-gray-400 shadow-sm focus:border-[var(--primary-color)] focus:outline-none focus:ring-[var(--primary-color)] sm:text-sm"
-                                placeholder="Ex: Licence Physique"
-                                {...register("program")}
-                            />
-                            {errors.program && (
-                                <p className="mt-1 text-xs text-red-500">{errors.program.message}</p>
-                            )}
-                        </div>
-
-                        <div>
-                            <Label className="mb-1.5">Fichier <span className="text-red-500">*</span></Label>
-                            <Input
-                                type="file"
-                                accept=".pdf,.doc,.docx,.jpg,.png"
-                                className="file:mr-3 file:rounded file:border-0 file:px-2 file:bg-gray-100 p-3 dark:bg-gray-900"
-                                {...register("file")}
-                            />
-                            {errors.file && (
-                                <p className="mt-1 text-xs text-red-500">{errors.file.message?.toString()}</p>
-                            )}
-                        </div>
-
-                        <div className="flex justify-end gap-2 pt-2">
-                            <button
-                                type="button"
-                                onClick={() => setIsModalOpen(false)}
-                                className="px-4 py-2 rounded-md border border-border bg-background text-foreground hover:bg-gray-50 dark:hover:bg-white/5"
-                            >
-                                Annuler
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={createExam.isPending}
-                                className="px-4 py-2 rounded-md bg-primary text-background disabled:opacity-50 flex items-center justify-center min-w-[100px]"
-                            >
-                                {createExam.isPending ? (
-                                    <RotatingLines
-                                        visible={true}
-                                        strokeWidth="5"
-                                        width="20"
-                                        strokeColor="#ffffff"
-                                        animationDuration="0.75"
-                                        ariaLabel="rotating-lines-loading"
-                                    />
-                                ) : "Uploader"}
-                            </button>
-                        </div>
-                    </form>
-                </Modal>
+                        <p className="text-base font-semibold text-gray-900 dark:text-white">Aucune épreuve trouvée</p>
+                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Modifiez vos filtres ou revenez plus tard.</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        {exams.map(exam => (
+                            <ExamCard key={exam.id} exam={exam} downloading={downloading} onDownload={downloadFile} />
+                        ))}
+                    </div>
+                )}
             </div>
         </>
+    );
+}
+
+function ExamCard({
+    exam,
+    downloading,
+    onDownload,
+}: {
+    exam: ExamItem;
+    downloading: string | null;
+    onDownload: (id: string, type: 'exam' | 'solution', name: string) => void;
+}) {
+    const isDownloadingExam = downloading === `${exam.id}-exam`;
+    const isDownloadingSolution = downloading === `${exam.id}-solution`;
+    const hasSolution = !!exam.solution_file_url;
+
+    return (
+        <div className="flex flex-col rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-gray-800 dark:bg-gray-900/80">
+            {exam.course && (
+                <div className="mb-3 inline-flex items-center gap-1.5 self-start rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                    <BookOpen size={11} />
+                    {exam.course.code}
+                </div>
+            )}
+
+            <h3 className="mb-1 flex-1 text-sm font-semibold leading-snug text-gray-900 dark:text-white">
+                {exam.name}
+            </h3>
+
+            {exam.course && (
+                <p className="mb-3 truncate text-xs text-gray-500 dark:text-gray-400">{exam.course.name}</p>
+            )}
+
+            <div className="mb-4 flex flex-wrap gap-1.5">
+                {exam.academic_year && (
+                    <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                        {exam.academic_year}
+                    </span>
+                )}
+                {exam.session && (
+                    <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                        {SESSION_LABELS[exam.session]}
+                    </span>
+                )}
+                {exam.exam_type && (
+                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${TYPE_COLORS[exam.exam_type]}`}>
+                        {TYPE_LABELS[exam.exam_type]}
+                    </span>
+                )}
+            </div>
+
+            <div className="flex gap-2">
+                <button
+                    onClick={() => onDownload(exam.id, 'exam', exam.name)}
+                    disabled={isDownloadingExam}
+                    className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-blue-600 px-3 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-60"
+                >
+                    <Download size={12} />
+                    {isDownloadingExam ? '…' : 'Épreuve'}
+                </button>
+                <button
+                    onClick={() => hasSolution && onDownload(exam.id, 'solution', `${exam.name} - Corrigé`)}
+                    disabled={isDownloadingSolution || !hasSolution}
+                    title={
+                        !hasSolution ? 'Aucun corrigé disponible'
+                        : exam.is_solution_paid ? 'Corrigé payant — abonnement requis'
+                        : 'Télécharger le corrigé'
+                    }
+                    className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-xs font-semibold text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                >
+                    {exam.is_solution_paid ? <Lock size={12} /> : <Unlock size={12} />}
+                    {isDownloadingSolution ? '…' : 'Corrigé'}
+                </button>
+            </div>
+        </div>
     );
 }

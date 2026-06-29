@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import AppHeader from "./AppHeader";
 import Backdrop from "./Backdrop";
 import AppSidebar from "./AppSidebar";
+import { BillingProvider } from "../context/BillingContext";
 
 const LayoutContent: React.FC = () => {
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
@@ -29,9 +30,11 @@ const LayoutContent: React.FC = () => {
 
 const AppLayout: React.FC = () => {
   return (
-    <SidebarProvider>
-      <LayoutContent />
-    </SidebarProvider>
+    <BillingProvider>
+      <SidebarProvider>
+        <LayoutContent />
+      </SidebarProvider>
+    </BillingProvider>
   );
 };
 

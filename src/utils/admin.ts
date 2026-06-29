@@ -118,6 +118,60 @@ export const useUpdateAdminPlan = () => {
     });
 };
 
+// --- Token Packs (admin) ---
+
+export const useCreateAdminTokenPack = () => {
+    const axiosPrivate = useAxiosPrivate();
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (data: { name: string; tokens: number; price_cad: number }) => {
+            const response = await axiosPrivate.post<{ data: unknown }>("/tokens/packs", data);
+            return response.data.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["token-packs"] });
+            toast.success("Pack créé avec succès");
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.detail || "Erreur lors de la création du pack");
+        },
+    });
+};
+
+export const useUpdateAdminTokenPack = () => {
+    const axiosPrivate = useAxiosPrivate();
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ id, data }: { id: string; data: { name?: string; tokens?: number; price_cad?: number; is_active?: boolean } }) => {
+            const response = await axiosPrivate.patch<{ data: unknown }>(`/tokens/packs/${id}`, data);
+            return response.data.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["token-packs"] });
+            toast.success("Pack mis à jour");
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.detail || "Erreur lors de la mise à jour");
+        },
+    });
+};
+
+export const useCreditUserTokens = () => {
+    const axiosPrivate = useAxiosPrivate();
+    return useMutation({
+        mutationFn: async (data: { user_id: string; amount: number; description: string }) => {
+            const response = await axiosPrivate.post<{ data: unknown }>("/tokens/admin/credit", data);
+            return response.data.data;
+        },
+        onSuccess: () => {
+            toast.success("Jetons crédités avec succès");
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.detail || "Erreur lors du crédit");
+        },
+    });
+};
+
 // --- Subscriptions ---
 
 export const useGetAdminSubscriptions = (skip: number = 0, limit: number = 100) => {

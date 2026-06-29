@@ -4,10 +4,12 @@ import Button from "../../components/ui/button/Button.tsx";
 import { useGetPlans } from "../../utils/plan";
 import {
   useCreateCheckout,
- useGetMyActiveSubscription
+  useGetMyActiveSubscription
 } from "../../utils/subscription";
+import { useGetTokenPacks, useBuyTokenPack } from "../../utils/billing";
+import { useBilling } from "../../context/BillingContext";
 import { useNavigate } from "react-router-dom";
-import { Loader2, CheckCircle2, XCircle, ArrowLeft } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle, ArrowLeft, Zap } from "lucide-react";
 import { useState } from "react";
 import Badge from "../../components/ui/badge/Badge";
 
@@ -16,10 +18,13 @@ export default function SettingsSubscription() {
   const [billingType, setBillingType] = useState<"monthly" | "annual">("monthly");
   const { data: plans, isLoading: isLoadingPlans, isError: isErrorPlans } = useGetPlans();
   const { data: activeSubscription, isLoading: isLoadingSub } = useGetMyActiveSubscription();
+  const { tokenBalance, isPro } = useBilling();
+  const { data: tokenPacks = [], isLoading: isLoadingPacks } = useGetTokenPacks();
+  const buyPack = useBuyTokenPack();
   const createCheckout = useCreateCheckout();
   // const cancelSubscription = useCancelSubscription();
 
-  const handleChoosePlan = async (planId: number) => {
+  const handleChoosePlan = async (planId: string) => {
     try {
       const response = await createCheckout.mutateAsync({
         plan_id: planId,
@@ -28,10 +33,8 @@ export default function SettingsSubscription() {
         cancel_url: `${window.location.origin}/payment/cancel`,
       });
 
-      // Store transaction_id locally to check status later
       localStorage.setItem("pending_transaction_id", response.transaction_id.toString());
-
-      // Redirect to Stripe
+      localStorage.setItem("pending_transaction_type", "subscription");
       window.location.href = response.checkout_url;
     } catch (error) {
       console.error("Checkout error:", error);
@@ -69,7 +72,7 @@ export default function SettingsSubscription() {
 
       <section className="space-y-8 pt-6">
         {/* Current Subscription Status */}
-        <div className="p-6 rounded-2xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] shadow-sm">
+        <div className="p-6 rounded-2xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] lg:shadow-sm">
           <h2 className="text-xl font-bold text-gray-800 dark:text-white/90">Statut de l'abonnement</h2>
 
           {isLoadingSub ? (
@@ -114,6 +117,68 @@ export default function SettingsSubscription() {
             </div>
           )}
         </div>
+
+        {/* Token Balance + Packs (only visible when not Pro) */}
+        {!isPro && (
+          <div className="p-6 rounded-2xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] lg:shadow-sm space-y-5">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div>
+                <h2 className="text-xl font-bold text-gray-800 dark:text-white/90">Jetons</h2>
+                <p className="text-sm text-gray-500 mt-0.5 dark:text-gray-400">
+                  Solde actuel :{' '}
+                  <span className="font-semibold text-gray-800 dark:text-white">
+                    🪙 {tokenBalance} jeton{tokenBalance !== 1 ? 's' : ''}
+                  </span>
+                </p>
+              </div>
+              <div className="flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200 px-3 py-1.5 dark:bg-amber-900/20 dark:border-amber-800">
+                <Zap size={13} className="text-amber-600 dark:text-amber-400" />
+                <span className="text-xs font-semibold text-amber-700 dark:text-amber-300">1 jeton = 1 génération</span>
+              </div>
+            </div>
+
+            {isLoadingPacks ? (
+              <div className="flex justify-center py-6">
+                <Loader2 className="animate-spin size-6 text-gray-400" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                {tokenPacks.map((pack, i) => (
+                  <div
+                    key={pack.id}
+                    className={`relative rounded-2xl border p-5 flex flex-col gap-3 ${
+                      i === 1
+                        ? 'border-blue-400 bg-blue-50/50 dark:border-blue-700 dark:bg-blue-900/10'
+                        : 'border-gray-200 bg-white dark:border-white/[0.06] dark:bg-white/[0.02]'
+                    }`}
+                  >
+                    {i === 1 && (
+                      <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full bg-blue-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white whitespace-nowrap">
+                        Recommandé
+                      </span>
+                    )}
+                    <div>
+                      <p className="text-sm font-bold text-gray-900 dark:text-white">{pack.name}</p>
+                      <p className="text-2xl font-black text-gray-900 dark:text-white mt-1">
+                        {pack.price_cad} <span className="text-sm font-semibold text-gray-500">$</span>
+                      </p>
+                    </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      🪙 <span className="font-semibold">{pack.tokens} jetons</span>
+                    </p>
+                    <button
+                      onClick={() => buyPack.mutate(pack.id)}
+                      disabled={buyPack.isPending}
+                      className="mt-auto w-full rounded-xl bg-blue-600 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+                    >
+                      {buyPack.isPending ? <Loader2 className="animate-spin size-4 mx-auto" /> : 'Acheter'}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Plan Selection */}
         <div className="space-y-6">
@@ -173,10 +238,10 @@ export default function SettingsSubscription() {
                       <h3 className="text-lg font-bold text-gray-800 dark:text-white/90">{p.name}</h3>
                       <div className="mt-4 flex items-baseline gap-1">
                         <span className="text-4xl font-black text-gray-900 dark:text-white">
-                          {billingType === "monthly" ? p.price : p.annual_price}€
+                          {billingType === "monthly" ? p.price : p.annual_price} $
                         </span>
                         <span className="text-gray-500 dark:text-gray-400 font-medium">
-                          /{billingType === "monthly" ? "mois" : "an"}
+                          CAD/{billingType === "monthly" ? "mois" : "an"}
                         </span>
                       </div>
                       <p className="mt-3 text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
@@ -201,16 +266,16 @@ export default function SettingsSubscription() {
                     <div className="mt-8">
                       <Button
                         size="md"
-                        className={`w-full rounded-xl font-bold transition-all ${activeSubscription?.plan_id === p.id && (activeSubscription.plan?.price===0 || activeSubscription.billing_type === billingType)
+                        className={`w-full rounded-xl font-bold transition-all ${activeSubscription?.plan_id === p.id && (Number(activeSubscription.plan?.price) === 0 || activeSubscription.billing_type === billingType)
                           ? "bg-green-500 hover:bg-green-600 cursor-default"
                           : createCheckout.isPending
                             ? "opacity-70 pointer-events-none"
                             : "hover:scale-[1.02] active:scale-[0.98]"
                           }`}
                         onClick={() => handleChoosePlan(p.id)}
-                        disabled={activeSubscription?.plan_id === p.id && (activeSubscription.plan?.price===0 || activeSubscription.billing_type === billingType)}
+                        disabled={activeSubscription?.plan_id === p.id && (Number(activeSubscription.plan?.price) === 0 || activeSubscription.billing_type === billingType)}
                       >
-                        {activeSubscription?.plan?.id === p.id && (activeSubscription.plan?.price===0 || activeSubscription.billing_type === billingType) ? (
+                        {activeSubscription?.plan?.id === p.id && (Number(activeSubscription.plan?.price) === 0 || activeSubscription.billing_type === billingType) ? (
                           "Plan actuel"
                         ) : createCheckout.isPending ? (
                           <Loader2 className="animate-spin size-5 mx-auto" />

@@ -38,6 +38,8 @@ import Announcements from "./pages/admin/Announcements.tsx";
 import Feedbacks from "./pages/admin/Feedbacks.tsx";
 import Reports from "./pages/admin/Reports.tsx";
 import AdminSettings from "./pages/admin/Settings.tsx";
+import AdminExamLibrary from "./pages/admin/ExamLibrary.tsx";
+import AdminTokenPacks from "./pages/admin/TokenPacks.tsx";
 import ExamLibrary from "./pages/appPage/ExamLibrary.tsx";
 import UserProfiles from "./pages/appPage/UserProfiles.tsx";
 import PaymentListPage from './pages/appPage/PaymentListPage.tsx';
@@ -91,10 +93,12 @@ function App() {
                             <Route path="/admin/users" element={<Users />} />
                             <Route path="/admin/subscriptions" element={<Subscriptions />} />
                             <Route path="/admin/plans" element={<Plans />} />
+                            <Route path="/admin/token-packs" element={<AdminTokenPacks />} />
                             <Route path="/admin/payments" element={<Payments />} />
                             <Route path="/admin/announcements" element={<Announcements />} />
                             <Route path="/admin/feedbacks" element={<Feedbacks />} />
                             <Route path="/admin/reports" element={<Reports />} />
+                            <Route path="/admin/exam-library" element={<AdminExamLibrary />} />
                             <Route path="/admin/settings" element={<AdminSettings />} />
                         </Route>
                     </Route>

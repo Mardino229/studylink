@@ -122,21 +122,34 @@ export interface PaginatedSubscriptions {
 export interface Transaction {
     id: string;
     user_id: string;
-    user_first_name: string;
-    user_last_name: string;
-    user_email: string;
-    plan_name: string;
-    billing_type: "monthly" | "annual";
-    plan?: SubscriptionPlan;
+
+    // Discriminant — "subscription" ou "token_pack"
+    transaction_type: "subscription" | "token_pack";
+
+    // Champs abonnement (null pour les packs de jetons)
+    plan_id?: string | null;
+    plan?: SubscriptionPlan | null;
+    plan_name?: string | null;
+    billing_type?: "monthly" | "annual" | null;
+    subscription_id?: string | null;
+
+    // Champ pack de jetons (null pour les abonnements)
+    token_pack_id?: string | null;
+
+    // Champs communs
     amount: string;
     currency: string;
     status: "pending" | "completed" | "failed" | "refunded";
-    stripe_session_id: string;
+    stripe_session_id?: string | null;
     stripe_payment_intent_id?: string | null;
-    subscription_id: string | null;
-    payment_date: string | null;
+    payment_date?: string | null;
     created_at: string;
     updated_at: string;
+
+    // Champs joints optionnels (selon l'endpoint)
+    user_first_name?: string | null;
+    user_last_name?: string | null;
+    user_email?: string | null;
 }
 
 export interface PaginatedTransactions {
@@ -191,15 +204,37 @@ export type UserContextProps = {
     setUser: Dispatch<SetStateAction<User>>;
 };
 
+export type TokenTransactionType = 'purchase' | 'artefact' | 'corrige' | 'chat' | 'bonus' | 'refund';
+
+export interface TokenTransaction {
+    id: string;
+    amount: number;
+    type: TokenTransactionType;
+    description: string | null;
+    created_at: string;
+}
+
 export interface AdminDashboardResponse {
     kpis: {
         totalUsers: number;
         activeSubscriptions: number;
         monthlyRevenue: number;
+        monthlySubscriptionRevenue?: number;
+        monthlyTokenRevenue?: number;
+        totalTokensCredited?: number;
+        totalTokensSpent?: number;
     };
     charts: {
         activity: Array<{ name: string; data: number[] }>;
         revenue: Array<{ name: string; data: number[] }>;
+    };
+    tokenAnalytics?: {
+        packsSold: Array<{ packName: string; tokens: number; salesCount: number; revenue: number }>;
+        consumption: {
+            artefact?: { count: number; tokensSpent: number };
+            corrige?: { count: number; tokensSpent: number };
+            chat?: { count: number; tokensSpent: number };
+        };
     };
     recentUsers: Array<{
         id: string;
@@ -211,12 +246,11 @@ export interface AdminDashboardResponse {
     }>;
     recentTransactions: Array<{
         id: string;
-        user: {
-            id: string;
-            name: string;
-        };
+        type: 'subscription' | 'token_pack';
+        user: { id: string; name: string };
         amount: number;
-        planName: string;
+        currency: string;
+        label: string;
         status: string;
         date: string;
     }>;

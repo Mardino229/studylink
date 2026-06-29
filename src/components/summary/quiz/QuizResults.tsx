@@ -132,17 +132,19 @@ export default function QuizResults({ score, total, answers, questions, onRestar
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full blur-3xl animate-pulse" />
             </div>
             
-            <div className="flex justify-between items-center ">
-                <h2 className="sm:text-2xl text-xl font-bold text-gray-900 bg-clip-text">
-                    Quiz terminé !
-                </h2>
-            </div>
+            
 
             {/* Carte des résultats moderne */}
-            <div className=" rounded-3xl p-8 max-w-md mx-auto ">
+            <div className=" rounded-3xl px-8 max-w-md mx-auto ">
                 <div className="space-y-6">
                     <div className="text-center">
-                        <div className={`text-6xl font-bold text-gray-900 bg-clip-text mb-2`}>
+                        <div className={`text-6xl font-bold mb-2 transition-colors duration-500 ${
+                            percentage >= 80 
+                                ? 'text-emerald-500 dark:text-emerald-400' 
+                                : percentage >= 50 
+                                ? 'text-amber-500 dark:text-amber-400' 
+                                : 'text-rose-500 dark:text-rose-400'
+                        }`}>
                             {percentage}%
                         </div>
                         <p className="text-gray-600 dark:text-gray-400 text-lg">
@@ -152,13 +154,19 @@ export default function QuizResults({ score, total, answers, questions, onRestar
                     
                     {/* Barre de progression animée */}
                     <div className="relative">
-                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
                             <div 
-                                className={`h-4 rounded-full bg-gray-900 transition-all duration-2000 shadow-lg`}
+                                className={`h-4 rounded-full transition-all duration-2000 ease-out shadow-lg ${
+                                    percentage >= 80 
+                                        ? 'bg-emerald-500' 
+                                        : percentage >= 50 
+                                        ? 'bg-amber-500' 
+                                        : 'bg-rose-500'
+                                }`}
                                 style={{ width: `${percentage}%` }}
                             />
                         </div>
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent rounded-full animate-pulse" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent rounded-full animate-pulse pointer-events-none" />
                     </div>
                     
                     {/* Statistiques rapides */}

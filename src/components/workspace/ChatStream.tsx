@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { useCreateChatSession, useGetChatMessages, useGetChatSessions } from '../../utils/workspace';
-import { SendIcon, BotIcon, PlusIcon, MessageSquare, Clock3, Menu } from 'lucide-react';
+import { SendIcon, BotIcon, PlusIcon, MessageSquare, Clock3, Menu, MessageCirclePlus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { autoScrollListRef } from '../summary/ai/use-auto-scroll';
 import { cn } from '../../lib/utils';
@@ -26,7 +26,7 @@ const SUGGESTED_QUESTIONS = [
     "Explique-moi ce concept",
     "Donne-moi un exemple",
     "Quels sont les points clés ?",
-    "Crée un quiz",
+    "Approfondis ce sujet",
 ];
 
 const toUiMessage = (message: WorkspaceChatMessage): Message => ({
@@ -44,20 +44,13 @@ const sortMessages = (messages: Message[]) =>
         return leftTime.localeCompare(rightTime);
     });
 
-const mergeMessages = (baseMessages: Message[], incomingMessages: Message[]) => {
-    const byId = new Map<string, Message>();
-    baseMessages.forEach((message) => byId.set(message.id, message));
-    incomingMessages.forEach((message) => {
-        const current = byId.get(message.id);
-        byId.set(message.id, current ? { ...current, ...message } : message);
-    });
-    return sortMessages(Array.from(byId.values()));
-};
-
 const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
-    const [messages, setMessages] = useState<Message[]>([]);
+    // Pending optimistic messages for the current in-flight exchange.
+    // Kept separate from real DB messages — never merged by content.
+    const [pendingUserMsg, setPendingUserMsg] = useState<Message | null>(null);
+    const [streamingAssistantMsg, setStreamingAssistantMsg] = useState<Message | null>(null);
     const [input, setInput] = useState('');
     const [sessionId, setSessionId] = useState<string | null>(null);
     const [isStreaming, setIsStreaming] = useState(false);
@@ -65,10 +58,13 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
     const [newSessionTitle, setNewSessionTitle] = useState('');
 
     const messagesContainerRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
     const shouldScrollToBottomRef = useRef(false);
     const preserveScrollRef = useRef(false);
     const previousScrollHeightRef = useRef(0);
     const lastSessionIdRef = useRef<string | null>(null);
+    // Timestamp (ms) of when the current exchange was initiated on the client.
+    const exchangeStartedAtRef = useRef<number | null>(null);
 
     const createSessionMutation = useCreateChatSession();
     const {
@@ -81,7 +77,6 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
-        isLoading: isLoadingChatMessages,
         refetch: refetchChatMessages,
     } = useGetChatMessages(notebookId, sessionId, { perPage: 20 });
 
@@ -98,9 +93,37 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
         return sortMessages(flattened);
     }, [chatMessages]);
 
+    // What's actually rendered: real DB messages + pending temp messages (if not yet confirmed).
+    // Confirmation is timestamp-based: once a real assistant message appears with created_at
+    // after when we sent, the exchange is confirmed and we drop the temp messages.
+    // A 5 s buffer handles client/server clock skew.
+    const displayMessages = useMemo<Message[]>(() => {
+        if (!pendingUserMsg && !streamingAssistantMsg) return fetchedMessages;
+
+        const sentAt = exchangeStartedAtRef.current;
+        if (sentAt !== null) {
+            const confirmed = fetchedMessages.some(
+                (m) => m.role === 'assistant' && new Date(m.created_at ?? 0).getTime() > sentAt - 5000
+            );
+            if (confirmed) return fetchedMessages;
+        }
+
+        const pending: Message[] = [];
+        if (pendingUserMsg) pending.push(pendingUserMsg);
+        if (streamingAssistantMsg) pending.push(streamingAssistantMsg);
+        return [...fetchedMessages, ...pending];
+    }, [fetchedMessages, pendingUserMsg, streamingAssistantMsg]);
+
+    const clearPending = () => {
+        setPendingUserMsg(null);
+        setStreamingAssistantMsg(null);
+        exchangeStartedAtRef.current = null;
+    };
+
+    // Reset all state when the notebook changes
     useEffect(() => {
         setSessionId(null);
-        setMessages([]);
+        clearPending();
         setInput('');
         setIsStreaming(false);
         setCreateModalOpen(false);
@@ -108,17 +131,15 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
         lastSessionIdRef.current = null;
         shouldScrollToBottomRef.current = false;
         preserveScrollRef.current = false;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [notebookId]);
 
+    // Auto-select the latest session when the list loads or changes
     useEffect(() => {
         if (!sessions.length) {
-            if (sessionId !== null) {
-                setSessionId(null);
-                setMessages([]);
-            }
+            if (sessionId !== null) setSessionId(null);
             return;
         }
-
         if (!sessionId) {
             const latestSession = [...sessions].sort((left, right) => right.created_at.localeCompare(left.created_at))[0];
             if (latestSession) {
@@ -127,7 +148,6 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
             }
             return;
         }
-
         if (!sessions.some((session) => session.id === sessionId)) {
             const latestSession = [...sessions].sort((left, right) => right.created_at.localeCompare(left.created_at))[0];
             shouldScrollToBottomRef.current = true;
@@ -135,27 +155,26 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
         }
     }, [sessions, sessionId]);
 
+    // Clear pending exchange whenever the active session changes
     useEffect(() => {
-        if (!sessionId) {
-            setMessages([]);
-            return;
-        }
-
         if (lastSessionIdRef.current !== sessionId) {
             lastSessionIdRef.current = sessionId;
-            setMessages([]);
+            clearPending();
             shouldScrollToBottomRef.current = true;
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [sessionId]);
 
-        if (!fetchedMessages.length) {
-            if (!isLoadingChatMessages) {
-                setMessages((current) => mergeMessages(current, []));
-            }
-            return;
-        }
-
-        setMessages((current) => mergeMessages(current, fetchedMessages));
-    }, [fetchedMessages, isLoadingChatMessages, sessionId]);
+    // Drop temp messages once the real exchange arrives in fetchedMessages
+    useEffect(() => {
+        const sentAt = exchangeStartedAtRef.current;
+        if (sentAt === null) return;
+        const confirmed = fetchedMessages.some(
+            (m) => m.role === 'assistant' && new Date(m.created_at ?? 0).getTime() > sentAt - 5000
+        );
+        if (confirmed) clearPending();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [fetchedMessages]);
 
     useEffect(() => {
         if (messagesContainerRef.current) {
@@ -180,12 +199,12 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
             messagesContainerRef.current.scrollTo({ top: messagesContainerRef.current.scrollHeight, behavior: 'auto' });
             shouldScrollToBottomRef.current = false;
         }
-    }, [messages]);
+    }, [displayMessages]);
 
     const handleOpenSession = (nextSessionId: string) => {
         if (nextSessionId === sessionId) return;
         setSessionId(nextSessionId);
-        setMessages([]);
+        clearPending();
         setInput('');
         setIsStreaming(false);
         shouldScrollToBottomRef.current = true;
@@ -194,12 +213,11 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
     const handleCreateSession = async () => {
         const title = newSessionTitle.trim();
         if (!title) return;
-
         try {
             const createdSession = await createSessionMutation.mutateAsync({ notebookId, title });
             await refetchChatSessions();
             setSessionId(createdSession.id);
-            setMessages([]);
+            clearPending();
             setInput('');
             setIsStreaming(false);
             setCreateModalOpen(false);
@@ -214,15 +232,21 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
         const content = (overrideContent ?? input).trim();
         if (!content || !sessionId) return;
 
-        const userMessage: Message = {
-            id: `user-${Date.now()}`,
+        const now = Date.now();
+        exchangeStartedAtRef.current = now;
+
+        setPendingUserMsg({
+            id: `user-${now}`,
             role: 'user',
             content,
-            created_at: new Date().toISOString(),
-        };
-        const assistantMessageId = `assistant-${Date.now() + 1}`;
-
-        setMessages((current) => sortMessages([...current, userMessage, { id: assistantMessageId, role: 'assistant', content: '', created_at: new Date().toISOString() }]));
+            created_at: new Date(now).toISOString(),
+        });
+        setStreamingAssistantMsg({
+            id: `assistant-${now}`,
+            role: 'assistant',
+            content: '',
+            created_at: new Date(now).toISOString(),
+        });
         setInput('');
         setIsStreaming(true);
         shouldScrollToBottomRef.current = true;
@@ -238,21 +262,16 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                 body: JSON.stringify({ content }),
                 onmessage(event) {
                     if (!event.data) return;
-
                     try {
                         const data = JSON.parse(event.data);
                         if (data.type === 'token') {
-                            setMessages((current) => current.map((message) => (
-                                message.id === assistantMessageId
-                                    ? { ...message, content: message.content + data.text }
-                                    : message
-                            )));
+                            setStreamingAssistantMsg((prev) =>
+                                prev ? { ...prev, content: prev.content + data.text } : null
+                            );
                         } else if (data.type === 'citations') {
-                            setMessages((current) => current.map((message) => (
-                                message.id === assistantMessageId
-                                    ? { ...message, citations: data.citations }
-                                    : message
-                            )));
+                            setStreamingAssistantMsg((prev) =>
+                                prev ? { ...prev, citations: data.citations } : null
+                            );
                         } else if (data.type === 'done') {
                             setIsStreaming(false);
                             void refetchChatMessages();
@@ -398,7 +417,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                         initial={{ width: 0, opacity: 0 }}
                         animate={{ width: 290, opacity: 1 }}
                         exit={{ width: 0, opacity: 0 }}
-                        transition={{ type: 'spring', damping: 25, stiffness: 200 }} 
+                        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
                         className="hidden xl:flex flex-col shrink-0 overflow-hidden rounded-2xl border-t border-r border-border bg-card "
                     >
                         <SidebarContent />
@@ -411,7 +430,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                 {/* Chat Header */}
                 <div className="flex items-center justify-between py-4">
                     <div className="flex items-center gap-3">
-                        {/* Desktop sidebar toggle button when closed/open */} 
+                        {/* Desktop sidebar toggle button when closed/open */}
                         <button
                             type="button"
                             onClick={() => setDesktopSidebarOpen(prev => !prev)}
@@ -436,23 +455,13 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                     </div>
 
                     <div className="flex items-center gap-2">
-                        {/* Mobile sidebar toggle button */}
-                        {/*<button
-                            type="button"
-                            onClick={() => setSidebarOpen(true)}
-                            className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-2 text-sm font-medium text-foreground hover:bg-foreground/5 xl:hidden"
-                        >
-                            <MessageSquare size={16} />
-                            Historique
-                        </button>*/}
-                        
                         <button
                             type="button"
                             onClick={() => setCreateModalOpen(true)}
                             className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-2 text-sm font-medium text-foreground hover:bg-foreground/5"
                         >
-                            <PlusIcon size={16} />
-                            Nouvelle session
+                            <MessageCirclePlus size={16} />
+                            <span className="hidden sm:block">Nouvelle session</span>
                         </button>
                     </div>
                 </div>
@@ -465,16 +474,27 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                 >
                     <div className="max-w-6xl mx-auto space-y-6">
                         {!sessionId && !isLoadingChatSessions && (
-                            <div className="flex flex-col items-center justify-center py-20">
-                                <div className="w-12 h-12 bg-brand-50 dark:bg-brand-950/30 rounded-full flex items-center justify-center mb-4 border border-brand-100 dark:border-brand-900/50">
-                                    <BotIcon className="w-6 h-6 text-brand-500 dark:text-brand-400" />
+                            <div className="flex flex-col items-center justify-center py-20 text-center px-4">
+                                <div className="w-16 h-16 bg-brand-50 dark:bg-brand-950/30 rounded-2xl flex items-center justify-center mb-5 border border-brand-100 dark:border-brand-900/50">
+                                    <BotIcon className="w-8 h-8 text-brand-500 dark:text-brand-400" />
                                 </div>
-                                <p className="text-slate-500 dark:text-slate-400 font-medium">Comment puis-je vous aider ?</p>
+                                <h3 className="text-base font-bold text-foreground mb-2">Démarrez une conversation</h3>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs mb-6">
+                                    Le chat IA répond à vos questions en s'appuyant sur les sources de ce notebook. Créez une session pour commencer.
+                                </p>
+                                <button
+                                    type="button"
+                                    onClick={() => setCreateModalOpen(true)}
+                                    className="inline-flex items-center gap-2 rounded-full bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
+                                >
+                                    <PlusIcon size={16} />
+                                    Créer une session de chat
+                                </button>
                             </div>
                         )}
 
                         <AnimatePresence initial={false}>
-                            {messages.map((msg) => {
+                            {displayMessages.map((msg) => {
                                 const sender = msg.role === 'user' ? 'user' : 'ai';
                                 return (
                                     <motion.div
@@ -528,51 +548,81 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                 </div>
 
                 {/* Input Area */}
-                <div className="p-4 border-t border-border bg-white dark:bg-slate-900">
-                    <div className="max-w-3xl mx-auto">
-                        {messages.length < 2 && (
-                            <div className="grid grid-cols-2 gap-2 mb-4">
-                                {SUGGESTED_QUESTIONS.map((q, i) => (
-                                    <button
-                                        key={i}
-                                        onClick={() => void handleSendMessage(q)}
-                                        className="text-left px-4 py-3 text-xs sm:text-sm text-slate-600 dark:text-slate-300 bg-white hover:bg-brand-50/50 dark:bg-slate-800/50 dark:hover:bg-brand-500/[0.08] hover:text-brand-500 dark:hover:text-brand-400 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-500/30 transition-all truncate"
-                                    >
-                                        {q}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-
-                        <div className="relative flex items-center">
-                            <input
-                                type="text"
-                                value={input}
-                                onChange={(e) => setInput(e.target.value)}
-                                onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
-                                    if (e.key === 'Enter' && !e.shiftKey) {
-                                        e.preventDefault();
-                                        void handleSendMessage();
-                                    }
-                                }}
-                                placeholder="Envoyer un message..."
-                                className="w-full py-3.5 pl-5 pr-12 bg-transparent border border-slate-200 dark:border-slate-800 rounded-full focus:outline-none focus:border-brand-500 dark:focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all placeholder:text-slate-400 text-slate-700 dark:text-slate-200"
-                                disabled={!sessionId || isStreaming}
-                            />
+                <div className="border-t border-border bg-white dark:bg-slate-900">
+                    {!sessionId && !isLoadingChatSessions ? (
+                        /* No session — CTA to create one */
+                        <div className="flex items-center justify-between gap-3 px-4 py-3">
+                            <p className="text-sm text-slate-500 dark:text-slate-400">
+                                Aucune session active — créez-en une pour commencer à discuter.
+                            </p>
                             <button
-                                onClick={() => void handleSendMessage()}
-                                disabled={!input.trim() || isStreaming || !sessionId}
-                                className="absolute right-2 p-2 bg-brand-500 hover:bg-brand-600 disabled:opacity-30 text-white rounded-full transition-all"
+                                type="button"
+                                onClick={() => setCreateModalOpen(true)}
+                                className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
                             >
-                                <SendIcon className="w-4 h-4" />
+                                <PlusIcon size={14} />
+                                Nouvelle session
                             </button>
                         </div>
-                        <div className="text-center mt-2">
-                            <p className="text-[10px] text-slate-400">
-                                L'IA peut faire des erreurs. Envisagez de vérifier les informations importantes.
-                            </p>
+                    ) : isLoadingChatSessions ? (
+                        /* Loading — neutral skeleton */
+                        <div className="flex items-center justify-center py-4">
+                            <div className="h-10 w-full max-w-3xl mx-4 animate-pulse rounded-full bg-slate-100 dark:bg-slate-800" />
                         </div>
-                    </div>
+                    ) : (
+                        /* Normal input */
+                        <div className="lg:px-4 py-4">
+                            <div className="max-w-3xl mx-auto">
+                                {displayMessages.length < 2 && (
+                                    <div className="grid grid-cols-2 gap-2 mb-4">
+                                        {SUGGESTED_QUESTIONS.map((q, i) => (
+                                            <button
+                                                key={i}
+                                                onClick={() => {
+                                                    setInput(q);
+                                                    inputRef.current?.focus();
+                                                }}
+                                                className="text-left px-4 py-3 text-xs sm:text-sm text-slate-600 dark:text-slate-300 bg-white hover:bg-brand-50/50 dark:bg-slate-800/50 dark:hover:bg-brand-500/[0.08] hover:text-brand-500 dark:hover:text-brand-400 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-500/30 transition-all truncate"
+                                            >
+                                                {q}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+
+                                <div className="relative flex items-center">
+                                    <input
+                                        ref={inputRef}
+                                        type="text"
+                                        value={input}
+                                        onChange={(e) => setInput(e.target.value)}
+                                        onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
+                                            if (e.key === 'Enter' && !e.shiftKey) {
+                                                e.preventDefault();
+                                                void handleSendMessage();
+                                            }
+                                        }}
+                                        placeholder="Envoyer un message..."
+                                        className="w-full py-3.5 pl-5 pr-12 bg-transparent border border-slate-200 dark:border-slate-800 rounded-full focus:outline-none focus:border-brand-500 dark:focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all placeholder:text-slate-400 text-slate-700 dark:text-slate-200"
+                                        disabled={isStreaming}
+                                        autoFocus
+                                    />
+                                    <button
+                                        onClick={() => void handleSendMessage()}
+                                        disabled={!input.trim() || isStreaming}
+                                        className="absolute right-2 p-2 bg-brand-500 hover:bg-brand-600 disabled:opacity-30 text-white rounded-full transition-all"
+                                    >
+                                        <SendIcon className="w-4 h-4" />
+                                    </button>
+                                </div>
+                                <div className="text-center mt-2">
+                                    <p className="text-[10px] text-slate-400">
+                                        L'IA peut faire des erreurs. Vérifiez les informations importantes.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <Modal isOpen={createModalOpen} onClose={() => setCreateModalOpen(false)} className="max-w-lg p-6">
@@ -590,7 +640,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                                 type="text"
                                 value={newSessionTitle}
                                 onChange={(e) => setNewSessionTitle(e.target.value)}
-                                placeholder="Ex: Révisions thermodynamique"
+                                placeholder="Ex: Révision de ..."
                                 className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none focus:border-brand-300 dark:border-gray-800 dark:bg-gray-950 dark:text-white dark:focus:border-brand-700"
                                 autoFocus
                             />

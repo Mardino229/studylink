@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Modal } from '../../components/ui/modal/index.tsx';
 import {
@@ -7,10 +7,14 @@ import {
     FileText,
     HelpCircle,
     Layers,
+    Lock,
     MessageSquare,
     Sparkles,
     Target,
+    Zap,
 } from 'lucide-react';
+import { useBilling } from '../../context/BillingContext';
+import UpgradeModal from '../../components/ui/UpgradeModal';
 import {
     useDeleteArtefactFlashcard,
     useDeleteArtefactPodcast,
@@ -52,6 +56,7 @@ const WorkspaceNotebook: React.FC = () => {
     const [flashcardTarget, setFlashcardTarget] = useState<{ sourceIds: string[]; themeIds: string[] }>({ sourceIds: [], themeIds: [] });
     const [quizTarget, setQuizTarget] = useState<{ sourceIds: string[]; themeIds: string[] }>({ sourceIds: [], themeIds: [] });
     const [podcastTarget, setPodcastTarget] = useState<{ sourceIds: string[]; themeIds: string[] }>({ sourceIds: [], themeIds: [] });
+    const [generationLanguage, setGenerationLanguage] = useState('fr');
 
     const { data: notebook, isLoading: isLoadingNotebook } = useGetNotebook(notebookId);
     const { data: sources, isLoading: isLoadingSources } = useGetSources(notebookId ?? "", { perPage: 100 });
@@ -70,6 +75,27 @@ const WorkspaceNotebook: React.FC = () => {
     const deleteQuiz = useDeleteArtefactQuiz();
     const deletePodcast = useDeleteArtefactPodcast();
     
+    const { isPro, tokenBalance } = useBilling();
+    const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+
+    const contentRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        contentRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+    }, [activeTab]);
+
+    // Cost in tokens per action (−1 each, except solution which is backend-only)
+    const ARTEFACT_COST = 1;
+
+    // Whether the user can generate (Pro OR has enough tokens)
+    const canGenerate = isPro || tokenBalance >= ARTEFACT_COST;
+
+    const handle402 = (error: unknown) => {
+        const status = (error as { response?: { status?: number } })?.response?.status;
+        if (status === 402) setUpgradeModalOpen(true);
+    };
+
     if (!notebookId) return <div>Notebook non trouvé</div>;
 
     const tabs = [
@@ -83,6 +109,12 @@ const WorkspaceNotebook: React.FC = () => {
     ] as const;
 
     const isGenerating = createSummary.isPending || createFlashcards.isPending || createQuiz.isPending || createPodcast.isPending;
+
+    const isCurrentlyGenerating =
+        (generationModal === 'summary' && createSummary.isPending) ||
+        (generationModal === 'flashcards' && createFlashcards.isPending) ||
+        (generationModal === 'quiz' && createQuiz.isPending) ||
+        (generationModal === 'podcast' && createPodcast.isPending);
 
     const stats = [
         { label: 'Sources', value: sources?.items?.length ?? 0, hint: isLoadingSources ? 'Chargement...' : 'Documents importés', icon: FileText },
@@ -119,6 +151,15 @@ const WorkspaceNotebook: React.FC = () => {
         }
     };
 
+    const MOBILE_TAB_LABEL: Record<string, string> = {
+        overview:   'Aperçu',
+        sources:    'Sources',
+        summaries:  'Résumés',
+        flashcards: 'Cartes',
+        quizzes:    'Quiz',
+        chat:       'Chat',
+    };
+
     const openGenerationModal = (type: 'summary' | 'flashcards' | 'quiz' | 'podcast') => {
         setGenerationModal(type);
         const notebookName = notebook?.name?.trim() || 'Notebook';
@@ -149,33 +190,61 @@ const WorkspaceNotebook: React.FC = () => {
                 }
             />
             <div className="relative dark:bg-background min-h-dvh rounded-none">
-                <div className="mx-auto gap-2 flex min-h-dvh max-w-(--breakpoint-2xl) flex-col px-2 pb-6 pt-4 sm:px-6">
-                    
-                    <div className="sticky top-[72px] z-30 -mx-4 mb-6 border-b border-gray-200 bg-white/85 px-4 backdrop-blur dark:border-gray-800 dark:bg-gray-900/85 sm:-mx-6 sm:px-6">
-                        <nav className="flex gap-6 overflow-x-auto no-scrollbar">
-                            {tabs.map((tab) => {
-                                const IconComponent = tab.icon;
-                                return (
+                <div className="mx-auto gap-2 flex min-h-dvh max-w-(--breakpoint-2xl) flex-col px-2 pb-6 lg:pt-4 sm:px-6 pb-20 md:pb-6">
+
+                    {/* Tab bar — desktop only */}
+                    <div className="hidden md:block sticky top-[72px] z-30 -mx-4 mb-6 border-b border-gray-200 bg-white/85 px-4 backdrop-blur dark:border-gray-800 dark:bg-gray-900/85 sm:-mx-6 sm:px-6">
+                        <div className="flex items-center">
+                            <nav className="flex flex-1 gap-6 overflow-x-auto no-scrollbar">
+                                {tabs.map((tab) => {
+                                    const IconComponent = tab.icon;
+                                    return (
+                                        <button
+                                            key={tab.id}
+                                            className={`flex items-center gap-2 border-b-2 px-1 pb-3 pt-4 text-sm font-medium whitespace-nowrap transition-colors ${activeTab === tab.id
+                                                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                                                }`}
+                                            onClick={() => setActiveTab(tab.id)}
+                                        >
+                                            <IconComponent className="h-4 w-4" />
+                                            {tab.label}
+                                        </button>
+                                    );
+                                })}
+                            </nav>
+                            {/* Token / subscription badge */}
+                            <div className="ml-3 shrink-0 pb-2 pt-3">
+                                {isPro ? (
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-600 px-2.5 py-1 text-[11px] font-semibold text-white">
+                                        <Sparkles size={10} />
+                                        Pro
+                                    </span>
+                                ) : tokenBalance > 0 ? (
                                     <button
-                                        key={tab.id}
-                                        className={`flex items-center gap-2 border-b-2 px-1 pb-3 pt-4 text-sm font-medium whitespace-nowrap transition-colors ${activeTab === tab.id
-                                            ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-                                            }`}
-                                        onClick={() => setActiveTab(tab.id)}
+                                        onClick={() => setUpgradeModalOpen(true)}
+                                        className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700 transition-colors hover:bg-amber-100 dark:border-amber-800/40 dark:bg-amber-950/20 dark:text-amber-400"
                                     >
-                                        <IconComponent className="h-4 w-4" />
-                                        {tab.label}
+                                        <Zap size={10} />
+                                        {tokenBalance} jeton{tokenBalance > 1 ? 's' : ''}
                                     </button>
-                                );
-                            })}
-                        </nav>
+                                ) : (
+                                    <button
+                                        onClick={() => setUpgradeModalOpen(true)}
+                                        className="inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-50 px-2.5 py-1 text-[11px] font-semibold text-red-600 transition-colors hover:bg-red-100 dark:border-red-900/40 dark:bg-red-950/20 dark:text-red-400"
+                                    >
+                                        <Lock size={10} />
+                                        Recharger
+                                    </button>
+                                )}
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="mt-6 flex-1 overflow-hidden">
+                    <div ref={contentRef} className="lg:mt-6 mt-2 flex-1 overflow-hidden">
                         <div className={`rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/80 ${
                             ['chat', 'summaries', 'flashcards', 'podcasts'].includes(activeTab)
-                                ? 'h-dvh sm:h-[600px] md:h-[calc(100vh-340px)] lg:h-[calc(100vh-300px)] overflow-hidden'
+                                ? 'h-[calc(100dvh-56px)] sm:h-[600px] md:h-[calc(100vh-340px)] lg:h-[calc(100vh-300px)] overflow-hidden'
                                 : ''
                         }`}>
                             {activeTab === 'overview' && (
@@ -204,8 +273,6 @@ const WorkspaceNotebook: React.FC = () => {
                                     flashcards={flashcards}
                                     isLoadingFlashcards={isLoadingFlashcards}
                                     isGenerating={isGenerating}
-                                    flashcardCount={flashcardCount}
-                                    setFlashcardCount={setFlashcardCount}
                                     openGenerationModal={openGenerationModal}
                                     handleDelete={handleDelete}
                                     deleteFlashcard={deleteFlashcard}
@@ -219,8 +286,6 @@ const WorkspaceNotebook: React.FC = () => {
                                     quizzes={quizzes}
                                     isLoadingQuizzes={isLoadingQuizzes}
                                     isGenerating={isGenerating}
-                                    quizCount={quizCount}
-                                    setQuizCount={setQuizCount}
                                     openGenerationModal={openGenerationModal}
                                     handleDelete={handleDelete}
                                     deleteQuiz={deleteQuiz}
@@ -250,10 +315,40 @@ const WorkspaceNotebook: React.FC = () => {
                 </div>
             </div>
 
+            {/* Mobile bottom navigation */}
+            <nav className="fixed bottom-0 inset-x-0 z-40 border-t border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-900/90 md:hidden safe-pb">
+                <div className="flex items-stretch">
+                    {tabs.map((tab) => {
+                        const IconComponent = tab.icon;
+                        const isActive = activeTab === tab.id;
+                        return (
+                            <button
+                                key={tab.id}
+                                type="button"
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`relative flex flex-1 flex-col items-center justify-center gap-0.5 py-2.5 transition-colors ${
+                                    isActive
+                                        ? 'text-blue-600 dark:text-blue-400'
+                                        : 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300'
+                                }`}
+                            >
+                                {isActive && (
+                                    <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full bg-blue-600 dark:bg-blue-400" />
+                                )}
+                                <IconComponent size={20} />
+                                <span className="text-[10px] font-medium leading-none">
+                                    {MOBILE_TAB_LABEL[tab.id] ?? tab.label}
+                                </span>
+                            </button>
+                        );
+                    })}
+                </div>
+            </nav>
+
             <Modal
                 isOpen={generationModal !== null}
-                onClose={() => setGenerationModal(null)}
-                className="max-w-3xl p-6"
+                onClose={() => { if (!isCurrentlyGenerating) { setGenerationModal(null); setGenerationTitle(''); } }}
+                className="max-w-3xl p-4 sm:p-6 max-h-[92dvh] overflow-y-auto"
             >
                 <div className="mb-5">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -262,106 +357,197 @@ const WorkspaceNotebook: React.FC = () => {
                         {generationModal === 'quiz' && 'Préparer le quiz'}
                         {generationModal === 'podcast' && 'Préparer le podcast'}
                     </h3>
-                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        Choisis les sources et les thèmes, puis lance la génération finale.
-                    </p>
+                    {!isCurrentlyGenerating && (
+                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            Choisis les sources et les thèmes, puis lance la génération finale.
+                        </p>
+                    )}
                 </div>
 
-                <div className="mb-5">
-                    <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-200">Titre</label>
-                    <input
-                        type="text"
-                        value={generationTitle}
-                        onChange={(e) => setGenerationTitle(e.target.value)}
-                        placeholder="Ex: Notebook - Résumé"
-                        className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 dark:border-gray-800 dark:bg-gray-900 dark:text-white"
-                    />
-                </div>
-
-                <div className="grid gap-4 lg:grid-cols-2">
-                    <div>
-                        <p className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-200">Sources à inclure</p>
-                        <div className="max-h-64 space-y-2 overflow-y-auto pr-1">
-                            {sources?.items?.map(source => {
-                                const currentTarget = generationModal === 'summary' ? summaryTarget : generationModal === 'flashcards' ? flashcardTarget : generationModal === 'quiz' ? quizTarget : podcastTarget;
-                                const currentSetTarget = generationModal === 'summary' ? setSummaryTarget : generationModal === 'flashcards' ? setFlashcardTarget : generationModal === 'quiz' ? setQuizTarget : setPodcastTarget;
-                                return (
-                                    <label key={source.id} className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-100 bg-white px-3 py-2 text-sm text-gray-700 transition-colors hover:border-blue-200 dark:border-gray-800 dark:bg-gray-900/40 dark:text-gray-200">
-                                        <input
-                                            type="checkbox"
-                                            checked={currentTarget.sourceIds.includes(source.id)}
-                                            onChange={() => currentSetTarget(prev => ({ ...prev, sourceIds: prev.sourceIds.includes(source.id) ? prev.sourceIds.filter(id => id !== source.id) : [...prev.sourceIds, source.id] }))}
-                                            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                        />
-                                        <span className="truncate">{source.filename}</span>
-                                    </label>
-                                );
-                            })}
-                            {sources?.items?.length === 0 && <p className="text-xs text-gray-400">Aucune source disponible.</p>}
+                {isCurrentlyGenerating ? (
+                    <div className="flex flex-col items-center justify-center py-14 gap-5">
+                        <div className="relative flex items-center justify-center">
+                            <div className="h-16 w-16 rounded-full border-4 border-blue-100 dark:border-blue-900" />
+                            <div className="absolute h-16 w-16 rounded-full border-4 border-blue-500 border-t-transparent animate-spin" />
+                        </div>
+                        <div className="text-center space-y-1">
+                            <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">
+                                {generationModal === 'summary' && 'Génération du résumé en cours…'}
+                                {generationModal === 'flashcards' && 'Génération des flashcards en cours…'}
+                                {generationModal === 'quiz' && 'Génération du quiz en cours…'}
+                                {generationModal === 'podcast' && 'Génération du podcast en cours…'}
+                            </p>
+                            <p className="text-xs text-gray-400 dark:text-gray-500">
+                                Cela peut prendre quelques instants. Ne fermez pas cette fenêtre.
+                            </p>
                         </div>
                     </div>
-
-                    <div>
-                        <p className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-200">Thèmes à inclure</p>
-                        <div className="max-h-64 space-y-2 overflow-y-auto pr-1">
-                            {themes?.items?.map(theme => {
-                                const currentTarget = generationModal === 'summary' ? summaryTarget : generationModal === 'flashcards' ? flashcardTarget : generationModal === 'quiz' ? quizTarget : podcastTarget;
-                                const currentSetTarget = generationModal === 'summary' ? setSummaryTarget : generationModal === 'flashcards' ? setFlashcardTarget : generationModal === 'quiz' ? setQuizTarget : setPodcastTarget;
-                                return (
-                                    <label key={theme.id} className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-100 bg-white px-3 py-2 text-sm text-gray-700 transition-colors hover:border-blue-200 dark:border-gray-800 dark:bg-gray-900/40 dark:text-gray-200">
-                                        <input
-                                            type="checkbox"
-                                            checked={currentTarget.themeIds.includes(theme.id)}
-                                            onChange={() => currentSetTarget(prev => ({ ...prev, themeIds: prev.themeIds.includes(theme.id) ? prev.themeIds.filter(id => id !== theme.id) : [...prev.themeIds, theme.id] }))}
-                                            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                        />
-                                        <span className="truncate">{theme.name}</span>
-                                    </label>
-                                );
-                            })}
-                            {themes?.items?.length === 0 && <p className="text-xs text-gray-400">Aucun thème disponible.</p>}
+                ) : (
+                    <>
+                        <div className="mb-5 grid gap-4 sm:grid-cols-2">
+                            <div>
+                                <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-200">Titre</label>
+                                <input
+                                    type="text"
+                                    value={generationTitle}
+                                    onChange={(e) => setGenerationTitle(e.target.value)}
+                                    placeholder="Ex: Notebook - Résumé"
+                                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 dark:border-gray-800 dark:bg-gray-900 dark:text-white"
+                                />
+                            </div>
+                            <div>
+                                <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-200">Langue</label>
+                                <select
+                                    value={generationLanguage}
+                                    onChange={(e) => setGenerationLanguage(e.target.value)}
+                                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 dark:border-gray-800 dark:bg-gray-900 dark:text-white"
+                                >
+                                    <option value="fr">Français</option>
+                                    <option value="en">English</option>
+                                    <option value="es">Español</option>
+                                    <option value="de">Deutsch</option>
+                                    <option value="pt">Português</option>
+                                    <option value="it">Italiano</option>
+                                    <option value="ar">العربية</option>
+                                </select>
+                            </div>
+                            {generationModal === 'flashcards' && (
+                                <div>
+                                    <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-200">Nombre de cartes</label>
+                                    <input
+                                        type="number"
+                                        min={1}
+                                        max={50}
+                                        value={flashcardCount}
+                                        onChange={(e) => setFlashcardCount(Math.max(1, Math.min(50, Number(e.target.value) || 10)))}
+                                        className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 dark:border-gray-800 dark:bg-gray-900 dark:text-white"
+                                    />
+                                </div>
+                            )}
+                            {generationModal === 'quiz' && (
+                                <div>
+                                    <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-200">Nombre de questions</label>
+                                    <input
+                                        type="number"
+                                        min={1}
+                                        max={20}
+                                        value={quizCount}
+                                        onChange={(e) => setQuizCount(Math.max(1, Math.min(20, Number(e.target.value) || 5)))}
+                                        className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 dark:border-gray-800 dark:bg-gray-900 dark:text-white"
+                                    />
+                                </div>
+                            )}
                         </div>
-                    </div>
-                </div>
 
-                <div className="mt-6 flex justify-end gap-2">
-                    <button
-                        type="button"
-                        onClick={() => {
-                            setGenerationModal(null);
-                            setGenerationTitle('');
-                        }}
-                        className="rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-white/5"
-                    >
-                        Annuler
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => {
-                            if (!generationTitle.trim()) {
-                                return;
-                            }
-                            if (generationModal === 'summary') {
-                                createSummary.mutate({ notebookId, title: generationTitle.trim(), sourceIds: summaryTarget.sourceIds, themeIds: summaryTarget.themeIds });
-                            }
-                            if (generationModal === 'flashcards') {
-                                createFlashcards.mutate({ notebookId, title: generationTitle.trim(), count: flashcardCount, sourceIds: flashcardTarget.sourceIds, themeIds: flashcardTarget.themeIds });
-                            }
-                            if (generationModal === 'quiz') {
-                                createQuiz.mutate({ notebookId, title: generationTitle.trim(), count: quizCount, sourceIds: quizTarget.sourceIds, themeIds: quizTarget.themeIds });
-                            }
-                            if (generationModal === 'podcast') {
-                                createPodcast.mutate({ notebookId, title: generationTitle.trim(), sourceIds: podcastTarget.sourceIds, themeIds: podcastTarget.themeIds });
-                            }
-                            setGenerationModal(null);
-                            setGenerationTitle('');
-                        }}
-                        disabled={!generationTitle.trim()}
-                        className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-                    >
-                        Lancer la génération
-                    </button>
-                </div>
+                        <div className="grid gap-4 lg:grid-cols-2">
+                            <div>
+                                <p className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-200">Sources à inclure</p>
+                                <div className="max-h-36 sm:max-h-52 lg:max-h-64 space-y-2 overflow-y-auto overflow-x-hidden pr-1">
+                                    {sources?.items?.map(source => {
+                                        const currentTarget = generationModal === 'summary' ? summaryTarget : generationModal === 'flashcards' ? flashcardTarget : generationModal === 'quiz' ? quizTarget : podcastTarget;
+                                        const currentSetTarget = generationModal === 'summary' ? setSummaryTarget : generationModal === 'flashcards' ? setFlashcardTarget : generationModal === 'quiz' ? setQuizTarget : setPodcastTarget;
+                                        return (
+                                            <label key={source.id} className="flex w-full min-w-0 overflow-hidden cursor-pointer items-center gap-3 rounded-xl border border-gray-100 bg-white px-3 py-2 text-sm text-gray-700 transition-colors hover:border-blue-200 dark:border-gray-800 dark:bg-gray-900/40 dark:text-gray-200">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={currentTarget.sourceIds.includes(source.id)}
+                                                    onChange={() => currentSetTarget(prev => ({ ...prev, sourceIds: prev.sourceIds.includes(source.id) ? prev.sourceIds.filter(id => id !== source.id) : [...prev.sourceIds, source.id] }))}
+                                                    className="h-4 w-4 shrink-0 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                />
+                                                <span className="min-w-0 truncate">{source.filename}</span>
+                                            </label>
+                                        );
+                                    })}
+                                    {sources?.items?.length === 0 && <p className="text-xs text-gray-400">Aucune source disponible.</p>}
+                                </div>
+                            </div>
+
+                            <div>
+                                <p className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-200">Thèmes à inclure</p>
+                                <div className="max-h-36 sm:max-h-52 lg:max-h-64 space-y-2 overflow-y-auto overflow-x-hidden pr-1">
+                                    {themes?.items?.map(theme => {
+                                        const currentTarget = generationModal === 'summary' ? summaryTarget : generationModal === 'flashcards' ? flashcardTarget : generationModal === 'quiz' ? quizTarget : podcastTarget;
+                                        const currentSetTarget = generationModal === 'summary' ? setSummaryTarget : generationModal === 'flashcards' ? setFlashcardTarget : generationModal === 'quiz' ? setQuizTarget : setPodcastTarget;
+                                        return (
+                                            <label key={theme.id} className="flex w-full min-w-0 overflow-hidden cursor-pointer items-center gap-3 rounded-xl border border-gray-100 bg-white px-3 py-2 text-sm text-gray-700 transition-colors hover:border-blue-200 dark:border-gray-800 dark:bg-gray-900/40 dark:text-gray-200">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={currentTarget.themeIds.includes(theme.id)}
+                                                    onChange={() => currentSetTarget(prev => ({ ...prev, themeIds: prev.themeIds.includes(theme.id) ? prev.themeIds.filter(id => id !== theme.id) : [...prev.themeIds, theme.id] }))}
+                                                    className="h-4 w-4 shrink-0 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                />
+                                                <span className="min-w-0 truncate">{theme.name}</span>
+                                            </label>
+                                        );
+                                    })}
+                                    {themes?.items?.length === 0 && <p className="text-xs text-gray-400">Aucun thème disponible.</p>}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mt-6 flex justify-end gap-2">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setGenerationModal(null);
+                                    setGenerationTitle('');
+                                }}
+                                className="rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-white/5"
+                            >
+                                Annuler
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (!canGenerate) {
+                                        setUpgradeModalOpen(true);
+                                        return;
+                                    }
+                                    if (!generationTitle.trim()) return;
+                                    const closeOnSuccess = () => {
+                                        setGenerationModal(null);
+                                        setGenerationTitle('');
+                                    };
+                                    if (generationModal === 'summary') {
+                                        createSummary.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, sourceIds: summaryTarget.sourceIds, themeIds: summaryTarget.themeIds }, { onSuccess: closeOnSuccess, onError: handle402 });
+                                    }
+                                    if (generationModal === 'flashcards') {
+                                        createFlashcards.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, count: flashcardCount, sourceIds: flashcardTarget.sourceIds, themeIds: flashcardTarget.themeIds }, { onSuccess: closeOnSuccess, onError: handle402 });
+                                    }
+                                    if (generationModal === 'quiz') {
+                                        createQuiz.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, count: quizCount, sourceIds: quizTarget.sourceIds, themeIds: quizTarget.themeIds }, { onSuccess: closeOnSuccess, onError: handle402 });
+                                    }
+                                    if (generationModal === 'podcast') {
+                                        createPodcast.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, sourceIds: podcastTarget.sourceIds, themeIds: podcastTarget.themeIds }, { onSuccess: closeOnSuccess, onError: handle402 });
+                                    }
+                                }}
+                                disabled={!generationTitle.trim() && canGenerate}
+                                className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-white transition-colors disabled:opacity-50 ${
+                                    canGenerate
+                                        ? 'bg-blue-600 hover:bg-blue-700'
+                                        : 'bg-amber-500 hover:bg-amber-600'
+                                }`}
+                            >
+                                {canGenerate ? (
+                                    <>
+                                        Lancer la génération
+                                        {!isPro && (
+                                            <span className="inline-flex items-center gap-0.5 rounded-full bg-blue-500/30 px-1.5 py-0.5 text-[10px] font-bold">
+                                                <Zap size={9} />
+                                                {ARTEFACT_COST}
+                                            </span>
+                                        )}
+                                    </>
+                                ) : (
+                                    <>
+                                        <Lock size={13} />
+                                        Aucun jeton
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </>
+                )}
             </Modal>
 
             <ConfirmModal
@@ -372,6 +558,11 @@ const WorkspaceNotebook: React.FC = () => {
                 cancelLabel="Annuler"
                 onConfirm={handleConfirm}
                 onCancel={() => setConfirmOpen(false)}
+            />
+
+            <UpgradeModal
+                isOpen={upgradeModalOpen}
+                onClose={() => setUpgradeModalOpen(false)}
             />
         </>
     );

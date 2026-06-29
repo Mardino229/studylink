@@ -4,12 +4,14 @@ import { FileIcon, UploadCloudIcon, CheckCircleIcon, LoaderIcon, Trash2 } from '
 import ConfirmModal from '../../components/ui/ConfirmModal';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { baseUrl } from '../../utils/api.ts';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface SourceUploaderProps {
     notebookId: string;
 }
 
 const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
+    const queryClient = useQueryClient();
     const { data: sources, refetch: refetchSources } = useGetSources(notebookId, { perPage: 100 });
     const uploadMutation = useUploadSource();
     const deleteMutation = useDeleteSource();
@@ -73,6 +75,15 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
 
                     if (data.progress === 100 || data.status === 'completed') {
                         void refetchSources();
+                        queryClient.invalidateQueries({ queryKey: ["themes", notebookId] });
+                        // Clean up streaming state after a short delay so progress bar disappears cleanly
+                        setTimeout(() => {
+                            setStreamingSources(prev => {
+                                const next = { ...prev };
+                                delete next[sourceId];
+                                return next;
+                            });
+                        }, 800);
                     }
                 } catch {
                     // Ignore malformed stream payloads.
@@ -94,8 +105,8 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
             <div className="space-y-4 p- sm:p-6">
                 <label className="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-300 p-6 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-white/[0.02]">
                     <UploadCloudIcon className="mb-2 text-gray-400" size={32} />
-                    <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Cliquez pour uploader (PDF, TXT)</span>
-                    <input type="file" className="hidden" accept=".pdf,.txt" onChange={handleFileChange} />
+                    <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Cliquez pour uploader (PDF, TXT, PPT, PPTX)</span>
+                    <input type="file" className="hidden" accept=".pdf,.txt,.ppt,.pptx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation" onChange={handleFileChange} />
                 </label>
 
                 {Object.entries(streamingSources).map(([id, info]) => {

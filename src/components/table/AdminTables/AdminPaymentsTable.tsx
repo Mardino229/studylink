@@ -36,9 +36,9 @@ export default function AdminPaymentsTable({
         if (!searchTerm) return true;
         const q = searchTerm.toLowerCase();
         return (
-            t.user_first_name.toLowerCase().includes(q) ||
-            t.user_last_name.toLowerCase().includes(q) ||
-            t.user_email.toLowerCase().includes(q) ||
+            (t.user_first_name || "").toLowerCase().includes(q) ||
+            (t.user_last_name || "").toLowerCase().includes(q) ||
+            (t.user_email || "").toLowerCase().includes(q) ||
             (t.plan_name || "").toLowerCase().includes(q)
         );
     });
@@ -63,6 +63,9 @@ export default function AdminPaymentsTable({
                                     <TableRow>
                                         <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
                                             Utilisateur
+                                        </TableCell>
+                                        <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
+                                            Type
                                         </TableCell>
                                         <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
                                             Plan
@@ -93,7 +96,10 @@ export default function AdminPaymentsTable({
                                                 </div>
                                             </TableCell>
                                             <TableCell className="px-5 py-4 text-start text-gray-500 text-theme-sm dark:text-gray-400">
-                                                {t.plan_name} ({t.billing_type === "monthly" ? "Mensuel" : "Annuel"})
+                                                {t.transaction_type === "subscription" ? "Abonnement" : "Pack de jetons"}
+                                            </TableCell>
+                                            <TableCell className="px-5 py-4 text-start text-gray-500 text-theme-sm dark:text-gray-400">
+                                                {t.plan_name} ({t.billing_type?  t.billing_type === "monthly" ? "Mensuel" : "Annuel" : "N/A"})
                                             </TableCell>
                                             <TableCell className="px-5 py-4 text-start text-gray-800 font-semibold text-theme-sm dark:text-white/90">
                                                 {parseFloat(t.amount).toFixed(2)} {t.currency.toUpperCase()}

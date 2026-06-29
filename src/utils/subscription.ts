@@ -23,7 +23,7 @@ export const useGetMySubscriptions = () => {
     });
 };
 
-export const useGetMyActiveSubscription = () => {
+export const  useGetMyActiveSubscription = () => {
     const axiosPrivate = useAxiosPrivate();
     return useQuery({
         queryKey: ["my-active-subscription"],

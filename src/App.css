@@ -1,22 +1,21 @@
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap")
-layer(base);
-@import "@fontsource/montserrat/400.css";
-@import "@fontsource/montserrat/500.css";
-@import "@fontsource/montserrat/600.css";
-@import "@fontsource/montserrat/700.css";
+@import "@fontsource/figtree/400.css";
+@import "@fontsource/figtree/500.css";
+@import "@fontsource/figtree/600.css";
+@import "@fontsource/figtree/700.css";
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
 
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-    --font-display: "Montserrat", "sans-serif";
+    --font-display: "Figtree", "sans-serif";
     --animation-typing: typing 2s steps(20) infinite alternate, blink 0.7s infinite;
 }
 
 body {
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Figtree', sans-serif;
 }
 
 :root {
@@ -992,18 +991,3 @@ span.flatpickr-weekday,
     @apply h-8 my-4 border-none opacity-0;
 }
 
-/* Styling for heading anchor links (rehype-autolink-headings) */
-.prose h1 > a,
-.prose h2 > a,
-.prose h3 > a,
-.prose h4 > a {
-    @apply no-underline ml-2 opacity-0 transition-opacity;
-    content: "#";
-}
-
-.prose h1:hover > a,
-.prose h2:hover > a,
-.prose h3:hover > a,
-.prose h4:hover > a {
-    @apply opacity-30 hover:opacity-100 dark:text-white;
-}

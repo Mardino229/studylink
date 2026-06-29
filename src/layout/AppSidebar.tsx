@@ -15,7 +15,7 @@ import {
     UserCircleIcon,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
-import {SettingsIcon} from "lucide-react";
+import { DockIcon, SettingsIcon } from "lucide-react";
 
 type NavItem = {
   name: string;
@@ -36,9 +36,9 @@ const navItems: NavItem[] = [
     path: "/workspaces"
   },
   {
-    icon: <AI />,
-    name: "Chat Assistant",
-    path: "/chat",
+    icon: <DockIcon />,
+    name: "Bibliothèque d'épreuves",
+    path: "/exam-library",
   },
   {
     icon: <UserCircleIcon />,

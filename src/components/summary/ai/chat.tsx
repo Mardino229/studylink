@@ -11,12 +11,6 @@ interface Message {
     timestamp: Date;
 }
 
-const SUGGESTED_QUESTIONS = [
-    "Explique-moi ce concept",
-    "Donne-moi un exemple",
-    "Quels sont les points clés ?",
-    "Crée un quiz",
-];
 
 const Chat = () => {
     const [messages, setMessages] = useState<Message[]>([
@@ -204,7 +198,7 @@ const Chat = () => {
             <div className="p-4 bg-white dark:bg-slate-900">
                 <div className="max-w-3xl mx-auto">
                     {/* Suggestions */}
-                    {messages.length < 2 && (
+                    {/*{messages.length < 2 && (
                         <div className="grid grid-cols-2 gap-2 mb-4">
                             {SUGGESTED_QUESTIONS.map((q, i) => (
                                 <button
@@ -216,7 +210,7 @@ const Chat = () => {
                                 </button>
                             ))}
                         </div>
-                    )}
+                    )}*/}
 
                     <div className="relative flex items-center">
                         <input

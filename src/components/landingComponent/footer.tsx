@@ -16,37 +16,37 @@ export default function Footer() {
                             </svg>
                             <h2 className="text-foreground text-2xl font-bold">StudyLink</h2>
                         </div>
-                        <p className="mt-4 text-sm">Empowering students to achieve academic excellence.</p>
+                        <p className="mt-4 text-sm">Une plateforme pour résumer, réviser et organiser vos études plus simplement.</p>
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:col-span-3 gap-8">
                         <div>
-                            <h3 className="text-base font-semibold text-foreground">Platform</h3>
+                            <h3 className="text-base font-semibold text-foreground">Plateforme</h3>
                             <ul className="mt-4 space-y-2">
-                                <li><a className="hover:text-foreground transition-colors" href="#key-features">Features</a></li>
-                                <li><a className="hover:text-foreground transition-colors" href="#pricing">Pricing</a></li>
-                                <li><Link className="hover:text-foreground transition-colors" to="/login">Dashboard</Link></li>
+                                <li><a className="hover:text-foreground transition-colors" href="#key-features">Fonctionnalités</a></li>
+                                <li><a className="hover:text-foreground transition-colors" href="#pricing">Tarifs</a></li>
+                                <li><Link className="hover:text-foreground transition-colors" to="/login">Connexion</Link></li>
                             </ul>
                         </div>
                         <div>
-                            <h3 className="text-base font-semibold text-foreground">Company</h3>
+                            <h3 className="text-base font-semibold text-foreground">Entreprise</h3>
                             <ul className="mt-4 space-y-2">
-                                <li><Link className="hover:text-foreground transition-colors" to="/about">About Us</Link></li>
-                                <li><a className="hover:text-foreground transition-colors" href="#">Careers</a></li>
-                                <li><a className="hover:text-foreground transition-colors" href="#">Contact</a></li>
+                                <li><Link className="hover:text-foreground transition-colors" to="/about">À propos</Link></li>
+                                <li><a className="hover:text-foreground transition-colors" href="#faq">FAQ</a></li>
+                                <li><a className="hover:text-foreground transition-colors" href="#home">Contact</a></li>
                             </ul>
                         </div>
                         <div>
-                            <h3 className="text-base font-semibold text-foreground">Legal</h3>
+                            <h3 className="text-base font-semibold text-foreground">Légal</h3>
                             <ul className="mt-4 space-y-2">
-                                <li><a className="hover:text-foreground transition-colors" href="#">Privacy Policy</a></li>
-                                <li><a className="hover:text-foreground transition-colors" href="#">Terms of Service</a></li>
+                                <li><a className="hover:text-foreground transition-colors" href="#">Confidentialité</a></li>
+                                <li><a className="hover:text-foreground transition-colors" href="#">Conditions</a></li>
                             </ul>
                         </div>
                     </div>
                 </div>
                 <div
                     className="mt-12 border-t border-border pt-8 flex flex-col sm:flex-row justify-between items-center">
-                    <p className="text-sm">© 2024 StudyLink. All rights reserved.</p>
+                    <p className="text-sm">© 2026 StudyLink. Tous droits réservés.</p>
                     <div className="flex gap-4 mt-4 sm:mt-0">
                         <a className="text-foreground/70 hover:text-foreground" href="#">
                             <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24"

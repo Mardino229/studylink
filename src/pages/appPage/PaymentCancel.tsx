@@ -10,7 +10,7 @@ export default function PaymentCancel() {
         <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center">
             <PageMeta title="Paiement Annulé" description="Le paiement a été annulé" />
 
-            <div className="max-w-md w-full p-8 rounded-2xl bg-white dark:bg-white/[0.03] border border-gray-100 dark:border-white/[0.05] shadow-xl">
+            <div className="max-w-md w-full p-8 rounded-2xl bg-white dark:bg-white/[0.03] dark:border-white/[0.05]">
                 <div className="mx-auto size-20 rounded-full bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center">
                     <XCircle className="size-12 text-orange-600" />
                 </div>
