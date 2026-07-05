@@ -41,6 +41,7 @@ import AdminSettings from "./pages/admin/Settings.tsx";
 import AdminExamLibrary from "./pages/admin/ExamLibrary.tsx";
 import AdminTokenPacks from "./pages/admin/TokenPacks.tsx";
 import ExamLibrary from "./pages/appPage/ExamLibrary.tsx";
+import ExamSolution from "./pages/appPage/ExamSolution.tsx";
 import UserProfiles from "./pages/appPage/UserProfiles.tsx";
 import PaymentListPage from './pages/appPage/PaymentListPage.tsx';
 import PaymentSuccess from './pages/appPage/PaymentSuccess.tsx';
@@ -63,6 +64,7 @@ function App() {
 
                 <Route element={<RequireAuth />}>
                     <Route path="/complete-profile" element={<CompleteProfile />} />
+                    <Route path="/exam-library/solution/:examId" element={<ExamSolution />} />
                     <Route element={<AppLayout />}>
                         <Route path="/home" element={<Home />} />
                         <Route path="/workspaces" element={<Workspaces />} />

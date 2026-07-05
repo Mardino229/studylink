@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { BookOpen, Download, FileText, Lock, Search, Unlock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import {
+    BookOpen, CheckCircle2, Download, Eye, FileText,
+    Lock, Search, Sparkles,
+} from 'lucide-react';
 import PageMeta from '../../components/common/PageMeta';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
-import { useGetCourses, useGetExams } from '../../utils/exam';
+import { useGetCourses, useGetExams, useGetUnlockedSolutions } from '../../utils/exam';
 import { useAxiosPrivate } from '../../hoooks/useAxiosPrivate';
+import { useBilling } from '../../context/BillingContext';
 import type { ExamItem, ExamSession, ExamType } from '../../types/exams';
 
 const SESSION_LABELS: Record<ExamSession, string> = {
     fall: 'Automne',
     winter: 'Hiver',
-    summer: 'Été',
+    summer: 'Printemps/Été', 
 };
 const TYPE_LABELS: Record<ExamType, string> = {
     midterm: 'Intra',
@@ -28,6 +33,8 @@ const TYPE_COLORS: Record<ExamType, string> = {
 
 export default function ExamLibrary() {
     const axiosPrivate = useAxiosPrivate();
+    const navigate = useNavigate();
+    const { isPro, tokenBalance } = useBilling();
 
     const [courseId, setCourseId] = useState('');
     const [academicYear, setAcademicYear] = useState('');
@@ -43,6 +50,9 @@ export default function ExamLibrary() {
 
     const [downloading, setDownloading] = useState<string | null>(null);
 
+    const { data: unlockedIds = [] } = useGetUnlockedSolutions();
+    const unlockedExams = new Set(unlockedIds);
+
     const { data: courses = [] } = useGetCourses();
     const { data: exams = [], isLoading } = useGetExams({
         is_validated: true,
@@ -54,20 +64,16 @@ export default function ExamLibrary() {
     });
 
     const handleSearch = () => setAppliedFilters({ courseId, academicYear, session, examType });
-
     const handleReset = () => {
         setCourseId(''); setAcademicYear(''); setSession(''); setExamType('');
         setAppliedFilters({ courseId: '', academicYear: '', session: '', examType: '' });
     };
-
     const hasActiveFilters = appliedFilters.courseId || appliedFilters.academicYear || appliedFilters.session || appliedFilters.examType;
 
-    const downloadFile = async (examId: string, type: 'exam' | 'solution', name: string) => {
-        const key = `${examId}-${type}`;
-        setDownloading(key);
+    const downloadExam = async (examId: string, name: string) => {
+        setDownloading(examId);
         try {
-            const url = type === 'exam' ? `/exam-library/${examId}/download` : `/exam-library/${examId}/solution`;
-            const response = await axiosPrivate.get(url, { responseType: 'blob' });
+            const response = await axiosPrivate.get(`/exam-library/${examId}/download`, { responseType: 'blob' });
             const blob = new Blob([response.data], { type: 'application/pdf' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -76,12 +82,10 @@ export default function ExamLibrary() {
             URL.revokeObjectURL(link.href);
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                if (error.response?.status === 402) {
-                    toast.error('Abonnement requis', { description: 'Un abonnement actif est nécessaire pour accéder à ce corrigé.' });
-                } else if (error.response?.status === 403) {
+                if (error.response?.status === 403) {
                     toast.error('Accès refusé', { description: "Cette épreuve n'est pas encore disponible." });
                 } else if (error.response?.status === 404) {
-                    toast.error('Corrigé indisponible', { description: "Aucun corrigé n'est disponible pour cette épreuve." });
+                    toast.error('Épreuve introuvable');
                 } else {
                     toast.error('Erreur lors du téléchargement');
                 }
@@ -89,6 +93,10 @@ export default function ExamLibrary() {
         } finally {
             setDownloading(null);
         }
+    };
+
+    const viewSolution = (exam: ExamItem) => {
+        navigate(`/exam-library/solution/${exam.id}?title=${encodeURIComponent(exam.name)}`);
     };
 
     return (
@@ -126,7 +134,7 @@ export default function ExamLibrary() {
                             <option value="">Toutes les sessions</option>
                             <option value="fall">Automne</option>
                             <option value="winter">Hiver</option>
-                            <option value="summer">Été</option>
+                            <option value="summer">Printemps/Été</option>
                         </select>
                         <select
                             value={examType}
@@ -182,7 +190,16 @@ export default function ExamLibrary() {
                 ) : (
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         {exams.map(exam => (
-                            <ExamCard key={exam.id} exam={exam} downloading={downloading} onDownload={downloadFile} />
+                            <ExamCard
+                                key={exam.id}
+                                exam={exam}
+                                isPro={isPro}
+                                tokenBalance={tokenBalance}
+                                isUnlocked={unlockedExams.has(exam.id)}
+                                downloading={downloading === exam.id}
+                                onDownloadExam={() => downloadExam(exam.id, exam.name)}
+                                onViewSolution={() => viewSolution(exam)}
+                            />
                         ))}
                     </div>
                 )}
@@ -193,25 +210,63 @@ export default function ExamLibrary() {
 
 function ExamCard({
     exam,
+    isPro,
+    tokenBalance,
+    isUnlocked,
     downloading,
-    onDownload,
+    onDownloadExam,
+    onViewSolution,
 }: {
     exam: ExamItem;
-    downloading: string | null;
-    onDownload: (id: string, type: 'exam' | 'solution', name: string) => void;
+    isPro: boolean;
+    tokenBalance: number;
+    isUnlocked: boolean;
+    downloading: boolean;
+    onDownloadExam: () => void;
+    onViewSolution: () => void;
 }) {
-    const isDownloadingExam = downloading === `${exam.id}-exam`;
-    const isDownloadingSolution = downloading === `${exam.id}-solution`;
     const hasSolution = !!exam.solution_file_url;
+    const solutionFree = !exam.is_solution_paid;
+    const canAccessFree = solutionFree || isPro || isUnlocked;
+    const canAccessWithTokens = tokenBalance >= 2;
+
+    const solutionTitle = !hasSolution
+        ? 'Aucun corrigé disponible'
+        : solutionFree
+        ? 'Voir le corrigé (gratuit)'
+        : isPro
+        ? 'Voir le corrigé (inclus Pro)'
+        : isUnlocked
+        ? 'Voir le corrigé (déjà acheté)'
+        : canAccessWithTokens
+        ? 'Voir le corrigé (🪙 2 jetons)'
+        : 'Solde insuffisant — 2 jetons requis';
 
     return (
         <div className="flex flex-col rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-gray-800 dark:bg-gray-900/80">
-            {exam.course && (
-                <div className="mb-3 inline-flex items-center gap-1.5 self-start rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                    <BookOpen size={11} />
-                    {exam.course.code}
-                </div>
-            )}
+            <div className="mb-3 flex items-start justify-between gap-2">
+                {exam.course ? (
+                    <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                        <BookOpen size={11} />
+                        {exam.course.code}
+                    </div>
+                ) : (
+                    <div />
+                )}
+
+                {isUnlocked && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                        <CheckCircle2 size={10} />
+                        Déjà acheté
+                    </span>
+                )}
+                {!isUnlocked && isPro && hasSolution && exam.is_solution_paid && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                        <Sparkles size={10} />
+                        Pro
+                    </span>
+                )}
+            </div>
 
             <h3 className="mb-1 flex-1 text-sm font-semibold leading-snug text-gray-900 dark:text-white">
                 {exam.name}
@@ -237,29 +292,41 @@ function ExamCard({
                         {TYPE_LABELS[exam.exam_type]}
                     </span>
                 )}
+                {hasSolution && exam.is_solution_paid && !isPro && !isUnlocked && (
+                    <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                        🪙 2 jetons
+                    </span>
+                )}
             </div>
 
-            <div className="flex gap-2">
+            <div className="mt-auto flex gap-2">
                 <button
-                    onClick={() => onDownload(exam.id, 'exam', exam.name)}
-                    disabled={isDownloadingExam}
+                    onClick={onDownloadExam}
+                    disabled={downloading}
                     className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-blue-600 px-3 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-60"
+                    title="Télécharger l'épreuve"
                 >
                     <Download size={12} />
-                    {isDownloadingExam ? '…' : 'Épreuve'}
+                    {downloading ? '…' : 'Épreuve'}
                 </button>
+
                 <button
-                    onClick={() => hasSolution && onDownload(exam.id, 'solution', `${exam.name} - Corrigé`)}
-                    disabled={isDownloadingSolution || !hasSolution}
-                    title={
-                        !hasSolution ? 'Aucun corrigé disponible'
-                        : exam.is_solution_paid ? 'Corrigé payant — abonnement requis'
-                        : 'Télécharger le corrigé'
-                    }
-                    className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-xs font-semibold text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                    onClick={onViewSolution}
+                    disabled={!hasSolution}
+                    title={solutionTitle}
+                    className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl border px-3 py-2.5 text-xs font-semibold transition-colors disabled:opacity-40 ${
+                        canAccessFree
+                            ? 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/40'
+                            : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+                    }`}
                 >
-                    {exam.is_solution_paid ? <Lock size={12} /> : <Unlock size={12} />}
-                    {isDownloadingSolution ? '…' : 'Corrigé'}
+                    {canAccessFree
+                        ? <Eye size={12} />
+                        : hasSolution
+                        ? <Lock size={12} />
+                        : <Lock size={12} />
+                    }
+                    Corrigé
                 </button>
             </div>
         </div>

@@ -13,7 +13,7 @@ import type { ExamItem, ExamSession, ExamType } from '../../types/exams';
 import { Modal } from '../../components/ui/modal/index.tsx';
 import ConfirmModal from '../../components/ui/ConfirmModal';
 
-const SESSION_LABELS: Record<ExamSession, string> = { fall: 'Automne', winter: 'Hiver', summer: 'Été' };
+const SESSION_LABELS: Record<ExamSession, string> = { fall: 'Automne', winter: 'Hiver', summer: 'Printemps/Été' };
 const TYPE_LABELS: Record<ExamType, string> = { midterm: 'Intra', final: 'Final', quiz: 'Quiz', other: 'Autre' };
 
 type Tab = 'exams' | 'courses';
@@ -275,7 +275,7 @@ export default function AdminExamLibrary() {
                                 <option value="">— Aucune —</option>
                                 <option value="fall">Automne</option>
                                 <option value="winter">Hiver</option>
-                                <option value="summer">Été</option>
+                                <option value="summer">Printemps/Été</option>
                             </select>
                         </div>
                         <div>

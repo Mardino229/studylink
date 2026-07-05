@@ -1,482 +1,251 @@
-# Guide de Réplication de l'Architecture Frontend (React + Vite)
+# Mise à jour — Accès aux corrigés
 
-Ce document décrit en détail la structure, les bibliothèques clés, les intercepteurs API, la persistance de l'authentification et les bonnes pratiques appliqués au projet **StudyLink**. Il est conçu pour être directement utilisable comme référence ou modèle (boilerplate) pour tout nouveau projet React + Vite afin d'en conserver les mêmes similarités architecturales.
-
----
-
-## 1. Choix Technologiques & Bibliothèques Phares
-
-Voici les dépendances principales à installer dans votre nouveau projet pour obtenir la même base technique :
-
-### Framework et Build Tools
-- **React 19** (`react`, `react-dom`) : Utilisation de la dernière version majeure de React.
-- **Vite 7** (`vite`, `@vitejs/plugin-react`) : Outil de build ultra-rapide.
-- **TypeScript 5** : Typage statique robuste.
-
-### Routing, State & Data Fetching
-- **React Router Dom v7** (`react-router-dom`) : Gestion des routes, redirections, et des layouts imbriqués via `<Outlet />`.
-- **Axios** (`axios`) : Client HTTP pour communiquer avec l'API backend.
-- **TanStack Query v5 (React Query)** (`@tanstack/react-query`) : Gestion globale du cache de l'API, synchronisation de l'état asynchrone, invalidation automatique du cache sur mutation, et gestion du statut de chargement/erreurs.
-
-### Styling & UI
-- **Tailwind CSS v4** (`tailwindcss`, `@tailwindcss/vite`, `@tailwindcss/typography`) : Version 4 de Tailwind. Attention : elle utilise un compilateur sous forme de plugin Vite au lieu du fichier classique `tailwind.config.js`.
-- **Framer Motion** (`framer-motion`, `motion`) : Bibliothèque d'animations pour des transitions d'interface fluides et premium.
-- **Lucide React** (`lucide-react`) : Ensemble d'icônes vectorielles légères et modernes.
-- **Sonner** (`sonner`) : Gestionnaire de toasts et notifications esthétiques avec support pour les thèmes (dark/light) et couleurs enrichies.
-
-### Formulaires et Validation
-- **React Hook Form** (`react-hook-form`) : Gestion performante des formulaires sans re-render intempestifs.
-- **Zod** (`zod` et `@hookform/resolvers`) : Validation de schémas de données en TypeScript, utilisée à la fois pour valider les formulaires côté client et typer les requêtes/réponses de l'API.
+> Ce document complète et **remplace les sections corrigé** de `EXAM_LIBRARY_API.md`.
+> Les sections cours, épreuves, admin restent inchangées.
 
 ---
 
-## 2. Structure Modulaire des Dossiers
+## Ce qui a changé
 
-Le projet suit une organisation modulaire sous le dossier `src/` :
+### Avant
+- Seul un abonnement actif donnait accès aux corrigés.
+- L'accès par jeton n'existait pas.
+- Le backend renvoyait un fichier téléchargeable.
 
-```text
-src/
-├── assets/             # Images, illustrations, fichiers statiques
-├── components/         # Composants d'interface réutilisables
-│   ├── authComponent/  # Composants dédiés à la connexion/inscription
-│   ├── common/         # Composants génériques (boutons, modales, etc.)
-│   └── layout/         # Gestion du contexte utilisateur global (UserContextProvider)
-├── context/            # Contextes React globaux et route-guards (AuthContext, RequireAuth, AdminGuard)
-├── hoooks/             # Hooks personnalisés (⚠️ typo "hoooks" avec 3 'o' dans ce projet, par convention préférez "hooks")
-├── icons/              # Icônes SVG personnalisées et composants d'icônes
-├── layout/             # Structures de mise en page globales (AppLayout, AdminLayout) avec Sidebar et Header
-├── pages/              # Pages de l'application (divisées en pages publiques d'auth, pages privées utilisateur, pages admin)
-├── services/           # Services additionnels (ex. données mockées pour le développement local)
-├── types/              # Déclarations globales de types TypeScript
-├── utils/              # Fichiers de configuration Axios et hooks d'API groupés par domaine (utils/course.ts, utils/workspace.ts)
-├── App.css             # Styles globaux spécifiques de l'application
-├── App.tsx             # Configuration de la table de routage principale (React Router)
-├── constant.ts         # Définition des constantes globales (ex. UserContext initial, listes d'étapes)
-├── index.css           # Configuration Tailwind v4 et directives globales CSS
-└── main.tsx            # Point d'entrée de l'application avec les providers globaux
+### Maintenant
+- Deux modes d'accès : **abonnement** ou **jetons**.
+- L'accès par jeton est **persistant** : on paie une fois pour un corrigé donné, on peut le rouvrir autant de fois qu'on veut sans repayer.
+- Le backend renvoie le PDF en **lecture seule** — le front doit l'afficher dans un viewer qui désactive le téléchargement.
+
+---
+
+## Modèle d'accès
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  GET /api/v1/exam-library/{exam_id}/solution                    │
+└─────────────────────────────────────────────────────────────────┘
+
+L'utilisateur a un abonnement Pro actif ?
+  → Oui  ──▶  Accès immédiat, 0 jeton déduit
+  → Non  ──▶  Voir ci-dessous
+
+L'utilisateur a déjà payé ce corrigé par le passé ?
+  → Oui  ──▶  Accès immédiat, 0 jeton déduit  (accès persistant)
+  → Non  ──▶  Voir ci-dessous
+
+L'utilisateur a ≥ 2 jetons ?
+  → Oui  ──▶  −2 jetons, accès enregistré définitivement, PDF affiché
+  → Non  ──▶  HTTP 402
 ```
 
----
+| Profil | 1ère ouverture | Ouvertures suivantes |
+|--------|---------------|----------------------|
+| Abonné Pro | Gratuit | Gratuit |
+| Token user (≥ 2 jetons) | −2 jetons | Gratuit (accès déjà en base) |
+| Token user (< 2 jetons) | HTTP 402 | HTTP 402 (accès non acquis) |
+| Aucun abonnement, 0 jeton | HTTP 402 | HTTP 402 |
 
-## 3. Configuration & Initialisation (Boilerplate)
-
-### Étape A : Configuration de Tailwind CSS v4 (`vite.config.ts`)
-Dans Tailwind v4, l'intégration se fait directement via un plugin Vite. Plus besoin de `tailwind.config.js`.
-
-```typescript
-// vite.config.ts
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
-
-export default defineConfig({
-  plugins: [
-    react(),
-    tailwindcss(), // Plugin Tailwind CSS v4
-  ],
-})
-```
-
-Dans votre `src/index.css` :
-```css
-@import "tailwindcss";
-
-/* Vos customisations de thèmes v4 s'effectuent via @theme */
-@theme {
-  --color-brand-primary: #10b981;
-  --color-brand-secondary: #3b82f6;
-}
-```
+> `is_solution_paid = false` sur l'épreuve = corrigé gratuit pour tout utilisateur connecté, aucune vérification.
 
 ---
 
-### Étape B : Point d'entrée de l'application (`src/main.tsx`)
-Initialise les providers globaux nécessaires (QueryClient, Context Utilisateur, Helmet, Toasts).
+## Endpoint corrigé
+
+```
+GET /api/v1/exam-library/{exam_id}/solution
+```
+
+**Accès :** Utilisateur connecté (abonnement actif **ou** jetons suffisants)
+
+**Réponse succès :**
+```
+HTTP 200
+Content-Type: application/pdf
+Content-Disposition: inline
+Cache-Control: no-store
+X-Content-Type-Options: nosniff
+```
+
+Le corps de la réponse est le flux binaire du PDF. Il n'y a **pas de JSON** — c'est directement le fichier.
+
+**Codes d'erreur :**
+
+| Code | Raison |
+|------|--------|
+| `401` | Cookie `access_token` manquant ou expiré |
+| `402` | Pas d'abonnement actif ET solde de jetons insuffisant (< 2) |
+| `404` | Épreuve introuvable ou aucun corrigé uploadé pour cette épreuve |
+
+---
+
+## Ce que le frontend doit faire
+
+### 1 — Afficher le corrigé sans téléchargement
+
+Le PDF est streamé avec `Content-Disposition: inline`. Le front **doit** utiliser un viewer JS qui désactive le bouton de téléchargement natif du navigateur.
+
+**Recommandation :** [`react-pdf`](https://react-pdf.org/) ou [`@react-pdf-viewer/core`](https://react-pdf-viewer.github.io/).
 
 ```tsx
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { HelmetProvider } from 'react-helmet-async'
-import { Toaster } from "sonner"
-import App from './App.tsx'
-import { UserContextProvider } from "./components/layout/userContextProvider.tsx"
-import './index.css'
+// Exemple avec @react-pdf-viewer/core
+import { Viewer, Worker } from '@react-pdf-viewer/core';
+import { toolbarPlugin } from '@react-pdf-viewer/toolbar';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false, // Évite les requêtes inutiles au focus de la fenêtre
-      retry: 1,                    // Limite les tentatives d'appel en cas d'erreur
-    },
-  },
-})
+const toolbar = toolbarPlugin();
+const { renderDefaultToolbar, Toolbar } = toolbar;
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <UserContextProvider>
-        <HelmetProvider>
-          <App />
-          <Toaster richColors position="top-center" />
-        </HelmetProvider>
-      </UserContextProvider>
-    </QueryClientProvider>
-  </StrictMode>
-)
-```
+// Masquer le bouton download dans la toolbar
+const renderToolbar = (Toolbar) => (
+  <Toolbar>
+    {renderDefaultToolbar((slot) => ({
+      ...slot,
+      Download: () => <></>,         // retire le bouton download
+      DownloadMenuItem: () => <></>,
+      Print: () => <></>,            // retire l'impression si souhaité
+    }))}
+  </Toolbar>
+);
 
----
+// Fetch du PDF via credentials (cookie)
+const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
-## 4. Intégration de l'API & Gestion de Session (Cookies HttpOnly)
+async function loadSolution(examId: string) {
+  const res = await fetch(`/api/v1/exam-library/${examId}/solution`, {
+    credentials: 'include',  // indispensable pour envoyer le cookie
+  });
 
-Le projet s'appuie sur une authentification sécurisée par cookies **HttpOnly/Secure** gérés par le navigateur. Cela implique que le client frontend ne lit jamais le token manuellement (pas de stockage dans le `localStorage`), mais configure chaque appel API pour envoyer et recevoir les cookies de session.
+  if (res.status === 402) {
+    // Voir section "Gérer le 402" ci-dessous
+    return;
+  }
+  if (!res.ok) throw new Error('Erreur accès corrigé');
 
-### 1. Configuration Axios (`src/utils/api.ts`)
-On crée deux instances d'Axios :
-- `axiosClient` : Pour les requêtes publiques (login, inscription, confirmation).
-- `axiosPrivate` : Pour les requêtes privées nécessitant l'authentification. Elle recevra des intercepteurs pour renouveler automatiquement la session.
-
-```typescript
-// src/utils/api.ts
-import axios from "axios";
-
-export const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1";
-
-const defaultHeaders = {
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-};
-
-// Instance pour les requêtes publiques
-export const axiosClient = axios.create({
-    baseURL: baseUrl,
-    headers: defaultHeaders,
-    withCredentials: true, // Crucial pour envoyer/recevoir les cookies HttpOnly
-});
-
-// Instance pour les requêtes authentifiées
-export const axiosPrivate = axios.create({
-    baseURL: baseUrl,
-    headers: defaultHeaders,
-    withCredentials: true,
-});
-```
-
----
-
-### 2. Renouvellement Silencieux du Token (Silent Refresh)
-Si la session expire, l'API renvoie un code d'erreur `401` ou `403`. Un intercepteur intercepte cette erreur, déclenche une requête sur `/auth/refresh` pour renouveler les cookies côté serveur, puis rejoue la requête initiale en toute transparence pour l'utilisateur.
-
-#### Hook `useRefreshToken` (`src/hoooks/useRefreshToken.ts`)
-```typescript
-// src/hoooks/useRefreshToken.ts
-import { axiosPrivate } from "../utils/api.ts";
-import { useQueryClient } from "@tanstack/react-query";
-
-const useRefreshToken = () => {
-    const queryClient = useQueryClient();
-
-    return async () => {
-        try {
-            // Appelle le refresh. Le backend lit le refresh token dans le cookie HttpOnly
-            await axiosPrivate.post('auth/refresh', {});
-            // Invalide le cache utilisateur pour forcer la mise à jour des données de session
-            await queryClient.invalidateQueries({ queryKey: ['user'] });
-        } catch (err) {
-            console.error("Session expirée, reconnexion requise.", err);
-        }
-    }
-}
-
-export default useRefreshToken;
-```
-
-#### Hook Intercepteur `useAxiosPrivate` (`src/hoooks/useAxiosPrivate.ts`)
-```typescript
-// src/hoooks/useAxiosPrivate.ts
-import { useEffect } from "react";
-import useRefreshToken from "./useRefreshToken.ts";
-import { axiosPrivate } from "../utils/api.ts";
-import { useUser } from "../components/layout/userContext.tsx";
-
-export const useAxiosPrivate = () => {
-    const { user } = useUser();
-    const refresh = useRefreshToken();
-
-    useEffect(() => {
-        const responseIntercept = axiosPrivate.interceptors.response.use(
-            response => response,
-            async (error) => {
-                const prevRequest = error?.config;
-                // Si l'API retourne 401 ou 403 et que la requête n'a pas déjà été rejouée (sent)
-                if ((error?.response?.status === 401 || error?.response?.status === 403) && !prevRequest?.sent) {
-                    prevRequest.sent = true;
-                    try {
-                        await refresh();
-                        return axiosPrivate(prevRequest); // Rejoue la requête originale
-                    } catch (refreshError) {
-                        return Promise.reject(refreshError);
-                    }
-                }
-                return Promise.reject(error);
-            }
-        );
-
-        return () => {
-            axiosPrivate.interceptors.response.eject(responseIntercept);
-        }
-    }, [user, refresh]);
-
-    return axiosPrivate;
+  const blob = await res.blob();
+  setPdfUrl(URL.createObjectURL(blob));
 }
 ```
 
----
+> **Important :** Ne jamais mettre l'URL de l'API directement dans `<iframe src="">` ou `<embed src="">` — le cookie ne serait pas envoyé. Toujours passer par `fetch` avec `credentials: 'include'`, puis créer un blob URL.
 
-## 5. Gardes de Route & Gestion de Rôles
-
-Les routes sont protégées de manière hiérarchique en enveloppant les pages dans des composants Route-Guards qui partagent le contexte utilisateur.
-
-### Le Provider d'état de l'utilisateur (`src/components/layout/userContextProvider.tsx`)
-```tsx
-import { type ReactNode, useState } from "react";
-import { UserContext } from "../../constant"; // Créez-le via createContext
-import type { User } from "../../utils/type";
-
-export function UserContextProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<User>({});
-    return (
-        <UserContext.Provider value={{ user, setUser }}>
-            {children}
-        </UserContext.Provider>
-    );
-}
-```
-
-### Le Hook d'accès rapide (`src/components/layout/userContext.tsx`)
-```typescript
-import { useContext } from "react";
-import { UserContext } from "../../constant.ts";
-
-export function useUser() {
-    return useContext(UserContext);
-}
-```
-
-### Route-Guard : Connexion Obligatoire (`src/context/RequireAuth.tsx`)
-Vérifie au chargement si l'utilisateur est connu en local. Sinon, tente de récupérer les informations de profil sur l'endpoint `/user/me`. En cas d'échec total, redirige vers la page `/login`.
+### 2 — Libérer le blob URL
 
 ```tsx
-// src/context/RequireAuth.tsx
-import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useUser } from "../components/layout/userContext.tsx";
-import { axiosPrivate } from "../utils/api.ts";
-import { useEffect, useState } from "react";
-import { Loader } from "lucide-react";
-
-const RequireAuth = () => {
-    const { user, setUser } = useUser();
-    const [isLoading, setIsLoading] = useState(true);
-    const location = useLocation();
-
-    useEffect(() => {
-        let isMounted = true;
-
-        const verifySession = async () => {
-            try {
-                // Tente de charger le profil de l'utilisateur connecté
-                const response = await axiosPrivate.get('user/me');
-                const userData = response.data.data.user;
-                if (isMounted) {
-                    setUser(userData);
-                    setIsLoading(false);
-                }
-            } catch (error) {
-                console.error('Aucune session active trouvée.', error);
-                if (isMounted) {
-                    setIsLoading(false);
-                }
-            }
-        }
-
-        if (!user?.email) {
-            verifySession();
-        } else {
-            setIsLoading(false);
-        }
-
-        return () => {
-            isMounted = false;
-        }
-    }, [user?.email, setUser]);
-
-    if (isLoading) {
-        return (
-            <div className="w-screen h-screen flex justify-center items-center">
-                <Loader className="h-12 w-12 animate-spin text-brand-primary" />
-            </div>
-        );
-    }
-
-    if (!user?.email && !isLoading) {
-        return <Navigate to="/login" state={{ from: location }} replace />;
-    }
-
-    return <Outlet />;
-}
-
-export default RequireAuth;
+useEffect(() => {
+  return () => {
+    if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+  };
+}, [pdfUrl]);
 ```
 
-### Route-Guard : Rôle Administrateur (`src/context/AdminGuard.tsx`)
-Se place en dessous de `RequireAuth`. Il s'assure que le compte est actif et possède le rôle d'administrateur.
+### 3 — Gérer le 402
+
+Quand la réponse est `402`, deux cas possibles :
+- L'utilisateur n'a **pas d'abonnement** → afficher la page d'upgrade vers Pro.
+- L'utilisateur a un abonnement mais **pas assez de jetons** → afficher la modale d'achat de pack de jetons.
+
+Pour différencier, vérifie d'abord le solde :
 
 ```tsx
-// src/context/AdminGuard.tsx
-import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useUser } from "../components/layout/userContext.tsx";
+async function handleSolutionAccess(examId: string) {
+  // Vérif préalable du solde (optionnelle, pour UX proactive)
+  const balanceRes = await fetch('/api/v1/tokens/balance', { credentials: 'include' });
+  const { data: balance } = await balanceRes.json(); // { balance: number, ... }
 
-export default function AdminGuard() {
-  const { user } = useUser();
-  const location = useLocation();
-  const isAdmin = user?.role?.name === 'admin';
-  const isActive = user?.is_active;
+  if (balance.balance < 2) {
+    // Montrer la modale d'achat de jetons
+    openTokenPurchaseModal();
+    return;
+  }
 
-  if (!isActive) return <Navigate to="/login" state={{ from: location }} replace />;
-  if (!isAdmin) return <Navigate to="/home" replace />;
-  
-  return <Outlet />;
+  // Sinon tenter l'accès
+  await loadSolution(examId);
 }
 ```
 
-### Utilisation dans les Routes (`src/App.tsx`)
+### 4 — Indiquer si l'accès est déjà acquis (UX)
+
+Il n'y a pas d'endpoint dédié "est-ce que j'ai déjà payé ce corrigé ?". La logique est côté backend — il suffit d'appeler l'endpoint et de réagir à la réponse :
+
+- `200` → afficher le PDF (que ce soit un premier accès ou un accès déjà en base, le résultat est le même)
+- `402` → l'accès n'est pas encore acquis
+
+Pour afficher un badge "Déjà acheté" dans la liste, tu peux maintenir un état local après le premier succès :
+
 ```tsx
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import RequireAuth from "./context/RequireAuth";
-import AdminGuard from "./context/AdminGuard";
-import AppLayout from "./layout/AppLayout";
-import Home from "./pages/Home";
-import AdminHome from "./pages/admin/AdminHome";
-import Login from "./pages/Login";
+const [unlockedExams, setUnlockedExams] = useState<Set<string>>(new Set());
 
-function App() {
-  return (
-    <Router>
-      <Routes>
-        {/* Routes publiques */}
-        <Route path="/login" element={<Login />} />
-
-        {/* Routes authentifiées obligatoires */}
-        <Route element={<RequireAuth />}>
-          <Route element={<AppLayout />}>
-            <Route path="/home" element={<Home />} />
-          </Route>
-
-          {/* Sous-section réservée aux admins */}
-          <Route element={<AdminGuard />}>
-            <Route path="/admin/home" element={<AdminHome />} />
-          </Route>
-        </Route>
-      </Routes>
-    </Router>
-  );
-}
+// Après un succès :
+setUnlockedExams(prev => new Set(prev).add(examId));
 ```
+
+Ou persister en `localStorage` pour retrouver l'état entre sessions.
 
 ---
 
-## 6. Bonnes Pratiques d'Intégration d'API (TanStack Query + Zod)
-
-Dans StudyLink, **tous les appels API sont encapsulés dans des hooks de requêtes personnalisés** situés dans le dossier `src/utils/` (ou `src/services/`), classés par domaine. 
-
-### Exemple Standard de Fichier d'Intégration d'un Domaine (`src/utils/course.ts`)
-
-Pour intégrer un nouveau domaine (ex: Gestion des Cours) :
-
-1. **Validation & Typage avec Zod** : Valider les données d'entrée des formulaires et dériver les types TypeScript.
-2. **Requête de Lecture (`useQuery`)** : Retourne les données fetchées via l'instance `axiosPrivate`.
-3. **Requêtes de Modification (`useMutation`)** :
-   - Effectuent l'appel HTTP en POST/PATCH/DELETE.
-   - **`onSuccess`** : Exécutent `queryClient.invalidateQueries` sur la clé de requête concernée pour déclencher un re-fetch en arrière-plan et garder l'interface à jour sans rechargement de page. Affichent un toast de succès avec `sonner`.
-   - **`onError`** : Affichent l'erreur en toast via `sonner` en inspectant dynamiquement l'erreur Axios retournée par le backend.
+## TypeScript — types
 
 ```typescript
-// src/utils/course.ts
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { z } from "zod";
-import type { AxiosError } from "axios";
-import { useAxiosPrivate } from "../hoooks/useAxiosPrivate.ts";
+// Réponse de GET /api/v1/exam-library/{id}
+interface ExamLibraryItem {
+  id: string;                        // UUID
+  name: string;
+  course_id: string | null;          // UUID
+  course: Course | null;
+  program_id: string | null;         // UUID
+  study_level_id: string | null;     // UUID
+  academic_year: number | null;
+  session: 'fall' | 'winter' | 'summer' | null;
+  exam_type: 'midterm' | 'final' | 'quiz' | 'other' | null;
+  is_solution_paid: boolean;         // true = accès payant (abonnement ou jetons)
+  exam_file_url: string;             // chemin interne, ne pas utiliser directement
+  solution_file_url: string | null;  // null si pas encore uploadé
+  is_validated: boolean;
+  creation_date: string;             // ISO 8601
+  creator_user_id: string;           // UUID
+}
 
-// 1. Schéma de validation Zod
-export const courseSchema = z.object({
-    course_name: z.string().min(1, "Le nom du cours est obligatoire"),
-    course_color: z.string().min(1, "La couleur est obligatoire")
-});
+interface Course {
+  id: string;
+  code: string;   // ex: "CSI2120"
+  name: string;
+  faculty_id: string | null;
+}
 
-export type CourseFormRequest = z.infer<typeof courseSchema>;
-
-export type Course = {
-    id: string;
-    course_name: string;
-    course_color: string;
-    created_at?: string;
-    updated_at?: string;
-};
-
-// 2. Query Hook pour récupérer la liste
-export const useGetCourses = () => {
-    const axiosPrivate = useAxiosPrivate();
-    return useQuery({
-        queryKey: ["courses"],
-        queryFn: async () => {
-            const response = await axiosPrivate.get<{ data: Course[] }>("/courses");
-            return response.data.data;
-        },
-    });
-};
-
-// 3. Mutation Hook pour créer un cours
-export const useCreateCourse = () => {
-    const queryClient = useQueryClient();
-    const axiosPrivate = useAxiosPrivate();
-    return useMutation({
-        mutationFn: async (data: CourseFormRequest) => {
-            const response = await axiosPrivate.post<{ data: Course }>("/courses", data);
-            return response.data.data;
-        },
-        onSuccess: () => {
-            // Force la mise à jour instantanée du composant de liste
-            queryClient.invalidateQueries({ queryKey: ["courses"] });
-            toast.success("Cours créé avec succès");
-        },
-        onError: (error) => {
-            const axiosError = error as AxiosError<{ detail: string }>;
-            toast.error("Erreur lors de la création du cours", {
-                description: axiosError.response?.data?.detail || "Une erreur est survenue",
-            });
-        },
-    });
-};
+// Erreur 402
+interface PaymentRequiredError {
+  detail: string;
+  // ex: "Insufficient tokens. Accessing a solution costs 2 tokens."
+  //  ou logique à déduire en vérifiant GET /api/v1/tokens/balance
+}
 ```
 
 ---
 
-## 7. Checklist d'application pour votre nouveau projet
+## Matrice d'accès complète
 
-1. **Générer le projet** :
-   ```bash
-   npx -y create-vite@latest mon-nouveau-projet --template react-ts
-   ```
-2. **Installer les packages essentiels** :
-   ```bash
-   npm install react-router-dom axios @tanstack/react-query @tailwindcss/vite lucide-react sonner zod react-hook-form @hookform/resolvers react-helmet-async framer-motion
-   ```
-3. **Activer Tailwind v4** dans `vite.config.ts` et importer `@import "tailwindcss";` dans `src/index.css`.
-4. **Créer la structure des dossiers** (`components`, `context`, `hooks`, `layout`, `pages`, `utils`).
-5. **Mettre en place la configuration de l'API** (`src/utils/api.ts`).
-6. **Copier les hooks d'authentification** (`useAxiosPrivate.ts` et `useRefreshToken.ts`).
-7. **Ajouter les guards** (`RequireAuth.tsx`, `AdminGuard.tsx`) et envelopper les routes dans `App.tsx`.
-8. **Initialiser les Providers** globaux dans `main.tsx`.
-9. **Développer vos features** en créant des hooks customisés (`useQuery` / `useMutation`) par domaine dans `utils/`.
+| Cas | `is_solution_paid` | Abonnement | Jetons | Résultat |
+|-----|-------------------|------------|--------|----------|
+| Solution gratuite | `false` | peu importe | peu importe | ✅ 200 |
+| Abonné Pro | `true` | actif | peu importe | ✅ 200, 0 jeton déduit |
+| Token user, première fois | `true` | inactif | ≥ 2 | ✅ 200, −2 jetons |
+| Token user, déjà acheté | `true` | inactif | peu importe | ✅ 200, 0 jeton déduit |
+| Token user, 1ère fois, solde insuffisant | `true` | inactif | < 2 | ❌ 402 |
+| Aucun accès | `true` | inactif | 0 | ❌ 402 |
+
+---
+
+## Flux complet étudiant
+
+```
+1. GET /api/v1/exam-library?course_id=...&session=winter&academic_year=2024
+   → liste les épreuves
+
+2. GET /api/v1/exam-library/{id}/download
+   → télécharge le fichier épreuve (PDF, gratuit pour tout utilisateur connecté)
+
+3. Bouton "Voir le corrigé" cliqué :
+   a. fetch GET /api/v1/exam-library/{id}/solution  { credentials: 'include' }
+   b. 200 → blob URL → afficher dans PDF viewer (sans bouton download)
+   c. 402 → vérifier solde → modale achat jetons ou upgrade abonnement
+```

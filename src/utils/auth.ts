@@ -1,8 +1,9 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { axiosClient } from "./api.ts";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../components/layout/userContext.tsx";
+import { clearUnlockedSolutions } from "./exam.ts";
 import type { LoginFormRequest, RegisterFormRequest, ValidationError } from "./type.ts";
 import type { AxiosError } from "axios";
 
@@ -205,12 +206,15 @@ const useVerify = () => {
 
 const useLogout = () => {
     const navigate = useNavigate();
-    const { setUser } = useUser();
+    const { user, setUser } = useUser();
+    const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async () => {
             await axiosClient.post('/auth/logout ');
-            setUser({})
-            toast.success("Logout successful")
+            clearUnlockedSolutions(user?.id);
+            queryClient.clear();
+            setUser({});
+            toast.success("Logout successful");
         },
         onSuccess: () => {
             navigate(`/`);

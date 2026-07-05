@@ -2,10 +2,52 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
 import { useAxiosPrivate } from "../hoooks/useAxiosPrivate";
+import { useUser } from "../components/layout/userContext";
 import type { Course, ExamFilters, ExamItem } from "../types/exams";
 
 const err = (error: unknown) =>
     (error as AxiosError<{ detail: string }>).response?.data?.detail || "Une erreur est survenue";
+
+// ─── Unlocked solutions (client-side, user-scoped) ─────────
+
+export const unlockedKey = (userId?: string) => ["unlocked-solutions", userId ?? ""];
+
+function storageKey(userId?: string) {
+    return `unlocked_solutions_${userId ?? "anonymous"}`;
+}
+
+export const useGetUnlockedSolutions = () => {
+    const { user } = useUser();
+    return useQuery({
+        queryKey: unlockedKey(user?.id),
+        queryFn: (): string[] => {
+            try {
+                return JSON.parse(localStorage.getItem(storageKey(user?.id)) ?? "[]");
+            } catch {
+                return [];
+            }
+        },
+        enabled: !!user?.id,
+        staleTime: Infinity,
+    });
+};
+
+export const useMarkSolutionUnlocked = () => {
+    const { user } = useUser();
+    const queryClient = useQueryClient();
+    return (examId: string) => {
+        const key = unlockedKey(user?.id);
+        const current = queryClient.getQueryData<string[]>(key) ?? [];
+        if (current.includes(examId)) return;
+        const updated = [...current, examId];
+        localStorage.setItem(storageKey(user?.id), JSON.stringify(updated));
+        queryClient.setQueryData(key, updated);
+    };
+};
+
+export function clearUnlockedSolutions(userId?: string) {
+    localStorage.removeItem(storageKey(userId));
+}
 
 // ─── Courses ──────────────────────────────────────────────
 

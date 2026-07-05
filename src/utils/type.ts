@@ -43,14 +43,14 @@ export type Role = {
 }
 
 export type User = {
-    id?: number;
+    id?: string;
     email?: string;
     first_name?: string | null;
     last_name?: string | null;
     is_active?: boolean;
-    study_level_id?: number | null;
-    faculty_id?: number | null;
-    program_id?: number | null;
+    study_level_id?: string | null;
+    faculty_id?: string | null;
+    program_id?: string | null;
     other_program?: string | null;
     role?: Role;
     study_level?: { id: string; name: string } | null;
