@@ -9,7 +9,7 @@ const TIER_FEATURES = [
     { label: "Épreuves",                       free: false, tokens: "1 🪙", pro: true  },
     { label: "Voir ses anciens artefacts",    free: true,  tokens: true,  pro: true  },
     { label: "Générer résumés / flashcards / quiz", free: false, tokens: "1 🪙", pro: true },
-    { label: "Chat IA (tranche 10 msgs)",     free: false, tokens: "1 🪙", pro: true  },
+    { label: "Chat (tranche 10 msgs)",     free: false, tokens: "1 🪙", pro: true  },
     { label: "Corrigés d'examens",            free: false, tokens: "2 🪙", pro: true  },
 ];
 

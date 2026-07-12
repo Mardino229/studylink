@@ -70,7 +70,7 @@ export default function Home() {
         },
         {
             label: `${chatCount * 10}+ messages`,
-            sub: "Échanges avec le chat IA",
+            sub: "Échanges avec le chat",
             icon: MessageSquare,
             color: "bg-cyan-50 text-cyan-600 dark:bg-cyan-500/10 dark:text-cyan-400",
             href: "/workspaces",
@@ -80,14 +80,14 @@ export default function Home() {
     const QUICK_ACTIONS = [
         { label: "Nouveau notebook", desc: "Créez un espace de travail", icon: BookOpen, href: "/workspaces", color: "from-blue-500 to-blue-600" },
         { label: "Bibliothèque d'épreuves", desc: "Examens & corrigés", icon: BookMarked, href: "/exam-library", color: "from-emerald-500 to-emerald-600" },
-        { label: "Chat IA", desc: "Posez vos questions", icon: Bot, href: "/workspaces", color: "from-purple-500 to-purple-600" },
+        { label: "Chat", desc: "Posez vos questions", icon: Bot, href: "/workspaces", color: "from-purple-500 to-purple-600" },
         { label: "Mon abonnement", desc: "Jetons & plans", icon: CreditCard, href: "/settings/subscription", color: "from-amber-500 to-amber-600" },
     ];
 
     const consumptions = [
         { label: "Résumés / Flashcards / Quiz", icon: FileText, count: tokenStats?.consumption?.artefact?.tokensSpent ?? 0, color: "bg-blue-500" },
         { label: "Corrigés d'examens", icon: HelpCircle, count: tokenStats?.consumption?.corrige?.tokensSpent ?? 0, color: "bg-emerald-500" },
-        { label: "Chat IA (tranches 10 msgs)", icon: MessageSquare, count: tokenStats?.consumption?.chat?.tokensSpent ?? 0, color: "bg-purple-500" },
+        { label: "Chat (tranches 10 msgs)", icon: MessageSquare, count: tokenStats?.consumption?.chat?.tokensSpent ?? 0, color: "bg-purple-500" },
     ];
     const totalConsumed = consumptions.reduce((s, c) => s + c.count, 0) || 1;
 

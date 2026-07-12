@@ -480,7 +480,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                                 </div>
                                 <h3 className="text-base font-bold text-foreground mb-2">Démarrez une conversation</h3>
                                 <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs mb-6">
-                                    Le chat IA répond à vos questions en s'appuyant sur les sources de ce notebook. Créez une session pour commencer.
+                                    Le chat répond à vos questions en s'appuyant sur les sources de ce notebook. Créez une session pour commencer.
                                 </p>
                                 <button
                                     type="button"

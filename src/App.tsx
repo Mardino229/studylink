@@ -23,6 +23,8 @@ import Exams from "./pages/appPage/Exams.tsx";
 import Chat from "./pages/appPage/Chat.tsx";
 import Settings from "./pages/appPage/Settings.tsx";
 import About from "./pages/authPage/about.tsx";
+import Privacy from "./pages/authPage/privacy.tsx";
+import Terms from "./pages/authPage/terms.tsx";
 import SettingsProfile from "./pages/appPage/SettingsProfile.tsx";
 import SettingsSubscription from "./pages/appPage/SettingsSubscription.tsx";
 import SettingsAnnouncements from "./pages/appPage/SettingsAnnouncements.tsx";
@@ -63,6 +65,8 @@ function App() {
                 <Route path="/confirm" element={<ConfirmAccount />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/about" element={<About />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
 
                 <Route element={<RequireAuth />}>
                     <Route path="/complete-profile" element={<CompleteProfile />} />

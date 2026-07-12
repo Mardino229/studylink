@@ -94,7 +94,7 @@ export default function AboutFeatures() {
                         variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
                         className="mt-4 text-lg text-foreground/70"
                     >
-                        Résumés, flashcards, quiz, bibliothèque d'épreuves, chat IA et statistiques — réunis dans une seule interface.
+                        Résumés, flashcards, quiz, bibliothèque d'épreuves, chat et statistiques — réunis dans une seule interface.
                     </motion.p>
                 </motion.div>
 

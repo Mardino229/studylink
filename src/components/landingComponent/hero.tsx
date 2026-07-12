@@ -98,7 +98,7 @@ const HeroContent = memo(function HeroContent() {
                 transition={{ duration: 0.5, delay: 0.3 }}
                 className="mt-8 flex flex-wrap justify-center gap-2"
             >
-                {["Résumés", "Flashcards", "Quiz", "Épreuves", "Chat IA", "Workspaces"].map(item => (
+                {["Résumés", "Flashcards", "Quiz", "Épreuves", "Chat", "Workspaces"].map(item => (
                     <span key={item} className={`rounded-full border px-4 py-1.5 text-sm font-medium ${chipStyle}`}>
                         {item}
                     </span>

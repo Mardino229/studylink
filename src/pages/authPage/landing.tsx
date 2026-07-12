@@ -14,7 +14,7 @@ export default function Landing() {
         <>
             <PageMeta
                 title="StudyLink — Révisez plus vite avec l'IA"
-                description="Résumés, flashcards, quiz, bibliothèque d'épreuves et chat IA pour les étudiants de l'Université d'Ottawa."
+                description="Résumés, flashcards, quiz, bibliothèque d'épreuves et chat pour les étudiants de l'Université d'Ottawa."
             />
             <div className="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden">
                 <div className="layout-container flex h-full grow flex-col">

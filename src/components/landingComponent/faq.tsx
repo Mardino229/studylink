@@ -1,7 +1,7 @@
 const FAQS = [
     {
         q: "Que permet StudyLink ?",
-        a: "StudyLink centralise vos outils d'étude : génération de résumés, flashcards et quiz à partir de vos fichiers, bibliothèque d'examens avec corrigés, chat IA, workspaces et statistiques de progression.",
+        a: "StudyLink centralise vos outils d'étude : génération de résumés, flashcards et quiz à partir de vos fichiers, bibliothèque d'examens avec corrigés, chat , workspaces et statistiques de progression.",
         open: true,
     },
     {
