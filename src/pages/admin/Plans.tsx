@@ -29,7 +29,7 @@ export default function Plans() {
   const updateMutation = useUpdateAdminPlan();
   const deleteMutation = useDeleteAdminPlan();
 
-  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editingPlan, setEditingPlan] = useState<SubscriptionPlan | null>(null);
 
   const {

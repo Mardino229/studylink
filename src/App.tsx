@@ -48,6 +48,8 @@ import PaymentSuccess from './pages/appPage/PaymentSuccess.tsx';
 import PaymentCancel from './pages/appPage/PaymentCancel.tsx';
 import Workspaces from './pages/appPage/Workspaces.tsx';
 import WorkspaceNotebook from './pages/appPage/WorkspaceNotebook.tsx';
+import MySubmissions from './pages/appPage/MySubmissions.tsx';
+import CoinsWallet from './pages/appPage/CoinsWallet.tsx';
 
 function App() {
 
@@ -77,6 +79,8 @@ function App() {
                         <Route path="/library-summary" element={<Home />} />
                         <Route path="/exams" element={<Exams />} />
                         <Route path="/exam-library" element={<ExamLibrary />} />
+                        <Route path="/my-submissions" element={<MySubmissions />} />
+                        <Route path="/coins" element={<CoinsWallet />} />
                         <Route path="/statistics" element={<Statistics />} />
                         <Route path="/chat" element={<Chat />} />
                         <Route path="/profile" element={<UserProfiles />} />

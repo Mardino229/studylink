@@ -1,0 +1,118 @@
+import { useState } from 'react';
+import { Upload } from 'lucide-react';
+import { Modal } from '../../../components/ui/modal/index.tsx';
+import CourseCombobox from '../../../components/ui/CourseCombobox';
+import { useUploadExam } from '../../../utils/exam';
+import type { Course, ExamSession, ExamType } from '../../../types/exams';
+
+const inputCls = "h-10 w-full rounded-xl border border-gray-200 bg-white px-3 text-sm text-gray-800 outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white";
+const selectCls = "h-10 w-full rounded-xl border border-gray-200 bg-white px-3 text-sm text-gray-800 outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white";
+const fileCls = "w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-gray-100 file:px-3 file:py-1 file:text-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white";
+
+const EMPTY_FORM = {
+    name: '', course_id: '', academic_year: '',
+    session: '' as ExamSession | '', exam_type: '' as ExamType | '', is_solution_paid: true,
+};
+
+export default function SubmitExamModal({ isOpen, onClose, courses }: {
+    isOpen: boolean;
+    onClose: () => void;
+    courses: Course[];
+}) {
+    const uploadExam = useUploadExam();
+    const [form, setForm] = useState(EMPTY_FORM);
+    const [examFile, setExamFile] = useState<File | null>(null);
+    const [solutionFile, setSolutionFile] = useState<File | null>(null);
+
+    const reset = () => { setForm(EMPTY_FORM); setExamFile(null); setSolutionFile(null); };
+
+    const handleSubmit = () => {
+        if (!form.name.trim() || !examFile) return;
+        uploadExam.mutate(
+            {
+                name: form.name.trim(),
+                exam_file: examFile,
+                solution_file: solutionFile ?? undefined,
+                course_id: form.course_id || undefined,
+                academic_year: form.academic_year ? Number(form.academic_year) : undefined,
+                session: (form.session || undefined) as ExamSession | undefined,
+                exam_type: (form.exam_type || undefined) as ExamType | undefined,
+                is_solution_paid: form.is_solution_paid,
+            },
+            { onSuccess: () => { onClose(); reset(); } }
+        );
+    };
+
+    return (
+        <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg p-6">
+            <div className="mb-5 flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30">
+                    <Upload size={18} className="text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-white">Soumettre une épreuve</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Elle sera vérifiée avant publication — vous gagnerez 0,5 coin.</p>
+                </div>
+            </div>
+
+            <div className="space-y-3">
+                <input
+                    value={form.name}
+                    onChange={(e) => setForm(p => ({ ...p, name: e.target.value }))}
+                    placeholder="Nom de l'épreuve *"
+                    className={inputCls}
+                />
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <CourseCombobox
+                        value={form.course_id}
+                        onChange={(id) => setForm(p => ({ ...p, course_id: id }))}
+                        courses={courses}
+                        placeholder="— Cours —"
+                    />
+                    <input
+                        type="number"
+                        value={form.academic_year}
+                        onChange={(e) => setForm(p => ({ ...p, academic_year: e.target.value }))}
+                        placeholder="Année"
+                        className={inputCls}
+                    />
+                    <select value={form.session} onChange={(e) => setForm(p => ({ ...p, session: e.target.value as ExamSession | '' }))} className={selectCls}>
+                        <option value="">— Session —</option>
+                        <option value="fall">Automne</option>
+                        <option value="winter">Hiver</option>
+                        <option value="summer">Printemps/Été</option>
+                    </select>
+                    <select value={form.exam_type} onChange={(e) => setForm(p => ({ ...p, exam_type: e.target.value as ExamType | '' }))} className={selectCls}>
+                        <option value="">— Type —</option>
+                        <option value="midterm">Intra</option>
+                        <option value="final">Final</option>
+                        <option value="quiz">Quiz</option>
+                        <option value="other">Autre</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400">Fichier épreuve *</label>
+                    <input type="file" accept=".pdf,.docx,.pptx,.ppt" onChange={(e) => setExamFile(e.target.files?.[0] ?? null)} className={fileCls} />
+                </div>
+                <div>
+                    <label className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400">Corrigé (optionnel — +0,5 coin supplémentaire si validé)</label>
+                    <input type="file" accept=".pdf,.docx,.pptx,.ppt" onChange={(e) => setSolutionFile(e.target.files?.[0] ?? null)} className={fileCls} />
+                </div>
+
+                <div className="flex flex-col-reverse gap-2 pt-1 sm:flex-row sm:justify-end">
+                    <button onClick={onClose} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5">
+                        Annuler
+                    </button>
+                    <button
+                        onClick={handleSubmit}
+                        disabled={!form.name.trim() || !examFile || uploadExam.isPending}
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+                    >
+                        {uploadExam.isPending ? 'Envoi…' : 'Soumettre'}
+                    </button>
+                </div>
+            </div>
+        </Modal>
+    );
+}

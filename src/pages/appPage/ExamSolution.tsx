@@ -23,6 +23,8 @@ export default function ExamSolution() {
     const axiosPrivate = useAxiosPrivate();
 
     const title = searchParams.get('title') ?? 'Corrigé';
+    const endpoint = searchParams.get('endpoint');
+    const cost = Number(searchParams.get('cost') ?? '2');
 
     const queryClient = useQueryClient();
     const markSolutionUnlocked = useMarkSolutionUnlocked();
@@ -47,21 +49,25 @@ export default function ExamSolution() {
     });
 
     useEffect(() => {
-        if (!examId) return;
+        if (!examId && !endpoint) return;
         let revoked = false;
+        setStatus('loading');
+        setPdfUrl(null);
+
+        const fetchUrl = endpoint || `/exam-library/${examId}/solution`;
 
         const fetchPdf = async () => {
             try {
-                const response = await axiosPrivate.get(`/exam-library/${examId}/solution`, {
-                    responseType: 'blob',
-                });
+                const response = await axiosPrivate.get(fetchUrl, { responseType: 'blob' });
                 const blob = new Blob([response.data], { type: 'application/pdf' });
                 const url = URL.createObjectURL(blob);
                 if (!revoked) {
                     setPdfUrl(url);
                     setStatus('success');
-                    markSolutionUnlocked(examId);
-                    queryClient.invalidateQueries({ queryKey: ['token-balance'] });
+                    if (!endpoint && examId) {
+                        markSolutionUnlocked(examId);
+                        queryClient.invalidateQueries({ queryKey: ['token-balance'] });
+                    }
                 }
             } catch (error) {
                 if (axios.isAxiosError(error)) {
@@ -81,7 +87,7 @@ export default function ExamSolution() {
             if (pdfUrl) URL.revokeObjectURL(pdfUrl);
         };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [examId]);
+    }, [examId, endpoint]);
 
     return (
         <div className="fixed inset-0 z-50 flex flex-col bg-white dark:bg-gray-900">
@@ -137,10 +143,10 @@ export default function ExamSolution() {
                         <div>
                             <h2 className="text-xl font-bold text-gray-900 dark:text-white">Accès non autorisé</h2>
                             <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                                Ce corrigé est payant. Il faut{' '}
-                                <span className="font-semibold text-amber-600 dark:text-amber-400">2 jetons</span>{' '}
+                                Ce fichier est payant. Il faut{' '}
+                                <span className="font-semibold text-amber-600 dark:text-amber-400">{cost} jeton{cost > 1 ? 's' : ''}</span>{' '}
                                 pour y accéder.
-                                <br />L'accès est ensuite définitif — vous ne repayez pas pour rouvrir ce corrigé.
+                                <br />L'accès est ensuite définitif — vous ne repayez pas pour rouvrir ce fichier.
                             </p>
                         </div>
                         <div className="flex flex-col gap-3 sm:flex-row">

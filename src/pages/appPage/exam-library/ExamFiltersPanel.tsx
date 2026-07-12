@@ -1,0 +1,69 @@
+import { Search } from 'lucide-react';
+import CourseCombobox from '../../../components/ui/CourseCombobox';
+import type { Course, ExamSession, ExamType } from '../../../types/exams';
+
+const inputCls = "h-10 w-full rounded-xl border border-gray-200 bg-white px-3 text-sm text-gray-800 outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white";
+const selectCls = "h-10 w-full rounded-xl border border-gray-200 bg-white px-3 text-sm text-gray-800 outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white";
+
+export default function ExamFiltersPanel({
+    courseId, setCourseId,
+    academicYear, setAcademicYear,
+    session, setSession,
+    examType, setExamType,
+    hasActiveFilters, onSearch, onReset,
+    courses,
+}: {
+    courseId: string; setCourseId: (v: string) => void;
+    academicYear: string; setAcademicYear: (v: string) => void;
+    session: ExamSession | ''; setSession: (v: ExamSession | '') => void;
+    examType: ExamType | ''; setExamType: (v: ExamType | '') => void;
+    hasActiveFilters: boolean; onSearch: () => void; onReset: () => void;
+    courses: Course[];
+}) {
+    return (
+        <div className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900/80">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="lg:col-span-2">
+                    <CourseCombobox value={courseId} onChange={setCourseId} courses={courses} />
+                </div>
+                <input
+                    type="number"
+                    placeholder="Année (ex: 2024)"
+                    value={academicYear}
+                    onChange={(e) => setAcademicYear(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && onSearch()}
+                    className={inputCls}
+                />
+                <select value={session} onChange={(e) => setSession(e.target.value as ExamSession | '')} className={selectCls}>
+                    <option value="">Toutes les sessions</option>
+                    <option value="fall">Automne</option>
+                    <option value="winter">Hiver</option>
+                    <option value="summer">Printemps/Été</option>
+                </select>
+                <select value={examType} onChange={(e) => setExamType(e.target.value as ExamType | '')} className={selectCls}>
+                    <option value="">Tous les types</option>
+                    <option value="midterm">Intra</option>
+                    <option value="final">Final</option>
+                    <option value="quiz">Quiz</option>
+                    <option value="other">Autre</option>
+                </select>
+            </div>
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+                {hasActiveFilters && (
+                    <button
+                        onClick={onReset}
+                        className="h-10 w-full rounded-lg border border-gray-200 px-4 text-sm text-gray-500 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 sm:w-auto"
+                    >
+                        Réinitialiser
+                    </button>
+                )}
+                <button
+                    onClick={onSearch}
+                    className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 sm:w-auto"
+                >
+                    <Search size={15} />Rechercher
+                </button>
+            </div>
+        </div>
+    );
+}

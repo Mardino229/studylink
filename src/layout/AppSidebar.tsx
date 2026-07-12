@@ -15,7 +15,7 @@ import {
     UserCircleIcon,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
-import { DockIcon, SettingsIcon } from "lucide-react";
+import { Coins, DockIcon, SendHorizonal, SettingsIcon } from "lucide-react";
 
 type NavItem = {
   name: string;
@@ -39,6 +39,16 @@ const navItems: NavItem[] = [
     icon: <DockIcon />,
     name: "Bibliothèque d'épreuves",
     path: "/exam-library",
+  },
+  {
+    icon: <SendHorizonal size={20} />,
+    name: "Mes soumissions",
+    path: "/my-submissions",
+  },
+  {
+    icon: <Coins size={20} />,
+    name: "Wallet coins",
+    path: "/coins",
   },
   {
     icon: <UserCircleIcon />,

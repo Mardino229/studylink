@@ -4,96 +4,142 @@ import { BookOpen, Bot, Layers, HelpCircle, BookMarked, FolderKanban } from "luc
 const FEATURES = [
     {
         icon: BookOpen,
-        color: "bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400",
+        color: "bg-blue-500/10 text-blue-500 dark:bg-blue-500/15 dark:text-blue-400",
+        glow: "bg-blue-400",
+        span: "lg:col-span-4",
+        wide: true,
         title: "Cours & Résumés",
         desc: "Créez vos matières, importez vos fichiers (PDF, DOCX, PPTX) et l'IA génère un résumé structuré prêt à réviser.",
+        n: "01",
     },
     {
         icon: Layers,
-        color: "bg-purple-50 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400",
+        color: "bg-purple-500/10 text-purple-500 dark:bg-purple-500/15 dark:text-purple-400",
+        glow: "bg-purple-400",
+        span: "lg:col-span-2",
+        wide: false,
         title: "Flashcards",
         desc: "Transformez n'importe quel document en jeu de flashcards question-réponse. Révisez par tranche, à votre rythme.",
+        n: "02",
     },
     {
         icon: HelpCircle,
-        color: "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400",
+        color: "bg-amber-500/10 text-amber-500 dark:bg-amber-500/15 dark:text-amber-400",
+        glow: "bg-amber-400",
+        span: "lg:col-span-2",
+        wide: false,
         title: "Quiz IA",
         desc: "Générez des questionnaires à choix multiples pour vous tester avant un examen. Score et corrections instantanés.",
-    },
-    {
-        icon: BookMarked,
-        color: "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400",
-        title: "Bibliothèque d'épreuves",
-        desc: "Consultez et téléchargez les épreuves passées. Accédez aux corrigés avec vos jetons ou votre abonnement Pro.",
+        n: "03",
     },
     {
         icon: Bot,
-        color: "bg-cyan-50 text-cyan-600 dark:bg-cyan-500/10 dark:text-cyan-400",
+        color: "bg-cyan-500/10 text-cyan-500 dark:bg-cyan-500/15 dark:text-cyan-400",
+        glow: "bg-cyan-400",
+        span: "lg:col-span-4",
+        wide: true,
         title: "Chat IA",
-        desc: "Posez vos questions à un assistant qui connaît vos documents. Idéal pour débloquer une notion avant un partiel.",
+        desc: "Posez vos questions à un assistant qui s'appuie sur vos propres documents pour vous répondre avec précision. Idéal pour débloquer une notion avant un partiel.",
+        n: "04",
+    },
+    {
+        icon: BookMarked,
+        color: "bg-emerald-500/10 text-emerald-500 dark:bg-emerald-500/15 dark:text-emerald-400",
+        glow: "bg-emerald-400",
+        span: "lg:col-span-3",
+        wide: false,
+        title: "Bibliothèque d'épreuves",
+        desc: "Consultez et téléchargez les épreuves passées. Accédez aux corrigés avec vos jetons ou votre abonnement Pro.",
+        n: "05",
     },
     {
         icon: FolderKanban,
-        color: "bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400",
+        color: "bg-orange-500/10 text-orange-500 dark:bg-orange-500/15 dark:text-orange-400",
+        glow: "bg-orange-400",
+        span: "lg:col-span-3",
+        wide: false,
         title: "Workspaces & Statistiques",
         desc: "Organisez vos notebooks par dossier, suivez votre progression et gardez une vue d'ensemble de vos révisions.",
+        n: "06",
     },
 ];
 
 export default function AboutFeatures() {
     return (
-        <section className="pt-20 sm:py-28 bg-background" id="key-features">
+        <section className="py-8 sm:py-12 bg-background" id="key-features">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <motion.div
                     initial="hidden"
                     whileInView="show"
                     viewport={{ once: true, amount: 0.5 }}
                     variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
-                    className="text-center max-w-3xl mx-auto"
+                    className="mx-auto max-w-3xl text-center"
                 >
                     <motion.p
                         variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } }}
-                        className="text-xs font-semibold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-3"
+                        className="mb-3 text-xs font-semibold uppercase tracking-widest text-blue-600 dark:text-blue-400"
                     >
                         Fonctionnalités
                     </motion.p>
                     <motion.h2
                         variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
-                        className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground"
+                        className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
                     >
-                        Tout ce dont vous avez besoin pour réviser
+                        Tout ce qu'il faut pour réviser{" "}
+                        <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                            vraiment efficacement
+                        </span>
                     </motion.h2>
                     <motion.p
                         variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
                         className="mt-4 text-lg text-foreground/70"
                     >
-                        De la gestion de cours à la génération IA de résumés, flashcards et quiz, en passant par la bibliothèque d'épreuves et le suivi de progression.
+                        Résumés, flashcards, quiz, bibliothèque d'épreuves, chat IA et statistiques — réunis dans une seule interface.
                     </motion.p>
                 </motion.div>
 
                 <motion.div
                     initial="hidden"
                     whileInView="show"
-                    viewport={{ once: true, amount: 0.15 }}
-                    variants={{
-                        hidden: { opacity: 0 },
-                        show: { opacity: 1, transition: { staggerChildren: 0.09, delayChildren: 0.08 } },
-                    }}
-                    className="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                    viewport={{ once: true, amount: 0.1 }}
+                    variants={{ hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } } }}
+                    className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6"
                 >
-                    {FEATURES.map(({ icon: Icon, color, title, desc }) => (
+                    {FEATURES.map(({ icon: Icon, color, glow, span, wide, title, desc, n }) => (
                         <motion.div
                             key={title}
-                            variants={{ hidden: { opacity: 0, y: 18 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } }}
-                            className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-7 shadow-sm hover:shadow-md transition-shadow"
+                            variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } }}
+                            className={`group relative overflow-hidden rounded-3xl border border-border bg-card p-7 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg ${span}`}
                         >
-                            <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${color}`}>
-                                <Icon size={22} />
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-bold text-foreground">{title}</h3>
-                                <p className="mt-2 text-sm leading-relaxed text-foreground/70">{desc}</p>
-                            </div>
+                            {/* Hover glow blob */}
+                            <div
+                                className={`pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-20 ${glow}`}
+                            />
+
+                            {/* Decorative number */}
+                            <span className="absolute right-5 top-3 select-none text-5xl font-black leading-none text-foreground/[0.05]">
+                                {n}
+                            </span>
+
+                            {wide ? (
+                                <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:gap-8">
+                                    <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${color}`}>
+                                        <Icon size={26} />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-bold text-foreground">{title}</h3>
+                                        <p className="mt-2 text-sm leading-relaxed text-foreground/70">{desc}</p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className={`mb-5 flex h-12 w-12 items-center justify-center rounded-2xl ${color}`}>
+                                        <Icon size={22} />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-foreground">{title}</h3>
+                                    <p className="mt-2 text-sm leading-relaxed text-foreground/70">{desc}</p>
+                                </>
+                            )}
                         </motion.div>
                     ))}
                 </motion.div>

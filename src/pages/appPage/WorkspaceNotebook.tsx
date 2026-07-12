@@ -389,7 +389,7 @@ const WorkspaceNotebook: React.FC = () => {
                                 <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-200">Titre</label>
                                 <input
                                     type="text"
-                                    value={generationTitle}
+                                    //value={generationTitle}
                                     onChange={(e) => setGenerationTitle(e.target.value)}
                                     placeholder="Ex: Notebook - Résumé"
                                     className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 dark:border-gray-800 dark:bg-gray-900 dark:text-white"

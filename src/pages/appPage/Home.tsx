@@ -147,7 +147,7 @@ export default function Home() {
                     className="grid grid-cols-2 gap-4 lg:grid-cols-4"
                 >
                     {KPI_CARDS.map(({ label, sub, icon: Icon, color, href }) => (
-                        <motion.div key={label} variants={fadeUp}>
+                        <motion.div key={label} >
                             <Link
                                 to={href}
                                 className="flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-gray-800 dark:bg-gray-900/80"
@@ -179,7 +179,7 @@ export default function Home() {
                         </h2>
                         <div className="grid grid-cols-2 gap-3">
                             {QUICK_ACTIONS.map(({ label, desc, icon: Icon, href, color }) => (
-                                <motion.div key={label} variants={fadeUp}>
+                                <motion.div key={label}>
                                     <Link
                                         to={href}
                                         className="group flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 dark:border-gray-800 dark:bg-gray-900/80"
