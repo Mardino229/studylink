@@ -9,7 +9,7 @@ const FEATURES = [
         span: "lg:col-span-4",
         wide: true,
         title: "Cours & Résumés",
-        desc: "Créez vos matières, importez vos fichiers (PDF, DOCX, PPTX) et l'IA génère un résumé structuré prêt à réviser.",
+        desc: "Créez vos matières, importez vos fichiers (PDF, DOCX, PPTX) et obtenez un résumé structuré prêt à réviser en quelques secondes.",
         n: "01",
     },
     {
@@ -28,7 +28,7 @@ const FEATURES = [
         glow: "bg-amber-400",
         span: "lg:col-span-2",
         wide: false,
-        title: "Quiz IA",
+        title: "Quiz",
         desc: "Générez des questionnaires à choix multiples pour vous tester avant un examen. Score et corrections instantanés.",
         n: "03",
     },
@@ -38,8 +38,8 @@ const FEATURES = [
         glow: "bg-cyan-400",
         span: "lg:col-span-4",
         wide: true,
-        title: "Chat IA",
-        desc: "Posez vos questions à un assistant qui s'appuie sur vos propres documents pour vous répondre avec précision. Idéal pour débloquer une notion avant un partiel.",
+        title: "Assistant de révision",
+        desc: "Posez vos questions et obtenez des réponses précises basées sur vos propres documents. Idéal pour débloquer une notion avant un partiel.",
         n: "04",
     },
     {
@@ -49,7 +49,7 @@ const FEATURES = [
         span: "lg:col-span-3",
         wide: false,
         title: "Bibliothèque d'épreuves",
-        desc: "Consultez et téléchargez les épreuves passées. Accédez aux corrigés avec vos jetons ou votre abonnement Pro.",
+        desc: "Accédez aux épreuves passées et à leurs corrigés avec vos jetons (1 jeton par épreuve, 2 pour un corrigé), ou sans limite avec le Pro.",
         n: "05",
     },
     {

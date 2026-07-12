@@ -71,7 +71,7 @@ const HeroContent = memo(function HeroContent() {
                     variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
                     className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-4"
                 >
-                    Plateforme de révision IA
+                    Plateforme de révision
                 </motion.p>
 
                 <motion.h1
@@ -85,7 +85,7 @@ const HeroContent = memo(function HeroContent() {
                     variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
                     className={`mt-5 text-lg sm:text-xl ${mutedColor} max-w-2xl mx-auto`}
                 >
-                    Résumés, flashcards, quiz, bibliothèque d'épreuves et chat IA — tout ce dont vous avez besoin pour réviser, dans une seule interface.
+                    Résumés, flashcards, quiz, bibliothèque d'épreuves et chat soit tout ce dont vous avez besoin pour réviser, dans une seule interface.
                 </motion.p>
             </motion.div>
 

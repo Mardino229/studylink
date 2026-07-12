@@ -8,7 +8,7 @@ const USE_CASES = [
         accent: "bg-blue-500",
         quoteColor: "text-blue-500",
         quote: "J'importe mes slides de cours et j'obtiens un résumé condensé en 30 secondes. Je révise l'essentiel sans relire 80 pages.",
-        label: "Résumés IA",
+        label: "Résumés",
         sub: "À partir de PDF, DOCX ou PPTX",
     },
     {
@@ -26,7 +26,7 @@ const USE_CASES = [
         accent: "bg-amber-500",
         quoteColor: "text-amber-500",
         quote: "Je génère un quiz de 10 questions avant chaque intra. Le score instantané me montre exactement où je bloque.",
-        label: "Quiz IA",
+        label: "Quiz",
         sub: "Auto-évaluation avant les examens",
     },
     {
@@ -34,7 +34,7 @@ const USE_CASES = [
         color: "bg-emerald-500/10 text-emerald-500 dark:bg-emerald-500/15 dark:text-emerald-400",
         accent: "bg-emerald-500",
         quoteColor: "text-emerald-500",
-        quote: "La bibliothèque d'épreuves me permet de m'entraîner sur les vrais sujets des années passées — avec les corrigés inclus en Pro.",
+        quote: "1 jeton pour voir l'épreuve, 2 pour le corrigé. Avec un pack, j'ai accès à des dizaines de vrais sujets passés — bien moins cher que de les chercher moi-même.",
         label: "Bibliothèque d'épreuves",
         sub: "Épreuves filtrées par cours",
     },
@@ -44,7 +44,7 @@ const USE_CASES = [
         accent: "bg-cyan-500",
         quoteColor: "text-cyan-500",
         quote: "Je colle une photo d'un exercice dans le chat et l'IA m'explique la démarche en s'appuyant sur mes propres notes de cours.",
-        label: "Chat IA",
+        label: "Assistant de révision",
         sub: "Basé sur vos documents",
     },
     {

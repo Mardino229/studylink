@@ -8,7 +8,7 @@ const STEPS = [
         color: "bg-blue-500/10 text-blue-500 dark:bg-blue-500/15 dark:text-blue-400",
         badge: "bg-blue-600",
         title: "Importez vos fichiers",
-        desc: "Déposez un PDF, DOCX ou PPTX dans votre workspace. L'IA analyse le contenu et en extrait les concepts clés.",
+        desc: "Déposez un PDF, DOCX ou PPTX dans votre workspace. Le contenu est analysé automatiquement et les concepts clés en sont extraits.",
     },
     {
         n: "2",
@@ -23,7 +23,7 @@ const STEPS = [
         icon: MessageCircle,
         color: "bg-cyan-500/10 text-cyan-500 dark:bg-cyan-500/15 dark:text-cyan-400",
         badge: "bg-cyan-600",
-        title: "Révisez avec le chat IA",
+        title: "Révisez avec l'assistant",
         desc: "Posez vos questions à un assistant qui s'appuie sur vos propres documents pour vous répondre avec précision.",
     },
     {
@@ -71,7 +71,7 @@ export default function Smart() {
                                 variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
                                 className="mt-4 text-lg text-foreground/70"
                             >
-                                StudyLink centralise vos cours, vos résumés, vos examens, votre chat IA et vos statistiques.
+                                StudyLink centralise vos cours, vos résumés, vos examens, votre assistant et vos statistiques.
                             </motion.p>
                         </motion.div>
 

@@ -6,7 +6,7 @@ import { useGetPlans } from "../../utils/plan";
 import { useGetPublicTokenPacks } from "../../utils/billing";
 
 const TIER_FEATURES = [
-    { label: "Télécharger les épreuves",     free: true,  tokens: true,  pro: true  },
+    { label: "Épreuves",                       free: false, tokens: "1 🪙", pro: true  },
     { label: "Voir ses anciens artefacts",    free: true,  tokens: true,  pro: true  },
     { label: "Générer résumés / flashcards / quiz", free: false, tokens: "1 🪙", pro: true },
     { label: "Chat IA (tranche 10 msgs)",     free: false, tokens: "1 🪙", pro: true  },
@@ -111,7 +111,7 @@ export default function Pricing() {
                         <p className="text-xs font-semibold uppercase tracking-widest text-amber-600 dark:text-amber-400 mb-2">Packs de jetons</p>
                         <h3 className="text-2xl sm:text-3xl font-bold text-foreground">Payez uniquement ce que vous utilisez</h3>
                         <p className="mt-3 text-foreground/60 max-w-xl mx-auto">
-                            Chaque jeton = 1 génération (résumé, flashcards, quiz…). Les corrigés coûtent 2 jetons. Aucune date d'expiration.
+                            Chaque jeton = 1 génération (résumé, flashcards, quiz…). Épreuves : 1 jeton · Corrigés : 2 jetons. Aucune date d'expiration.
                         </p>
                     </div>
 
