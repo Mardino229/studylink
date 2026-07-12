@@ -11,17 +11,17 @@ export default function Terms() {
                 title="Conditions d'utilisation • StudyLink"
                 description="Les conditions régissant l'utilisation de la plateforme StudyLink."
             />
-            <div className="relative flex min-h-screen flex-col bg-white dark:bg-background">
+            <div className="relative flex min-h-screen flex-col bg-muted dark:bg-background">
                 <div className="layout-container flex h-full grow flex-col">
                     <Header />
                     <main className="flex-1">
                         <div className="container mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
                             {/* Header */}
                             <div className="mb-12">
-                                <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-blue-600 dark:text-blue-400">
+                                <p className="mb-2 text-center text-xs font-semibold uppercase tracking-widest text-blue-600 dark:text-blue-400">
                                     Légal
                                 </p>
-                                <h1 className="text-4xl font-bold tracking-tight text-foreground">
+                                <h1 className="sm:text-4xl text-3xl font-bold tracking-tight text-foreground">
                                     Conditions d'utilisation
                                 </h1>
                                 <p className="mt-3 text-foreground/60">
