@@ -40,9 +40,9 @@ const SIDEBAR_ICONS = [BookOpen, Layers, Bot, BarChart2];
 
 export default function Smart() {
     return (
-        <section className="py-8 sm:py-12 bg-background" id="how-it-works">
+        <section className="py-10 sm:py-12 bg-background" id="how-it-works">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid gap-14 lg:grid-cols-2 lg:items-center">
+                <div className="grid lg:gap-14 lg:grid-cols-2 lg:items-center">
 
                     {/* Left — steps */}
                     

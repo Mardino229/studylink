@@ -141,11 +141,11 @@ export default function Hero() {
     return (
         <section
             id="home"
-            className="relative lg:min-h-[80vh]  overflow-hidden bg-background py-24 sm:py-32"
+            className="relative lg:min-h-[70vh]  overflow-hidden bg-background py-24 sm:py-32"
             style={HERO_BG ? { backgroundImage: `url(${HERO_BG})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
         >
             {HERO_BG && <div className="absolute inset-0 bg-slate-950/60" />}
-            <div className="relative container mx-auto flex min-h-[66vh] items-center px-4 sm:px-6 lg:px-8">
+            <div className="relative container mx-auto flex md:min-h-[66vh] items-center px-4 sm:px-6 lg:px-8">
                 <HeroContent />
             </div>
         </section>
