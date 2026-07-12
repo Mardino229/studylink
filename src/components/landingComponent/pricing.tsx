@@ -28,7 +28,7 @@ export default function Pricing() {
     const proPlan = plans[0] ?? null;
 
     return (
-        <section className="py-8 sm:py-12 bg-background" id="pricing">
+        <section className="py-12 sm:py-28 bg-background" id="pricing">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
 
                 {/* Header */}

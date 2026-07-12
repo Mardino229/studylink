@@ -66,7 +66,7 @@ const FEATURES = [
 
 export default function AboutFeatures() {
     return (
-        <section className="py-8 sm:py-12 bg-background" id="key-features">
+        <section className="py-12 sm:py-28 bg-background" id="key-features">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <motion.div
                     initial="hidden"
