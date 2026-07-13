@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, type KeyboardEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Bot, User, Sparkles, Eraser } from "lucide-react";
+import { Send, Bot } from "lucide-react";
 import { autoScrollListRef } from "./use-auto-scroll";
 import { cn } from "../../../lib/utils";
 

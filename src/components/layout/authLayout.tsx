@@ -1,6 +1,7 @@
 import type { ReactElement, ReactNode } from "react";
 import PageMeta from "../common/PageMeta.tsx";
 import AuthHeader from "../authComponent/authheader.tsx";
+import SupportWidget from "../common/SupportWidget.tsx";
 type AuthLayoutProps = {
     title : string, description : string, children: ReactNode
 }
@@ -17,6 +18,7 @@ export default function AuthLayout(props: AuthLayoutProps): ReactElement {
                     </main>
                 </div>
             </div>
+            <SupportWidget />
         </>
     )
 }

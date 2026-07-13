@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, Trash2, Clock, Menu, Sparkles, Play, SkipForward, SkipBack, Volume2 } from 'lucide-react';
+import { Mic, Trash2, Clock, Loader, Menu, Sparkles, Play, SkipForward, SkipBack, Volume2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ArtefactPodcast, PaginatedResponse } from '../../../types/workspace';
 
@@ -155,7 +155,7 @@ export const PodcastsTab: React.FC<PodcastsTabProps> = ({
             {/* Sidebar Header */}
             <div className="p-4 flex items-center justify-between">
                 <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
-                    <Mic size={16} className="text-emerald-500" />
+                    <Mic size={16} className="text-indigo-500" />
                     Audio Briefs
                 </h4>
                 <button
@@ -191,8 +191,17 @@ export const PodcastsTab: React.FC<PodcastsTabProps> = ({
                             >
                                 <p className="truncate text-sm font-semibold text-foreground">{podcast.title || 'Podcast'}</p>
                                 <div className="mt-1 flex items-center gap-1 text-xs text-foreground/50">
-                                    <Clock size={12} />
-                                    <span>{formatDate(podcast.created_at)}</span>
+                                    {(podcast.status === 'processing' || podcast.status === 'pending') ? (
+                                        <>
+                                            <Loader size={12} className="animate-spin" />
+                                            <span>En cours de génération…</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Clock size={12} />
+                                            <span>{formatDate(podcast.created_at)}</span>
+                                        </>
+                                    )}
                                 </div>
                             </button>
                             <button
@@ -223,11 +232,12 @@ export const PodcastsTab: React.FC<PodcastsTabProps> = ({
     );
 
     return (
-        <div className="flex h-[calc(100vh-340px)] lg:h-[calc(100vh-300px)] p-1 sm:p-4 w-full gap-4 overflow-hidden relative">
-            {/* Mobile Drawer */}
-            <AnimatePresence>
-                {sidebarOpen && (
-                    <div className="fixed inset-0 z-50 xl:hidden">
+        <div className='h-full'>
+                    <div className="flex h-full sm:p-4 p-1 w-full gap-4 overflow-hidden relative">
+                        {/* Mobile Drawer */}
+                        <AnimatePresence>
+                            {sidebarOpen && (
+                                <div className="fixed top-16 inset-0 z-50 xl:hidden"> 
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -309,24 +319,29 @@ export const PodcastsTab: React.FC<PodcastsTabProps> = ({
                 {/* Main Content */}
                 <div className="flex-1 overflow-y-auto p-4 sm:p-6 scroll-smooth">
                     {selectedPodcast ? (
-                        <div className="max-w-3xl mx-auto space-y-6">
+                        <div className="max-w-4xl mx-auto space-y-6">
                             {/* Audio Player */}
-                            <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 dark:from-emerald-500/5 dark:to-teal-500/5 border border-emerald-500/20 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row items-center gap-6 shadow-sm">
-                                <div className="h-16 w-16 md:h-20 md:w-20 shrink-0 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-2xl flex items-center justify-center text-white shadow-md animate-pulse">
+                            <div className="bg-gradient-to-r from-indigo-500 to-blue-500 dark:from-emerald-500/5 dark:to-teal-500/5 text-white border border-emerald-500/20 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row items-center gap-6">
+                                <div className="h-16 w-16 md:h-20 md:w-20 shrink-0 rounded-2xl flex items-center justify-center text-white">
                                     <Mic size={32} />
                                 </div>
                                 <div className="flex-1 min-w-0 w-full text-center md:text-left space-y-3">
                                     <div>
-                                        <h4 className="text-base font-bold text-foreground truncate">{selectedPodcast.title || 'Briefing Audio'}</h4>
-                                        <p className="text-xs text-foreground/50 mt-1">Généré le {formatDate(selectedPodcast.created_at)}</p>
+                                        <h4 className="text-base font-bold truncate">{selectedPodcast.title || 'Briefing Audio'}</h4>
+                                        <p className="text-xs  mt-1">Généré le {formatDate(selectedPodcast.created_at)}</p>
                                     </div>
 
-                                    {selectedPodcast.audio_url ? (
+                                    {(selectedPodcast.status === 'processing' || selectedPodcast.status === 'pending') ? (
+                                        <div className="flex items-center gap-3 rounded-xl border border-dashed border-white/30 bg-white/10 px-4 py-3 text-sm text-white/90">
+                                            <Loader size={16} className="animate-spin shrink-0" />
+                                            <span>Génération en cours — l'audio sera disponible dans quelques instants.</span>
+                                        </div>
+                                    ) : selectedPodcast.audio_url ? (
                                         <div className="flex flex-col gap-3">
                                             <audio ref={audioRef} src={selectedPodcast.audio_url} preload="metadata" />
 
                                             <div className="flex items-center gap-3">
-                                                <span className="text-xs text-foreground/60 tabular-nums">{formatTime(currentTime)}</span>
+                                                <span className="text-xs tabular-nums">{formatTime(currentTime)}</span>
                                                 <input
                                                     type="range"
                                                     min={0}
@@ -334,10 +349,10 @@ export const PodcastsTab: React.FC<PodcastsTabProps> = ({
                                                     step={0.1}
                                                     value={playbackProgress}
                                                     onChange={handleSeek}
-                                                    className="h-1.5 flex-1 cursor-pointer accent-emerald-500"
+                                                    className="h-1.5 flex-1 cursor-pointer accent-white-500"
                                                     aria-label="Progression de lecture"
                                                 />
-                                                <span className="text-xs text-foreground/60 tabular-nums">{formatTime(duration)}</span>
+                                                <span className="text-xs tabular-nums">{formatTime(duration)}</span>
                                             </div>
 
                                             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -345,7 +360,7 @@ export const PodcastsTab: React.FC<PodcastsTabProps> = ({
                                                     <button
                                                         type="button"
                                                         onClick={() => handleSkip(-15)}
-                                                        className="p-2 text-foreground/60 hover:text-foreground transition-all hover:bg-foreground/5 rounded-full"
+                                                        className="p-2 transition-all hover:bg-foreground/5 rounded-full"
                                                         aria-label="Reculer de 15 secondes"
                                                     >
                                                         <SkipBack size={16} />
@@ -353,7 +368,7 @@ export const PodcastsTab: React.FC<PodcastsTabProps> = ({
                                                     <button
                                                         type="button"
                                                         onClick={togglePlayback}
-                                                        className="inline-flex items-center justify-center h-12 w-12 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-all shadow-sm hover:scale-105"
+                                                        className="inline-flex items-center justify-center h-12 w-12 bg-indigo-500 hover:bg-indigo-600 text-white rounded-full transition-all shadow-sm hover:scale-105"
                                                         aria-label={isPlaying ? 'Mettre en pause' : 'Lire'}
                                                     >
                                                         <Play size={20} className={isPlaying ? 'hidden' : 'ml-0.5'} />
@@ -364,14 +379,14 @@ export const PodcastsTab: React.FC<PodcastsTabProps> = ({
                                                     <button
                                                         type="button"
                                                         onClick={() => handleSkip(15)}
-                                                        className="p-2 text-foreground/60 hover:text-foreground transition-all hover:bg-foreground/5 rounded-full"
+                                                        className="p-2 transition-all hover:bg-foreground/5 rounded-full"
                                                         aria-label="Avancer de 15 secondes"
                                                     >
                                                         <SkipForward size={16} />
                                                     </button>
                                                 </div>
 
-                                                <div className="flex items-center gap-2 text-foreground/60 md:ml-6">
+                                                <div className="flex items-center gap-2 text-white md:ml-6">
                                                     <Volume2 size={16} />
                                                     <input
                                                         type="range"
@@ -380,7 +395,7 @@ export const PodcastsTab: React.FC<PodcastsTabProps> = ({
                                                         step={0.01}
                                                         value={volume}
                                                         onChange={(event) => setVolume(Number(event.target.value))}
-                                                        className="h-1 w-24 cursor-pointer accent-emerald-500"
+                                                        className="h-1 w-24 cursor-pointer accent-white-500"
                                                         aria-label="Volume"
                                                     />
                                                 </div>
@@ -395,15 +410,17 @@ export const PodcastsTab: React.FC<PodcastsTabProps> = ({
                             </div>
 
                             {/* Transcript Content */}
-                            <div className="space-y-4">
-                                <h3 className="text-sm font-bold text-foreground uppercase tracking-wider border-b border-border pb-2">Transcription</h3>
-                                <p className="text-sm md:text-base text-foreground/80 leading-relaxed whitespace-pre-wrap bg-background p-5 rounded-2xl border border-border shadow-xs">
-                                    {selectedPodcast.transcript}
-                                </p>
-                            </div>
+                            {selectedPodcast.transcript && (
+                                <div className="space-y-4">
+                                    <h3 className="text-sm font-bold text-foreground tracking-wider border-b border-border pb-2">Transcription</h3>
+                                    <p className="text-sm md:text-base text-foreground/80 leading-relaxed whitespace-pre-wrap bg-background p-5 rounded-2xl border border-border">
+                                        {selectedPodcast.transcript}
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     ) : (
-                        <div className="flex h-full flex-col items-center justify-center py-20 text-center">
+                        <div className="flex flex-col items-center justify-center py-20 text-center">
                             <div className="w-16 h-16 bg-brand-50 dark:bg-brand-950/30 rounded-2xl flex items-center justify-center mb-4 border border-brand-100 dark:border-brand-900/50 text-brand-500">
                                 <Mic size={28} />
                             </div>
@@ -423,6 +440,7 @@ export const PodcastsTab: React.FC<PodcastsTabProps> = ({
                     )}
                 </div>
             </section>
+        </div>
         </div>
     );
 };

@@ -27,6 +27,7 @@ export type TokenStats = {
         artefact?: { count: number; tokensSpent: number };
         corrige?: { count: number; tokensSpent: number };
         chat?: { count: number; tokensSpent: number };
+        audio?: { count: number; tokensSpent: number };
     };
 };
 

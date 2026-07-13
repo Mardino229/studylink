@@ -184,7 +184,7 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
 
 // --- Main Workspaces Component ---
 const Workspaces: React.FC = () => {
-    const [viewMode, setViewMode] = useState<'folders' | 'simple'>('folders');
+    const [viewMode, setViewMode] = useState<'folders' | 'simple'>('simple');
     const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
 
     // Notebook organization modal states
@@ -286,6 +286,17 @@ const Workspaces: React.FC = () => {
                     <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-4 mb-6">
                         <div className="flex items-center gap-2 bg-gray-100 dark:bg-white/[0.04] p-1 rounded-xl">
                             <button
+                                    onClick={() => setViewMode('simple')}
+                                    className={`flex items-center gap-2 text-xs sm:text-sm font-medium px-4 py-2 rounded-lg transition-all ${
+                                        viewMode === 'simple'
+                                            ? 'bg-white dark:bg-gray-800 text-brand-500 shadow-xs'
+                                            : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                                    }`}
+                                >
+                                    <LayoutGridIcon size={16} />
+                                    Simple (Tous)
+                            </button>
+                            <button
                                 onClick={() => { setViewMode('folders'); setSelectedFolderId(null); }}
                                 className={`flex items-center gap-2 text-xs sm:text-sm font-medium px-4 py-2 rounded-lg transition-all ${
                                     viewMode === 'folders'
@@ -295,17 +306,6 @@ const Workspaces: React.FC = () => {
                             >
                                 <FolderTreeIcon size={16} />
                                 Par Dossier
-                            </button>
-                            <button
-                                onClick={() => setViewMode('simple')}
-                                className={`flex items-center gap-2 text-xs sm:text-sm font-medium px-4 py-2 rounded-lg transition-all ${
-                                    viewMode === 'simple'
-                                        ? 'bg-white dark:bg-gray-800 text-brand-500 shadow-xs'
-                                        : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
-                                }`}
-                            >
-                                <LayoutGridIcon size={16} />
-                                Simple (Tous)
                             </button>
                         </div>
                     </div>

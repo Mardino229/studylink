@@ -20,7 +20,7 @@ const USER_NAV = [
     { label: "Mon profil",               desc: "Informations personnelles",     path: "/profile",                 icon: User },
     { label: "Statistiques",             desc: "Statistiques d'étude",         path: "/statistics",              icon: BarChart3 },
     { label: "Paramètres",               desc: "Préférences de compte",        path: "/settings",                icon: Settings },
-    { label: "Abonnement & jetons",      desc: "Plans Pro et packs de jetons",  path: "/settings/subscription",  icon: CreditCard },
+    { label: "Abonnement & jetons",      desc: "Plans Pro et packs de jetons",  path: "/subscription",  icon: CreditCard },
     { label: "Historique des paiements", desc: "Mes transactions",             path: "/settings/payments",       icon: Receipt },
     { label: "Annonces",                 desc: "Actualités StudyLink",         path: "/settings/announcements",  icon: Bell },
     { label: "Feedback",                 desc: "Donnez votre avis",            path: "/settings/feedback",       icon: MessageSquare },
@@ -43,27 +43,36 @@ const ADMIN_NAV = [
 
 // ── Token badge ──────────────────────────────────────────────────
 function TokenStatusBadge() {
-    const { isPro, tokenBalance, isLoading } = useBilling();
+    const { isPro, isUltra, tokenBalance, isLoading } = useBilling();
     if (isLoading) return null;
 
     if (isPro) {
         return (
-            <Link to="/settings/subscription" className="inline-flex items-center gap-1.5 rounded-full bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-opacity hover:opacity-90">
+            <Link to="/subscription" className="inline-flex items-center gap-1.5 rounded-full bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-opacity hover:opacity-90">
                 <Sparkles size={12} />
                 Pro
             </Link>
         );
     }
+    if (isUltra) {
+        return (
+            <Link to="/subscription" className="inline-flex items-center gap-1.5 rounded-full bg-purple-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-opacity hover:opacity-90">
+                <Sparkles size={12} />
+                Ultra
+            </Link>
+        );
+    }
+
     if (tokenBalance > 0) {
         return (
-            <Link to="/settings/subscription" className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700">
+            <Link to="/subscription" className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700">
                 <Zap size={12} className="text-amber-500" />
                 {tokenBalance} jeton{tokenBalance > 1 ? "s" : ""}
             </Link>
         );
     }
     return (
-        <Link to="/settings/subscription" className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 shadow-sm transition-colors hover:bg-red-100 dark:border-red-900/40 dark:bg-red-950/20 dark:text-red-400">
+        <Link to="/subscription" className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 shadow-sm transition-colors hover:bg-red-100 dark:border-red-900/40 dark:bg-red-950/20 dark:text-red-400">
             <Zap size={12} />
             Recharger
         </Link>
@@ -276,7 +285,7 @@ const AppHeader: React.FC = () => {
                 <div className={`${isApplicationMenuOpen ? "flex" : "hidden"} items-center justify-between w-full gap-4 px-5 py-4 lg:flex shadow-theme-md lg:justify-end lg:px-0 lg:shadow-none`}>
                     <div className="flex items-center gap-2 2xsm:gap-3">
                         <TokenStatusBadge />
-                        <NotificationDropdown />
+                        {/*<NotificationDropdown />*/}
                     </div>
                     <UserDropdown />
                 </div>

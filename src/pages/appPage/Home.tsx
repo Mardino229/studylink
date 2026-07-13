@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-    BookMarked, BookOpen, Bot, CreditCard,
-    FileText, Layers, MessageSquare, Settings,
+    BookMarked, BookOpen, Bot, ArrowRight, ChevronRight, CreditCard,
+    FileText, Layers, MessageSquare, Mic, Settings,
     Sparkles, Zap, HelpCircle, TrendingUp,
 } from "lucide-react";
 import PageMeta from "../../components/common/PageMeta";
@@ -23,11 +23,11 @@ const container = {
 
 export default function Home() {
     const { user } = useUser();
-    const { isPro, tokenBalance, subscription } = useBilling();
+    const { isPro, isUltra, tokenBalance, subscription } = useBilling();
     const { data: tokenStats } = useGetTokenStats();
     const { data: notebooks } = useGetNotebooks(undefined, { perPage: 1 });
 
-    const notebookCount = notebooks?.total ?? 0;
+    const notebookCount = notebooks?.pagination.total ?? 0;
     const artefactCount = tokenStats?.consumption?.artefact?.count ?? 0;
     const chatCount = tokenStats?.consumption?.chat?.count ?? 0;
     const tokenSpent = tokenStats?.totalTokensSpent ?? 0;
@@ -40,40 +40,46 @@ export default function Home() {
 
     const KPI_CARDS = [
         {
-            label: isPro ? "Abonnement Pro" : `${tokenBalance} jeton${tokenBalance !== 1 ? "s" : ""}`,
+            value: isUltra ? "Ultra" : isPro ? "Pro" : String(tokenBalance),
+            label: isUltra ? "Abonnement Ultra" : isPro ? "Abonnement Pro" : "Jetons disponibles",
             sub: isPro
                 ? subscription?.end_date
-                    ? `Actif jusqu'au ${new Date(subscription.end_date).toLocaleDateString("fr-CA")}`
+                    ? `Jusqu'au ${new Date(subscription.end_date).toLocaleDateString("fr-CA")}`
                     : "Accès illimité"
-                : tokenBalance === 0 ? "Solde vide" : "Disponibles",
+                : tokenBalance === 0 ? "Solde vide — rechargez" : `${tokenPurchased} achetés au total`,
             icon: isPro ? Sparkles : Zap,
-            color: isPro
+            color: isUltra
+                ? "bg-purple-50 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400"
+                : isPro
                 ? "bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400"
                 : tokenBalance > 0
                 ? "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400"
                 : "bg-red-50 text-red-500 dark:bg-red-500/10 dark:text-red-400",
-            href: "/settings/subscription",
+            href: "/subscription",
         },
         {
-            label: `${notebookCount} notebook${notebookCount !== 1 ? "s" : ""}`,
+            value: String(notebookCount),
+            label: "Notebooks",
             sub: "Workspaces actifs",
             icon: BookOpen,
             color: "bg-purple-50 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400",
             href: "/workspaces",
         },
         {
-            label: `${artefactCount} artefact${artefactCount !== 1 ? "s" : ""}`,
+            value: String(artefactCount),
+            label: "Artefacts générés",
             sub: "Résumés, flashcards & quiz",
             icon: Layers,
             color: "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400",
             href: "/workspaces",
         },
         {
-            label: `${chatCount * 10}+ messages`,
-            sub: "Échanges avec le chat",
+            value: String(chatCount),
+            label: "Sessions de chat",
+            sub: "Avec votre assistant",
             icon: MessageSquare,
             color: "bg-cyan-50 text-cyan-600 dark:bg-cyan-500/10 dark:text-cyan-400",
-            href: "/workspaces",
+            href: "/chat",
         },
     ];
 
@@ -81,13 +87,14 @@ export default function Home() {
         { label: "Nouveau notebook", desc: "Créez un espace de travail", icon: BookOpen, href: "/workspaces", color: "from-blue-500 to-blue-600" },
         { label: "Bibliothèque d'épreuves", desc: "Examens & corrigés", icon: BookMarked, href: "/exam-library", color: "from-emerald-500 to-emerald-600" },
         { label: "Chat", desc: "Posez vos questions", icon: Bot, href: "/workspaces", color: "from-purple-500 to-purple-600" },
-        { label: "Mon abonnement", desc: "Jetons & plans", icon: CreditCard, href: "/settings/subscription", color: "from-amber-500 to-amber-600" },
+        { label: "Mon abonnement", desc: "Jetons & plans", icon: CreditCard, href: "/subscription", color: "from-amber-500 to-amber-600" },
     ];
 
     const consumptions = [
         { label: "Résumés / Flashcards / Quiz", icon: FileText, count: tokenStats?.consumption?.artefact?.tokensSpent ?? 0, color: "bg-blue-500" },
         { label: "Corrigés d'examens", icon: HelpCircle, count: tokenStats?.consumption?.corrige?.tokensSpent ?? 0, color: "bg-emerald-500" },
         { label: "Chat (tranches 10 msgs)", icon: MessageSquare, count: tokenStats?.consumption?.chat?.tokensSpent ?? 0, color: "bg-purple-500" },
+        { label: "Audio & Podcasts", icon: Mic, count: tokenStats?.consumption?.audio?.tokensSpent ?? 0, color: "bg-amber-500" },
     ];
     const totalConsumed = consumptions.reduce((s, c) => s + c.count, 0) || 1;
 
@@ -146,18 +153,22 @@ export default function Home() {
                     animate="show"
                     className="grid grid-cols-2 gap-4 lg:grid-cols-4"
                 >
-                    {KPI_CARDS.map(({ label, sub, icon: Icon, color, href }) => (
-                        <motion.div key={label} >
+                    {KPI_CARDS.map(({ value, label, sub, icon: Icon, color, href }) => (
+                        <motion.div key={label}>
                             <Link
                                 to={href}
-                                className="flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-gray-800 dark:bg-gray-900/80"
+                                className="group flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-gray-800 dark:bg-gray-900/80"
                             >
-                                <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${color}`}>
-                                    <Icon size={20} />
+                                <div className="flex items-start justify-between">
+                                    <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${color}`}>
+                                        <Icon size={19} />
+                                    </div>
+                                    <ChevronRight size={13} className="mt-0.5 text-gray-300 transition-colors group-hover:text-gray-500 dark:text-gray-700 dark:group-hover:text-gray-400" />
                                 </div>
                                 <div>
-                                    <p className="text-base font-bold text-gray-900 dark:text-white leading-snug">{label}</p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{sub}</p>
+                                    <p className="text-2xl font-black leading-tight text-gray-900 dark:text-white">{value}</p>
+                                    <p className="mt-0.5 text-sm font-medium text-gray-700 dark:text-gray-300">{label}</p>
+                                    <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500">{sub}</p>
                                 </div>
                             </Link>
                         </motion.div>
@@ -169,30 +180,33 @@ export default function Home() {
 
                     {/* Quick actions */}
                     <motion.div
-                        variants={container}
-                        initial="hidden"
-                        whileInView="show"
+                        initial={{ opacity: 0, y: 16 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.45, ease: "easeOut" }}
                         viewport={{ once: true, amount: 0.2 }}
+                        className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900/80"
                     >
-                        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+                        <h2 className="mb-4 text-sm font-semibold text-gray-400 dark:text-gray-500">
                             Actions rapides
                         </h2>
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 gap-3">
                             {QUICK_ACTIONS.map(({ label, desc, icon: Icon, href, color }) => (
-                                <motion.div key={label}>
-                                    <Link
-                                        to={href}
-                                        className="group flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 dark:border-gray-800 dark:bg-gray-900/80"
-                                    >
-                                        <div className={`flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br ${color} text-white shadow-sm`}>
-                                            <Icon size={17} />
+                                <Link
+                                    key={label}
+                                    to={href}
+                                    className="flex items-center justify-between p-3 rounded-xl border border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-colors group"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br ${color} text-white`}>
+                                            <Icon size={15} />
                                         </div>
                                         <div>
-                                            <p className="text-sm font-semibold text-gray-900 dark:text-white">{label}</p>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{desc}</p>
+                                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</p>
+                                            <p className="text-xs text-gray-400 dark:text-gray-500">{desc}</p>
                                         </div>
-                                    </Link>
-                                </motion.div>
+                                    </div>
+                                    <ArrowRight className="size-4 text-gray-400 group-hover:translate-x-1 transition-transform shrink-0" />
+                                </Link>
                             ))}
                         </div>
                     </motion.div>
@@ -203,7 +217,7 @@ export default function Home() {
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.45, ease: "easeOut" }}
                         viewport={{ once: true, amount: 0.2 }}
-                        className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900/80"
+                        className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900/80"
                     >
                         <div className="mb-4 flex items-center justify-between">
                             <h2 className="text-sm font-semibold text-gray-400 dark:text-gray-500">
@@ -257,7 +271,7 @@ export default function Home() {
                         )}
 
                         <Link
-                            to="/settings/subscription"
+                            to="/subscription"
                             className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 py-2.5 text-xs font-semibold text-gray-600 transition-colors hover:bg-gray-50 dark:border-gray-800 dark:text-gray-400 dark:hover:bg-white/5"
                         >
                             <Settings size={13} />
@@ -300,7 +314,7 @@ export default function Home() {
                         <Link
                             key={title}
                             to={href}
-                            className="group flex gap-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-gray-800 dark:bg-gray-900/80"
+                            className="group flex gap-4 rounded-2xl border border-gray-200 bg-white p-5 transition-shadow hover:shadow-md dark:border-gray-800 dark:bg-gray-900/80"
                         >
                             <div className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${color}`}>
                                 <Icon size={20} />

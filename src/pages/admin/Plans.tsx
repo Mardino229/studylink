@@ -5,7 +5,7 @@ import * as z from "zod";
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
 import { toast } from "sonner";
-import { Plus, Tag, DollarSign, AlignLeft, List, Loader2, AlertTriangle, X, Pencil } from "lucide-react";
+import { Plus, Tag, DollarSign, AlignLeft, List, Loader2, AlertTriangle, X, Pencil, Mic } from "lucide-react";
 import ComponentCard from "../../components/common/ComponentCard.tsx";
 import PlansTable from "../../components/table/AdminTables/PlansTable.tsx";
 import { useGetAdminPlans, useCreateAdminPlan, useDeleteAdminPlan, useUpdateAdminPlan } from "../../utils/admin";
@@ -19,6 +19,7 @@ const planSchema = z.object({
   price: z.number().min(0, "Le prix doit être positif"),
   annual_price: z.number().min(0, "Le prix annuel doit être positif"),
   benefits: z.string().optional(),
+  includes_audio: z.boolean(),
 });
 
 type PlanFormValues = z.infer<typeof planSchema>;
@@ -37,6 +38,7 @@ export default function Plans() {
     handleSubmit,
     reset,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<PlanFormValues>({
     resolver: zodResolver(planSchema),
@@ -46,8 +48,11 @@ export default function Plans() {
       price: 0,
       annual_price: 0,
       benefits: "",
+      includes_audio: false,
     },
   });
+
+  const includesAudio = watch("includes_audio");
 
   const onSubmit = (values: PlanFormValues) => {
     const payload = {
@@ -55,7 +60,8 @@ export default function Plans() {
       price: values.price,
       annual_price: values.annual_price,
       description: values.description,
-      benefits_description: values.benefits ? values.benefits.split(",").map(b => b.trim()).filter(b => b.length > 0) : []
+      benefits_description: values.benefits ? values.benefits.split(",").map(b => b.trim()).filter(b => b.length > 0) : [],
+      includes_audio: values.includes_audio,
     };
 
     if (editingPlan) {
@@ -84,6 +90,7 @@ export default function Plans() {
     setValue("price", Number(plan.price));
     setValue("annual_price", Number(plan.annual_price));
     setValue("benefits", plan.benefits_description?.join(", ") || "");
+    setValue("includes_audio", plan.includes_audio ?? false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -184,6 +191,20 @@ export default function Plans() {
               />
             </div>
           </div>
+
+          <label className="flex cursor-pointer items-center gap-4 rounded-lg border border-gray-200 dark:border-gray-800 px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
+            <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${includesAudio ? 'bg-purple-50 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400' : 'bg-gray-100 text-gray-400 dark:bg-gray-800'}`}>
+              <Mic size={16} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-900 dark:text-white">Inclure l'audio</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Résumés audio et podcasts sans jetons (plan Ultra)</p>
+            </div>
+            <div className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${includesAudio ? 'bg-purple-500' : 'bg-gray-200 dark:bg-gray-700'}`}>
+              <input type="checkbox" {...register("includes_audio")} className="sr-only" />
+              <span className={`inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${includesAudio ? 'translate-x-6' : 'translate-x-1'}`} />
+            </div>
+          </label>
 
           <div className="flex justify-end gap-3">
             {editingPlan && (

@@ -25,7 +25,7 @@ export default function Pricing() {
     const { data: plans = [], isLoading: isLoadingPlans } = useGetPlans();
     const { data: packs = [], isLoading: isLoadingPacks } = useGetPublicTokenPacks();
 
-    const proPlan = plans[0] ?? null;
+    const proPlans = plans ?? null;
 
     return (
         <section className="py-12 sm:py-28 bg-background" id="pricing">
@@ -205,63 +205,64 @@ export default function Pricing() {
                             </button>
                         </div>
                     </div>
-
-                    {isLoadingPlans ? (
-                        <div className="flex justify-center py-8">
-                            <Loader2 className="animate-spin size-8 text-blue-500" />
-                        </div>
-                    ) : proPlan ? (
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.55, ease: "easeOut" }}
-                            viewport={{ once: true, amount: 0.3 }}
-                            className="max-w-md mx-auto"
-                        >
-                            <div className="relative flex flex-col rounded-2xl border-2 border-blue-500 bg-gradient-to-br from-blue-50 to-white p-8 shadow-xl shadow-blue-100/40 dark:from-blue-950/10 dark:to-card dark:shadow-none">
-                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-blue-600 px-4 py-0.5 text-xs font-bold uppercase tracking-wider text-white">
-                                    <Sparkles size={11} className="inline mr-1 -mt-0.5" />
-                                    Pro
-                                </div>
-                                <h3 className="text-xl font-bold text-foreground">{proPlan.name}</h3>
-                                {proPlan.description && (
-                                    <p className="mt-1 text-sm text-foreground/60">{proPlan.description}</p>
-                                )}
-                                <div className="mt-6 flex items-baseline gap-1">
-                                    <span className="text-5xl font-black text-foreground">
-                                        {billingType === "monthly" ? proPlan.price : proPlan.annual_price}
-                                    </span>
-                                    <span className="text-foreground/50 font-medium">
-                                        $ CAD/{billingType === "monthly" ? "mois" : "an"}
-                                    </span>
-                                </div>
-                                {billingType === "monthly" && (
-                                    <p className="mt-1 text-xs text-foreground/40">
-                                        Ou {proPlan.annual_price} $ CAD/an — économisez 40 %
-                                    </p>
-                                )}
-                                <Link
-                                    to="/register"
-                                    className="mt-8 flex items-center justify-center rounded-full h-13 px-8 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold text-base shadow-lg hover:shadow-xl hover:opacity-90 transition-all"
-                                >
-                                    Commencer avec Pro
-                                </Link>
-                                {proPlan.benefits_description?.length > 0 && (
-                                    <ul className="mt-8 space-y-3">
-                                        {proPlan.benefits_description.map((b, i) => (
-                                            <li key={i} className="flex items-center gap-2.5 text-sm text-foreground/70">
-                                                <CheckCircle2 size={16} className="text-blue-500 shrink-0" />
-                                                {b}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
+                    <div className="grid grid-cols-1 items-center sm:grid-cols-2 gap-6 max-w-5xl mx-auto">
+                        {isLoadingPlans ? (
+                            <div className="flex justify-center py-8">
+                                <Loader2 className="animate-spin size-8 text-blue-500" />
                             </div>
-                        </motion.div>
-                    ) : (
-                        <p className="text-center text-foreground/40 py-8">Plans en cours de configuration.</p>
-                    )}
-                </div>
+                        ) : proPlans ? proPlans.map((proPlan) => (
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.55, ease: "easeOut" }}
+                                viewport={{ once: true, amount: 0.3 }}
+                                className="max-w-md mx-auto"
+                            >
+                                <div className="relative flex flex-col rounded-2xl border-2 border-blue-500 bg-gradient-to-br from-blue-50 to-white p-8 shadow-xl shadow-blue-100/40 dark:from-blue-950/10 dark:to-card dark:shadow-none">
+                                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-blue-600 px-4 py-0.5 text-xs font-bold uppercase tracking-wider text-white">
+                                        <Sparkles size={11} className="inline mr-1 -mt-0.5" />
+                                        {proPlan.name}
+                                    </div>
+                                    <h3 className="text-xl font-bold text-foreground">{proPlan.name}</h3>
+                                    {proPlan.description && (
+                                        <p className="mt-1 text-sm text-foreground/60">{proPlan.description}</p>
+                                    )}
+                                    <div className="mt-6 flex items-baseline gap-1">
+                                        <span className="text-5xl font-black text-foreground">
+                                            {billingType === "monthly" ? proPlan.price : proPlan.annual_price}
+                                        </span>
+                                        <span className="text-foreground/50 font-medium">
+                                            $ CAD/{billingType === "monthly" ? "mois" : "an"}
+                                        </span>
+                                    </div>
+                                    {billingType === "monthly" && (
+                                        <p className="mt-1 text-xs text-foreground/40">
+                                            Ou {proPlan.annual_price} $ CAD/an — économisez 40 %
+                                        </p>
+                                    )}
+                                    <Link
+                                        to="/register"
+                                        className="mt-8 flex items-center justify-center rounded-full h-13 px-8 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold text-base shadow-lg hover:shadow-xl hover:opacity-90 transition-all"
+                                    >
+                                        Commencer avec {proPlan.name}
+                                    </Link>
+                                    {proPlan.benefits_description?.length > 0 && (
+                                        <ul className="mt-8 space-y-3">
+                                            {proPlan.benefits_description.map((b, i) => (
+                                                <li key={i} className="flex items-center gap-2.5 text-sm text-foreground/70">
+                                                    <CheckCircle2 size={16} className="text-blue-500 shrink-0" />
+                                                    {b}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
+                            </motion.div>
+                        )) : (
+                            <p className="text-center text-foreground/40 py-8">Plans en cours de configuration.</p>
+                        )}
+                        </div>
+                    </div>
 
                 {/* Bottom note */}
                 <p className="mt-14 text-center text-sm text-foreground/40">

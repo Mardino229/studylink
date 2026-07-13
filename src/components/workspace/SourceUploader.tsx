@@ -105,7 +105,7 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
             <div className="space-y-4 p- sm:p-6">
                 <label className="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-300 p-6 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-white/[0.02]">
                     <UploadCloudIcon className="mb-2 text-gray-400" size={32} />
-                    <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Cliquez pour uploader (PDF, TXT, PPT, PPTX)</span>
+                    <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Cliquez pour importer (PDF, TXT, PPT, PPTX)</span>
                     <input type="file" className="hidden" accept=".pdf,.txt,.ppt,.pptx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation" onChange={handleFileChange} />
                 </label>
 

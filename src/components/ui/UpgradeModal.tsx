@@ -77,7 +77,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                     <p className="text-xs text-gray-500 dark:text-gray-400">Tout illimité dès 6,99 $/mois</p>
                 </div>
                 <Link
-                    to="/settings/subscription"
+                    to="/subscription"
                     onClick={onClose}
                     className="rounded-lg border border-blue-600 px-3 py-1.5 text-xs font-semibold text-blue-600 transition-colors hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20"
                 >

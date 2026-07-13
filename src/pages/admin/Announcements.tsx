@@ -29,7 +29,7 @@ export default function Announcements() {
   const updateMutation = useUpdateAdminAnnouncement();
   const deleteMutation = useDeleteAdminAnnouncement();
 
-  const [deleteId, setDeleteId] = useState<StringConstructor | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<Announcement | null>(null);
 
   const {

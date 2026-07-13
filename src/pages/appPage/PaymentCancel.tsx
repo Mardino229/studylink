@@ -22,7 +22,7 @@ export default function PaymentCancel() {
                 </p>
 
                 <div className="mt-8 flex flex-col gap-3">
-                    <Button className="w-full" onClick={() => navigate("/settings/subscription")}>
+                    <Button className="w-full" onClick={() => navigate("/subscription")}>
                         Retour aux abonnements
                     </Button>
                     <button

@@ -397,7 +397,7 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                                     className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1.5 text-xs font-medium text-emerald-700 transition-all hover:bg-emerald-100 disabled:opacity-50 dark:bg-emerald-950/20 dark:text-emerald-100 dark:hover:bg-emerald-950/40"
                                 >
                                     {audioRequestSummaryId === selectedSummary.id ? <Loader2 size={12} className="animate-spin" /> : <Volume2 size={12} />}
-                                    <span className="hidden sm:block">
+                                    <span className="">
                                         {selectedSummary.audio_status === 'completed' ? 'Régénérer audio' : 'Générer audio'}
                                     </span>
                                 </button>

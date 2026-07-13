@@ -164,7 +164,7 @@ export default function Profile() {
           {/* Plan et crédits */}
           <section className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm">
             <h2 className="text-base font-semibold">Mon plan</h2>
-            <Button className="mt-2" size="sm" variant="outline" onClick={() => navigate("/settings/subscription")}>Changer de plan</Button>
+            <Button className="mt-2" size="sm" variant="outline" onClick={() => navigate("/subscription")}>Changer de plan</Button>
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-xs text-gray-500">Plan actuel</div>
@@ -237,7 +237,7 @@ export default function Profile() {
             <Button className="w-full justify-start" variant="outline" onClick={() => navigate("/settings/profile")}> 
               <Pencil className="w-4 h-4 mr-2" /> Modifier le profil
             </Button>
-            <Button className="w-full justify-start" onClick={() => navigate("/settings/subscription")}>
+            <Button className="w-full justify-start" onClick={() => navigate("/subscription")}>
               <CreditCard className="w-4 h-4 mr-2" /> Gérer l’abonnement
             </Button>
           </div>

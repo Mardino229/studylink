@@ -5,6 +5,7 @@ import type { Subscription } from '../utils/type';
 
 type BillingContextType = {
     isPro: boolean;
+    isUltra: boolean;
     tokenBalance: number;
     subscription: Subscription | null;
     refetchBilling: () => void;
@@ -13,6 +14,7 @@ type BillingContextType = {
 
 const BillingContext = createContext<BillingContextType>({
     isPro: false,
+    isUltra: false,
     tokenBalance: 0,
     subscription: null,
     refetchBilling: () => {},
@@ -23,7 +25,10 @@ export const BillingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const { data: subscription, isLoading: isLoadingSub, refetch: refetchSub } = useGetMyActiveSubscription();
     const { data: tokenData, isLoading: isLoadingBalance, refetch: refetchBalance } = useGetTokenBalance();
 
-    const isPro = subscription?.status === 'active';
+    const isPro = subscription?.status === 'active' && (subscription?.plan?.includes_audio === false);
+    const isUltra = subscription?.status === 'active' && (subscription?.plan?.includes_audio === true);
+    
+    
     const tokenBalance = tokenData?.balance ?? 0;
 
     const refetchBilling = () => {
@@ -34,6 +39,7 @@ export const BillingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return (
         <BillingContext.Provider value={{
             isPro,
+            isUltra,
             tokenBalance,
             subscription: subscription ?? null,
             refetchBilling,

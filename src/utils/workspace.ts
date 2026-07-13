@@ -225,7 +225,6 @@ export const useGetSources = (notebookId: string, options: PaginationOptions = {
 };
 
 export const useUploadSource = () => {
-    const queryClient = useQueryClient();
     const axiosPrivate = useAxiosPrivate();
     return useMutation({
         mutationFn: async ({ notebookId, file }: { notebookId: string; file: File }) => {
@@ -236,8 +235,7 @@ export const useUploadSource = () => {
             });
             return response.data.data;
         },
-        onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: ["sources", variables.notebookId] });
+        onSuccess: () => {
             toast.success("Source ajoutée");
         },
         onError: (error) => {
@@ -295,7 +293,7 @@ export const useDeleteArtefactFlashcard = () => {
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["artefact-flashcards", variables.notebookId] });
             toast.success("Flashcard supprimée");
-        },
+        },  
         onError: (error) => {
             const axiosError = error as AxiosError<{ message: string }>;
             toast.error("Erreur", { description: axiosError.response?.data?.message || "Erreur de suppression" });

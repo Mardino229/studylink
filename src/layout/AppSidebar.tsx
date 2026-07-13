@@ -15,7 +15,7 @@ import {
     UserCircleIcon,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
-import { Coins, DockIcon, SendHorizonal, SettingsIcon } from "lucide-react";
+import { Coins, CreditCard, DockIcon, SendHorizonal, SettingsIcon } from "lucide-react";
 
 type NavItem = {
   name: string;
@@ -49,6 +49,11 @@ const navItems: NavItem[] = [
     icon: <Coins size={20} />,
     name: "Wallet coins",
     path: "/coins",
+  },
+  {
+    icon: <CreditCard size={20} />,
+    name: "Mon abonnement",
+    path: "/subscription",
   },
   {
     icon: <UserCircleIcon />,

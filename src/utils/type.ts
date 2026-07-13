@@ -85,6 +85,7 @@ export interface SubscriptionPlan {
     annual_price: string | number;
     description: string;
     benefits_description: string[];
+    includes_audio: boolean;
 }
 
 export interface SubscriptionPlanRequest {
@@ -93,6 +94,7 @@ export interface SubscriptionPlanRequest {
     annual_price: number;
     description: string;
     benefits_description: string[];
+    includes_audio: boolean;
 }
 
 export interface Subscription {
@@ -108,6 +110,9 @@ export interface Subscription {
     status: "active" | "canceled" | "past_due";
     start_date: string;
     end_date: string;
+    pending_plan_id?: string | null;
+    pending_billing_type?: string | null;
+    cancel_at_period_end?: boolean;
     created_at: string;
     updated_at: string;
 }

@@ -126,7 +126,7 @@ export default function PaymentSuccess() {
                                 <p className="text-gray-500 dark:text-gray-400">
                                     Votre abonnement est désormais actif. Vous avez accès illimité à toutes les fonctionnalités IA — sans jamais consommer de jetons.
                                 </p>
-                                <Button className="w-full" onClick={() => navigate("/settings/subscription")}>
+                                <Button className="w-full" onClick={() => navigate("/subscription")}>
                                     Voir mon abonnement
                                 </Button>
                             </>
@@ -145,7 +145,7 @@ export default function PaymentSuccess() {
                                     <Button className="w-full" onClick={() => navigate("/workspaces")}>
                                         Commencer à générer
                                     </Button>
-                                    <Button variant="outline" className="w-full" onClick={() => navigate("/settings/subscription")}>
+                                    <Button variant="outline" className="w-full" onClick={() => navigate("/subscription")}>
                                         Voir mon solde
                                     </Button>
                                 </div>
@@ -173,7 +173,7 @@ export default function PaymentSuccess() {
                         <div className="flex flex-col gap-3">
                             <Button
                                 className="w-full"
-                                onClick={() => navigate(isSubscription ? "/settings/subscription" : "/settings/subscription")}
+                                onClick={() => navigate(isSubscription ? "/subscription" : "/subscription")}
                             >
                                 {isSubscription ? "Voir mes abonnements" : "Voir mon solde"}
                             </Button>

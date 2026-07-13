@@ -101,8 +101,10 @@ export interface ArtefactSummary {
 
 export interface ArtefactPodcast {
   id: string;
+  notebook_id?: string;
   title?: string;
-  transcript: string;
+  status: 'pending' | 'processing' | 'completed' | 'error';
+  transcript: string | null;
   audio_url: string | null;
   created_at?: string;
   updated_at?: string;

@@ -90,7 +90,7 @@ function App() {
                         <Route path="/profile" element={<UserProfiles />} />
                         <Route path="/settings" element={<Settings />} />
                         <Route path="/settings/profile" element={<SettingsProfile />} />
-                        <Route path="/settings/subscription" element={<SettingsSubscription />} />
+                        <Route path="/subscription" element={<SettingsSubscription />} />
                         <Route path="/settings/payments" element={<PaymentListPage />} />
                         <Route path="/settings/announcements" element={<SettingsAnnouncements />} />
                         <Route path="/settings/feedback" element={<SettingsFeedback />} />

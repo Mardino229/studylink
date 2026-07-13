@@ -7,10 +7,11 @@ import {
     FileText,
     HelpCircle,
     Layers,
-    Lock,
     MessageSquare,
+    Mic,
     Sparkles,
     Target,
+    Upload,
     Zap,
 } from 'lucide-react';
 import { useBilling } from '../../context/BillingContext';
@@ -32,6 +33,7 @@ import {
     useGetSources,
     useGetThemes,
 } from '../../utils/workspace';
+import { useQueryClient } from '@tanstack/react-query';
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
 import ConfirmModal from '../../components/ui/ConfirmModal';
@@ -75,21 +77,39 @@ const WorkspaceNotebook: React.FC = () => {
     const deleteQuiz = useDeleteArtefactQuiz();
     const deletePodcast = useDeleteArtefactPodcast();
     
-    const { isPro, tokenBalance } = useBilling();
+    const { isPro, isUltra, tokenBalance } = useBilling();
+    const queryClient = useQueryClient();
     const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
 
     const contentRef = useRef<HTMLDivElement>(null);
+
+    const sourceCount = sources?.items?.length ?? 0;
+    const hasNoSources = !isLoadingSources && sourceCount === 0;
+
+    // Poll every 2 s while any podcast is still processing
+    const hasProcessingPodcast = podcasts?.items?.some(
+        p => p.status === 'processing' || p.status === 'pending'
+    );
+    useEffect(() => {
+        if (!hasProcessingPodcast || !notebookId) return;
+        const id = setInterval(() => {
+            void queryClient.invalidateQueries({ queryKey: ['artefact-podcasts', notebookId] });
+        }, 2000);
+        return () => clearInterval(id);
+    }, [hasProcessingPodcast, notebookId, queryClient]);
 
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'instant' });
         contentRef.current?.scrollTo({ top: 0, behavior: 'instant' });
     }, [activeTab]);
 
-    // Cost in tokens per action (−1 each, except solution which is backend-only)
     const ARTEFACT_COST = 1;
+    const AUDIO_COST = 2;
 
-    // Whether the user can generate (Pro OR has enough tokens)
-    const canGenerate = isPro || tokenBalance >= ARTEFACT_COST;
+    // Audio (podcast) is free only on Ultra; text artefacts are free on Pro or Ultra
+    const canGenerate = generationModal === 'podcast'
+        ? (isUltra || tokenBalance >= AUDIO_COST)
+        : (isPro || tokenBalance >= ARTEFACT_COST);
 
     const handle402 = (error: unknown) => {
         const status = (error as { response?: { status?: number } })?.response?.status;
@@ -104,7 +124,7 @@ const WorkspaceNotebook: React.FC = () => {
         { id: 'summaries', label: 'Résumés', value: summaries?.items?.length ?? 0, hint: isLoadingSummaries ? 'Chargement...' : 'Résumés générés', icon: Sparkles },
         { id: 'flashcards', label: 'Flashcards', icon: Layers },
         { id: 'quizzes', label: 'Quiz', icon: HelpCircle },
-        //{ id: 'podcasts', label: 'Podcasts', icon: Mic },
+        { id: 'podcasts', label: 'Podcasts', icon: Mic },
         { id: 'chat', label: 'Chat', icon: MessageSquare },
     ] as const;
 
@@ -192,158 +212,188 @@ const WorkspaceNotebook: React.FC = () => {
             <div className="relative dark:bg-background min-h-dvh rounded-none">
                 <div className="mx-auto gap-2 flex min-h-dvh max-w-(--breakpoint-2xl) flex-col px-2 pb-6 lg:pt-4 sm:px-6 pb-20 md:pb-6">
 
-                    {/* Tab bar — desktop only */}
-                    <div className="hidden md:block sticky top-[72px] z-30 -mx-4 mb-6 border-b border-gray-200 bg-white/85 px-4 backdrop-blur dark:border-gray-800 dark:bg-gray-900/85 sm:-mx-6 sm:px-6">
-                        <div className="flex items-center">
-                            <nav className="flex flex-1 gap-6 overflow-x-auto no-scrollbar">
-                                {tabs.map((tab) => {
-                                    const IconComponent = tab.icon;
-                                    return (
-                                        <button
-                                            key={tab.id}
-                                            className={`flex items-center gap-2 border-b-2 px-1 pb-3 pt-4 text-sm font-medium whitespace-nowrap transition-colors ${activeTab === tab.id
-                                                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-                                                }`}
-                                            onClick={() => setActiveTab(tab.id)}
-                                        >
-                                            <IconComponent className="h-4 w-4" />
-                                            {tab.label}
-                                        </button>
-                                    );
-                                })}
-                            </nav>
-                            {/* Token / subscription badge */}
-                            <div className="ml-3 shrink-0 pb-2 pt-3">
-                                {isPro ? (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-600 px-2.5 py-1 text-[11px] font-semibold text-white">
-                                        <Sparkles size={10} />
-                                        Pro
-                                    </span>
-                                ) : tokenBalance > 0 ? (
-                                    <button
-                                        onClick={() => setUpgradeModalOpen(true)}
-                                        className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700 transition-colors hover:bg-amber-100 dark:border-amber-800/40 dark:bg-amber-950/20 dark:text-amber-400"
-                                    >
-                                        <Zap size={10} />
-                                        {tokenBalance} jeton{tokenBalance > 1 ? 's' : ''}
-                                    </button>
-                                ) : (
-                                    <button
-                                        onClick={() => setUpgradeModalOpen(true)}
-                                        className="inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-50 px-2.5 py-1 text-[11px] font-semibold text-red-600 transition-colors hover:bg-red-100 dark:border-red-900/40 dark:bg-red-950/20 dark:text-red-400"
-                                    >
-                                        <Lock size={10} />
-                                        Recharger
-                                    </button>
-                                )}
+                    {hasNoSources ? (
+                        /* ── Source gate: no sources yet ── */
+                        <div className="flex flex-col items-center justify-center px-4">
+                            <div className="w-full max-w-xl py-20">
+                                <div className="mb-8 text-center">
+                                    <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 dark:bg-blue-500/10">
+                                        <Upload size={28} className="text-blue-500 dark:text-blue-400" />
+                                    </div>
+                                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                                        Ajoutez vos premières sources
+                                    </h2>
+                                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                                        Importez vos documents (PDF, DOCX, PPTX…) pour commencer à générer des résumés, flashcards et quiz.
+                                    </p>
+                                </div>
+                                <SourcesTab notebookId={notebookId} />
                             </div>
                         </div>
-                    </div>
+                    ) : (
+                        <>
+                            {/* Tab bar — desktop only */}
+                            <div className="hidden md:block sticky top-[72px] z-30 -mx-4 mb-6 border-b border-gray-200 bg-white/85 px-4 backdrop-blur dark:border-gray-800 dark:bg-gray-900/85 sm:-mx-6 sm:px-6">
+                                <div className="flex items-center">
+                                    <nav className="flex flex-1 gap-6 overflow-x-auto no-scrollbar">
+                                        {tabs.map((tab) => {
+                                            const IconComponent = tab.icon;
+                                            return (
+                                                <button
+                                                    key={tab.id}
+                                                    className={`flex items-center gap-1.5 border-b-2 px-1 pb-3 pt-4 text-sm font-medium whitespace-nowrap transition-colors ${
+                                                        activeTab === tab.id
+                                                            ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                                                    }`}
+                                                    onClick={() => setActiveTab(tab.id)}
+                                                >
+                                                    <IconComponent className="h-4 w-4" />
+                                                    {tab.label}
+                                                </button>
+                                            );
+                                        })}
+                                    </nav>
+                                    {/* Token / subscription badge */}
+                                    <div className="ml-3 shrink-0 pb-2 pt-3">
+                                        {isPro ? (
+                                            <span className="inline-flex items-center gap-1 rounded-full bg-blue-600 px-2.5 py-1 text-[11px] font-semibold text-white">
+                                                <Sparkles size={10} />
+                                                Pro
+                                            </span>
+                                        ) : isUltra ? (
+                                            <span className="inline-flex items-center gap-1 rounded-full bg-purple-600 px-2.5 py-1 text-[11px] font-semibold text-white">
+                                                <Sparkles size={10} />
+                                                Ultra
+                                            </span>
+                                        ) : tokenBalance > 0 ? (
+                                            <button
+                                                onClick={() => setUpgradeModalOpen(true)}
+                                                className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700 transition-colors hover:bg-amber-100 dark:border-amber-800/40 dark:bg-amber-950/20 dark:text-amber-400"
+                                            >
+                                                <Zap size={10} />
+                                                {tokenBalance} jeton{tokenBalance > 1 ? 's' : ''}
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={() => setUpgradeModalOpen(true)}
+                                                className="inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-50 px-2.5 py-1 text-[11px] font-semibold text-red-600 transition-colors hover:bg-red-100 dark:border-red-900/40 dark:bg-red-950/20 dark:text-red-400"
+                                            >
+                                                <Zap size={10} />
+                                                Recharger
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
 
-                    <div ref={contentRef} className="lg:mt-6 mt-2 flex-1 overflow-hidden">
-                        <div className={`rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/80 ${
-                            ['chat', 'summaries', 'flashcards', 'podcasts'].includes(activeTab)
-                                ? 'h-[calc(100dvh-56px)] sm:h-[600px] md:h-[calc(100vh-340px)] lg:h-[calc(100vh-300px)] overflow-hidden'
-                                : ''
-                        }`}>
-                            {activeTab === 'overview' && (
-                                <OverviewTab stats={stats} themes={themes} isLoadingThemes={isLoadingThemes} />
-                            )}
+                            <div ref={contentRef} className="lg:mt-6 mt-2 flex-1 overflow-hidden">
+                                <div className={`rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/80 ${
+                                    ['chat', 'summaries', 'flashcards', 'podcasts'].includes(activeTab)
+                                        ? 'h-[calc(100dvh-56px)] sm:h-[600px] md:h-[calc(100vh-340px)] lg:h-[calc(100vh-300px)] overflow-hidden'
+                                        : ''
+                                }`}>
+                                    {activeTab === 'overview' && (
+                                        <OverviewTab stats={stats} themes={themes} isLoadingThemes={isLoadingThemes} />
+                                    )}
 
-                            {activeTab === 'sources' && (
-                                <SourcesTab notebookId={notebookId} />
-                            )}
+                                    {activeTab === 'sources' && (
+                                        <SourcesTab notebookId={notebookId} />
+                                    )}
 
-                            {activeTab === 'summaries' && (
-                                <SummariesTab
-                                    summaries={summaries}
-                                    isLoadingSummaries={isLoadingSummaries}
-                                    isGenerating={isGenerating}
-                                    openGenerationModal={openGenerationModal}
-                                    handleDelete={handleDelete}
-                                    deleteSummary={deleteSummary}
-                                    notebookId={notebookId}
-                                    formatDate={formatDate}
-                                />
-                            )}
+                                    {activeTab === 'summaries' && (
+                                        <SummariesTab
+                                            summaries={summaries}
+                                            isLoadingSummaries={isLoadingSummaries}
+                                            isGenerating={isGenerating}
+                                            openGenerationModal={openGenerationModal}
+                                            handleDelete={handleDelete}
+                                            deleteSummary={deleteSummary}
+                                            notebookId={notebookId}
+                                            formatDate={formatDate}
+                                        />
+                                    )}
 
-                            {activeTab === 'flashcards' && (
-                                <FlashcardsTab
-                                    flashcards={flashcards}
-                                    isLoadingFlashcards={isLoadingFlashcards}
-                                    isGenerating={isGenerating}
-                                    openGenerationModal={openGenerationModal}
-                                    handleDelete={handleDelete}
-                                    deleteFlashcard={deleteFlashcard}
-                                    notebookId={notebookId}
-                                    formatDate={formatDate}
-                                />
-                            )}
+                                    {activeTab === 'flashcards' && (
+                                        <FlashcardsTab
+                                            flashcards={flashcards}
+                                            isLoadingFlashcards={isLoadingFlashcards}
+                                            isGenerating={isGenerating}
+                                            openGenerationModal={openGenerationModal}
+                                            handleDelete={handleDelete}
+                                            deleteFlashcard={deleteFlashcard}
+                                            notebookId={notebookId}
+                                            formatDate={formatDate}
+                                        />
+                                    )}
 
-                            {activeTab === 'quizzes' && (
-                                <QuizzesTab
-                                    quizzes={quizzes}
-                                    isLoadingQuizzes={isLoadingQuizzes}
-                                    isGenerating={isGenerating}
-                                    openGenerationModal={openGenerationModal}
-                                    handleDelete={handleDelete}
-                                    deleteQuiz={deleteQuiz}
-                                    notebookId={notebookId}
-                                    formatDate={formatDate}
-                                />
-                            )}
+                                    {activeTab === 'quizzes' && (
+                                        <QuizzesTab
+                                            quizzes={quizzes}
+                                            isLoadingQuizzes={isLoadingQuizzes}
+                                            isGenerating={isGenerating}
+                                            openGenerationModal={openGenerationModal}
+                                            handleDelete={handleDelete}
+                                            deleteQuiz={deleteQuiz}
+                                            notebookId={notebookId}
+                                            formatDate={formatDate}
+                                        />
+                                    )}
 
-                            {activeTab === 'podcasts' && (
-                                <PodcastsTab
-                                    podcasts={podcasts}
-                                    isLoadingPodcasts={isLoadingPodcasts}
-                                    isGenerating={isGenerating}
-                                    openGenerationModal={openGenerationModal}
-                                    handleDelete={handleDelete}
-                                    deletePodcast={deletePodcast}
-                                    notebookId={notebookId}
-                                    formatDate={formatDate}
-                                />
-                            )}
+                                    {activeTab === 'podcasts' && (
+                                        <PodcastsTab
+                                            podcasts={podcasts}
+                                            isLoadingPodcasts={isLoadingPodcasts}
+                                            isGenerating={isGenerating}
+                                            openGenerationModal={openGenerationModal}
+                                            handleDelete={handleDelete}
+                                            deletePodcast={deletePodcast}
+                                            notebookId={notebookId}
+                                            formatDate={formatDate}
+                                        />
+                                    )}
 
-                            {activeTab === 'chat' && (
-                                <ChatTab notebookId={notebookId} />
-                            )}
-                        </div>
-                    </div>
+                                    {activeTab === 'chat' && (
+                                        <ChatTab notebookId={notebookId} />
+                                    )}
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
 
-            {/* Mobile bottom navigation */}
-            <nav className="fixed bottom-0 inset-x-0 z-40 border-t border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-900/90 md:hidden safe-pb">
-                <div className="flex items-stretch">
-                    {tabs.map((tab) => {
-                        const IconComponent = tab.icon;
-                        const isActive = activeTab === tab.id;
-                        return (
-                            <button
-                                key={tab.id}
-                                type="button"
-                                onClick={() => setActiveTab(tab.id)}
-                                className={`relative flex flex-1 flex-col items-center justify-center gap-0.5 py-2.5 transition-colors ${
-                                    isActive
-                                        ? 'text-blue-600 dark:text-blue-400'
-                                        : 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300'
-                                }`}
-                            >
-                                {isActive && (
-                                    <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full bg-blue-600 dark:bg-blue-400" />
-                                )}
-                                <IconComponent size={20} />
-                                <span className="text-[10px] font-medium leading-none">
-                                    {MOBILE_TAB_LABEL[tab.id] ?? tab.label}
-                                </span>
-                            </button>
-                        );
-                    })}
-                </div>
-            </nav>
+            {/* Mobile bottom navigation — hidden during source gate */}
+            {!hasNoSources && (
+                <nav className="fixed bottom-0 inset-x-0 z-40 border-t border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-900/90 md:hidden safe-pb">
+                    <div className="flex items-stretch">
+                        {tabs.map((tab) => {
+                            const IconComponent = tab.icon;
+                            const isActive = activeTab === tab.id;
+                            return (
+                                <button
+                                    key={tab.id}
+                                    type="button"
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`relative flex flex-1 flex-col items-center justify-center gap-0.5 py-2.5 transition-colors ${
+                                        isActive
+                                            ? 'text-blue-600 dark:text-blue-400'
+                                            : 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300'
+                                    }`}
+                                >
+                                    {isActive && (
+                                        <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full bg-blue-600 dark:bg-blue-400" />
+                                    )}
+                                    <IconComponent size={20} />
+                                    <span className="text-[10px] font-medium leading-none">
+                                        {MOBILE_TAB_LABEL[tab.id] ?? tab.label}
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </nav>
+            )}
 
             <Modal
                 isOpen={generationModal !== null}
@@ -531,16 +581,25 @@ const WorkspaceNotebook: React.FC = () => {
                                 {canGenerate ? (
                                     <>
                                         Lancer la génération
-                                        {!isPro && (
-                                            <span className="inline-flex items-center gap-0.5 rounded-full bg-blue-500/30 px-1.5 py-0.5 text-[10px] font-bold">
-                                                <Zap size={9} />
-                                                {ARTEFACT_COST}
-                                            </span>
+                                        {generationModal === 'podcast' ? (
+                                            !isUltra && (
+                                                <span className="inline-flex items-center gap-0.5 rounded-full bg-blue-500/30 px-1.5 py-0.5 text-[10px] font-bold">
+                                                    <Zap size={9} />
+                                                    {AUDIO_COST}
+                                                </span>
+                                            )
+                                        ) : (
+                                            !isPro && (
+                                                <span className="inline-flex items-center gap-0.5 rounded-full bg-blue-500/30 px-1.5 py-0.5 text-[10px] font-bold">
+                                                    <Zap size={9} />
+                                                    {ARTEFACT_COST}
+                                                </span>
+                                            )
                                         )}
                                     </>
                                 ) : (
                                     <>
-                                        <Lock size={13} />
+                                        <Zap size={13} />
                                         Aucun jeton
                                     </>
                                 )}
