@@ -18,7 +18,7 @@ export default function Settings() {
       <div className="space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
-            <section className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm">
+            <section className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5">
               <h2 className="text-base font-semibold mb-3">Abonnement / Plan</h2>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Gérez votre plan, consultez vos crédits et votre historique de paiements.</p>
               <div className="flex items-center gap-3 flex-wrap">
@@ -27,13 +27,13 @@ export default function Settings() {
               </div>
             </section>
 
-            <section className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm">
+            <section className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5">
               <h2 className="text-base font-semibold mb-3">Mon profil</h2>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Mettez à jour vos informations personnelles.</p>
               <Button className="w-full" variant="outline" onClick={() => navigate("/profile")}>Modifier le profil</Button>
             </section>
 
-            <section className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm">
+            {/*<section className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm">
               <h2 className="text-base font-semibold mb-3">FAQ & Assistance</h2>
               <div className="space-y-3">
                 <details className="rounded-md border border-gray-200 dark:border-gray-800 p-3">
@@ -45,11 +45,11 @@ export default function Settings() {
                   <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Utilisez l'assistant d'épreuves en 3 étapes dans la section Mes épreuves et examens.</p>
                 </details>
               </div>
-            </section>
+            </section>*/}
           </div>
 
           <div className="space-y-6">
-            <section className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm">
+            <section className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5">
               <h2 className="text-base font-semibold mb-3">Personnalisation</h2>
               <div className="space-y-4">
                 <div>
@@ -75,13 +75,13 @@ export default function Settings() {
               </div>
             </section>
 
-            <section className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm">
+            <section className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5">
               <h2 className="text-base font-semibold mb-3">Sondages & Annonces</h2>
               <p className="text-sm text-gray-600 dark:text-gray-400">Participez aux sondages pour gagner des récompenses et suivez les annonces importantes.</p>
               <Button className="w-full mt-3" variant="outline" onClick={() => navigate("/settings/announcements")}>Voir les annonces</Button>
             </section>
 
-            <section className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm">
+            <section className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5">
               <h2 className="text-base font-semibold mb-3">Support & Feedback</h2>
               <p className="text-sm text-gray-600 dark:text-gray-400">Signalez un bug, suggérez une fonctionnalité ou partagez votre avis sur StudyLink.</p>
               <Button className="w-full mt-3" variant="outline" onClick={() => navigate("/settings/feedback")}>Contacter le support</Button>

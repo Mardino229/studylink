@@ -10,10 +10,15 @@ const TICKET_TYPES: { value: TicketType; label: string; icon: React.ReactNode }[
     { value: "feedback",        label: "Laisser un avis",          icon: <MessageSquare size={14} /> },
 ];
 
-export default function SupportWidget() {
+interface SupportWidgetProps {
+    requireEmail?: boolean;
+}
+
+export default function SupportWidget({ requireEmail = false }: SupportWidgetProps) {
     const [open, setOpen] = useState(false);
     const [type, setType] = useState<TicketType>("feedback");
     const [message, setMessage] = useState("");
+    const [email, setEmail] = useState("");
     const [done, setDone] = useState(false);
 
     const { mutateAsync, isPending } = useSubmitSupportTicket();
@@ -21,9 +26,10 @@ export default function SupportWidget() {
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         if (!message.trim()) return;
-        await mutateAsync({ type, message: message.trim() });
+        await mutateAsync({ type, message: message.trim(), ...(requireEmail ? { email } : {}) });
         setDone(true);
         setMessage("");
+        setEmail("");
     }
 
     function handleClose() {
@@ -120,6 +126,18 @@ export default function SupportWidget() {
                                                 </button>
                                             ))}
                                         </div>
+
+                                        {/* Email (anonymous only) */}
+                                        {requireEmail && (
+                                            <input
+                                                type="email"
+                                                value={email}
+                                                onChange={(e) => setEmail(e.target.value)}
+                                                required
+                                                placeholder="Votre e-mail"
+                                                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-transparent px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-300 dark:focus:border-brand-700 transition-colors"
+                                            />
+                                        )}
 
                                         {/* Message */}
                                         <textarea

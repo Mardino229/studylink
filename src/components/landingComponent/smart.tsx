@@ -15,15 +15,15 @@ const STEPS = [
         icon: Sparkles,
         color: "bg-purple-500/10 text-purple-500 dark:bg-purple-500/15 dark:text-purple-400",
         badge: "bg-purple-600",
-        title: "Générez vos artefacts",
-        desc: "En un clic : résumé, flashcards ou quiz. Chaque génération coûte 1 jeton — ou zéro avec l'abonnement Pro.",
+        title: "Générez vos outils de révision",
+        desc: "En un clic : résumé audio, podcast, flashcards ou quiz. Chaque outils coûte 1 jeton — ou zéro avec l'abonnement Pro ou Ultra.",
     },
     {
         n: "3",
         icon: MessageCircle,
         color: "bg-cyan-500/10 text-cyan-500 dark:bg-cyan-500/15 dark:text-cyan-400",
         badge: "bg-cyan-600",
-        title: "Révisez avec l'assistant",
+        title: "Révisez avec un assistant",
         desc: "Posez vos questions à un assistant qui s'appuie sur vos propres documents pour vous répondre avec précision.",
     },
     {

@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { CheckCircle2, Loader2, Sparkles, Zap } from "lucide-react";
+import { CheckCircle2, Loader2, Mic, Sparkles, Zap } from "lucide-react";
 import { useGetPlans } from "../../utils/plan";
 import { useGetPublicTokenPacks } from "../../utils/billing";
 
 const TIER_FEATURES = [
-    { label: "Épreuves",                       free: false, tokens: "1 🪙", pro: true  },
-    { label: "Voir ses anciens artefacts",    free: true,  tokens: true,  pro: true  },
-    { label: "Générer résumés / flashcards / quiz", free: false, tokens: "1 🪙", pro: true },
-    { label: "Chat (tranche 10 msgs)",     free: false, tokens: "1 🪙", pro: true  },
-    { label: "Corrigés d'examens",            free: false, tokens: "2 🪙", pro: true  },
+    { label: "Voir ses anciens artefacts",         free: true,  tokens: true,    pro: true,  ultra: true  },
+    { label: "Épreuves",                           free: false, tokens: "1 🪙",  pro: true,  ultra: true  },
+    { label: "Générer résumés / flashcards / quiz", free: false, tokens: "1 🪙", pro: true,  ultra: true  },
+    { label: "Chat (tranche 10 msgs)",             free: false, tokens: "1 🪙",  pro: true,  ultra: true  },
+    { label: "Corrigés d'examens",                 free: false, tokens: "2 🪙",  pro: true,  ultra: true  },
+    { label: "Résumés audio",                      free: false, tokens: "2 🪙",  pro: false, ultra: true  },
+    { label: "Podcasts générés par l'IA",          free: false, tokens: "2 🪙",  pro: false, ultra: true  },
 ];
 
 function Check() {
@@ -49,7 +51,7 @@ export default function Pricing() {
                         viewport={{ once: true, amount: 0.5 }}
                         className="mt-4 text-lg text-foreground/70"
                     >
-                        Utilisez StudyLink gratuitement, achetez des jetons à la demande, ou passez à Pro pour un accès illimité.
+                        Gratuit, jetons à la demande, Pro illimité — ou Ultra pour débloquer les podcasts et résumés audio.
                     </motion.p>
                 </div>
 
@@ -61,29 +63,28 @@ export default function Pricing() {
                     viewport={{ once: true, amount: 0.2 }}
                     className="mt-14 overflow-x-auto rounded-2xl border border-border"
                 >
-                    <table className="w-full min-w-[540px] text-sm">
+                    <table className="w-full min-w-[620px] text-sm">
                         <thead>
                             <tr className="border-b border-border">
-                                <th className="px-6 py-4 text-left font-medium text-foreground/50 w-1/2">Fonctionnalité</th>
+                                <th className="px-6 py-4 text-left font-medium text-foreground/50 w-2/5">Fonctionnalité</th>
                                 <th className="px-4 py-4 text-center font-semibold text-foreground/70">Gratuit</th>
                                 <th className="px-4 py-4 text-center font-semibold text-amber-600 dark:text-amber-400">
-                                    <span className="inline-flex items-center gap-1">
-                                        <Zap size={14} /> Jetons
-                                    </span>
+                                    <span className="inline-flex items-center gap-1"><Zap size={14} /> Jetons</span>
                                 </th>
                                 <th className="px-4 py-4 text-center font-semibold text-blue-600 dark:text-blue-400">
-                                    <span className="inline-flex items-center gap-1">
-                                        <Sparkles size={14} /> Pro
-                                    </span>
+                                    <span className="inline-flex items-center gap-1"><Sparkles size={14} /> Pro</span>
+                                </th>
+                                <th className="px-4 py-4 text-center font-semibold text-violet-600 dark:text-violet-400">
+                                    <span className="inline-flex items-center gap-1"><Mic size={14} /> Ultra</span>
                                 </th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border bg-card">
-                            {TIER_FEATURES.map(({ label, free, tokens, pro }) => (
+                            {TIER_FEATURES.map(({ label, free, tokens, pro, ultra }) => (
                                 <tr key={label} className="hover:bg-muted/40 transition-colors">
                                     <td className="px-6 py-3.5 text-foreground/80">{label}</td>
                                     <td className="px-4 py-3.5 text-center">
-                                        {free === true ? <div className="flex justify-center"><Check /></div> : <div className="flex justify-center"><Cross /></div>}
+                                        {free ? <div className="flex justify-center"><Check /></div> : <div className="flex justify-center"><Cross /></div>}
                                     </td>
                                     <td className="px-4 py-3.5 text-center">
                                         {tokens === true ? (
@@ -98,6 +99,9 @@ export default function Pricing() {
                                     </td>
                                     <td className="px-4 py-3.5 text-center">
                                         {pro ? <div className="flex justify-center"><Check /></div> : <div className="flex justify-center"><Cross /></div>}
+                                    </td>
+                                    <td className="px-4 py-3.5 text-center">
+                                        {ultra ? <div className="flex justify-center"><Check /></div> : <div className="flex justify-center"><Cross /></div>}
                                     </td>
                                 </tr>
                             ))}
@@ -169,13 +173,13 @@ export default function Pricing() {
                     )}
                 </div>
 
-                {/* ── Pro subscription ── */}
+                {/* ── Subscriptions ── */}
                 <div className="mt-20">
                     <div className="text-center mb-10">
-                        <p className="text-xs font-semibold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-2">Abonnement Pro</p>
+                        <p className="text-xs font-semibold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-2">Abonnements</p>
                         <h3 className="text-2xl sm:text-3xl font-bold text-foreground">Tout illimité, sans compter les jetons</h3>
                         <p className="mt-3 text-foreground/60 max-w-xl mx-auto">
-                            Un abonné Pro ne consomme jamais de jetons. Générez autant que vous voulez, accédez à tous les corrigés.
+                            Pro pour un accès illimité aux artefacts et corrigés. Ultra pour tout ça, plus les podcasts et résumés audio inclus.
                         </p>
 
                         {/* Billing toggle */}
@@ -210,26 +214,39 @@ export default function Pricing() {
                             <div className="flex justify-center py-8">
                                 <Loader2 className="animate-spin size-8 text-blue-500" />
                             </div>
-                        ) : proPlans ? proPlans.map((proPlan) => (
+                        ) : proPlans ? proPlans.map((plan) => {
+                            const isUltra = plan.includes_audio;
+                            const accent = isUltra
+                                ? { border: "border-violet-500", from: "from-violet-50 dark:from-violet-950/10", badge: "bg-violet-600", btn: "from-violet-500 to-purple-600", check: "text-violet-500" }
+                                : { border: "border-blue-500",   from: "from-blue-50 dark:from-blue-950/10",   badge: "bg-blue-600",   btn: "from-blue-500 to-purple-600",   check: "text-blue-500"   };
+                            return (
                             <motion.div
+                                key={plan.id}
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.55, ease: "easeOut" }}
                                 viewport={{ once: true, amount: 0.3 }}
-                                className="max-w-md mx-auto"
+                                className="max-w-md mx-auto w-full"
                             >
-                                <div className="relative flex flex-col rounded-2xl border-2 border-blue-500 bg-gradient-to-br from-blue-50 to-white p-8 shadow-xl shadow-blue-100/40 dark:from-blue-950/10 dark:to-card dark:shadow-none">
-                                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-blue-600 px-4 py-0.5 text-xs font-bold uppercase tracking-wider text-white">
-                                        <Sparkles size={11} className="inline mr-1 -mt-0.5" />
-                                        {proPlan.name}
+                                <div className={`relative flex flex-col rounded-2xl border-2 ${accent.border} bg-gradient-to-br ${accent.from} to-white p-8 shadow-xl dark:to-card dark:shadow-none`}>
+                                    <div className={`absolute -top-3 left-1/2 -translate-x-1/2 rounded-full ${accent.badge} px-4 py-0.5 text-xs font-bold uppercase tracking-wider text-white`}>
+                                        {isUltra
+                                            ? <><Mic size={11} className="inline mr-1 -mt-0.5" />{plan.name}</>
+                                            : <><Sparkles size={11} className="inline mr-1 -mt-0.5" />{plan.name}</>
+                                        }
                                     </div>
-                                    <h3 className="text-xl font-bold text-foreground">{proPlan.name}</h3>
-                                    {proPlan.description && (
-                                        <p className="mt-1 text-sm text-foreground/60">{proPlan.description}</p>
+                                    <h3 className="text-xl font-bold text-foreground">{plan.name}</h3>
+                                    {plan.description && (
+                                        <p className="mt-1 text-sm text-foreground/60">{plan.description}</p>
+                                    )}
+                                    {isUltra && (
+                                        <span className="mt-3 inline-flex items-center gap-1.5 self-start rounded-full bg-violet-100 dark:bg-violet-900/30 px-2.5 py-1 text-xs font-semibold text-violet-700 dark:text-violet-300">
+                                            <Mic size={11} /> Podcasts & Audio inclus
+                                        </span>
                                     )}
                                     <div className="mt-6 flex items-baseline gap-1">
                                         <span className="text-5xl font-black text-foreground">
-                                            {billingType === "monthly" ? proPlan.price : proPlan.annual_price}
+                                            {billingType === "monthly" ? plan.price : plan.annual_price}
                                         </span>
                                         <span className="text-foreground/50 font-medium">
                                             $ CAD/{billingType === "monthly" ? "mois" : "an"}
@@ -237,20 +254,20 @@ export default function Pricing() {
                                     </div>
                                     {billingType === "monthly" && (
                                         <p className="mt-1 text-xs text-foreground/40">
-                                            Ou {proPlan.annual_price} $ CAD/an — économisez 40 %
+                                            Ou {plan.annual_price} $ CAD/an — économisez 40 %
                                         </p>
                                     )}
                                     <Link
                                         to="/register"
-                                        className="mt-8 flex items-center justify-center rounded-full h-13 px-8 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold text-base shadow-lg hover:shadow-xl hover:opacity-90 transition-all"
+                                        className={`mt-8 flex items-center justify-center rounded-full h-13 px-8 bg-gradient-to-r ${accent.btn} text-white font-bold text-base shadow-lg hover:shadow-xl hover:opacity-90 transition-all`}
                                     >
-                                        Commencer avec {proPlan.name}
+                                        Commencer avec {plan.name}
                                     </Link>
-                                    {proPlan.benefits_description?.length > 0 && (
+                                    {plan.benefits_description?.length > 0 && (
                                         <ul className="mt-8 space-y-3">
-                                            {proPlan.benefits_description.map((b, i) => (
+                                            {plan.benefits_description.map((b, i) => (
                                                 <li key={i} className="flex items-center gap-2.5 text-sm text-foreground/70">
-                                                    <CheckCircle2 size={16} className="text-blue-500 shrink-0" />
+                                                    <CheckCircle2 size={16} className={`${accent.check} shrink-0`} />
                                                     {b}
                                                 </li>
                                             ))}
@@ -258,7 +275,8 @@ export default function Pricing() {
                                     )}
                                 </div>
                             </motion.div>
-                        )) : (
+                            );
+                        }) : (
                             <p className="text-center text-foreground/40 py-8">Plans en cours de configuration.</p>
                         )}
                         </div>

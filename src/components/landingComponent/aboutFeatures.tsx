@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { BookOpen, Bot, Layers, HelpCircle, BookMarked, FolderKanban } from "lucide-react";
+import { BookOpen, Bot, Layers, HelpCircle, BookMarked, FolderKanban, Mic } from "lucide-react";
 
 const FEATURES = [
     {
@@ -62,6 +62,17 @@ const FEATURES = [
         desc: "Organisez vos notebooks par dossier, suivez votre progression et gardez une vue d'ensemble de vos révisions.",
         n: "06",
     },
+    {
+        icon: Mic,
+        color: "bg-violet-500/10 text-violet-500 dark:bg-violet-500/15 dark:text-violet-400",
+        glow: "bg-violet-400",
+        span: "lg:col-span-6",
+        wide: true,
+        title: "Audio & Podcasts — Ultra",
+        desc: "Transformez vos résumés en briefings audio et générez des podcasts complets à partir de vos documents. Écoutez vos révisions en déplacement, en mode mains libres. Disponible en exclusivité avec le plan Ultra.",
+        n: "07",
+        badge: "Ultra",
+    },
 ];
 
 export default function AboutFeatures() {
@@ -94,7 +105,7 @@ export default function AboutFeatures() {
                         variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
                         className="mt-4 text-lg text-foreground/70"
                     >
-                        Résumés, flashcards, quiz, bibliothèque d'épreuves, chat et statistiques — réunis dans une seule interface.
+                        Résumés, flashcards, quiz, bibliothèque d'épreuves, chat, podcasts audio et statistiques — réunis dans une seule interface.
                     </motion.p>
                 </motion.div>
 
@@ -105,11 +116,11 @@ export default function AboutFeatures() {
                     variants={{ hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } } }}
                     className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6"
                 >
-                    {FEATURES.map(({ icon: Icon, color, glow, span, wide, title, desc, n }) => (
+                    {FEATURES.map(({ icon: Icon, color, glow, span, wide, title, desc, n, badge }) => (
                         <motion.div
                             key={title}
                             variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } }}
-                            className={`group relative overflow-hidden rounded-3xl border border-border bg-card p-7 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg ${span}`}
+                            className={`group relative overflow-hidden rounded-3xl border p-7 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg ${span} ${badge ? "border-violet-400/40 bg-gradient-to-br from-violet-50/60 to-card dark:from-violet-950/20 dark:to-card" : "border-border bg-card"}`}
                         >
                             {/* Hover glow blob */}
                             <div
@@ -120,6 +131,14 @@ export default function AboutFeatures() {
                             <span className="absolute right-5 top-3 select-none text-5xl font-black leading-none text-foreground/[0.05]">
                                 {n}
                             </span>
+
+                            {/* Ultra badge */}
+                            {badge && (
+                                <span className="absolute top-5 right-5 inline-flex items-center gap-1 rounded-full bg-violet-500 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white">
+                                    <Mic size={11} />
+                                    {badge}
+                                </span>
+                            )}
 
                             {wide ? (
                                 <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:gap-8">

@@ -8,9 +8,10 @@ const HERO_BG = heroPic;
 const PHRASES = [
     "Générer des résumés en quelques secondes",
     "Créer des flashcards à partir de vos PDF",
-    "Préparer des quiz de révision avec l'IA",
+    "Préparer des quiz de révision",
+    "Génerer des podcasts à partir de vos cours",
     "Consulter les épreuves et corrigés",
-    "Discuter avec votre assistant d'étude IA",
+    "Discuter avec votre assistant d'étude",
     "Organiser vos workspaces de révision",
 ];
 
@@ -85,7 +86,7 @@ const HeroContent = memo(function HeroContent() {
                     variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
                     className={`mt-5 text-lg sm:text-xl ${mutedColor} max-w-2xl mx-auto`}
                 >
-                    Résumés, flashcards, quiz, bibliothèque d'épreuves et chat soit tout ce dont vous avez besoin pour réviser, dans une seule interface.
+                    Résumés, podcasts, flashcards, quiz, bibliothèque d'épreuves et chat soit tout ce dont vous avez besoin pour réviser, dans une seule interface.
                 </motion.p>
             </motion.div>
 
@@ -98,7 +99,7 @@ const HeroContent = memo(function HeroContent() {
                 transition={{ duration: 0.5, delay: 0.3 }}
                 className="mt-8 flex flex-wrap justify-center gap-2"
             >
-                {["Résumés", "Flashcards", "Quiz", "Épreuves", "Chat", "Workspaces"].map(item => (
+                {["Résumés", "Flashcards", "Podcasts", "Quiz", "Épreuves", "Chat", "Workspaces"].map(item => (
                     <span key={item} className={`rounded-full border px-4 py-1.5 text-sm font-medium ${chipStyle}`}>
                         {item}
                     </span>

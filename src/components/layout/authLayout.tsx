@@ -18,7 +18,7 @@ export default function AuthLayout(props: AuthLayoutProps): ReactElement {
                     </main>
                 </div>
             </div>
-            <SupportWidget />
+            <SupportWidget requireEmail />
         </>
     )
 }

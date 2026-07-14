@@ -154,15 +154,24 @@ const useRegister = () => {
 
 const useVerify = () => {
     const navigate = useNavigate();
+    const { setUser } = useUser();
     return useMutation({
         mutationFn: async (data: { email: string | null; otp: string; }) => {
-            const response = await axiosClient.post('/auth/verify-otp', data)
-            toast.success(response.data.message, {
-                description: "Your account have been verified",
-            })
+            const response = await axiosClient.post('/auth/verify-otp', data);
+            const userData = response.data.data?.user ?? null;
+            if (userData) setUser(userData);
+            return { user: userData };
         },
-        onSuccess: () => {
-            navigate(`/login`);
+        onSuccess: ({ user }) => {
+            if (user) {
+                toast.success("Compte activé !", { description: "Bienvenue sur StudyLink." });
+                if (user.role?.name === 'admin') navigate('/admin/home');
+                else if (user.study_level_id === null) navigate('/complete-profile');
+                else navigate('/home');
+            } else {
+                toast.success("Compte déjà activé", { description: "Connectez-vous avec votre mot de passe." });
+                navigate('/login');
+            }
         },
         onError: (error) => {
 
@@ -183,7 +192,6 @@ const useVerify = () => {
                     status: number,
                 };
             }
-            console.log(err.response.status === 422)
             if (err.response.status === 422) {
                 const err = error as unknown as {
                     response: {
@@ -196,7 +204,7 @@ const useVerify = () => {
                     description: `${err.response.data.detail[0].loc[1]}: ${err.response.data.detail[0].msg}`,
                 })
             } else {
-                toast.error("Validation failed", {
+                toast.error("Échec de la vérification", {
                     description: err.response.data.detail,
                 })
             }
@@ -338,4 +346,30 @@ const useResetPassword = () => {
 };
 
 
-export { useLogin, useRegister, useVerify, useLogout, useRequestPassword, useResetPassword };
+const useResendOtp = () => {
+    const navigate = useNavigate();
+    return useMutation({
+        mutationFn: async (email: string) => {
+            const response = await axiosClient.post<{ success: boolean; message: string }>('/auth/resend-otp', { email });
+            return response.data;
+        },
+        onSuccess: (data) => {
+            if (data.message === "Account already activated") {
+                toast.success("Compte déjà activé", { description: "Vous pouvez vous connecter directement." });
+                navigate('/login');
+            } else {
+                toast.success("Code renvoyé", { description: "Vérifiez votre boîte mail." });
+            }
+        },
+        onError: (error) => {
+            const axiosError = error as AxiosError;
+            if (!axiosError.response) {
+                toast.error("Service indisponible", { description: "Veuillez réessayer plus tard." });
+            } else {
+                toast.error("Erreur", { description: (axiosError.response.data as { detail?: string })?.detail ?? "Une erreur est survenue." });
+            }
+        },
+    });
+};
+
+export { useLogin, useRegister, useVerify, useLogout, useRequestPassword, useResetPassword, useResendOtp };

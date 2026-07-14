@@ -100,9 +100,9 @@ export default function Privacy() {
                                     <p>StudyLink fait appel aux services tiers suivants :</p>
                                     <ul>
                                         <li>
-                                            <strong>OpenAI (ou fournisseur d'IA équivalent)</strong> — vos fichiers et
+                                            <strong>Google </strong> — vos fichiers et
                                             messages de chat sont transmis à une API d'intelligence artificielle pour
-                                            produire les résumés, flashcards, quiz et réponses. Ces données sont traitées
+                                            produire les résumés, podcast, flashcards, quiz et réponses. Ces données sont traitées
                                             conformément à la politique de confidentialité du fournisseur d'IA. Nous vous
                                             déconseillons d'importer des documents contenant des informations sensibles ou
                                             confidentielles.
@@ -166,16 +166,7 @@ export default function Privacy() {
                                 </section>
 
                                 <section>
-                                    <h2>8. Mineurs</h2>
-                                    <p>
-                                        StudyLink est destiné à un public universitaire. Les utilisateurs de moins de 13 ans
-                                        ne sont pas autorisés à créer un compte. Les utilisateurs entre 13 et 18 ans doivent
-                                        avoir obtenu le consentement d'un parent ou tuteur légal.
-                                    </p>
-                                </section>
-
-                                <section>
-                                    <h2>9. Modifications</h2>
+                                    <h2>8. Modifications</h2>
                                     <p>
                                         Nous pouvons mettre à jour cette politique à tout moment. En cas de changement
                                         significatif, nous vous en informerons par courriel ou via une notification dans
@@ -184,7 +175,7 @@ export default function Privacy() {
                                 </section>
 
                                 <section>
-                                    <h2>10. Contact</h2>
+                                    <h2>9. Contact</h2>
                                     <p>
                                         Pour toute question relative à cette politique ou à vos données personnelles :
                                     </p>
