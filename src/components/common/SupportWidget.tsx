@@ -65,7 +65,7 @@ export default function SupportWidget() {
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 16, scale: 0.97 }}
                             transition={{ duration: 0.25, ease: "easeOut" }}
-                            className="fixed bottom-24 right-6 z-50 w-[340px] rounded-2xl border border-gray-200 bg-white shadow-2xl dark:border-gray-800 dark:bg-gray-900"
+                            className="fixed bottom-24 right-6 z-50 w-[80vw] lg:w-[340px] rounded-2xl border border-gray-200 bg-white shadow-2xl dark:border-gray-800 dark:bg-gray-900"
                         >
                             {/* Header */}
                             <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 px-5 py-4">
