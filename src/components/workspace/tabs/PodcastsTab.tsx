@@ -334,7 +334,7 @@ export const PodcastsTab: React.FC<PodcastsTabProps> = ({
                                     {(selectedPodcast.status === 'processing' || selectedPodcast.status === 'pending') ? (
                                         <div className="flex items-center gap-3 rounded-xl border border-dashed border-white/30 bg-white/10 px-4 py-3 text-sm text-white/90">
                                             <Loader size={16} className="animate-spin shrink-0" />
-                                            <span>Génération en cours — l'audio sera disponible dans quelques instants.</span>
+                                            <span>Génération en cours   l'audio sera disponible dans quelques instants.</span>
                                         </div>
                                     ) : selectedPodcast.audio_url ? (
                                         <div className="flex flex-col gap-3">

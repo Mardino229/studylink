@@ -102,7 +102,7 @@ export default function AdminExamLibrary() {
 
     const previewSolution = (sol: SolutionSubmission) => {
         const params = new URLSearchParams({
-            title: `Corrigé — ${sol.exam?.name ?? ''}`,
+            title: `Corrigé   ${sol.exam?.name ?? ''}`,
             endpoint: `/exam-library/solutions/${sol.id}/file`,
         });
         navigate(`/exam-library/solution/${sol.exam?.id ?? sol.id}?${params}`);
@@ -149,7 +149,7 @@ export default function AdminExamLibrary() {
     return (
         <div className="space-y-5">
 
-            <PageMeta title="Admin — Bibliothèque d'épreuves" description="Gestion de la bibliothèque d'épreuves" />
+            <PageMeta title="Admin   Bibliothèque d'épreuves" description="Gestion de la bibliothèque d'épreuves" />
             <PageBreadcrumb pageTitle="Bibliothèque d'épreuves" />
             <div className="flex justify-end">
                 {tab === 'exams' && (
@@ -402,16 +402,16 @@ export default function AdminExamLibrary() {
                     <input value={examForm.name} onChange={(e) => setExamForm(p => ({ ...p, name: e.target.value }))} placeholder="Nom de l'épreuve *" className={inputCls} />
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <select value={examForm.course_id} onChange={(e) => setExamForm(p => ({ ...p, course_id: e.target.value }))} className={selectCls}>
-                            <option value="">— Cours —</option>
-                            {courses.map(c => <option key={c.id} value={c.id}>{c.code} — {c.name}</option>)}
+                            <option value="">  Cours  </option>
+                            {courses.map(c => <option key={c.id} value={c.id}>{c.code}   {c.name}</option>)}
                         </select>
                         <input type="number" value={examForm.academic_year} onChange={(e) => setExamForm(p => ({ ...p, academic_year: e.target.value }))} placeholder="Année" className={inputCls} />
                         <select value={examForm.session} onChange={(e) => setExamForm(p => ({ ...p, session: e.target.value as ExamSession | '' }))} className={selectCls}>
-                            <option value="">— Session —</option>
+                            <option value="">  Session  </option>
                             <option value="fall">Automne</option><option value="winter">Hiver</option><option value="summer">Printemps/Été</option>
                         </select>
                         <select value={examForm.exam_type} onChange={(e) => setExamForm(p => ({ ...p, exam_type: e.target.value as ExamType | '' }))} className={selectCls}>
-                            <option value="">— Type —</option>
+                            <option value="">  Type  </option>
                             <option value="midterm">Intra</option><option value="final">Final</option><option value="quiz">Quiz</option><option value="other">Autre</option>
                         </select>
                     </div>
@@ -436,7 +436,7 @@ export default function AdminExamLibrary() {
             {/* ── Modal : Reject exam ── */}
             <Modal isOpen={!!rejectExamId} onClose={() => setRejectExamId(null)} className="max-w-md p-6">
                 <h3 className="mb-3 text-base font-semibold text-gray-900 dark:text-white">Refuser l'épreuve</h3>
-                <p className="mb-3 text-sm text-gray-500 dark:text-gray-400">Expliquez la raison du refus — l'utilisateur pourra la corriger et re-soumettre.</p>
+                <p className="mb-3 text-sm text-gray-500 dark:text-gray-400">Expliquez la raison du refus   l'utilisateur pourra la corriger et re-soumettre.</p>
                 <textarea
                     value={rejectExamNote}
                     onChange={(e) => setRejectExamNote(e.target.value)}
@@ -488,7 +488,7 @@ export default function AdminExamLibrary() {
             <Modal isOpen={courseModal} onClose={() => setCourseModal(false)} className="max-w-sm p-6">
                 <h3 className="mb-4 text-base font-semibold text-gray-900 dark:text-white">Nouveau cours</h3>
                 <div className="space-y-3">
-                    <input value={courseForm.code} onChange={(e) => setCourseForm(p => ({ ...p, code: e.target.value }))} placeholder="Code — ex: CSI2120" className={inputCls} />
+                    <input value={courseForm.code} onChange={(e) => setCourseForm(p => ({ ...p, code: e.target.value }))} placeholder="Code   ex: CSI2120" className={inputCls} />
                     <input value={courseForm.name} onChange={(e) => setCourseForm(p => ({ ...p, name: e.target.value }))} placeholder="Nom du cours" className={inputCls} />
                     <ModalButtons onCancel={() => setCourseModal(false)} onConfirm={handleCreateCourse} loading={createCourse.isPending} disabled={!courseForm.code.trim() || !courseForm.name.trim()} label="Créer" />
                 </div>
@@ -562,7 +562,7 @@ function ExamRow({ exam, onValidate, onReject, onUploadSolution, onDelete, onPre
                 <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500">{exam.id.slice(0, 8)}…</p>
             </td>
             <td className="px-4 py-3">
-                {exam.course ? <span className="font-mono text-xs text-blue-600 dark:text-blue-400">{exam.course.code}</span> : <span className="text-gray-400">—</span>}
+                {exam.course ? <span className="font-mono text-xs text-blue-600 dark:text-blue-400">{exam.course.code}</span> : <span className="text-gray-400"> </span>}
             </td>
             <td className="px-4 py-3">
                 <div className="flex flex-wrap gap-1">
@@ -622,7 +622,7 @@ function PendingExamRow({ exam, onValidate, onReject, onPreview, isValidating, i
                 )}
             </td>
             <td className="px-4 py-3">
-                {exam.course ? <span className="font-mono text-xs text-blue-600 dark:text-blue-400">{exam.course.code}</span> : <span className="text-gray-400">—</span>}
+                {exam.course ? <span className="font-mono text-xs text-blue-600 dark:text-blue-400">{exam.course.code}</span> : <span className="text-gray-400"> </span>}
             </td>
             <td className="px-4 py-3">
                 <div className="flex flex-wrap gap-1">

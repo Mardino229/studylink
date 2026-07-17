@@ -7,19 +7,20 @@ import { useGetPublicTokenPacks } from "../../utils/billing";
 
 const TIER_FEATURES = [
     { label: "Voir ses anciens artefacts",         free: true,  tokens: true,    pro: true,  ultra: true  },
+    { label: "Sources YouTube (vidéos publiques)", free: true,  tokens: true,    pro: true,  ultra: true  },
     { label: "Épreuves",                           free: false, tokens: "1 🪙",  pro: true,  ultra: true  },
     { label: "Générer résumés / flashcards / quiz", free: false, tokens: "1 🪙", pro: true,  ultra: true  },
     { label: "Chat (tranche 10 msgs)",             free: false, tokens: "1 🪙",  pro: true,  ultra: true  },
     { label: "Corrigés d'examens",                 free: false, tokens: "2 🪙",  pro: true,  ultra: true  },
     { label: "Résumés audio",                      free: false, tokens: "2 🪙",  pro: false, ultra: true  },
-    { label: "Podcasts générés par l'IA",          free: false, tokens: "2 🪙",  pro: false, ultra: true  },
+    { label: "Podcasts",          free: false, tokens: "2 🪙",  pro: false, ultra: true  },
 ];
 
 function Check() {
     return <CheckCircle2 size={16} className="text-green-500 shrink-0" />;
 }
 function Cross() {
-    return <span className="text-gray-300 dark:text-gray-700 text-lg font-bold select-none">—</span>;
+    return <span className="text-gray-300 dark:text-gray-700 text-lg font-bold select-none"> </span>;
 }
 
 export default function Pricing() {
@@ -51,7 +52,7 @@ export default function Pricing() {
                         viewport={{ once: true, amount: 0.5 }}
                         className="mt-4 text-lg text-foreground/70"
                     >
-                        Gratuit, jetons à la demande, Pro illimité — ou Ultra pour débloquer les podcasts et résumés audio.
+                        Gratuit, jetons à la demande, Pro illimité   ou Ultra pour débloquer les podcasts et résumés audio.
                     </motion.p>
                 </div>
 
@@ -254,7 +255,7 @@ export default function Pricing() {
                                     </div>
                                     {billingType === "monthly" && (
                                         <p className="mt-1 text-xs text-foreground/40">
-                                            Ou {plan.annual_price} $ CAD/an — économisez 40 %
+                                            Ou {plan.annual_price} $ CAD/an   économisez 40 %
                                         </p>
                                     )}
                                     <Link

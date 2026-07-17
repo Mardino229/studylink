@@ -7,8 +7,8 @@ const STEPS = [
         icon: Upload,
         color: "bg-blue-500/10 text-blue-500 dark:bg-blue-500/15 dark:text-blue-400",
         badge: "bg-blue-600",
-        title: "Importez vos fichiers",
-        desc: "Déposez un PDF, DOCX ou PPTX dans votre workspace. Le contenu est analysé automatiquement et les concepts clés en sont extraits.",
+        title: "Importez vos sources",
+        desc: "Déposez un PDF, DOCX, PPTX   ou collez un lien YouTube. Notre app lit ou regarde la vidéo, en extrait le contenu et l'indexe comme n'importe quelle source.",
     },
     {
         n: "2",
@@ -16,7 +16,7 @@ const STEPS = [
         color: "bg-purple-500/10 text-purple-500 dark:bg-purple-500/15 dark:text-purple-400",
         badge: "bg-purple-600",
         title: "Générez vos outils de révision",
-        desc: "En un clic : résumé audio, podcast, flashcards ou quiz. Chaque outils coûte 1 jeton — ou zéro avec l'abonnement Pro ou Ultra.",
+        desc: "En un clic : résumé audio, podcast, flashcards ou quiz. Chaque outils coûte 1 jeton   ou zéro avec l'abonnement Pro ou Ultra.",
     },
     {
         n: "3",
@@ -44,7 +44,7 @@ export default function Smart() {
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid lg:gap-14 lg:grid-cols-2 lg:items-center">
 
-                    {/* Left — steps */}
+                    {/* Left   steps */}
                     
                         <motion.div
                             initial="hidden"

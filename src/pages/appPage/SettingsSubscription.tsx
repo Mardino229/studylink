@@ -167,7 +167,7 @@ export default function SettingsSubscription() {
                 </div>
               )}
 
-              {/* Cancel button — only when not already scheduled */}
+              {/* Cancel button   only when not already scheduled */}
               {!isCancelScheduled && !pendingPlanId && (
                 <div className="flex justify-end">
                   <button
@@ -197,7 +197,7 @@ export default function SettingsSubscription() {
                 {hasSub ? "Changer de plan" : "Choisir un plan"}
               </h2>
               <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
-                Ultra est un sur-ensemble de Pro — il inclut tout Pro plus l'audio et les podcasts illimités.
+                Ultra est un sur-ensemble de Pro   il inclut tout Pro plus l'audio et les podcasts illimités.
               </p>
             </div>
             <div className="inline-flex p-1 bg-gray-100 dark:bg-white/[0.05] rounded-lg">

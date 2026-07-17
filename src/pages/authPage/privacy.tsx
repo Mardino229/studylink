@@ -46,29 +46,29 @@ export default function Privacy() {
                                     </p>
                                     <ul>
                                         <li>
-                                            <strong>Informations de compte</strong> — votre adresse courriel et votre nom
+                                            <strong>Informations de compte</strong>   votre adresse courriel et votre nom
                                             d'affichage, fournis lors de l'inscription.
                                         </li>
                                         <li>
-                                            <strong>Fichiers importés</strong> — les documents que vous déposez sur la
+                                            <strong>Fichiers importés</strong>   les documents que vous déposez sur la
                                             plateforme (PDF, DOCX, PPTX) pour générer des résumés, flashcards ou quiz.
                                         </li>
                                         <li>
-                                            <strong>Contenu généré</strong> — les artefacts produits par la plateforme
+                                            <strong>Contenu généré</strong>   les artefacts produits par la plateforme
                                             (résumés, flashcards, quiz, historique de chat) associés à votre compte.
                                         </li>
                                         <li>
-                                            <strong>Données de paiement</strong> — le traitement est entièrement délégué à
+                                            <strong>Données de paiement</strong>   le traitement est entièrement délégué à
                                             Stripe. Nous ne stockons jamais de numéros de carte ou d'informations bancaires
                                             directement.
                                         </li>
                                         <li>
-                                            <strong>Données d'utilisation</strong> — solde de jetons, historique de
+                                            <strong>Données d'utilisation</strong>   solde de jetons, historique de
                                             transactions, statistiques agrégées de révision (nombre de sessions, modules
                                             consultés).
                                         </li>
                                         <li>
-                                            <strong>Données techniques</strong> — adresse IP, type de navigateur et logs
+                                            <strong>Données techniques</strong>   adresse IP, type de navigateur et logs
                                             d'accès à des fins de sécurité et de débogage.
                                         </li>
                                     </ul>
@@ -100,7 +100,7 @@ export default function Privacy() {
                                     <p>StudyLink fait appel aux services tiers suivants :</p>
                                     <ul>
                                         <li>
-                                            <strong>Google </strong> — vos fichiers et
+                                            <strong>Google </strong>   vos fichiers et
                                             messages de chat sont transmis à une API d'intelligence artificielle pour
                                             produire les résumés, podcast, flashcards, quiz et réponses. Ces données sont traitées
                                             conformément à la politique de confidentialité du fournisseur d'IA. Nous vous
@@ -108,7 +108,7 @@ export default function Privacy() {
                                             confidentielles.
                                         </li>
                                         <li>
-                                            <strong>Stripe</strong> — traitement sécurisé des paiements par carte de crédit
+                                            <strong>Stripe</strong>   traitement sécurisé des paiements par carte de crédit
                                             et des abonnements. Stripe est certifié PCI DSS.
                                         </li>
                                     </ul>

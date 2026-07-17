@@ -8,6 +8,7 @@ const HERO_BG = heroPic;
 const PHRASES = [
     "Générer des résumés en quelques secondes",
     "Créer des flashcards à partir de vos PDF",
+    "Transformer une vidéo YouTube en source de révision",
     "Préparer des quiz de révision",
     "Génerer des podcasts à partir de vos cours",
     "Consulter les épreuves et corrigés",
@@ -49,7 +50,7 @@ const TypingText = memo(function TypingText({ cursorColor, mutedColor }: { curso
     );
 });
 
-// Static content — only mounts animations once, no re-renders from typing
+// Static content   only mounts animations once, no re-renders from typing
 const HeroContent = memo(function HeroContent() {
     const textColor = HERO_BG ? "text-white" : "text-foreground";
     const mutedColor = HERO_BG ? "text-white/80" : "text-foreground/70";
@@ -86,11 +87,11 @@ const HeroContent = memo(function HeroContent() {
                     variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
                     className={`mt-5 text-lg sm:text-xl ${mutedColor} max-w-2xl mx-auto`}
                 >
-                    Résumés, podcasts, flashcards, quiz, bibliothèque d'épreuves et chat soit tout ce dont vous avez besoin pour réviser, dans une seule interface.
+                    Résumés, podcasts, flashcards, quiz, bibliothèque d'épreuves, chat   et même vos vidéos YouTube transformées en sources de révision. Tout dans une seule interface.
                 </motion.p>
             </motion.div>
 
-            {/* Typing text — in its own component so its re-renders stay isolated */}
+            {/* Typing text   in its own component so its re-renders stay isolated */}
             <TypingText mutedColor={mutedColor} cursorColor={cursorColor} />
 
             <motion.div
@@ -99,7 +100,7 @@ const HeroContent = memo(function HeroContent() {
                 transition={{ duration: 0.5, delay: 0.3 }}
                 className="mt-8 flex flex-wrap justify-center gap-2"
             >
-                {["Résumés", "Flashcards", "Podcasts", "Quiz", "Épreuves", "Chat", "Workspaces"].map(item => (
+                {["Résumés", "Flashcards", "Podcasts", "Quiz", "YouTube", "Épreuves", "Chat", "Workspaces"].map(item => (
                     <span key={item} className={`rounded-full border px-4 py-1.5 text-sm font-medium ${chipStyle}`}>
                         {item}
                     </span>

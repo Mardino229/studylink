@@ -76,7 +76,7 @@ export default function CoinsWallet() {
                         )}
                         {canConvert
                             ? `Convertir (solde : ${coinBalance.toLocaleString('fr-CA', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} coins)`
-                            : `Solde insuffisant — il faut ${CONVERT_THRESHOLD} coins`}
+                            : `Solde insuffisant   il faut ${CONVERT_THRESHOLD} coins`}
                     </button>
                 </div>
 

@@ -232,7 +232,7 @@ const WorkspaceNotebook: React.FC = () => {
                         </div>
                     ) : (
                         <>
-                            {/* Tab bar — desktop only */}
+                            {/* Tab bar   desktop only */}
                             <div className="hidden md:block sticky top-[72px] z-30 -mx-4 mb-6 border-b border-gray-200 bg-white/85 px-4 backdrop-blur dark:border-gray-800 dark:bg-gray-900/85 sm:-mx-6 sm:px-6">
                                 <div className="flex items-center">
                                     <nav className="flex flex-1 gap-6 overflow-x-auto no-scrollbar">
@@ -363,7 +363,7 @@ const WorkspaceNotebook: React.FC = () => {
                 </div>
             </div>
 
-            {/* Mobile bottom navigation — hidden during source gate */}
+            {/* Mobile bottom navigation   hidden during source gate */}
             {!hasNoSources && (
                 <nav className="fixed bottom-0 inset-x-0 z-40 border-t border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-900/90 md:hidden safe-pb">
                     <div className="flex items-stretch">

@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { BookOpen, Bot, Layers, HelpCircle, BookMarked, FolderKanban, Mic } from "lucide-react";
+import { BookOpen, Bot, Layers, HelpCircle, BookMarked, FolderKanban, Mic, Video } from "lucide-react";
 
 const FEATURES = [
     {
@@ -46,21 +46,31 @@ const FEATURES = [
         icon: BookMarked,
         color: "bg-emerald-500/10 text-emerald-500 dark:bg-emerald-500/15 dark:text-emerald-400",
         glow: "bg-emerald-400",
-        span: "lg:col-span-3",
+        span: "lg:col-span-2",
         wide: false,
         title: "Bibliothèque d'épreuves",
         desc: "Accédez aux épreuves passées et à leurs corrigés avec vos jetons (1 jeton par épreuve, 2 pour un corrigé), ou sans limite avec le Pro.",
         n: "05",
     },
     {
+        icon: Video,
+        color: "bg-red-500/10 text-red-500 dark:bg-red-500/15 dark:text-red-400",
+        glow: "bg-red-400",
+        span: "lg:col-span-2",
+        wide: false,
+        title: "Sources YouTube",
+        desc: "Collez un lien YouTube comme n'importe quelle source. Générez ensuite résumé, flashcards et quiz à partir de la vidéo.",
+        n: "06",
+    },
+    {
         icon: FolderKanban,
         color: "bg-orange-500/10 text-orange-500 dark:bg-orange-500/15 dark:text-orange-400",
         glow: "bg-orange-400",
-        span: "lg:col-span-3",
+        span: "lg:col-span-2",
         wide: false,
         title: "Workspaces & Statistiques",
         desc: "Organisez vos notebooks par dossier, suivez votre progression et gardez une vue d'ensemble de vos révisions.",
-        n: "06",
+        n: "07",
     },
     {
         icon: Mic,
@@ -68,10 +78,10 @@ const FEATURES = [
         glow: "bg-violet-400",
         span: "lg:col-span-6",
         wide: true,
-        title: "Audio & Podcasts — Ultra",
+        title: "Audio & Podcasts Ultra",
         desc: "Transformez vos résumés en briefings audio et générez des podcasts complets à partir de vos documents. Écoutez vos révisions en déplacement, en mode mains libres. Disponible en exclusivité avec le plan Ultra.",
-        n: "07",
-        badge: "Ultra",
+        n: "08",
+        badge: "",
     },
 ];
 
@@ -105,7 +115,7 @@ export default function AboutFeatures() {
                         variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
                         className="mt-4 text-lg text-foreground/70"
                     >
-                        Résumés, flashcards, quiz, bibliothèque d'épreuves, chat, podcasts audio et statistiques — réunis dans une seule interface.
+                        Résumés, flashcards, quiz, sources YouTube, bibliothèque d'épreuves, chat, podcasts audio et statistiques   réunis dans une seule interface.
                     </motion.p>
                 </motion.div>
 

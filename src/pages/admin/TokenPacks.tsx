@@ -64,7 +64,7 @@ export default function TokenPacks() {
 
     return (
         <div className="space-y-6">
-            <PageMeta title="Admin — Jetons" description="Gestion des packs de jetons" />
+            <PageMeta title="Admin   Jetons" description="Gestion des packs de jetons" />
             <PageBreadcrumb pageTitle="Packs de jetons" />
 
             {/* ── Pack list + form ── */}

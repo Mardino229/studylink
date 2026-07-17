@@ -69,7 +69,7 @@ export default function ExamLibrary() {
             <div className="space-y-5 pt-4">
                 <div className="flex items-center justify-between">
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Contribuez en soumettant vos épreuves — gagnez des coins !
+                        Contribuez en soumettant vos épreuves   gagnez des coins !
                     </p>
                     <button
                         onClick={() => setSubmitOpen(true)}
@@ -140,13 +140,13 @@ export default function ExamLibrary() {
                         <p className="mb-5 text-sm text-gray-500 dark:text-gray-400">
                             L'accès à cette épreuve coûte{' '}
                             <span className="font-semibold text-violet-600 dark:text-violet-400">1 jeton</span>.
-                            Il est <strong>définitif</strong> — vous ne repayez pas pour rouvrir cette épreuve.
+                            Il est <strong>définitif</strong>   vous ne repayez pas pour rouvrir cette épreuve.
                         </p>
                         <div className="mb-5 flex items-center justify-between rounded-xl bg-gray-50 px-4 py-3 dark:bg-white/5">
                             <span className="text-sm text-gray-500 dark:text-gray-400">Votre solde</span>
                             <span className={`text-sm font-semibold ${tokenBalance >= 1 ? 'text-gray-900 dark:text-white' : 'text-red-500'}`}>
                                 {tokenBalance} jeton{tokenBalance !== 1 ? 's' : ''}
-                                {tokenBalance < 1 && ' — insuffisant'}
+                                {tokenBalance < 1 && '   insuffisant'}
                             </span>
                         </div>
                         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
@@ -181,13 +181,13 @@ export default function ExamLibrary() {
                         <p className="mb-5 text-sm text-gray-500 dark:text-gray-400">
                             Cet accès coûte{' '}
                             <span className="font-semibold text-amber-600 dark:text-amber-400">2 jetons</span>.
-                            Il est <strong>définitif</strong> — vous ne repayez pas pour rouvrir ce corrigé.
+                            Il est <strong>définitif</strong>   vous ne repayez pas pour rouvrir ce corrigé.
                         </p>
                         <div className="mb-5 flex items-center justify-between rounded-xl bg-gray-50 px-4 py-3 dark:bg-white/5">
                             <span className="text-sm text-gray-500 dark:text-gray-400">Votre solde</span>
                             <span className={`text-sm font-semibold ${tokenBalance >= 2 ? 'text-gray-900 dark:text-white' : 'text-red-500'}`}>
                                 {tokenBalance} jeton{tokenBalance !== 1 ? 's' : ''}
-                                {tokenBalance < 2 && ' — insuffisant'}
+                                {tokenBalance < 2 && '   insuffisant'}
                             </span>
                         </div>
                         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">

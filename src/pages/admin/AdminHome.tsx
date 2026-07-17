@@ -106,7 +106,7 @@ export default function AdminHome() {
         </div>
       </div>
 
-      {/* KPIs — revenus détaillés */}
+      {/* KPIs   revenus détaillés */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
           <div className="flex items-center gap-3 mb-3">
@@ -116,7 +116,7 @@ export default function AdminHome() {
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Revenus abonnements (mois)</p>
           </div>
           <h4 className="text-2xl font-bold text-gray-800 dark:text-white/90">
-            {data.kpis?.monthlySubscriptionRevenue?.toLocaleString() ?? '—'} $
+            {data.kpis?.monthlySubscriptionRevenue?.toLocaleString() ?? ' '} $
           </h4>
         </div>
 
@@ -128,7 +128,7 @@ export default function AdminHome() {
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Revenus jetons (mois)</p>
           </div>
           <h4 className="text-2xl font-bold text-gray-800 dark:text-white/90">
-            {data.kpis?.monthlyTokenRevenue?.toLocaleString() ?? '—'} $
+            {data.kpis?.monthlyTokenRevenue?.toLocaleString() ?? ' '} $
           </h4>
         </div>
 
@@ -140,7 +140,7 @@ export default function AdminHome() {
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Jetons consommés (total)</p>
           </div>
           <h4 className="text-2xl font-bold text-gray-800 dark:text-white/90">
-            {data.kpis?.totalTokensSpent?.toLocaleString() ?? '—'}
+            {data.kpis?.totalTokensSpent?.toLocaleString() ?? ' '}
           </h4>
         </div>
       </div>
@@ -194,7 +194,7 @@ export default function AdminHome() {
                     <div className="mb-1 flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
                       <span>{label}</span>
                       <span className="font-semibold">
-                        {d ? `${d.tokensSpent.toLocaleString()} 🪙 · ${d.count} actions · ${pct}%` : '—'}
+                        {d ? `${d.tokensSpent.toLocaleString()} 🪙 · ${d.count} actions · ${pct}%` : ' '}
                       </span>
                     </div>
                     <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">

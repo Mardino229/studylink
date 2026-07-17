@@ -28,17 +28,17 @@ const USER_NAV = [
 
 // ── Admin navigation ─────────────────────────────────────────────
 const ADMIN_NAV = [
-    { label: "Admin — Vue d'ensemble",    desc: "Tableau de bord admin",       path: "/admin/home",              icon: ShieldCheck },
-    { label: "Admin — Utilisateurs",      desc: "Gestion des comptes",         path: "/admin/users",             icon: Users },
-    { label: "Admin — Abonnements",       desc: "Abonnements actifs",          path: "/admin/subscriptions",     icon: BadgeCheck },
-    { label: "Admin — Plans",             desc: "Plans d'abonnement",          path: "/admin/plans",             icon: Layers },
-    { label: "Admin — Jetons",            desc: "Packs de jetons",             path: "/admin/token-packs",       icon: Zap },
-    { label: "Admin — Paiements",         desc: "Historique des transactions",  path: "/admin/payments",          icon: CreditCard },
-    { label: "Admin — Épreuves",          desc: "Bibliothèque d'épreuves",     path: "/admin/exam-library",      icon: BookMarked },
-    { label: "Admin — Annonces",          desc: "Annonces et sondages",        path: "/admin/announcements",     icon: Megaphone },
-    { label: "Admin — Feedbacks",         desc: "Retours utilisateurs",        path: "/admin/feedbacks",         icon: MessageSquare },
-    { label: "Admin — Rapports",          desc: "Rapports et statistiques",    path: "/admin/reports",           icon: BarChart3 },
-    { label: "Admin — Paramètres",        desc: "Configuration système",       path: "/admin/settings",          icon: Settings },
+    { label: "Admin   Vue d'ensemble",    desc: "Tableau de bord admin",       path: "/admin/home",              icon: ShieldCheck },
+    { label: "Admin   Utilisateurs",      desc: "Gestion des comptes",         path: "/admin/users",             icon: Users },
+    { label: "Admin   Abonnements",       desc: "Abonnements actifs",          path: "/admin/subscriptions",     icon: BadgeCheck },
+    { label: "Admin   Plans",             desc: "Plans d'abonnement",          path: "/admin/plans",             icon: Layers },
+    { label: "Admin   Jetons",            desc: "Packs de jetons",             path: "/admin/token-packs",       icon: Zap },
+    { label: "Admin   Paiements",         desc: "Historique des transactions",  path: "/admin/payments",          icon: CreditCard },
+    { label: "Admin   Épreuves",          desc: "Bibliothèque d'épreuves",     path: "/admin/exam-library",      icon: BookMarked },
+    { label: "Admin   Annonces",          desc: "Annonces et sondages",        path: "/admin/announcements",     icon: Megaphone },
+    { label: "Admin   Feedbacks",         desc: "Retours utilisateurs",        path: "/admin/feedbacks",         icon: MessageSquare },
+    { label: "Admin   Rapports",          desc: "Rapports et statistiques",    path: "/admin/reports",           icon: BarChart3 },
+    { label: "Admin   Paramètres",        desc: "Configuration système",       path: "/admin/settings",          icon: Settings },
 ];
 
 // ── Token badge ──────────────────────────────────────────────────
@@ -192,7 +192,7 @@ const AppHeader: React.FC = () => {
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M5.99902 10.4951C6.82745 10.4951 7.49902 11.1667 7.49902 11.9951V12.0051C7.49902 12.8335 6.82745 13.5051 5.99902 13.5051C5.1706 13.5051 4.49902 12.8335 4.49902 12.0051V11.9951C4.49902 11.1667 5.1706 10.4951 5.99902 10.4951ZM17.999 10.4951C18.8275 10.4951 19.499 11.1667 19.499 11.9951V12.0051C19.499 12.8335 18.8275 13.5051 17.999 13.5051C17.1706 13.5051 16.499 12.8335 16.499 12.0051V11.9951C16.499 11.1667 17.1706 10.4951 17.999 10.4951ZM13.499 11.9951C13.499 11.1667 12.8275 10.4951 11.999 10.4951C11.1706 10.4951 10.499 11.1667 10.499 11.9951V12.0051C10.499 12.8335 11.1706 13.5051 11.999 13.5051C12.8275 13.5051 13.499 12.8335 13.499 12.0051V11.9951Z" fill="currentColor" /></svg>
                     </button>
 
-                    {/* Search input — desktop only */}
+                    {/* Search input   desktop only */}
                     <div className="relative hidden lg:block">
                         {/* Input */}
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">

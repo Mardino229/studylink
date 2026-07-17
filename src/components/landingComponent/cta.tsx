@@ -51,7 +51,7 @@ export default function Cta() {
                         Prêt à centraliser vos révisions ?
                     </h2>
                     <p className="mt-4 text-lg text-blue-100 max-w-xl mx-auto">
-                        Créez votre compte, importez vos premiers fichiers et générez résumés, podcasts, flashcards et quiz en quelques secondes.
+                        Créez votre compte, importez vos fichiers ou collez un lien YouTube, et générez résumés, flashcards, quiz et podcasts en quelques secondes.
                     </p>
 
                     <div className="mt-8 flex flex-wrap justify-center gap-3 text-sm text-blue-200">

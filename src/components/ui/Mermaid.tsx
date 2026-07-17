@@ -18,7 +18,7 @@ const sanitizeMermaid = (chart: string): string =>
             /^(\s*subgraph\s+)(?!")([^\n]+\([^\n]*)$/gm,
             (_, pre, title) => `${pre}"${title.trim()}"`,
         )
-        // Replace bare `note "..."` lines — valid only in sequence diagrams, not
+        // Replace bare `note "..."` lines   valid only in sequence diagrams, not
         // flowcharts. Convert to a Mermaid comment (%%) to avoid parse errors.
         .replace(/^(\s*)note\s+"[^"]*"\s*$/gm, '$1%%');
 
@@ -63,7 +63,7 @@ const Mermaid: React.FC<{ chart: string }> = ({ chart }) => {
         return (
             <div className="my-6 space-y-2">
                 <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
-                    Diagramme — syntaxe non supportée, affichage en texte brut :
+                    Diagramme   syntaxe non supportée, affichage en texte brut :
                 </p>
                 <pre className="overflow-x-auto rounded-xl border border-gray-200 bg-gray-50 p-4 text-xs leading-relaxed text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300">
                     {chart}

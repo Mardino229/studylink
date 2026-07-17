@@ -27,10 +27,10 @@ export default function PaymentSuccess() {
     const [attempts, setAttempts] = useState(0);
     const [confirmedTx, setConfirmedTx] = useState<{ amount?: number; label?: string } | null>(null);
 
-    // Subscription polling — fetch last 10 transactions
+    // Subscription polling   fetch last 10 transactions
     const { data: subTransactions, refetch: refetchSub } = useGetTransactions(10, 0);
 
-    // Token pack polling — fetch last 10 token transactions
+    // Token pack polling   fetch last 10 token transactions
     const { data: tokenTransactions, refetch: refetchToken } = useGetTokenTransactions(0, 10);
 
     useEffect(() => {
@@ -57,7 +57,7 @@ export default function PaymentSuccess() {
                     setAttempts(p => p + 1);
                 }
             } else {
-                // token_pack — look for a "purchase" transaction created after checkout
+                // token_pack   look for a "purchase" transaction created after checkout
                 await refetchToken();
                 const tx = (tokenTransactions as TokenTransaction[] | undefined)?.find(
                     t => t.type === "purchase" && t.amount > 0 &&
@@ -124,7 +124,7 @@ export default function PaymentSuccess() {
                                     </h1>
                                 </div>
                                 <p className="text-gray-500 dark:text-gray-400">
-                                    Votre abonnement est désormais actif. Vous avez accès illimité à toutes les fonctionnalités IA — sans jamais consommer de jetons.
+                                    Votre abonnement est désormais actif. Vous avez accès illimité à toutes les fonctionnalités sans jamais consommer de jetons.
                                 </p>
                                 <Button className="w-full" onClick={() => navigate("/subscription")}>
                                     Voir mon abonnement
@@ -166,7 +166,7 @@ export default function PaymentSuccess() {
                         <p className="text-gray-500 dark:text-gray-400">
                             {status === "timeout"
                                 ? isSubscription
-                                    ? "L'activation de votre abonnement prend plus de temps que prévu. Vous serez actif d'ici quelques minutes — rafraîchissez la page paramètres."
+                                    ? "L'activation de votre abonnement prend plus de temps que prévu. Vous serez actif d'ici quelques minutes   rafraîchissez la page paramètres."
                                     : "Le crédit de vos jetons prend plus de temps que prévu. Votre solde sera mis à jour d'ici quelques minutes."
                                 : "Nous n'avons pas pu confirmer votre paiement. Si vous avez été débité, contactez le support."}
                         </p>

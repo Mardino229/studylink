@@ -245,6 +245,20 @@ export const useUploadSource = () => {
     });
 };
 
+export const useAddYoutubeSource = () => {
+    const axiosPrivate = useAxiosPrivate();
+    return useMutation({
+        mutationFn: async ({ notebookId, url }: { notebookId: string; url: string }) => {
+            const response = await axiosPrivate.post<{ data: Source }>(`/notebooks/${notebookId}/sources/youtube`, { url });
+            return response.data.data;
+        },
+        onError: (error) => {
+            const axiosError = error as AxiosError<{ detail: string }>;
+            toast.error("Erreur", { description: axiosError.response?.data?.detail || "URL YouTube invalide" });
+        },
+    });
+};
+
 export const useDeleteSource = () => {
     const queryClient = useQueryClient();
     const axiosPrivate = useAxiosPrivate();

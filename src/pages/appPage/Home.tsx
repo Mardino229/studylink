@@ -46,7 +46,7 @@ export default function Home() {
                 ? subscription?.end_date
                     ? `Jusqu'au ${new Date(subscription.end_date).toLocaleDateString("fr-CA")}`
                     : "Accès illimité"
-                : tokenBalance === 0 ? "Solde vide — rechargez" : `${tokenPurchased} achetés au total`,
+                : tokenBalance === 0 ? "Solde vide   rechargez" : `${tokenPurchased} achetés au total`,
             icon: isPro ? Sparkles : Zap,
             color: isUltra
                 ? "bg-purple-50 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400"
@@ -300,7 +300,7 @@ export default function Home() {
                             icon: HelpCircle,
                             color: "text-amber-600 bg-amber-50 dark:bg-amber-500/10",
                             title: "Quiz IA",
-                            body: "Testez vos connaissances avant un examen avec des questions générées par l'IA.",
+                            body: "Testez vos connaissances avant un examen avec des questions générées.",
                             href: "/workspaces",
                         },
                         {

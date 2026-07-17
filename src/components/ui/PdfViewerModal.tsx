@@ -4,7 +4,7 @@ import { Worker, Viewer, SpecialZoomLevel } from '@react-pdf-viewer/core';
 import { toolbarPlugin, type TransformToolbarSlot } from '@react-pdf-viewer/toolbar';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/toolbar/lib/styles/index.css';
-// @ts-ignore — Vite ?url import for the local pdfjs worker
+// @ts-ignore   Vite ?url import for the local pdfjs worker
 import WORKER_URL from 'pdfjs-dist/build/pdf.worker.min.js?url';
 
 type Props = {

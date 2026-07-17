@@ -6,7 +6,7 @@ import { Worker, Viewer, SpecialZoomLevel } from '@react-pdf-viewer/core';
 import { toolbarPlugin, type TransformToolbarSlot } from '@react-pdf-viewer/toolbar';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/toolbar/lib/styles/index.css';
-// @ts-ignore — Vite ?url import
+// @ts-ignore   Vite ?url import
 import WORKER_URL from 'pdfjs-dist/build/pdf.worker.min.js?url';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAxiosPrivate } from '../../hoooks/useAxiosPrivate';
@@ -134,7 +134,7 @@ export default function ExamSolution() {
                     </Worker>
                 )}
 
-                {/* 402 — Insufficient tokens */}
+                {/* 402   Insufficient tokens */}
                 {status === 'error402' && (
                     <div className="flex flex-1 flex-col items-center justify-center gap-6 px-6 text-center">
                         <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-amber-50 dark:bg-amber-500/10">
@@ -146,7 +146,7 @@ export default function ExamSolution() {
                                 Ce fichier est payant. Il faut{' '}
                                 <span className="font-semibold text-amber-600 dark:text-amber-400">{cost} jeton{cost > 1 ? 's' : ''}</span>{' '}
                                 pour y accéder.
-                                <br />L'accès est ensuite définitif — vous ne repayez pas pour rouvrir ce fichier.
+                                <br />L'accès est ensuite définitif   vous ne repayez pas pour rouvrir ce fichier.
                             </p>
                         </div>
                         <div className="flex flex-col gap-3 sm:flex-row">
@@ -175,7 +175,7 @@ export default function ExamSolution() {
                 )}
                 
 
-                {/* 404 — No solution uploaded */}
+                {/* 404   No solution uploaded */}
                 {status === 'error404' && (
                     <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
                         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800">

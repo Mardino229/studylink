@@ -51,7 +51,7 @@ export default function SubmitExamModal({ isOpen, onClose, courses }: {
                 </div>
                 <div>
                     <h3 className="text-base font-semibold text-gray-900 dark:text-white">Soumettre une épreuve</h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Elle sera vérifiée avant publication — vous gagnerez 0,5 coin.</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Elle sera vérifiée avant publication   vous gagnerez 0,5 coin.</p>
                 </div>
             </div>
 
@@ -67,7 +67,7 @@ export default function SubmitExamModal({ isOpen, onClose, courses }: {
                         value={form.course_id}
                         onChange={(id) => setForm(p => ({ ...p, course_id: id }))}
                         courses={courses}
-                        placeholder="— Cours —"
+                        placeholder="  Cours  "
                     />
                     <input
                         type="number"
@@ -77,13 +77,13 @@ export default function SubmitExamModal({ isOpen, onClose, courses }: {
                         className={inputCls}
                     />
                     <select value={form.session} onChange={(e) => setForm(p => ({ ...p, session: e.target.value as ExamSession | '' }))} className={selectCls}>
-                        <option value="">— Session —</option>
+                        <option value="">  Session  </option>
                         <option value="fall">Automne</option>
                         <option value="winter">Hiver</option>
                         <option value="summer">Printemps/Été</option>
                     </select>
                     <select value={form.exam_type} onChange={(e) => setForm(p => ({ ...p, exam_type: e.target.value as ExamType | '' }))} className={selectCls}>
-                        <option value="">— Type —</option>
+                        <option value="">  Type  </option>
                         <option value="midterm">Intra</option>
                         <option value="final">Final</option>
                         <option value="quiz">Quiz</option>
@@ -96,7 +96,7 @@ export default function SubmitExamModal({ isOpen, onClose, courses }: {
                     <input type="file" accept=".pdf,.docx,.pptx,.ppt" onChange={(e) => setExamFile(e.target.files?.[0] ?? null)} className={fileCls} />
                 </div>
                 <div>
-                    <label className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400">Corrigé (optionnel — +0,5 coin supplémentaire si validé)</label>
+                    <label className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400">Corrigé (optionnel   +0,5 coin supplémentaire si validé)</label>
                     <input type="file" accept=".pdf,.docx,.pptx,.ppt" onChange={(e) => setSolutionFile(e.target.files?.[0] ?? null)} className={fileCls} />
                 </div>
 

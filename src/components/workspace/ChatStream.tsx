@@ -48,7 +48,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
     // Pending optimistic messages for the current in-flight exchange.
-    // Kept separate from real DB messages — never merged by content.
+    // Kept separate from real DB messages   never merged by content.
     const [pendingUserMsg, setPendingUserMsg] = useState<Message | null>(null);
     const [streamingAssistantMsg, setStreamingAssistantMsg] = useState<Message | null>(null);
     const [input, setInput] = useState('');
@@ -550,10 +550,10 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                 {/* Input Area */}
                 <div className="border-t border-border bg-white dark:bg-slate-900">
                     {!sessionId && !isLoadingChatSessions ? (
-                        /* No session — CTA to create one */
+                        /* No session   CTA to create one */
                         <div className="flex items-center justify-between gap-3 px-4 py-3">
                             <p className="text-sm text-slate-500 dark:text-slate-400">
-                                Aucune session active — créez-en une pour commencer à discuter.
+                                Aucune session active   créez-en une pour commencer à discuter.
                             </p>
                             <button
                                 type="button"
@@ -565,7 +565,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                             </button>
                         </div>
                     ) : isLoadingChatSessions ? (
-                        /* Loading — neutral skeleton */
+                        /* Loading   neutral skeleton */
                         <div className="flex items-center justify-center py-4">
                             <div className="h-10 w-full max-w-3xl mx-4 animate-pulse rounded-full bg-slate-100 dark:bg-slate-800" />
                         </div>

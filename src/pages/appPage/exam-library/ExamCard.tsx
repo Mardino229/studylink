@@ -33,7 +33,7 @@ export default function ExamCard({ exam, isPro, tokenBalance, isUnlocked, onView
         ? 'Voir le corrigé (déjà acheté)'
         : canAccessWithTokens
         ? 'Voir le corrigé (🪙 2 jetons)'
-        : 'Solde insuffisant — 2 jetons requis';
+        : 'Solde insuffisant   2 jetons requis';
 
     return (
         <div className="flex flex-col rounded-2xl border border-gray-200 bg-white p-5 lg:shadow-sm transition-shadow hover:shadow-md dark:border-gray-800 dark:bg-gray-900/80">

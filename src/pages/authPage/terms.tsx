@@ -120,16 +120,16 @@ export default function Terms() {
                                     <h2>6. Jetons et paiements</h2>
                                     <ul>
                                         <li>
-                                            <strong>Packs de jetons</strong> — les jetons achetés n'ont pas de date
+                                            <strong>Packs de jetons</strong>   les jetons achetés n'ont pas de date
                                             d'expiration mais ne sont pas remboursables une fois achetés.
                                         </li>
                                         <li>
-                                            <strong>Abonnement Pro</strong> — l'abonnement est renouvelé automatiquement
+                                            <strong>Abonnement Pro</strong>   l'abonnement est renouvelé automatiquement
                                             (mensuel ou annuel) et peut être annulé à tout moment depuis vos paramètres.
                                             Aucun remboursement n'est accordé pour la période en cours.
                                         </li>
                                         <li>
-                                            <strong>Accès aux épreuves</strong> — l'accès à une épreuve (1 jeton) ou à
+                                            <strong>Accès aux épreuves</strong>   l'accès à une épreuve (1 jeton) ou à
                                             un corrigé (2 jetons) est permanent : une fois débloqué, il reste accessible
                                             indéfiniment, même après la fin d'un abonnement Pro.
                                         </li>

@@ -88,7 +88,7 @@ export default function MySubmissions() {
             {/* Coins info banner */}
             <div className="mb-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/30 dark:bg-amber-900/10">
                 <p className="text-sm text-amber-800 dark:text-amber-300">
-                    <span className="font-semibold">Gagnez des coins 🪙</span> — chaque épreuve ou corrigé validé par l'équipe vous rapporte <strong>0,5 coin</strong>.
+                    <span className="font-semibold">Gagnez des coins 🪙</span>   chaque épreuve ou corrigé validé par l'équipe vous rapporte <strong>0,5 coin</strong>.
                     Convertissez <strong>5 coins → 1 jeton</strong> depuis votre{' '}
                     <a href="/coins" className="underline underline-offset-2">wallet</a>.
                 </p>
@@ -158,7 +158,7 @@ export default function MySubmissions() {
                     </p>
                     <SubmissionList
                         isLoading={loadingMissing}
-                        empty={{ icon: CheckCircle2, text: 'Toutes les épreuves ont déjà un corrigé — revenez plus tard !' }}
+                        empty={{ icon: CheckCircle2, text: 'Toutes les épreuves ont déjà un corrigé   revenez plus tard !' }}
                     >
                         {missingSolutions.map(exam => (
                             <MissingSolutionCard

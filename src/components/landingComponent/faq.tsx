@@ -1,16 +1,20 @@
 const FAQS = [
     {
         q: "Que permet StudyLink ?",
-        a: "StudyLink centralise vos outils d'étude : génération de résumés, flashcards et quiz à partir de vos fichiers, bibliothèque d'examens avec corrigés, chat , workspaces et statistiques de progression.",
+        a: "StudyLink centralise vos outils d'étude : génération de résumés, flashcards et quiz à partir de vos fichiers ou de vidéos YouTube, bibliothèque d'examens avec corrigés, chat, podcasts audio et statistiques de progression. Tout part d'une source   un PDF, un PPTX ou un lien YouTube   et StudyLink s'occupe du reste.",
         open: true,
     },
     {
+        q: "Puis-je utiliser une vidéo YouTube comme source ?",
+        a: "Oui. Collez l'URL d'une vidéo YouTube publique (youtube.com/watch, youtu.be ou youtube.com/shorts) dans votre workspace : Notre app extrait le contenu et l'indexe comme n'importe quelle source. Générez ensuite résumé, flashcards et quiz à partir de la vidéo. Les vidéos privées ou non listées ne sont pas supportées, et la durée maximale est d'environ 1 heure.",
+    },
+    {
         q: "Comment fonctionne le système de jetons ?",
-        a: "Chaque action IA consomme des jetons : 1 jeton pour générer un résumé, des flashcards ou un quiz, 1 jeton par tranche de 10 messages de chat, et 2 jetons pour accéder à un corrigé payant. Vous achetez un pack de jetons (Starter, Standard ou Maxi) et les utilisez à votre rythme — sans date d'expiration.",
+        a: "Chaque fonctionnalité consomme des jetons : 1 jeton pour générer un résumé, des flashcards ou un quiz, 1 jeton par tranche de 10 messages de chat, et 2 jetons pour accéder à un corrigé payant. Vous achetez un pack de jetons (Starter, Standard ou Maxi) et les utilisez à votre rythme   sans date d'expiration.",
     },
     {
         q: "Quelle est la différence entre l'abonnement Pro et les packs de jetons ?",
-        a: "Avec les packs de jetons, vous payez à la consommation. L'abonnement Pro donne un accès illimité à toutes les fonctionnalités IA, sans jamais déduire de jetons. Pro est idéal si vous générez beaucoup de contenu chaque mois.",
+        a: "Avec les packs de jetons, vous payez à la consommation. L'abonnement Pro donne un accès illimité à toutes les fonctionnalités, sans jamais déduire de jetons. Pro est idéal si vous générez beaucoup de contenu chaque mois.",
     },
     {
         q: "Les corrigés sont-ils tous payants ?",
@@ -22,7 +26,7 @@ const FAQS = [
     },
     {
         q: "Puis-je utiliser StudyLink sur mobile ?",
-        a: "Oui. L'interface est responsive et pensée pour s'adapter aux petits écrans — que ce soit sur la landing ou dans l'application elle-même.",
+        a: "Oui. L'interface est responsive et pensée pour s'adapter aux petits écrans   que ce soit sur la landing ou dans l'application elle-même.",
     },
 ];
 

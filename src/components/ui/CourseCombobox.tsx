@@ -61,7 +61,7 @@ export default function CourseCombobox({
                         />
                     ) : (
                         <span className={`w-36 truncate ${selected ? 'text-gray-900 dark:text-white' : 'text-gray-400'}`}>
-                            {selected ? `${selected.code} — ${selected.name}` : placeholder}
+                            {selected ? `${selected.code}   ${selected.name}` : placeholder}
                         </span>
                     )}
                     {selected && !open
@@ -84,7 +84,7 @@ export default function CourseCombobox({
                                     className={`w-full px-3 py-2 text-left text-xs transition-colors hover:bg-gray-50 dark:hover:bg-white/5 ${value === c.id ? 'font-semibold text-blue-600 dark:text-blue-400' : 'text-gray-900 dark:text-white'}`}
                                 >
                                     <span className="font-mono text-blue-500 dark:text-blue-400">{c.code}</span>
-                                    {' — '}{c.name}
+                                    {'   '}{c.name}
                                 </button>
                             ))
                         }
@@ -111,7 +111,7 @@ export default function CourseCombobox({
                     />
                 ) : (
                     <span className={`flex-1 truncate ${selected ? 'text-gray-800 dark:text-white' : 'text-gray-400'}`}>
-                        {selected ? `${selected.code} — ${selected.name}` : placeholder}
+                        {selected ? `${selected.code}   ${selected.name}` : placeholder}
                     </span>
                 )}
                 {selected && !open
@@ -134,7 +134,7 @@ export default function CourseCombobox({
                                 className={`w-full px-3 py-2.5 text-left text-sm transition-colors hover:bg-gray-50 dark:hover:bg-white/5 ${value === c.id ? 'font-semibold text-blue-600 dark:text-blue-400' : 'text-gray-800 dark:text-white'}`}
                             >
                                 <span className="font-mono text-blue-500 dark:text-blue-400">{c.code}</span>
-                                {' — '}{c.name}
+                                {'   '}{c.name}
                             </button>
                         ))
                     }
