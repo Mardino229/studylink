@@ -25,7 +25,7 @@ export default function Feature() {
                         className="mt-4 text-lg text-foreground/70 max-w-2xl mx-auto"
                     >
                         Discover the powerful tools that make
-                        StudyLink the ultimate academic companion.
+                        GoStudyEasy the ultimate academic companion.
                     </motion.p>
                 </div>
                 <motion.div

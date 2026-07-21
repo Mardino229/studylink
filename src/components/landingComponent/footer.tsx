@@ -1,6 +1,7 @@
 
 
 import { Link } from "react-router-dom";
+import logo from "../../assets/study-removebg-preview.png";
 
 export default function Footer() {
 
@@ -10,11 +11,8 @@ export default function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                     <div className="md:col-span-1">
                         <div className="flex items-center gap-3">
-                            <svg className="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 48 48"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path d="M6 6H42L36 24L42 42H6L12 24L6 6Z" fill="currentColor"></path>
-                            </svg>
-                            <h2 className="text-foreground text-2xl font-bold">StudyLink</h2>
+                            <img src={logo} alt="GoStudyEasy" className="h-8 w-auto" />
+                            <h2 className="text-foreground text-2xl font-bold">GoStudyEasy</h2>
                         </div>
                         <p className="mt-4 text-sm">Une plateforme pour résumer, réviser et organiser vos études plus simplement.</p>
                     </div>
@@ -46,7 +44,7 @@ export default function Footer() {
                 </div>
                 <div
                     className="mt-12 border-t border-border pt-8 flex flex-col sm:flex-row justify-between items-center">
-                    <p className="text-sm">© 2026 StudyLink. Tous droits réservés.</p>
+                    <p className="text-sm">© 2026 GoStudyEasy. Tous droits réservés.</p>
                     <div className="flex gap-4 mt-4 sm:mt-0">
                         <a className="text-foreground/70 hover:text-foreground" href="#">
                             <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24"

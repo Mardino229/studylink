@@ -80,7 +80,7 @@ const HeroContent = memo(function HeroContent() {
                     variants={{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.7 } } }}
                     className={`text-4xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tighter ${textColor}`}
                 >
-                    Révisez plus vite avec StudyLink
+                    Révisez plus vite avec GoStudyEasy
                 </motion.h1>
 
                 <motion.p

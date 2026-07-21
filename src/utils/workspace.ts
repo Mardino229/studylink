@@ -584,3 +584,40 @@ export const useGetArtefactPodcasts = (notebookId: string, options: PaginationOp
         enabled: !!notebookId,
     });
 };
+
+// ─── Flashcard position & status ─────────────────────────
+
+export const useUpdateFlashcardPosition = () => {
+    const axiosPrivate = useAxiosPrivate();
+    return useMutation({
+        mutationFn: async ({ notebookId, flashcardId, currentIndex }: { notebookId: string; flashcardId: string; currentIndex: number }) => {
+            const response = await axiosPrivate.patch<{ data: ArtefactFlashcard }>(
+                `/notebooks/${notebookId}/artefacts/flashcards/${flashcardId}/position`,
+                { current_index: currentIndex }
+            );
+            return response.data.data;
+        },
+    });
+};
+
+export const useSetFlashcardItemStatus = () => {
+    const axiosPrivate = useAxiosPrivate();
+    return useMutation({
+        mutationFn: async ({ notebookId, flashcardId, itemIndex, status }: {
+            notebookId: string;
+            flashcardId: string;
+            itemIndex: number;
+            status: 'review_again' | null;
+        }) => {
+            const response = await axiosPrivate.patch<{ data: ArtefactFlashcard }>(
+                `/notebooks/${notebookId}/artefacts/flashcards/${flashcardId}/items/${itemIndex}/status`,
+                { status }
+            );
+            return response.data.data;
+        },
+        onError: (error) => {
+            const axiosError = error as AxiosError<{ detail: string }>;
+            toast.error("Erreur", { description: axiosError.response?.data?.detail || "Impossible de mettre à jour le statut" });
+        },
+    });
+};

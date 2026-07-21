@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import logo from "../assets/study-removebg-preview.png";
 
 // Assume these icons are imported from an icon library
 import {
@@ -101,7 +102,6 @@ const othersItems: NavItem[] = [
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const location = useLocation();
-
   const [openSubmenu, setOpenSubmenu] = useState<{
     type: "main" | "others";
     index: number;
@@ -309,19 +309,10 @@ const AppSidebar: React.FC = () => {
           !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
         }`}
       >
-        <Link to="/">
-          {isExpanded || isHovered || isMobileOpen ? (
-            <>
-              <svg className="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 48 48"
-                  xmlns="http://www.w3.org/2000/svg">
-              <path d="M6 6H42L36 24L42 42H6L12 24L6 6Z" fill="currentColor"></path>
-                </svg>
-            </>
-          ) : (
-              <svg className="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 48 48"
-                   xmlns="http://www.w3.org/2000/svg">
-                  <path d="M6 6H42L36 24L42 42H6L12 24L6 6Z" fill="currentColor"></path>
-              </svg>
+        <Link to="/" className="flex items-center gap-2">
+          <img src={logo} alt="GoStudyEasy" className="h-8 w-auto shrink-0" />
+          {(isExpanded || isHovered || isMobileOpen) && (
+            <span className="text-lg font-bold text-foreground whitespace-nowrap">GoStudyEasy</span>
           )}
         </Link>
       </div>

@@ -9,8 +9,8 @@ import PasswordChangeCard from "../../components/common/PasswordChangeCard.tsx";
 export default function AdminSettings() {
   const [maintenance, setMaintenance] = useState(false);
   const [allowRegistration, setAllowRegistration] = useState(true);
-  const [emailFrom, setEmailFrom] = useState("no-reply@studylink.app");
-  const [supportEmail, setSupportEmail] = useState("support@studylink.app");
+  const [emailFrom, setEmailFrom] = useState("no-reply@gostudyeasy.app");
+  const [supportEmail, setSupportEmail] = useState("support@gostudyeasy.app");
 
   const save = () => {
     toast.success("Paramètres enregistrés");

@@ -75,9 +75,9 @@ export interface ArtefactQuiz {
 }
 
 export interface ArtefactFlashcardItem {
-  id?: string;
   front: string;
   back: string;
+  status?: 'review_again' | null;
 }
 
 export interface ArtefactFlashcard {
@@ -85,6 +85,7 @@ export interface ArtefactFlashcard {
   notebook_id: string;
   items: ArtefactFlashcardItem[];
   title?: string;
+  current_index?: number;
   created_at?: string;
   updated_at?: string;
 }

@@ -164,7 +164,7 @@ const useVerify = () => {
         },
         onSuccess: ({ user }) => {
             if (user) {
-                toast.success("Compte activé !", { description: "Bienvenue sur StudyLink." });
+                toast.success("Compte activé !", { description: "Bienvenue sur GoStudyEasy." });
                 if (user.role?.name === 'admin') navigate('/admin/home');
                 else if (user.study_level_id === null) navigate('/complete-profile');
                 else navigate('/home');

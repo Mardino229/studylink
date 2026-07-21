@@ -63,7 +63,7 @@ export default function SettingsFeedback() {
                     </div>
                     <h2 className="text-xl font-bold text-gray-900 dark:text-white">Message envoyé !</h2>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Notre équipe prendra en compte votre retour. Merci de contribuer à l'amélioration de StudyLink.
+                        Notre équipe prendra en compte votre retour. Merci de contribuer à l'amélioration de GoStudyEasy.
                     </p>
                     <div className="flex gap-3 mt-2">
                         <button

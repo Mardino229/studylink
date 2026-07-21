@@ -6,7 +6,7 @@ import { useGetPlans } from "../../utils/plan";
 import { useGetPublicTokenPacks } from "../../utils/billing";
 
 const TIER_FEATURES = [
-    { label: "Voir ses anciens artefacts",         free: true,  tokens: true,    pro: true,  ultra: true  },
+    { label: "Accéder à ses outils de révision",   free: true,  tokens: true,    pro: true,  ultra: true  },
     { label: "Sources YouTube (vidéos publiques)", free: true,  tokens: true,    pro: true,  ultra: true  },
     { label: "Épreuves",                           free: false, tokens: "1 🪙",  pro: true,  ultra: true  },
     { label: "Générer résumés / flashcards / quiz", free: false, tokens: "1 🪙", pro: true,  ultra: true  },
@@ -180,7 +180,7 @@ export default function Pricing() {
                         <p className="text-xs font-semibold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-2">Abonnements</p>
                         <h3 className="text-2xl sm:text-3xl font-bold text-foreground">Tout illimité, sans compter les jetons</h3>
                         <p className="mt-3 text-foreground/60 max-w-xl mx-auto">
-                            Pro pour un accès illimité aux artefacts et corrigés. Ultra pour tout ça, plus les podcasts et résumés audio inclus.
+                            Pro pour un accès illimité à tous vos outils de révision et corrigés. Ultra pour tout ça, plus les podcasts et résumés audio inclus.
                         </p>
 
                         {/* Billing toggle */}

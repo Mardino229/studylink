@@ -81,7 +81,7 @@ export default function Testimonial() {
                     >
                         Ce que vous pouvez faire avec{" "}
                         <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                            StudyLink
+                            GoStudyEasy
                         </span>
                     </motion.h2>
                     <motion.p

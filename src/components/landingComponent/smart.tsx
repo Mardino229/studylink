@@ -32,7 +32,7 @@ const STEPS = [
         color: "bg-emerald-500/10 text-emerald-500 dark:bg-emerald-500/15 dark:text-emerald-400",
         badge: "bg-emerald-600",
         title: "Suivez votre progression",
-        desc: "Vos statistiques, notebooks et artefacts restent accessibles en permanence, même après désabonnement.",
+        desc: "Vos statistiques, notebooks et outils de révision restent accessibles en permanence, même après désabonnement.",
     },
 ];
 
@@ -71,7 +71,7 @@ export default function Smart() {
                                 variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
                                 className="mt-4 text-lg text-foreground/70"
                             >
-                                StudyLink centralise vos cours, vos résumés, vos examens, votre assistant et vos statistiques.
+                                GoStudyEasy centralise vos cours, vos résumés, vos examens, votre assistant et vos statistiques.
                             </motion.p>
                         </motion.div>
 

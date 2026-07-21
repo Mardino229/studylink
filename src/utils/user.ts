@@ -44,7 +44,7 @@ const useCompleteProfile = () => {
             })
         },
         onSuccess: () => {
-            navigate(`/home`);
+            navigate('/onboarding');
         },
         onError: (error) => {
             console.error(error);

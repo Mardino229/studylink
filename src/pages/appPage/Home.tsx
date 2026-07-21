@@ -12,10 +12,6 @@ import { useBilling } from "../../context/BillingContext";
 import { useGetTokenStats } from "../../utils/billing";
 import { useGetNotebooks } from "../../utils/workspace";
 
-const fadeUp = {
-    hidden: { opacity: 0, y: 16 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
-};
 const container = {
     hidden: {},
     show: { transition: { staggerChildren: 0.07 } },
@@ -67,7 +63,7 @@ export default function Home() {
         },
         {
             value: String(artefactCount),
-            label: "Artefacts générés",
+            label: "Outils de révision générés",
             sub: "Résumés, flashcards & quiz",
             icon: Layers,
             color: "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400",
@@ -100,7 +96,7 @@ export default function Home() {
 
     return (
         <>
-            <PageMeta title="Dashboard" description="Tableau de bord StudyLink" />
+            <PageMeta title="Dashboard" description="Tableau de bord GoStudyEasy" />
             <PageBreadcrumb pageTitle="Dashboard" />
 
             <div className="space-y-6 pb-6">

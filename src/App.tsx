@@ -11,6 +11,7 @@ import Register from "./pages/authPage/register.tsx";
 import ConfirmAccount from "./pages/authPage/confirmAccount.tsx";
 import ResetPassword from "./pages/authPage/resetPassword.tsx";
 import CompleteProfile from "./pages/authPage/completeProfile.tsx";
+import Onboarding from "./pages/authPage/Onboarding.tsx";
 import Home from "./pages/appPage/Home.tsx";
 import AppLayout from "./layout/AppLayout.tsx";
 import { ScrollToTop } from "./components/common/ScrollToTop.tsx";
@@ -70,6 +71,7 @@ function App() {
 
                 <Route element={<RequireAuth />}>
                     <Route path="/complete-profile" element={<CompleteProfile />} />
+                    <Route path="/onboarding" element={<Onboarding />} />
                     <Route path="/exam-library/solution/:examId" element={<ExamSolution />} />
                     <Route element={<AppLayout />}>
                         <Route path="/home" element={<Home />} />

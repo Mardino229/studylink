@@ -8,6 +8,8 @@ export type Flashcard = {
     summary_id: string;
     question: string;
     answer: string;
+    itemIndex?: number;
+    status?: 'review_again' | null;
 };
 
 export type QuizQuestion = {

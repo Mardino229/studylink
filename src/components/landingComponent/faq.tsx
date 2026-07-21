@@ -1,7 +1,7 @@
 const FAQS = [
     {
-        q: "Que permet StudyLink ?",
-        a: "StudyLink centralise vos outils d'étude : génération de résumés, flashcards et quiz à partir de vos fichiers ou de vidéos YouTube, bibliothèque d'examens avec corrigés, chat, podcasts audio et statistiques de progression. Tout part d'une source   un PDF, un PPTX ou un lien YouTube   et StudyLink s'occupe du reste.",
+        q: "Que permet GoStudyEasy ?",
+        a: "GoStudyEasy centralise vos outils d'étude : génération de résumés, flashcards et quiz à partir de vos fichiers ou de vidéos YouTube, bibliothèque d'examens avec corrigés, chat, podcasts audio et statistiques de progression. Tout part d'une source   un PDF, un PPTX ou un lien YouTube   et GoStudyEasy s'occupe du reste.",
         open: true,
     },
     {
@@ -21,11 +21,11 @@ const FAQS = [
         a: "Non. Certains corrigés sont gratuits et accessibles sans jeton. Les corrigés marqués \"payants\" nécessitent soit 2 jetons, soit un abonnement Pro actif. Le téléchargement des épreuves (sans corrigé) est toujours gratuit.",
     },
     {
-        q: "Mes anciens résumés et artefacts disparaissent-ils si je n'ai plus de jetons ?",
-        a: "Non. Les artefacts déjà générés (résumés, flashcards, quiz) restent accessibles indéfiniment, même si votre solde de jetons tombe à zéro ou si votre abonnement Pro expire.",
+        q: "Mes outils de révision disparaissent-ils si je n'ai plus de jetons ?",
+        a: "Non. Vos outils de révision déjà générés (résumés, flashcards, quiz) restent accessibles indéfiniment, même si votre solde de jetons tombe à zéro ou si votre abonnement Pro expire.",
     },
     {
-        q: "Puis-je utiliser StudyLink sur mobile ?",
+        q: "Puis-je utiliser GoStudyEasy sur mobile ?",
         a: "Oui. L'interface est responsive et pensée pour s'adapter aux petits écrans   que ce soit sur la landing ou dans l'application elle-même.",
     },
 ];
@@ -37,7 +37,7 @@ export default function Faq() {
                 <div className="text-center">
                     <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">Questions fréquentes</h2>
                     <p className="mt-4 text-lg text-foreground/70 max-w-2xl mx-auto">
-                        Tout ce que vous devez savoir sur StudyLink, les jetons et les abonnements.
+                        Tout ce que vous devez savoir sur GoStudyEasy, les jetons et les abonnements.
                     </p>
                 </div>
                 <div className="mt-16 max-w-4xl mx-auto space-y-4">

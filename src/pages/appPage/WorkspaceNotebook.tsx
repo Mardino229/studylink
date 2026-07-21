@@ -441,7 +441,6 @@ const WorkspaceNotebook: React.FC = () => {
                                     type="text"
                                     //value={generationTitle}
                                     onChange={(e) => setGenerationTitle(e.target.value)}
-                                    placeholder="Ex: Notebook - Résumé"
                                     className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 dark:border-gray-800 dark:bg-gray-900 dark:text-white"
                                 />
                             </div>

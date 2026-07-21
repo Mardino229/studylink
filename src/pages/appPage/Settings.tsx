@@ -83,7 +83,7 @@ export default function Settings() {
 
             <section className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5">
               <h2 className="text-base font-semibold mb-3">Support & Feedback</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Signalez un bug, suggérez une fonctionnalité ou partagez votre avis sur StudyLink.</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Signalez un bug, suggérez une fonctionnalité ou partagez votre avis sur GoStudyEasy.</p>
               <Button className="w-full mt-3" variant="outline" onClick={() => navigate("/settings/feedback")}>Contacter le support</Button>
             </section>
           </div>

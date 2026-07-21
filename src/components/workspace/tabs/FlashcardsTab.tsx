@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Layers, Trash2, Clock, Menu, Sparkles } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Layers, Trash2, Clock, Menu, Sparkles, Bookmark } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StackPreview } from '../../summary/flashcards/flashcards';
 import type { ArtefactFlashcard, PaginatedResponse } from '../../../types/workspace';
+import { useUpdateFlashcardPosition, useSetFlashcardItemStatus } from '../../../utils/workspace';
 
 interface FlashcardsTabProps {
     flashcards?: PaginatedResponse<ArtefactFlashcard>;
@@ -28,6 +29,10 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
     const [selectedFlashcardBatchId, setSelectedFlashcardBatchId] = useState<string | null>(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
+    const [filter, setFilter] = useState<'all' | 'flagged'>('all');
+
+    const updatePosition = useUpdateFlashcardPosition();
+    const setItemStatus = useSetFlashcardItemStatus();
 
     const flashcardBatchesList = flashcards?.items ?? [];
 
@@ -41,16 +46,39 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
         }
     }, [flashcardBatchesList, selectedFlashcardBatchId]);
 
-    const selectedFlashcardBatch = flashcardBatchesList.find(batch => batch.id === selectedFlashcardBatchId) ?? flashcardBatchesList[0] ?? null;
+    // Reset filter when batch changes
+    useEffect(() => {
+        setFilter('all');
+    }, [selectedFlashcardBatchId]);
+
+    const selectedFlashcardBatch = flashcardBatchesList.find(b => b.id === selectedFlashcardBatchId) ?? flashcardBatchesList[0] ?? null;
+
     const selectedFlashcards = selectedFlashcardBatch?.items.map((item, index) => ({
-        id: item.id || `${selectedFlashcardBatch.id}-${index}`,
+        id: `${selectedFlashcardBatch.id}-${index}`,
         summary_id: selectedFlashcardBatch.id,
         question: item.front,
         answer: item.back,
+        itemIndex: index,
+        status: item.status,
     })) ?? [];
 
+    const flaggedCount = selectedFlashcards.filter(fc => fc.status === 'review_again').length;
+    const displayedFlashcards = filter === 'flagged'
+        ? selectedFlashcards.filter(fc => fc.status === 'review_again')
+        : selectedFlashcards;
+
+    const handleNavigate = useCallback((itemIndex: number) => {
+        if (!selectedFlashcardBatch || !notebookId) return;
+        updatePosition.mutate({ notebookId, flashcardId: selectedFlashcardBatch.id, currentIndex: itemIndex });
+    }, [selectedFlashcardBatch, notebookId, updatePosition]);
+
+    const handleToggleStatus = useCallback((itemIndex: number, newStatus: 'review_again' | null) => {
+        if (!selectedFlashcardBatch || !notebookId) return;
+        setItemStatus.mutate({ notebookId, flashcardId: selectedFlashcardBatch.id, itemIndex, status: newStatus });
+    }, [selectedFlashcardBatch, notebookId, setItemStatus]);
+
     const SidebarContent = () => (
-        <div className="flex h-full flex-col ">
+        <div className="flex h-full flex-col">
             {/* Sidebar Header */}
             <div className="p-4 space-y-3">
                 <div className="flex items-center justify-between">
@@ -67,13 +95,45 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
                         Générer
                     </button>
                 </div>
-                
+
+                {/* Filter tabs */}
+                {selectedFlashcardBatch && (
+                    <div className="flex gap-1 rounded-lg bg-gray-100 dark:bg-white/5 p-0.5">
+                        <button
+                            onClick={() => setFilter('all')}
+                            className={`flex-1 rounded-md px-2 py-1 text-xs font-semibold transition-all ${
+                                filter === 'all'
+                                    ? 'bg-white dark:bg-white/10 text-foreground shadow-sm'
+                                    : 'text-muted-foreground hover:text-foreground'
+                            }`}
+                        >
+                            Toutes
+                        </button>
+                        <button
+                            onClick={() => setFilter('flagged')}
+                            className={`flex-1 inline-flex items-center justify-center gap-1 rounded-md px-2 py-1 text-xs font-semibold transition-all ${
+                                filter === 'flagged'
+                                    ? 'bg-white dark:bg-white/10 text-amber-500 shadow-sm'
+                                    : 'text-muted-foreground hover:text-foreground'
+                            }`}
+                        >
+                            <Bookmark size={10} fill={filter === 'flagged' ? 'currentColor' : 'none'} />
+                            À revoir
+                            {flaggedCount > 0 && (
+                                <span className="ml-0.5 rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 px-1 text-[9px] font-bold">
+                                    {flaggedCount}
+                                </span>
+                            )}
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* Sidebar Item List */}
             <div className="flex-1 overflow-y-auto p-3 space-y-2">
                 {flashcardBatchesList.map((batch) => {
                     const isActive = selectedFlashcardBatch?.id === batch.id;
+                    const batchFlaggedCount = batch.items.filter(i => i.status === 'review_again').length;
                     return (
                         <div
                             key={batch.id}
@@ -90,12 +150,20 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
                                 }}
                                 className="w-full text-left pr-8"
                             >
-                                <p className="truncate text-sm font-semibold text-foreground">{batch.title || 'Flashcards'} ({batch.items.length} cartes)</p>
+                                <p className="truncate text-sm font-semibold text-foreground">
+                                    {batch.title || 'Flashcards'} ({batch.items.length} cartes)
+                                </p>
                                 <div className="mt-1 flex items-center gap-3 text-xs text-foreground/50">
                                     <span className="flex items-center gap-1">
                                         <Clock size={12} />
                                         <span>{formatDate(batch.created_at)}</span>
                                     </span>
+                                    {batchFlaggedCount > 0 && (
+                                        <span className="flex items-center gap-1 text-amber-500">
+                                            <Bookmark size={10} fill="currentColor" />
+                                            {batchFlaggedCount}
+                                        </span>
+                                    )}
                                 </div>
                             </button>
                             <button
@@ -128,8 +196,8 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
                 {/* Mobile Drawer */}
                 <AnimatePresence>
                     {sidebarOpen && (
-                        <div className="fixed top-16 inset-0 z-50 xl:hidden"> 
-                            <motion.div 
+                        <div className="fixed top-16 inset-0 z-50 xl:hidden">
+                            <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
@@ -159,7 +227,7 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
                             animate={{ width: 280, opacity: 1 }}
                             exit={{ width: 0, opacity: 0 }}
                             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                            className="hidden xl:flex flex-col shrink-0 overflow-hidden rounded-2xl shadow-t-sm shadow-r-sm border-t border-r border-border  bg-card"
+                            className="hidden xl:flex flex-col shrink-0 overflow-hidden rounded-2xl shadow-t-sm shadow-r-sm border-t border-r border-border bg-card"
                         >
                             <SidebarContent />
                         </motion.aside>
@@ -206,12 +274,34 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
                         )}
                     </div>
 
-                    {/* Main Content (StackPreview / Empty State) */}
+                    {/* Main Content */}
                     <div className="flex-1 overflow-y-auto p-4 sm:p-6 scroll-smooth">
-                        {selectedFlashcards.length > 0 ? (
+                        {displayedFlashcards.length > 0 ? (
                             <div className="w-full pt-10 max-w-2xl">
-                                <StackPreview flashcards={selectedFlashcards} />
-                            </div> 
+                                <StackPreview
+                                    key={`${selectedFlashcardBatch?.id}-${filter}`}
+                                    flashcards={displayedFlashcards}
+                                    initialIndex={filter === 'all' ? (selectedFlashcardBatch?.current_index ?? 0) : 0}
+                                    onNavigate={filter === 'all' ? handleNavigate : undefined}
+                                    onToggleStatus={handleToggleStatus}
+                                />
+                            </div>
+                        ) : filter === 'flagged' ? (
+                            <div className="flex flex-col items-center justify-center py-20 text-center">
+                                <div className="w-16 h-16 bg-amber-50 dark:bg-amber-500/10 rounded-2xl flex items-center justify-center mb-4 border border-amber-100 dark:border-amber-500/20 text-amber-500">
+                                    <Bookmark size={28} />
+                                </div>
+                                <h4 className="text-base font-bold text-foreground">Aucune carte marquée</h4>
+                                <p className="mt-2 text-sm text-muted-foreground max-w-sm">
+                                    Marquez des cartes avec l'icône <Bookmark size={12} className="inline" /> pendant la révision pour les retrouver ici.
+                                </p>
+                                <button
+                                    onClick={() => setFilter('all')}
+                                    className="mt-4 text-sm text-brand-500 hover:text-brand-600 font-medium transition-colors"
+                                >
+                                    Afficher toutes les cartes
+                                </button>
+                            </div>
                         ) : (
                             <div className="flex flex-col items-center justify-center py-20 text-center">
                                 <div className="w-16 h-16 bg-brand-50 dark:bg-brand-950/30 rounded-2xl flex items-center justify-center mb-4 border border-brand-100 dark:border-brand-900/50 text-brand-500">

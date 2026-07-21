@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import logo from "../../assets/study-removebg-preview.png";
 import { useSidebar } from "../../context/SidebarContext";
 import { LayoutDashboard, Users, BadgeCheck, Layers, CreditCard, Megaphone, MessageSquare, BarChart3, Settings as SettingsIcon, BookMarked, Zap } from "lucide-react";
 
@@ -31,10 +32,11 @@ export default function AdminSidebar() {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className={`py-8 flex ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"}`}>
-        <Link to="/admin/home">
-          <svg className="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-            <path d="M6 6H42L36 24L42 42H6L12 24L6 6Z" fill="currentColor"></path>
-          </svg>
+        <Link to="/admin/home" className="flex items-center gap-2">
+          <img src={logo} alt="GoStudyEasy" className="h-8 w-auto shrink-0" />
+          {(isExpanded || isHovered || isMobileOpen) && (
+            <span className="text-lg font-bold text-foreground whitespace-nowrap">GoStudyEasy</span>
+          )}
         </Link>
       </div>
       <nav className="mb-6">

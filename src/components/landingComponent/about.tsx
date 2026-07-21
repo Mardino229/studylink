@@ -13,7 +13,7 @@ export default function About() {
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground"
           >
-            À propos de StudyLink
+            À propos de GoStudyEasy
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 8 }}

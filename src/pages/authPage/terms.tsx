@@ -2,14 +2,14 @@ import Header from "../../components/landingComponent/header.tsx";
 import Footer from "../../components/landingComponent/footer.tsx";
 import PageMeta from "../../components/common/PageMeta.tsx";
 
-const LAST_UPDATED = "13 juillet 2026";
+const LAST_UPDATED = "20 juillet 2026";
 
 export default function Terms() {
     return (
         <>
             <PageMeta
-                title="Conditions d'utilisation • StudyLink"
-                description="Les conditions régissant l'utilisation de la plateforme StudyLink."
+                title="Conditions d'utilisation • GoStudyEasy"
+                description="Les conditions régissant l'utilisation de la plateforme GoStudyEasy."
             />
             <div className="relative flex min-h-screen flex-col bg-muted dark:bg-background">
                 <div className="layout-container flex h-full grow flex-col">
@@ -33,17 +33,18 @@ export default function Terms() {
 
                                 <p>
                                     Les présentes conditions d'utilisation (<strong>"Conditions"</strong>) régissent votre
-                                    accès à la plateforme StudyLink et son utilisation. En créant un compte ou en utilisant
+                                    accès à la plateforme GoStudyEasy et son utilisation. En créant un compte ou en utilisant
                                     le service, vous acceptez ces Conditions dans leur intégralité.
                                 </p>
 
                                 <section>
                                     <h2>1. Description du service</h2>
                                     <p>
-                                        StudyLink est une plateforme d'aide à la révision permettant aux étudiants de
-                                        générer des résumés, des flashcards et des quiz à partir de leurs documents,
-                                        d'accéder à une bibliothèque d'épreuves, et d'interagir avec un assistant de
-                                        révision. Le service est fourni tel quel et peut évoluer sans préavis.
+                                        GoStudyEasy est une plateforme d'aide à la révision permettant aux étudiants de
+                                        générer des résumés, des flashcards, des pistes audios explicatives et des quiz
+                                        à partir de leurs documents, d'accéder à une bibliothèque d'épreuves, et
+                                        d'interagir avec un assistant de révision. Le service est fourni tel quel et
+                                        peut évoluer sans préavis.
                                     </p>
                                 </section>
 
@@ -62,7 +63,7 @@ export default function Terms() {
                                         </li>
                                         <li>
                                             Vous devez avoir au moins 13 ans pour créer un compte. Les utilisateurs entre
-                                            13 et 18 ans doivent avoir obtenu le consentement d'un parent ou tuteur légal.
+                                            13 et 16 ans doivent avoir obtenu le consentement d'un parent ou tuteur légal.
                                         </li>
                                     </ul>
                                 </section>
@@ -98,7 +99,7 @@ export default function Terms() {
                                     <h2>4. Contenu utilisateur</h2>
                                     <p>
                                         Vous conservez l'entière propriété des documents que vous importez. En les déposant
-                                        sur StudyLink, vous nous accordez une licence limitée, non exclusive et
+                                        sur GoStudyEasy, vous nous accordez une licence limitée, non exclusive et
                                         non transférable pour les traiter dans le seul but de vous fournir le service.
                                     </p>
                                     <p className="mt-3">
@@ -110,8 +111,8 @@ export default function Terms() {
                                 <section>
                                     <h2>5. Propriété intellectuelle</h2>
                                     <p>
-                                        StudyLink et tous ses composants (interface, marque, code, artefacts générés par la
-                                        plateforme elle-même) sont la propriété exclusive de StudyLink. Aucun élément ne
+                                        GoStudyEasy et tous ses composants (interface, marque, code, artefacts générés par la
+                                        plateforme elle-même) sont la propriété exclusive de GoStudyEasy. Aucun élément ne
                                         peut être reproduit, copié ou distribué sans notre accord écrit préalable.
                                     </p>
                                 </section>
@@ -120,21 +121,21 @@ export default function Terms() {
                                     <h2>6. Jetons et paiements</h2>
                                     <ul>
                                         <li>
-                                            <strong>Packs de jetons</strong>   les jetons achetés n'ont pas de date
+                                            <strong>Packs de jetons : </strong>   les jetons achetés n'ont pas de date
                                             d'expiration mais ne sont pas remboursables une fois achetés.
                                         </li>
                                         <li>
-                                            <strong>Abonnement Pro</strong>   l'abonnement est renouvelé automatiquement
+                                            <strong>Abonnement Pro : </strong>   l'abonnement est renouvelé automatiquement
                                             (mensuel ou annuel) et peut être annulé à tout moment depuis vos paramètres.
                                             Aucun remboursement n'est accordé pour la période en cours.
                                         </li>
                                         <li>
-                                            <strong>Accès aux épreuves</strong>   l'accès à une épreuve (1 jeton) ou à
+                                            <strong>Accès aux épreuves : </strong>   l'accès à une épreuve (1 jeton) ou à
                                             un corrigé (2 jetons) est permanent : une fois débloqué, il reste accessible
                                             indéfiniment, même après la fin d'un abonnement Pro.
                                         </li>
                                         <li>
-                                            Tous les prix sont en dollars canadiens (CAD) et incluent les taxes applicables.
+                                            Tous les prix sont en dollars canadiens (CAD) et n'incluent pas les taxes applicables.
                                         </li>
                                         <li>
                                             Les paiements sont traités de manière sécurisée par Stripe.
@@ -147,7 +148,7 @@ export default function Terms() {
                                     <p>
                                         Nous faisons notre possible pour maintenir le service disponible, mais ne pouvons
                                         garantir une disponibilité ininterrompue. Des interruptions de maintenance ou des
-                                        incidents techniques peuvent survenir. StudyLink ne pourra être tenu responsable des
+                                        incidents techniques peuvent survenir. GoStudyEasy ne pourra être tenu responsable des
                                         pertes liées à une indisponibilité temporaire.
                                     </p>
                                 </section>
@@ -155,9 +156,9 @@ export default function Terms() {
                                 <section>
                                     <h2>8. Limitation de responsabilité</h2>
                                     <p>
-                                        Le contenu généré par StudyLink (résumés, flashcards, quiz, réponses du chat) est
+                                        Le contenu généré par GoStudyEasy (résumés, flashcards, quiz, réponses du chat) est
                                         produit par un système automatisé. Il peut contenir des erreurs ou inexactitudes.
-                                        StudyLink ne garantit pas l'exactitude, l'exhaustivité ou l'adéquation de ce
+                                        GoStudyEasy ne garantit pas l'exactitude, l'exhaustivité ou l'adéquation de ce
                                         contenu à un usage académique spécifique.
                                     </p>
                                     <p className="mt-3">
@@ -200,7 +201,7 @@ export default function Terms() {
                                         Pour toute question relative aux présentes Conditions :
                                     </p>
                                     <p className="mt-2">
-                                        <strong>StudyLink</strong>
+                                        <strong>GoStudyEasy</strong>
                                         <br />
                                         <a
                                             href="mailto:studylink.uni@gmail.com"

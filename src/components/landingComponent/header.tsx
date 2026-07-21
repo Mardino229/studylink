@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import logo from "../../assets/study-removebg-preview.png";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState, useCallback } from "react";
 import ThemeToggle from "../common/ThemeToggle";
@@ -115,10 +116,8 @@ export default function Header() {
                 <div className="container mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4">
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-3 text-foreground">
-                        <svg className="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M6 6H42L36 24L42 42H6L12 24L6 6Z" fill="currentColor" />
-                        </svg>
-                        <span className="text-2xl font-bold leading-tight tracking-tighter">StudyLink</span>
+                        <img src={logo} alt="GoStudyEasy" className="h-8 w-auto" />
+                        <span className="text-2xl font-bold leading-tight tracking-tighter">GoStudyEasy</span>
                     </Link>
 
                     {/* Desktop nav */}

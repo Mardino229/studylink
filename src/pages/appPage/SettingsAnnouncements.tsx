@@ -13,7 +13,7 @@ export default function SettingsAnnouncements() {
 
   return (
     <>
-      <PageMeta title="Paramètres • Annonces" description="Dernières annonces et mises à jour StudyLink" />
+      <PageMeta title="Paramètres • Annonces" description="Dernières annonces et mises à jour GoStudyEasy" />
       <PageBreadcrumb pageTitle="Annonces" />
 
       <div className="pt-6">

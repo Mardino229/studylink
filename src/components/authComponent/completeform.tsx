@@ -9,6 +9,7 @@ import { Faculties, type Faculty, type Program, Programs, type StudyLevel, Study
 import type { CompleteProfileRequest } from "../../utils/type.ts";
 import { useCompleteProfile } from "../../utils/user.ts";
 import { RotatingLines } from "react-loader-spinner";
+import { Input } from "../ui/input.tsx";
 import {
     Select,
     SelectContent,
@@ -137,7 +138,16 @@ export default function CompleteProfileForm() {
         completeProfile.mutate(payload)
     };
 
+    const inputClass = "form-input block w-full appearance-none rounded-lg border border-gray-300 px-3 py-3 placeholder-gray-400 shadow-sm focus:border-[var(--primary-color)] focus:outline-none focus:ring-[var(--primary-color)] sm:text-sm";
+
     return (
+        <>
+            <div className="cylinder1" />
+            <div className="cylinder2" />
+            <div className="cylinder3" />
+            <div className="cylinder4" />
+            <div className="relative z-10 w-full max-w-xl">
+            <div className="rounded-2xl bg-white/50 dark:bg-white/5 bg-clip-padding backdrop-blur-lg border border-white/20 dark:border-white/10 shadow-2xl ring-1 ring-black/5 p-6 sm:p-8">
         <FormLayout title="Complétez votre profil" description="Dernière étape pour finaliser votre compte.">
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -146,9 +156,7 @@ export default function CompleteProfileForm() {
                             <FormItem>
                                 <FormLabel>Prénom</FormLabel>
                                 <FormControl>
-                                    <input {...field}
-                                        className="block w-full border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-[var(--primary-color)] sm:text-sm sm:leading-6 appearance-none rounded-md border-gray-300 px-2.5 py-2.5 placeholder-gray-400 focus:border-[var(--primary-color)] focus:outline-none"
-                                        placeholder="Votre prénom" />
+                                    <Input {...field} className={inputClass} placeholder="Votre prénom" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -157,9 +165,7 @@ export default function CompleteProfileForm() {
                             <FormItem>
                                 <FormLabel>Nom</FormLabel>
                                 <FormControl>
-                                    <input {...field}
-                                        className="block w-full border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-[var(--primary-color)] sm:text-sm sm:leading-6 appearance-none rounded-md border-gray-300 px-2.5 py-2.5 placeholder-gray-400 focus:border-[var(--primary-color)] focus:outline-none"
-                                        placeholder="Votre nom" />
+                                    <Input {...field} className={inputClass} placeholder="Votre nom" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -248,27 +254,32 @@ export default function CompleteProfileForm() {
                             <FormItem>
                                 <FormLabel>Nom du programme</FormLabel>
                                 <FormControl>
-                                    <input {...field}
-                                        className="block w-full border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-[var(--primary-color)] sm:text-sm sm:leading-6 appearance-none rounded-md border-gray-300 px-2.5 py-2.5 placeholder-gray-400 focus:border-[var(--primary-color)] focus:outline-none"
-                                        placeholder="Ex: B.Sc. Informatique" />
+                                    <Input {...field} className={inputClass} placeholder="Ex: B.Sc. Informatique" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )} />
                     )}
-                    <Button variant={completeProfile.isPending ? 'outline' : 'default'} type="submit" className="text-sm font-semibold" disabled={completeProfile.isPending}>
-                        {completeProfile.isPending ?
-                            <RotatingLines
-                                visible={true}
-                                strokeWidth="5"
-                                width="20"
-                                strokeColor="#135bec"
-                                animationDuration="0.75"
-                                ariaLabel="rotating-lines-loading"
-                            /> : "Finaliser"}
+                    <Button variant={completeProfile.isPending ? 'outline' : 'default'} type="submit" className="w-full h-11 text-sm font-semibold" disabled={completeProfile.isPending}>
+                        {completeProfile.isPending ? (
+                            <span className="inline-flex items-center gap-2">
+                                <RotatingLines
+                                    visible={true}
+                                    strokeWidth="5"
+                                    width="18"
+                                    strokeColor="#135bec"
+                                    animationDuration="0.75"
+                                    ariaLabel="rotating-lines-loading"
+                                />
+                                Enregistrement…
+                            </span>
+                        ) : "Finaliser"}
                     </Button>
                 </form>
             </Form>
         </FormLayout>
+        </div>
+        </div>
+        </>
     )
 }

@@ -36,7 +36,7 @@ export default function CoinsWallet() {
                             </p>
                         )}
                         <p className="mt-2 text-sm text-amber-700 dark:text-amber-400">
-                            Gagnés par vos soumissions validées par l'équipe StudyLink.
+                            Gagnés par vos soumissions validées par l'équipe GoStudyEasy.
                         </p>
                     </div>
                 </div>

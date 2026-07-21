@@ -13,7 +13,7 @@ export default function Landing() {
     return (
         <>
             <PageMeta
-                title="StudyLink   Révisez plus vite, plus efficacement"
+                title="GoStudyEasy   Révisez plus vite, plus efficacement"
                 description="Résumés, flashcards, quiz, bibliothèque d'épreuves et chat pour les étudiants de l'Université d'Ottawa."
             />
             <div className="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden">
