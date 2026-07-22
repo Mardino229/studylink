@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { StackPreview } from '../../summary/flashcards/flashcards';
 import type { ArtefactFlashcard, PaginatedResponse } from '../../../types/workspace';
 import { useUpdateFlashcardPosition, useSetFlashcardItemStatus } from '../../../utils/workspace';
+import { PlusIcon } from '../../../icons';
 
 interface FlashcardsTabProps {
     flashcards?: PaginatedResponse<ArtefactFlashcard>;
@@ -91,10 +92,10 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
                         disabled={isGenerating}
                         className="inline-flex items-center gap-1.5 rounded-full bg-brand-500 hover:bg-brand-600 text-white px-3 py-1.5 text-xs font-semibold shadow-sm transition-all disabled:opacity-50"
                     >
-                        <Sparkles size={12} />
-                        Générer
-                    </button>
-                </div>
+                        <PlusIcon size={12} />
+                        Créer
+                    </button>  
+                </div> 
 
                 {/* Filter tabs */}
                 {selectedFlashcardBatch && (

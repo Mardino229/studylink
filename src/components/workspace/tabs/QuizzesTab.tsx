@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import QuizRunner from '../../summary/quiz/quiz';
 import { useGetArtefactQuiz } from '../../../utils/workspace';
 import type { ArtefactQuiz, PaginatedResponse } from '../../../types/workspace';
+import { PlusIcon } from '../../../icons';
 
 interface QuizzesTabProps {
     quizzes?: PaginatedResponse<ArtefactQuiz>;
@@ -73,8 +74,8 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
                         disabled={isGenerating}
                         className="inline-flex items-center gap-1 rounded-full bg-brand-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-brand-600 dark:hover:bg-brand-600"
                     >
-                        <Sparkles size={12} />
-                        Générer
+                        <PlusIcon size={12} />
+                        Créer
                     </button>
                 </div>
 

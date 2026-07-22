@@ -28,7 +28,10 @@ export default function RegisterForm() {
             .regex(/[a-z]/, { message: "Password must contain a lowercase letter" })
             .regex(/[0-9]/, { message: "Password must contain a number" })
             .regex(/[^A-Za-z0-9]/, { message: "Password must contain a special character" }),
-        confirmPassword: z.string()
+        confirmPassword: z.string(),
+        acceptTerms: z.boolean().refine(val => val === true, {
+            message: "Vous devez accepter les conditions d'utilisation et la politique de confidentialité."
+        }),
     }).refine((data) => data.password === data.confirmPassword, {
         message: "Passwords do not match",
         path: ["confirmPassword"]
@@ -39,12 +42,14 @@ export default function RegisterForm() {
         defaultValues: {
             email: "",
             password: "",
-            confirmPassword: ""
+            confirmPassword: "",
+            acceptTerms: false,
         }
     });
 
-    const onSubmit = (data: RegisterFormRequest) => {
-        register.mutate(data)
+    const onSubmit = (data: RegisterFormRequest & { acceptTerms: boolean }) => {
+        const { acceptTerms: _, ...apiData } = data;
+        register.mutate(apiData as RegisterFormRequest);
     };
 
     return (
@@ -98,6 +103,34 @@ export default function RegisterForm() {
                                     </button>
                                 </div>
                             </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                    <FormField name="acceptTerms" control={form.control} render={({ field }) => (
+                        <FormItem>
+                            <div className="flex items-start gap-3">
+                                <FormControl>
+                                    <input
+                                        type="checkbox"
+                                        id="acceptTerms"
+                                        ref={field.ref}
+                                        checked={!!field.value}
+                                        onChange={e => field.onChange(e.target.checked)}
+                                        onBlur={field.onBlur}
+                                        className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-[var(--primary-color)] focus:ring-[var(--primary-color)] dark:border-gray-600"
+                                    />
+                                </FormControl>
+                                <label htmlFor="acceptTerms" className="text-sm text-gray-600 dark:text-gray-300 leading-snug cursor-pointer">
+                                    J'accepte les{" "}
+                                    <Link to="/terms" target="_blank" className="font-semibold text-[var(--primary-color)] hover:underline">
+                                        conditions d'utilisation
+                                    </Link>{" "}
+                                    et la{" "}
+                                    <Link to="/privacy" target="_blank" className="font-semibold text-[var(--primary-color)] hover:underline">
+                                        politique de confidentialité
+                                    </Link>
+                                </label>
+                            </div>
                             <FormMessage />
                         </FormItem>
                     )} />

@@ -6,11 +6,11 @@ import heroPic from "../../assets/hero_pic.jpg";
 const HERO_BG = heroPic;
 
 const PHRASES = [
-    "Générer des résumés en quelques secondes",
+    "Créer des résumés en quelques secondes",
     "Créer des flashcards à partir de vos PDF",
     "Transformer une vidéo YouTube en source de révision",
     "Préparer des quiz de révision",
-    "Génerer des podcasts à partir de vos cours",
+    "Créer des podcasts à partir de vos cours",
     "Consulter les épreuves et corrigés",
     "Discuter avec votre assistant d'étude",
     "Organiser vos workspaces de révision",

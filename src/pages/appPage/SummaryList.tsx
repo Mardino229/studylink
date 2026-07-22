@@ -233,7 +233,7 @@ export default function SummaryList() {
                                                     animationDuration="0.75"
                                                     ariaLabel="rotating-lines-loading"
                                                 />
-                                            ) : "Générer"}
+                                            ) : "Créer"}
                                         </button>
                                     </div>
                                 </form>

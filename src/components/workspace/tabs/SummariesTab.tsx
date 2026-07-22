@@ -12,6 +12,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useAxiosPrivate } from '../../../hoooks/useAxiosPrivate.ts';
 import { baseUrl } from '../../../utils/api.ts';
 import type { ArtefactSummary, PaginatedResponse } from '../../../types/workspace';
+import { PlusIcon } from '../../../icons/index.ts';
 
 interface SummariesTabProps {
     summaries?: PaginatedResponse<ArtefactSummary>;
@@ -256,8 +257,8 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                     disabled={isGenerating}
                     className="inline-flex items-center gap-1.5 rounded-full bg-brand-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-all hover:bg-brand-600 disabled:opacity-50"
                 >
-                    <Sparkles size={12} />
-                    Générer
+                    <PlusIcon size={12} />
+                    Créer
                 </button>
             </div>
 
@@ -461,9 +462,9 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                                     disabled={isGenerating}
                                     className="mt-4 inline-flex items-center gap-2 rounded-full bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-brand-600"
                                 >
-                                    <Sparkles size={16} />
-                                    Générer un résumé
-                                </button>
+                                    <PlusIcon size={16} />
+                                    Créer un résumé
+                                </button> 
                             </div>
                         )}
                     </div>

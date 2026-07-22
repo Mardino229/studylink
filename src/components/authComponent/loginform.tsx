@@ -49,15 +49,13 @@ export default function LoginForm() {
                     <div className="space-y-4">
                         <FormField name="email" control={form.control} render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Email address</FormLabel>
+                                <FormLabel>Email</FormLabel>
                                 <FormControl>
                                     <Input {...field} type="email" autoComplete="email" aria-invalid={!!form.formState.errors.email}
                                            placeholder="email@uottawa.com"
-                                           className="
-                                           form-input block w-full appearance-none rounded-lg border border-gray-300 px-3 py-3 placeholder-gray-400 shadow-sm
-                                    focus:border-[var(--primary-color)] focus:outline-none focus:ring-[var(--primary-color)] sm:text-sm"
+                                           className="form-input block w-full appearance-none rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 shadow-sm focus:border-[var(--primary-color)] focus:outline-none focus:ring-[var(--primary-color)] sm:text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
                                            id="email"  />
-                                </FormControl>
+                                </FormControl> 
                                 <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Use your institutional email address.</p>
                                 <FormMessage />
                             </FormItem>
@@ -78,7 +76,7 @@ export default function LoginForm() {
                                             placeholder="Enter your password"
                                             autoComplete="current-password"
                                             aria-invalid={!!form.formState.errors.password}
-                                            className="form-input block w-full appearance-none rounded-lg border border-gray-300 px-3 py-3 pr-10 placeholder-gray-400 shadow-sm focus:border-[var(--primary-color)] focus:outline-none focus:ring-[var(--primary-color)] sm:text-sm"
+                                            className="form-input block w-full appearance-none rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 shadow-sm focus:border-[var(--primary-color)] focus:outline-none focus:ring-[var(--primary-color)] sm:text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 pr-10"
         
                                             id="password"
                                             type={showPassword ? "text" : "password"}
@@ -96,7 +94,6 @@ export default function LoginForm() {
                                         </button>
                                     </div>
                                 </FormControl>
-                                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Make sure your password is at least 8 characters.</p>
                                 <FormMessage />
                             </FormItem>
                         )} />

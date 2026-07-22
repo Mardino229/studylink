@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useUploadSource, useGetSources, useDeleteSource, useAddYoutubeSource } from '../../utils/workspace';
-import { FileIcon, UploadCloudIcon, CheckCircleIcon, LoaderIcon, Trash2, Link2 } from 'lucide-react';
+import { FileIcon, ImageIcon, UploadCloudIcon, CheckCircleIcon, LoaderIcon, Trash2, Link2, XCircleIcon } from 'lucide-react';
 
 const YoutubeIcon = ({ size = 24, className = '' }: { size?: number; className?: string }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -8,10 +8,23 @@ const YoutubeIcon = ({ size = 24, className = '' }: { size?: number; className?:
         <path d="m10 15 5-3-5-3z" />
     </svg>
 );
+
 import ConfirmModal from '../../components/ui/ConfirmModal';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { baseUrl } from '../../utils/api.ts';
 import { useQueryClient } from '@tanstack/react-query';
+
+const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+const isImageType = (fileType: string) => IMAGE_EXTENSIONS.includes(fileType.toLowerCase());
+
+const ACCEPTED_TYPES = '.pdf,.txt,.ppt,.pptx,.jpg,.jpeg,.png,.webp,.gif,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,image/*';
+
+interface StreamInfo {
+    progress: number;
+    message: string;
+    status: string;
+    filename: string;
+}
 
 interface SourceUploaderProps {
     notebookId: string;
@@ -36,13 +49,19 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
     const [mode, setMode] = useState<'file' | 'youtube'>('file');
     const [youtubeUrl, setYoutubeUrl] = useState('');
     const [urlError, setUrlError] = useState('');
+    const [isDragging, setIsDragging] = useState(false);
 
-    const [streamingSources, setStreamingSources] = useState<{ [id: string]: { progress: number; message: string; status: string } }>({});
+    const [streamingSources, setStreamingSources] = useState<Record<string, StreamInfo>>({});
 
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [sourceToDelete, setSourceToDelete] = useState<string | null>(null);
 
-    const listenToSourceProgress = (sourceId: string) => {
+    const listenToSourceProgress = (sourceId: string, filename: string) => {
+        setStreamingSources(prev => ({
+            ...prev,
+            [sourceId]: { progress: 0, message: 'Démarrage...', status: 'pending', filename },
+        }));
+
         void fetchEventSource(`${baseUrl}/notebooks/${notebookId}/sources/${sourceId}/stream`, {
             method: 'GET',
             credentials: 'include',
@@ -54,9 +73,10 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
                     setStreamingSources(prev => ({
                         ...prev,
                         [sourceId]: {
-                            progress: data.progress ?? 0,
+                            progress: data.progress ?? prev[sourceId]?.progress ?? 0,
                             message: data.message ?? '',
                             status: data.status ?? 'processing',
+                            filename: prev[sourceId]?.filename ?? filename,
                         },
                     }));
                     if (data.progress === 100 || data.status === 'completed') {
@@ -70,26 +90,60 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
                             });
                         }, 800);
                     }
+                    if (data.status === 'error') {
+                        setTimeout(() => {
+                            setStreamingSources(prev => {
+                                const next = { ...prev };
+                                delete next[sourceId];
+                                return next;
+                            });
+                        }, 6000);
+                    }
                 } catch {
                     // ignore malformed payloads
                 }
             },
             onerror(error) {
                 console.error('SSE Error', error);
+                setStreamingSources(prev => ({
+                    ...prev,
+                    [sourceId]: {
+                        ...prev[sourceId],
+                        status: 'error',
+                        message: 'Erreur de connexion au stream',
+                        filename: prev[sourceId]?.filename ?? filename,
+                    },
+                }));
                 throw error;
             },
         });
     };
 
+    const handleFiles = async (files: FileList | File[]) => {
+        const fileArray = Array.from(files);
+        if (fileArray.length === 0) return;
+        try {
+            const newSources = await uploadMutation.mutateAsync({ notebookId, files: fileArray });
+            for (const source of newSources) {
+                listenToSourceProgress(source.id, source.filename);
+            }
+        } catch (err) {
+            console.error('Upload failed', err);
+        }
+    };
+
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
-            const file = e.target.files[0];
-            try {
-                const newSource = await uploadMutation.mutateAsync({ notebookId, file });
-                listenToSourceProgress(newSource.id);
-            } catch (err) {
-                console.error('Upload failed', err);
-            }
+            await handleFiles(e.target.files);
+            e.target.value = '';
+        }
+    };
+
+    const handleDrop = async (e: React.DragEvent<HTMLLabelElement>) => {
+        e.preventDefault();
+        setIsDragging(false);
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            await handleFiles(e.dataTransfer.files);
         }
     };
 
@@ -103,7 +157,7 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
         try {
             const newSource = await youtubeM.mutateAsync({ notebookId, url: youtubeUrl.trim() });
             setYoutubeUrl('');
-            listenToSourceProgress(newSource.id);
+            listenToSourceProgress(newSource.id, newSource.filename);
         } catch {
             // error handled in hook
         }
@@ -125,6 +179,19 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
             setSourceToDelete(null);
         }
     };
+
+    const dismissStreaming = (id: string) => {
+        setStreamingSources(prev => {
+            const next = { ...prev };
+            delete next[id];
+            return next;
+        });
+    };
+
+    const getUnsupportedMessage = (msg: string) =>
+        /unsupported file type/i.test(msg)
+            ? "Ce type de fichier n'est pas supporté — utilisez PDF, TXT, PPTX ou une image."
+            : msg;
 
     return (
         <div className="rounded-2xl bg-white dark:bg-transparent">
@@ -160,15 +227,28 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
                 </div>
 
                 {mode === 'file' ? (
-                    <label className="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-300 p-2 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-white/[0.02]">
-                        <UploadCloudIcon className="mb-2 text-gray-400" size={32} />
+                    <label
+                        className={`flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 transition-colors ${
+                            isDragging
+                                ? 'border-blue-400 bg-blue-50 dark:border-blue-500 dark:bg-blue-500/10'
+                                : 'border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-white/[0.02]'
+                        }`}
+                        onDragOver={e => { e.preventDefault(); setIsDragging(true); }}
+                        onDragLeave={() => setIsDragging(false)}
+                        onDrop={handleDrop}
+                    >
+                        <UploadCloudIcon className={`mb-2 ${isDragging ? 'text-blue-400' : 'text-gray-400'}`} size={32} />
                         <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                            Cliquez pour importer (PDF, TXT, PPT, PPTX)
+                            {isDragging ? 'Déposez vos fichiers ici' : 'Glissez-déposez ou cliquez pour importer'}
+                        </span>
+                        <span className="mt-1 text-xs text-gray-400">
+                            PDF, TXT, PPT, PPTX, JPG, PNG, WEBP, GIF · Plusieurs fichiers acceptés
                         </span>
                         <input
                             type="file"
+                            multiple
                             className="hidden"
-                            accept=".pdf,.txt,.ppt,.pptx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation"
+                            accept={ACCEPTED_TYPES}
                             onChange={handleFileChange}
                         />
                     </label>
@@ -209,25 +289,56 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
                     </form>
                 )}
 
-                {/* Processing banners */}
+                {/* Processing banners — one per file */}
                 {Object.entries(streamingSources).map(([id, info]) => {
+                    const isError = info.status === 'error';
                     if (info.progress === 100) return null;
                     return (
-                        <div key={id} className="rounded-2xl border border-sky-100 bg-sky-50 p-4 dark:border-sky-500/20 dark:bg-sky-500/10">
+                        <div
+                            key={id}
+                            className={`rounded-2xl border p-4 ${
+                                isError
+                                    ? 'border-red-100 bg-red-50 dark:border-red-500/20 dark:bg-red-500/10'
+                                    : 'border-sky-100 bg-sky-50 dark:border-sky-500/20 dark:bg-sky-500/10'
+                            }`}
+                        >
                             <div className="mb-1 flex items-center justify-between text-sm">
-                                <span className="flex items-center gap-2 font-medium text-sky-800 dark:text-sky-200">
-                                    <LoaderIcon size={14} className="animate-spin" />
-                                    Traitement en cours...
+                                <span className={`flex items-center gap-2 font-medium ${isError ? 'text-red-700 dark:text-red-300' : 'text-sky-800 dark:text-sky-200'}`}>
+                                    {isError
+                                        ? <XCircleIcon size={14} />
+                                        : <LoaderIcon size={14} className="animate-spin" />
+                                    }
+                                    <span className="max-w-[180px] truncate">{info.filename}</span>
                                 </span>
-                                <span className="font-bold text-sky-600 dark:text-sky-300">{info.progress}%</span>
+                                <div className="flex items-center gap-2">
+                                    {!isError && (
+                                        <span className={`font-bold ${isError ? 'text-red-600 dark:text-red-400' : 'text-sky-600 dark:text-sky-300'}`}>
+                                            {info.progress}%
+                                        </span>
+                                    )}
+                                    {isError && (
+                                        <button
+                                            type="button"
+                                            onClick={() => dismissStreaming(id)}
+                                            className="text-red-400 hover:text-red-600 dark:text-red-500 dark:hover:text-red-300"
+                                            aria-label="Fermer"
+                                        >
+                                            ×
+                                        </button>
+                                    )}
+                                </div>
                             </div>
-                            <div className="mb-2 h-1.5 w-full rounded-full bg-sky-200 dark:bg-sky-500/20">
-                                <div
-                                    className="h-1.5 rounded-full bg-sky-600 dark:bg-sky-300"
-                                    style={{ width: `${info.progress}%` }}
-                                />
-                            </div>
-                            <p className="truncate text-xs text-sky-700 dark:text-sky-200">{info.message}</p>
+                            {!isError && (
+                                <div className="mb-2 h-1.5 w-full rounded-full bg-sky-200 dark:bg-sky-500/20">
+                                    <div
+                                        className="h-1.5 rounded-full bg-sky-600 dark:bg-sky-300 transition-all duration-300"
+                                        style={{ width: `${info.progress}%` }}
+                                    />
+                                </div>
+                            )}
+                            <p className={`truncate text-xs ${isError ? 'text-red-600 dark:text-red-400' : 'text-sky-700 dark:text-sky-200'}`}>
+                                {isError ? getUnsupportedMessage(info.message) : info.message}
+                            </p>
                         </div>
                     );
                 })}
@@ -236,6 +347,7 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
                 <div className="space-y-3">
                     {sources?.items?.map(source => {
                         const isYoutube = source.file_type === 'youtube';
+                        const isImage = isImageType(source.file_type);
                         const videoId = isYoutube ? extractYoutubeId(source.filename) : null;
                         return (
                             <div
@@ -254,8 +366,14 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
                                             <YoutubeIcon size={18} className="text-red-500" />
                                         </div>
                                     )
+                                ) : isImage ? (
+                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-500/10">
+                                        <ImageIcon size={18} className="text-purple-500" />
+                                    </div>
                                 ) : (
-                                    <FileIcon className="shrink-0 text-gray-500 dark:text-gray-400" size={20} />
+                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+                                        <FileIcon size={18} className="text-gray-500 dark:text-gray-400" />
+                                    </div>
                                 )}
                                 <div className="min-w-0 flex-1 overflow-hidden">
                                     <p className="truncate text-sm font-medium text-gray-800 dark:text-white/90">
@@ -264,7 +382,7 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
                                             : source.filename}
                                     </p>
                                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                                        {isYoutube ? 'YouTube' : source.file_type.toUpperCase()}
+                                        {isYoutube ? 'YouTube' : isImage ? 'Image' : source.file_type.toUpperCase()}
                                     </p>
                                 </div>
                                 <CheckCircleIcon className="shrink-0 text-green-500" size={18} />

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Mic, Trash2, Clock, Loader, Menu, Sparkles, Play, SkipForward, SkipBack, Volume2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ArtefactPodcast, PaginatedResponse } from '../../../types/workspace';
+import { PlusIcon } from '../../../icons';
 
 interface PodcastsTabProps {
     podcasts?: PaginatedResponse<ArtefactPodcast>;
@@ -163,8 +164,8 @@ export const PodcastsTab: React.FC<PodcastsTabProps> = ({
                     disabled={isGenerating}
                     className="inline-flex items-center gap-1.5 rounded-full bg-brand-500 hover:bg-brand-600 text-white px-3 py-1.5 text-xs font-semibold shadow-sm transition-all disabled:opacity-50"
                 >
-                    <Sparkles size={12} />
-                    Générer
+                    <PlusIcon size={12} />
+                    Créer 
                 </button>
             </div>
 
@@ -433,8 +434,8 @@ export const PodcastsTab: React.FC<PodcastsTabProps> = ({
                                 disabled={isGenerating}
                                 className="mt-4 inline-flex items-center gap-2 rounded-full bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 text-sm font-semibold shadow-sm transition-all"
                             >
-                                <Sparkles size={16} />
-                                Générer un briefing
+                                <PlusIcon size={16} />
+                                Créer un briefing
                             </button>
                         </div>
                     )}

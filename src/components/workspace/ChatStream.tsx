@@ -64,7 +64,10 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
     const previousScrollHeightRef = useRef(0);
     const lastSessionIdRef = useRef<string | null>(null);
     // Timestamp (ms) of when the current exchange was initiated on the client.
-    const exchangeStartedAtRef = useRef<number | null>(null);
+    // Kept as state (not a ref) so that clearPending() nulls it in the same React batch
+    // as the pending message states — prevents a render where sentAt is null but pending
+    // messages are still set, which would cause displayMessages to append duplicates.
+    const [exchangeStartedAt, setExchangeStartedAt] = useState<number | null>(null);
 
     const createSessionMutation = useCreateChatSession();
     const {
@@ -100,10 +103,9 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
     const displayMessages = useMemo<Message[]>(() => {
         if (!pendingUserMsg && !streamingAssistantMsg) return fetchedMessages;
 
-        const sentAt = exchangeStartedAtRef.current;
-        if (sentAt !== null) {
+        if (exchangeStartedAt !== null) {
             const confirmed = fetchedMessages.some(
-                (m) => m.role === 'assistant' && new Date(m.created_at ?? 0).getTime() > sentAt - 5000
+                (m) => m.role === 'assistant' && new Date(m.created_at ?? 0).getTime() > exchangeStartedAt - 5000
             );
             if (confirmed) return fetchedMessages;
         }
@@ -112,12 +114,12 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
         if (pendingUserMsg) pending.push(pendingUserMsg);
         if (streamingAssistantMsg) pending.push(streamingAssistantMsg);
         return [...fetchedMessages, ...pending];
-    }, [fetchedMessages, pendingUserMsg, streamingAssistantMsg]);
+    }, [fetchedMessages, pendingUserMsg, streamingAssistantMsg, exchangeStartedAt]);
 
     const clearPending = () => {
         setPendingUserMsg(null);
         setStreamingAssistantMsg(null);
-        exchangeStartedAtRef.current = null;
+        setExchangeStartedAt(null);
     };
 
     // Reset all state when the notebook changes
@@ -167,14 +169,13 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
 
     // Drop temp messages once the real exchange arrives in fetchedMessages
     useEffect(() => {
-        const sentAt = exchangeStartedAtRef.current;
-        if (sentAt === null) return;
+        if (exchangeStartedAt === null) return;
         const confirmed = fetchedMessages.some(
-            (m) => m.role === 'assistant' && new Date(m.created_at ?? 0).getTime() > sentAt - 5000
+            (m) => m.role === 'assistant' && new Date(m.created_at ?? 0).getTime() > exchangeStartedAt - 5000
         );
         if (confirmed) clearPending();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [fetchedMessages]);
+    }, [fetchedMessages, exchangeStartedAt]);
 
     useEffect(() => {
         if (messagesContainerRef.current) {
@@ -233,7 +234,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
         if (!content || !sessionId) return;
 
         const now = Date.now();
-        exchangeStartedAtRef.current = now;
+        setExchangeStartedAt(now);
 
         setPendingUserMsg({
             id: `user-${now}`,
@@ -532,7 +533,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                             })}
                         </AnimatePresence>
 
-                        {isStreaming && (
+                        {isStreaming && !streamingAssistantMsg?.content && (
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-3">
                                 <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-50 dark:bg-brand-950/30 flex items-center justify-center border border-brand-100 dark:border-brand-900/50">
                                     <BotIcon className="w-4 h-4 text-brand-500 dark:text-brand-400" />

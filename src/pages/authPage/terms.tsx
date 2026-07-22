@@ -41,7 +41,7 @@ export default function Terms() {
                                     <h2>1. Description du service</h2>
                                     <p>
                                         GoStudyEasy est une plateforme d'aide à la révision permettant aux étudiants de
-                                        générer des résumés, des flashcards, des pistes audios explicatives et des quiz
+                                        créer des résumés, des flashcards, des pistes audios explicatives et des quiz
                                         à partir de leurs documents, d'accéder à une bibliothèque d'épreuves, et
                                         d'interagir avec un assistant de révision. Le service est fourni tel quel et
                                         peut évoluer sans préavis.

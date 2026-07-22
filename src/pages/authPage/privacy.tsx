@@ -51,7 +51,7 @@ export default function Privacy() {
                                         </li>
                                         <li>
                                             <strong>Fichiers importés : </strong>   les documents que vous déposez sur la
-                                            plateforme (PDF, DOCX, PPTX) pour générer des résumés, flashcards ou quiz.
+                                            plateforme (PDF, DOCX, PPTX) pour créer des résumés, flashcards ou quiz.
                                         </li>
                                         <li>
                                             <strong>Contenu généré : </strong>   les artefacts produits par la plateforme
@@ -80,7 +80,7 @@ export default function Privacy() {
                                     <ul>
                                         <li>Fournir et maintenir le service GoStudyEasy.</li>
                                         <li>
-                                            Générer les artefacts que vous demandez (résumés, flashcards, quiz, réponses du
+                                            Créer les outils de révision que vous demandez (résumés, flashcards, quiz, réponses du
                                             chat).
                                         </li>
                                         <li>Gérer votre abonnement, vos packs de jetons et vos paiements.</li>

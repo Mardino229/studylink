@@ -227,16 +227,19 @@ export const useGetSources = (notebookId: string, options: PaginationOptions = {
 export const useUploadSource = () => {
     const axiosPrivate = useAxiosPrivate();
     return useMutation({
-        mutationFn: async ({ notebookId, file }: { notebookId: string; file: File }) => {
+        mutationFn: async ({ notebookId, files }: { notebookId: string; files: File[] }) => {
             const formData = new FormData();
-            formData.append("file", file);
-            const response = await axiosPrivate.post<{ data: Source }>(`/notebooks/${notebookId}/sources`, formData, {
+            for (const file of files) {
+                formData.append("files", file);
+            }
+            const response = await axiosPrivate.post<{ data: Source[] }>(`/notebooks/${notebookId}/sources`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             return response.data.data;
         },
-        onSuccess: () => {
-            toast.success("Source ajoutée");
+        onSuccess: (data) => {
+            const n = data.length;
+            toast.success(`${n} source${n > 1 ? 's' : ''} ajoutée${n > 1 ? 's' : ''}`);
         },
         onError: (error) => {
             const axiosError = error as AxiosError<{ message: string }>;

@@ -9,7 +9,7 @@ const TIER_FEATURES = [
     { label: "Accéder à ses outils de révision",   free: true,  tokens: true,    pro: true,  ultra: true  },
     { label: "Sources YouTube (vidéos publiques)", free: true,  tokens: true,    pro: true,  ultra: true  },
     { label: "Épreuves",                           free: false, tokens: "1 🪙",  pro: true,  ultra: true  },
-    { label: "Générer résumés / flashcards / quiz", free: false, tokens: "1 🪙", pro: true,  ultra: true  },
+    { label: "Créer résumés / flashcards / quiz", free: false, tokens: "1 🪙", pro: true,  ultra: true  },
     { label: "Chat (tranche 10 msgs)",             free: false, tokens: "1 🪙",  pro: true,  ultra: true  },
     { label: "Corrigés d'examens",                 free: false, tokens: "2 🪙",  pro: true,  ultra: true  },
     { label: "Résumés audio",                      free: false, tokens: "2 🪙",  pro: false, ultra: true  },

@@ -4,9 +4,11 @@ import { Dropdown } from "../ui/dropdown/Dropdown";
 import {useUser} from "../layout/userContext.tsx";
 import Button from "../ui/button/Button.tsx";
 import {useLogout} from "../../utils/auth.ts";
+import ConfirmModal from "../ui/ConfirmModal.tsx";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
     const {user} = useUser();
     const logout = useLogout();
   function toggleDropdown() {
@@ -70,7 +72,7 @@ export default function UserDropdown() {
         </div>
 
         <ul className="flex flex-col gap-1 pt-4 pb-3 border-b border-gray-200 dark:border-gray-800">
-          <li>
+          {/*<li>
             <DropdownItem
               onItemClick={closeDropdown}
               tag="a"
@@ -94,7 +96,7 @@ export default function UserDropdown() {
               </svg>
               Edit profile
             </DropdownItem>
-          </li>
+          </li>*/}
           <li>
             <DropdownItem
               onItemClick={closeDropdown}
@@ -120,7 +122,7 @@ export default function UserDropdown() {
               Account settings
             </DropdownItem>
           </li>
-          <li>
+          {/*<li>
             <DropdownItem
               onItemClick={closeDropdown}
               tag="a"
@@ -144,10 +146,10 @@ export default function UserDropdown() {
               </svg>
               Support
             </DropdownItem>
-          </li>
+          </li>*/}
         </ul>
         <Button
-            onClick={logout.mutate}
+            onClick={() => { closeDropdown(); setShowLogoutModal(true); }}
             variant="outline"
           className="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
         >
@@ -169,6 +171,16 @@ export default function UserDropdown() {
           Sign out
         </Button>
       </Dropdown>
+
+      <ConfirmModal
+        isOpen={showLogoutModal}
+        title="Déconnexion"
+        message="Êtes-vous sûr de vouloir vous déconnecter ?"
+        confirmLabel="Se déconnecter"
+        cancelLabel="Annuler"
+        onConfirm={() => logout.mutate()}
+        onCancel={() => setShowLogoutModal(false)}
+      />
     </div>
   );
 }

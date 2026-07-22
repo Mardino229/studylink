@@ -143,7 +143,7 @@ export default function PaymentSuccess() {
                                 </p>
                                 <div className="flex flex-col gap-3">
                                     <Button className="w-full" onClick={() => navigate("/workspaces")}>
-                                        Commencer à générer
+                                        Commencer à créer vous outils de révision
                                     </Button>
                                     <Button variant="outline" className="w-full" onClick={() => navigate("/subscription")}>
                                         Voir mon solde

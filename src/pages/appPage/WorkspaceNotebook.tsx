@@ -224,7 +224,7 @@ const WorkspaceNotebook: React.FC = () => {
                                         Ajoutez vos premiers documents
                                     </h2>
                                     <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                                        Importez vos documents (PDF, DOCX, PPTX…) pour commencer à générer des résumés, podcasts, flashcards et quiz.
+                                        Importez vos documents (PDF, DOCX, PPTX…) pour commencer à créer des résumés, podcasts, flashcards et quiz.
                                     </p>
                                 </div>
                                 <SourcesTab notebookId={notebookId} />

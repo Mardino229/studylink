@@ -82,7 +82,7 @@ const ArtefactGenerator: React.FC<ArtefactGeneratorProps> = ({ notebookId }) => 
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
                 <BrainIcon className="text-purple-500" />
-                Générer des Artefacts
+                Créer des Outils de révision
             </h3>
             
             <div className="grid grid-cols-2 gap-2 mb-6">

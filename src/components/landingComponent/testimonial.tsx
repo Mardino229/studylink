@@ -60,7 +60,7 @@ const USE_CASES = [
 
 export default function Testimonial() {
     return (
-        <section className="py-12 sm:py-28 bg-muted/40" id="testimonials">
+        <section className="py-12 sm:py-28 bg-background" id="testimonials">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <motion.div
                     initial="hidden"
