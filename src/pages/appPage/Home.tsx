@@ -56,7 +56,7 @@ export default function Home() {
         {
             value: String(notebookCount),
             label: "Notebooks",
-            sub: "Workspaces actifs",
+            sub: "Espaces de travail actifs",
             icon: BookOpen,
             color: "bg-purple-50 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400",
             href: "/workspaces",
@@ -106,19 +106,31 @@ export default function Home() {
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.45, ease: "easeOut" }}
-                    className="relative overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-600 via-blue-500 to-purple-600 p-6 sm:p-8 dark:border-blue-900/30"
+                    className="relative overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50 p-6 sm:p-8 dark:border-blue-900/30 dark:from-blue-900/20 dark:to-indigo-900/10"
                 >
-                    <div className="pointer-events-none absolute -top-16 -right-16 h-48 w-48 rounded-full bg-white/10 blur-2xl" />
-                    <div className="pointer-events-none absolute -bottom-8 left-8 h-32 w-32 rounded-full bg-purple-300/20 blur-2xl" />
+                    {/* Grain texture — multiply sur fond clair = grain sombre visible */}
+                    <svg
+                        className="pointer-events-none absolute inset-0 h-full w-full rounded-2xl"
+                        style={{ mixBlendMode: 'multiply', opacity: 0.38 } as React.CSSProperties}
+                        aria-hidden="true"
+                    >
+                        <filter id="hero-grain">
+                            <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="4" stitchTiles="stitch" />
+                            <feColorMatrix type="saturate" values="0" />
+                        </filter>
+                        <rect width="100%" height="100%" filter="url(#hero-grain)" />
+                    </svg>
+                    <div className="pointer-events-none absolute -top-10 -right-10 h-36 w-36 rounded-full bg-blue-200/40 blur-2xl dark:bg-blue-500/10" />
+                    <div className="pointer-events-none absolute -bottom-8 left-8 h-24 w-24 rounded-full bg-indigo-200/40 blur-2xl dark:bg-indigo-500/10" />
                     <div className="relative">
-                        <p className="text-xs font-semibold uppercase tracking-widest text-blue-200 mb-1">
+                        <p className="text-xs font-semibold uppercase tracking-widest text-blue-500 dark:text-blue-400 mb-1">
                             {greeting}
                         </p>
-                        <h1 className="text-2xl sm:text-3xl font-bold text-white">
+                        <h1 className="text-2xl sm:text-3xl font-bold text-blue-900 dark:text-blue-100">
                             {firstName} 👋
                         </h1>
                         {user?.program?.name && (
-                            <p className="mt-2 text-sm text-blue-100 opacity-80">
+                            <p className="mt-2 text-sm text-blue-600 dark:text-blue-400 opacity-80">
                                 {user.program.name}
                                 {user.faculty?.name && ` · ${user.faculty.name}`}
                             </p>
@@ -126,14 +138,14 @@ export default function Home() {
                         <div className="mt-5 flex flex-wrap gap-3">
                             <Link
                                 to="/workspaces"
-                                className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-blue-600 shadow hover:opacity-90 transition-opacity"
+                                className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition-colors"
                             >
                                 <BookOpen size={15} />
                                 Mes notebooks
                             </Link>
                             <Link
                                 to="/exam-library"
-                                className="inline-flex items-center gap-2 rounded-full bg-white/15 border border-white/25 px-4 py-2 text-sm font-semibold text-white hover:bg-white/20 transition-colors"
+                                className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white/70 px-4 py-2 text-sm font-semibold text-blue-700 hover:bg-white transition-colors dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50"
                             >
                                 <BookMarked size={15} />
                                 Épreuves

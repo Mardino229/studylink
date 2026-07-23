@@ -68,7 +68,7 @@ const FEATURES = [
         glow: "bg-orange-400",
         span: "lg:col-span-2",
         wide: false,
-        title: "Workspaces & Statistiques",
+        title: "Espaces de travail & Statistiques",
         desc: "Organisez vos notebooks par dossier, suivez votre progression et gardez une vue d'ensemble de vos révisions.",
         n: "07",
     },

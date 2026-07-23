@@ -13,7 +13,7 @@ const PHRASES = [
     "Créer des podcasts à partir de vos cours",
     "Consulter les épreuves et corrigés",
     "Discuter avec votre assistant d'étude",
-    "Organiser vos workspaces de révision",
+    "Organiser vos espaces de travail de révision",
 ];
 
 // Isolated so its frequent state updates don't re-render the whole Hero
@@ -100,7 +100,7 @@ const HeroContent = memo(function HeroContent() {
                 transition={{ duration: 0.5, delay: 0.3 }}
                 className="mt-8 flex flex-wrap justify-center gap-2"
             >
-                {["Résumés", "Flashcards", "Podcasts", "Quiz", "YouTube", "Épreuves", "Chat", "Workspaces"].map(item => (
+                {["Résumés", "Flashcards", "Podcasts", "Quiz", "YouTube", "Épreuves", "Chat", "Espaces de travail"].map(item => (
                     <span key={item} className={`rounded-full border px-4 py-1.5 text-sm font-medium ${chipStyle}`}>
                         {item}
                     </span>

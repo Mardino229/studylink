@@ -203,7 +203,7 @@ const WorkspaceNotebook: React.FC = () => {
                     <Link
                         to="/workspaces"
                         className="inline-flex items-center gap-1 rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-800 dark:hover:bg-gray-800 dark:hover:text-white"
-                        aria-label="Retour aux workspaces"
+                        aria-label="Retour aux espaces de travail"
                     >
                         <ArrowLeftIcon size={20} />
                     </Link>

@@ -33,7 +33,7 @@ const navItems: NavItem[] = [
   },
   {
     icon: <ListIcon />,
-    name: "Workspaces",
+    name: "Espaces de travail",
     path: "/workspaces"
   },
   {

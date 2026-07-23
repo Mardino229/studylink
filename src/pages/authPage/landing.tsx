@@ -30,7 +30,7 @@ export default function Landing() {
                         <AboutFeatures />
 
                         {/* 4. Cas d'usage   Pic du désir : "des étudiants comme moi l'utilisent ainsi" */}
-                        <Testimonial />
+                        {/*<Testimonial />*/}
 
                         {/* 5. Tarifs   Le désir est au max, montrer le prix maintenant */}
                         <Pricing />

@@ -277,8 +277,8 @@ const Workspaces: React.FC = () => {
 
     return (
         <>
-            <PageMeta title="Workspaces" description="Gérez vos espaces de travail interactifs" />
-            <PageBreadcrumb pageTitle="Workspaces" />
+            <PageMeta title="Espaces de travail" description="Gérez vos espaces de travail interactifs" />
+            <PageBreadcrumb pageTitle="Espaces de travail" />
             <div className="relative overflow-hidden dark:bg-background min-h-dvh rounded-none">
                 <div className="p-2 sm:p-6 space-y-6">
                     
