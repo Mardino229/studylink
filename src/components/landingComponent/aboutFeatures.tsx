@@ -9,7 +9,7 @@ const FEATURES = [
         span: "lg:col-span-4",
         wide: true,
         title: "Cours & Résumés",
-        desc: "Créez vos matières, importez vos fichiers (PDF, DOCX, PPTX) et obtenez un résumé structuré prêt à réviser en quelques secondes.",
+        desc: "Crée tes résumés structurés en quelques secondes à partir de tes fichiers de cours, d'images et de vidéos YouTube.",
         n: "01",
     },
     {
@@ -19,7 +19,7 @@ const FEATURES = [
         span: "lg:col-span-2",
         wide: false,
         title: "Flashcards",
-        desc: "Transformez n'importe quel document en jeu de flashcards question-réponse. Révisez par tranche, à votre rythme.",
+        desc: "Importe un document, GoStudyEasy le transforme en jeu de flashcards question-réponse. Révise question par question, à ton rythme.",
         n: "02",
     },
     {
@@ -29,7 +29,7 @@ const FEATURES = [
         span: "lg:col-span-2",
         wide: false,
         title: "Quiz",
-        desc: "Générez des questionnaires à choix multiples pour vous tester avant un examen. Score et corrections instantanés.",
+        desc: "GoStudyEasy génère des questionnaires à choix multiples pour te tester sur ton matériel de cours. Obtiens ton score et les corrections instantanément.",
         n: "03",
     },
     {
@@ -39,7 +39,7 @@ const FEATURES = [
         span: "lg:col-span-4",
         wide: true,
         title: "Assistant de révision",
-        desc: "Posez vos questions et obtenez des réponses précises basées sur vos propres documents. Idéal pour débloquer une notion avant un partiel.",
+        desc: "Pose tes questions à l'assistant IA, obtiens des réponses précises basées sur tes propres documents. Idéal pour approfondir certaines notions et améliorer sa compréhension du cours.",
         n: "04",
     },
     {
@@ -49,7 +49,7 @@ const FEATURES = [
         span: "lg:col-span-2",
         wide: false,
         title: "Bibliothèque d'épreuves",
-        desc: "Accédez aux épreuves passées et à leurs corrigés avec vos jetons (1 jeton par épreuve, 2 pour un corrigé), ou sans limite avec le Pro.",
+        desc: "Accède à une banque d'épreuves triées selon la matière, la session ou encore l'année ainsi qu'à leurs corrigés avec tes jetons. Ouvrir une épreuve nécessite un jeton, ouvrir un corrigé en nécessite deux, l'ouverture étant permanente. L'abonnement Pro ou Ultra te permet d'accéder sans jetons à toutes les épreuves et à leurs corrigés sans limites.",
         n: "05",
     },
     {
@@ -58,8 +58,8 @@ const FEATURES = [
         glow: "bg-red-400",
         span: "lg:col-span-2",
         wide: false,
-        title: "Sources YouTube",
-        desc: "Collez un lien YouTube comme n'importe quelle source. Générez ensuite résumé, flashcards et quiz à partir de la vidéo.",
+        title: "Résumés de vidéos YouTube",
+        desc: "À partir du lien d'une vidéo YouTube, GoStudyEasy te génère un résumé, des flashcards et des quiz pour tes révisions.",
         n: "06",
     },
     {
@@ -68,8 +68,8 @@ const FEATURES = [
         glow: "bg-orange-400",
         span: "lg:col-span-2",
         wide: false,
-        title: "Espaces de travail & Statistiques",
-        desc: "Organisez vos notebooks par dossier, suivez votre progression et gardez une vue d'ensemble de vos révisions.",
+        title: "Espace de travail & Statistiques",
+        desc: "Organise tes cours par dossier. Suis ta progression et garde une vue d'ensemble de tes révisions.",
         n: "07",
     },
     {
@@ -78,8 +78,8 @@ const FEATURES = [
         glow: "bg-violet-400",
         span: "lg:col-span-6",
         wide: true,
-        title: "Audio & Podcasts Ultra",
-        desc: "Transformez vos résumés en briefings audio et générez des podcasts complets à partir de vos documents. Écoutez vos révisions en déplacement, en mode mains libres. Disponible en exclusivité avec le plan Ultra.",
+        title: "Audio & Podcasts",
+        desc: "GoStudyEasy transforme tes résumés en briefings audio et génère des podcasts complets à partir de tes documents. Les podcasts prennent la forme d'une discussion éducative entre un professeur et un élève. Écoute tes révisions en déplacement et à tout moment où tes mains ne sont pas libres. Disponible en exclusivité avec le plan Ultra.",
         n: "08",
         badge: "",
     },
@@ -106,17 +106,11 @@ export default function AboutFeatures() {
                         variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
                         className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
                     >
-                        Tout ce qu'il faut pour réviser{" "}
+                        Découvrez comment GoStudyEasy{" "}
                         <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                            vraiment efficacement
+                            vous aide en détails !
                         </span>
                     </motion.h2>
-                    <motion.p
-                        variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
-                        className="mt-4 text-lg text-foreground/70"
-                    >
-                        Résumés, flashcards, quiz, sources YouTube, bibliothèque d'épreuves, chat, podcasts audio et statistiques   réunis dans une seule interface.
-                    </motion.p>
                 </motion.div>
 
                 <motion.div

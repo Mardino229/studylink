@@ -32,7 +32,7 @@ export default function Landing() {
                         {/* 4. Cas d'usage   Pic du désir : "des étudiants comme moi l'utilisent ainsi" */}
                         {/*<Testimonial />*/}
 
-                        {/* 5. Tarifs   Le désir est au max, montrer le prix maintenant */}
+                        {/* 5. Offres   Le désir est au max, montrer le prix maintenant */}
                         <Pricing />
 
                         {/* 6. FAQ   Lever les dernières objections (jetons, annulation, Pro vs tokens) */}

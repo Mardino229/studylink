@@ -20,8 +20,8 @@ export default function Footer() {
                         <div>
                             <h3 className="text-base font-semibold text-foreground">Plateforme</h3>
                             <ul className="mt-4 space-y-2">
-                                <li><a className="hover:text-foreground transition-colors" href="#key-features">Fonctionnalités</a></li>
-                                <li><a className="hover:text-foreground transition-colors" href="#pricing">Tarifs</a></li>
+                                <li><a className="hover:text-foreground transition-colors" href="/#key-features">Fonctionnalités</a></li>
+                                <li><a className="hover:text-foreground transition-colors" href="/#pricing">Offres</a></li>
                                 <li><Link className="hover:text-foreground transition-colors" to="/login">Connexion</Link></li>
                             </ul>
                         </div>
@@ -29,8 +29,8 @@ export default function Footer() {
                             <h3 className="text-base font-semibold text-foreground">Entreprise</h3>
                             <ul className="mt-4 space-y-2">
                                 <li><Link className="hover:text-foreground transition-colors" to="/about">À propos</Link></li>
-                                <li><a className="hover:text-foreground transition-colors" href="#faq">FAQ</a></li>
-                                <li><a className="hover:text-foreground transition-colors" href="#home">Contact</a></li>
+                                <li><a className="hover:text-foreground transition-colors" href="/#faq">FAQ</a></li>
+                                <li><a className="hover:text-foreground transition-colors" href="/#home">Contact</a></li>
                             </ul>
                         </div>
                         <div>

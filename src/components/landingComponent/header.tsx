@@ -94,11 +94,11 @@ export default function Header() {
 
     const NAV_LINKS = [
         { label: "Accueil",         hash: "#" },
-        { label: "Fonctionnement",  hash: "#how-it-works" },
+        { label: "Comment ça marche",  hash: "#how-it-works" },
         { label: "Fonctionnalités", hash: "#key-features" },
-        { label: "Aperçu",          hash: "#testimonials" },
-        { label: "Tarifs",          hash: "#pricing" },
+        { label: "Offres",          hash: "#pricing" },
         { label: "FAQ",             hash: "#faq" },
+        {/*{ label: "Aperçu",          hash: "#testimonials" },*/},
     ];
 
     return (
@@ -121,7 +121,7 @@ export default function Header() {
                     </Link>
 
                     {/* Desktop nav */}
-                    <nav className="hidden md:flex items-center gap-8">
+                    <nav className="hidden xl:flex items-center gap-8">
                         {NAV_LINKS.map(({ label, hash }) => (
                             <a
                                 key={hash}
@@ -154,7 +154,7 @@ export default function Header() {
                         <button
                             type="button"
                             aria-label="Toggle menu"
-                            className="md:hidden inline-flex items-center justify-center rounded-md p-2 text-foreground hover:bg-foreground/5"
+                            className="xl:hidden inline-flex items-center justify-center rounded-md p-2 text-foreground hover:bg-foreground/5"
                             onClick={() => setMobileOpen(v => !v)}
                         >
                             {mobileOpen ? (

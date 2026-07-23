@@ -1,32 +1,32 @@
 const FAQS = [
     {
         q: "Que permet GoStudyEasy ?",
-        a: "GoStudyEasy centralise vos outils d'étude : génération de résumés, flashcards et quiz à partir de vos fichiers ou de vidéos YouTube, bibliothèque d'examens avec corrigés, chat, podcasts audio et statistiques de progression. Tout part d'une source   un PDF, un PPTX ou un lien YouTube   et GoStudyEasy s'occupe du reste.",
+        a: "GoStudyEasy génère l'ensemble de tes outils d'étude et de révision à partir des contenus que tu lui fournis : résumés, flashcards et quiz à partir de tes fichiers ou de vidéos YouTube. Tu disposes aussi d'une bibliothèque d'épreuves dont certaines sont corrigées, d'un assistant de révision, de podcasts audio et d'outils de suivi de ta progression.",
         open: true,
     },
     {
         q: "Puis-je utiliser une vidéo YouTube comme source ?",
-        a: "Oui. Collez l'URL d'une vidéo YouTube publique (youtube.com/watch, youtu.be ou youtube.com/shorts) dans votre workspace : Notre app extrait le contenu et l'indexe comme n'importe quelle source. Générez ensuite résumé, flashcards et quiz à partir de la vidéo. Les vidéos privées ou non listées ne sont pas supportées, et la durée maximale est d'environ 1 heure.",
+        a: "Oui. Colle l'URL d'une vidéo YouTube publique dans l'espace dédié de ton espace de travail. GoStudyEasy en extrait le contenu et le rend disponible comme n'importe quelle autre source. Génère ensuite des résumés, des flashcards et des quiz à partir de la vidéo. Les vidéos privées ou non listées ne sont pas prises en charge, et la durée maximale est d'environ 1 heure.",
     },
     {
         q: "Comment fonctionne le système de jetons ?",
-        a: "Chaque fonctionnalité consomme des jetons : 1 jeton pour générer un résumé, des flashcards ou un quiz, 1 jeton par tranche de 10 messages de chat, et 2 jetons pour accéder à un corrigé payant. Vous achetez un pack de jetons (Starter, Standard ou Maxi) et les utilisez à votre rythme   sans date d'expiration.",
+        a: "Si tu ne disposes pas d'un abonnement, chaque fonctionnalité consomme des jetons : 1 jeton pour générer un résumé, des flashcards ou un quiz, 1 jeton par tranche de 10 messages de chat, 1 jeton pour accéder à une épreuve et 2 jetons pour accéder à un corrigé payant. Tu achètes un pack de jetons (Starter, Standard ou Maxi) et tu les utilises à ton rythme, sans date d'expiration pour les jetons.",
     },
     {
         q: "Quelle est la différence entre l'abonnement Pro et les packs de jetons ?",
-        a: "Avec les packs de jetons, vous payez à la consommation. L'abonnement Pro donne un accès illimité à toutes les fonctionnalités, sans jamais déduire de jetons. Pro est idéal si vous générez beaucoup de contenu chaque mois.",
+        a: "Avec les packs de jetons, vous payez à la consommation. L'abonnement Pro donne un accès illimité à toutes les fonctionnalités, sans jamais déduire de jetons pendant toute la durée de l'abonnement. Pro est idéal si vous générez beaucoup de contenu chaque mois.",
     },
     {
-        q: "Les corrigés sont-ils tous payants ?",
-        a: "Non. Certains corrigés sont gratuits et accessibles sans jeton. Les corrigés marqués \"payants\" nécessitent soit 2 jetons, soit un abonnement Pro actif. Le téléchargement des épreuves (sans corrigé) est toujours gratuit.",
+        q: "Les épreuves et corrigés sont-ils tous payants ?",
+        a: "Oui. L'accès à une épreuve nécessite 1 jeton, et l'accès à son corrigé nécessite 2 jetons, sauf avec un abonnement Pro ou Ultra actif qui donne un accès illimité aux deux.",
     },
     {
-        q: "Mes outils de révision disparaissent-ils si je n'ai plus de jetons ?",
-        a: "Non. Vos outils de révision déjà générés (résumés, flashcards, quiz) restent accessibles indéfiniment, même si votre solde de jetons tombe à zéro ou si votre abonnement Pro expire.",
+        q: "Mes anciens résumés et générations disparaissent-ils si je n'ai plus de jetons ?",
+        a: "Non. Tes créations déjà générées (résumés, flashcards, quiz) restent accessibles indéfiniment, même si ton solde de jetons tombe à zéro ou si ton abonnement expire.",
     },
     {
         q: "Puis-je utiliser GoStudyEasy sur mobile ?",
-        a: "Oui. L'interface est responsive et pensée pour s'adapter aux petits écrans   que ce soit sur la landing ou dans l'application elle-même.",
+        a: "Oui. Le site et l'application s'adaptent automatiquement à ton téléphone, pour une expérience aussi fluide que sur ordinateur.",
     },
 ];
 
@@ -36,9 +36,6 @@ export default function Faq() {
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center">
                     <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">Questions fréquentes</h2>
-                    <p className="mt-4 text-lg text-foreground/70 max-w-2xl mx-auto">
-                        Tout ce que vous devez savoir sur GoStudyEasy, les jetons et les abonnements.
-                    </p>
                 </div>
                 <div className="mt-16 max-w-4xl mx-auto space-y-4">
                     {FAQS.map(({ q, a, open }) => (

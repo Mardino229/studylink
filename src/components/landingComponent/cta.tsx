@@ -6,7 +6,7 @@ import { CheckCircle2 } from "lucide-react";
 const BULLETS = [
     "Gratuit pour commencer",
     "Packs de jetons sans expiration",
-    "Abonnement Pro annulable à tout moment",
+    "Abonnements Pro et Ultra annulable à tout moment",
 ];
 
 export default function Cta() {
@@ -48,10 +48,10 @@ export default function Cta() {
                     </motion.p>
 
                     <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
-                        Prêt à centraliser vos révisions ?
+                        Prêt à mieux réviser ?
                     </h2>
                     <p className="mt-4 text-lg text-blue-100 max-w-xl mx-auto">
-                        Créez votre compte, importez vos fichiers ou collez un lien YouTube, et générez résumés, flashcards, quiz et podcasts en quelques secondes.
+                        Crée ton compte, importe tes fichiers ou colle un lien YouTube, et génère résumés, flashcards, quiz et podcasts en quelques secondes.
                     </p>
 
                     <div className="mt-8 flex flex-wrap justify-center gap-3 text-sm text-blue-200">
@@ -69,13 +69,13 @@ export default function Cta() {
                             onClick={fireConfetti}
                             className="flex w-full sm:w-auto min-w-[180px] items-center justify-center rounded-full h-14 px-8 bg-white text-blue-600 text-base font-bold shadow-lg hover:bg-white/90 hover:shadow-xl transition-all duration-300"
                         >
-                            Créer un compte gratuit
+                            Commencer gratuitement
                         </Link>
                         <a
                             href="#pricing"
                             className="flex w-full sm:w-auto min-w-[180px] items-center justify-center rounded-full h-14 px-8 border border-white/30 bg-white/10 text-white text-base font-bold hover:bg-white/15 transition-all duration-300"
                         >
-                            Voir les tarifs
+                            Voir les offres
                         </a>
                     </div>
                 </motion.div>

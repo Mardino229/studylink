@@ -6,17 +6,16 @@ import heroPic from "../../assets/hero_pic.jpg";
 const HERO_BG = heroPic;
 
 const PHRASES = [
-    "Créer des résumés en quelques secondes",
-    "Créer des flashcards à partir de vos PDF",
-    "Transformer une vidéo YouTube en source de révision",
-    "Préparer des quiz de révision",
-    "Créer des podcasts à partir de vos cours",
-    "Consulter les épreuves et corrigés",
-    "Discuter avec votre assistant d'étude",
-    "Organiser vos espaces de travail de révision",
+    "Transforme une vidéo YouTube en outils de révision",
+    "Prépare des quiz de révision",
+    "Discute avec un assistant IA",
+    "Crée des flashcards à partir de tes documents de cours",
+    "Organise ton espace de révision",
+    "Génère des résumés en quelques secondes",
+    "Consulte des épreuves et des corrigés",
+    "Crée des podcasts audio à partir de tes cours",
 ];
 
-// Isolated so its frequent state updates don't re-render the whole Hero
 const TypingText = memo(function TypingText({ cursorColor, mutedColor }: { cursorColor: string; mutedColor: string }) {
     const [phraseIndex, setPhraseIndex] = useState(0);
     const [displayText, setDisplayText] = useState("");
@@ -50,7 +49,6 @@ const TypingText = memo(function TypingText({ cursorColor, mutedColor }: { curso
     );
 });
 
-// Static content   only mounts animations once, no re-renders from typing
 const HeroContent = memo(function HeroContent() {
     const textColor = HERO_BG ? "text-white" : "text-foreground";
     const mutedColor = HERO_BG ? "text-white/80" : "text-foreground/70";
@@ -73,25 +71,24 @@ const HeroContent = memo(function HeroContent() {
                     variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
                     className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-4"
                 >
-                    Plateforme de révision
+                    Outil de révision
                 </motion.p>
 
                 <motion.h1
                     variants={{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.7 } } }}
                     className={`text-4xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tighter ${textColor}`}
                 >
-                    Révisez plus vite avec GoStudyEasy
+                    Réviser mieux avec GoStudyEasy.
                 </motion.h1>
 
                 <motion.p
                     variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
                     className={`mt-5 text-lg sm:text-xl ${mutedColor} max-w-2xl mx-auto`}
                 >
-                    Résumés, podcasts, flashcards, quiz, bibliothèque d'épreuves, chat   et même vos vidéos YouTube transformées en sources de révision. Tout dans une seule interface.
+                    À partir de tes cours, PDF ou vidéos YouTube, GoStudyEasy génère des résumés, flashcards, quiz, chat IA et podcasts, le tout dans une seule interface.
                 </motion.p>
             </motion.div>
 
-            {/* Typing text   in its own component so its re-renders stay isolated */}
             <TypingText mutedColor={mutedColor} cursorColor={cursorColor} />
 
             <motion.div
@@ -100,7 +97,7 @@ const HeroContent = memo(function HeroContent() {
                 transition={{ duration: 0.5, delay: 0.3 }}
                 className="mt-8 flex flex-wrap justify-center gap-2"
             >
-                {["Résumés", "Flashcards", "Podcasts", "Quiz", "YouTube", "Épreuves", "Chat", "Espaces de travail"].map(item => (
+                {["Résumés", "Flashcards", "Podcasts", "Quiz", "Examens", "Assistant IA"].map(item => (
                     <span key={item} className={`rounded-full border px-4 py-1.5 text-sm font-medium ${chipStyle}`}>
                         {item}
                     </span>
@@ -117,13 +114,13 @@ const HeroContent = memo(function HeroContent() {
                     to="/register"
                     className="flex w-full sm:w-auto min-w-[160px] items-center justify-center rounded-full h-14 px-8 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-base font-bold shadow-lg hover:opacity-90 transition-opacity"
                 >
-                    Créer un compte gratuit
+                    Commence gratuitement
                 </Link>
                 <a
                     href="#pricing"
                     className={`flex w-full sm:w-auto min-w-[160px] items-center justify-center rounded-full h-14 px-8 ${secondaryBtn} text-base font-bold shadow-md transition-all`}
                 >
-                    Voir les tarifs
+                    Voir les offres
                 </a>
             </motion.div>
 
@@ -133,7 +130,7 @@ const HeroContent = memo(function HeroContent() {
                 transition={{ delay: 0.6 }}
                 className={`mt-6 text-sm ${HERO_BG ? "text-white/50" : "text-foreground/40"}`}
             >
-                Gratuit pour commencer · Packs de jetons dès 2,99 $ · Abonnement Pro dès 6,99 $/mois
+                Gratuit pour essayer · Packs de jetons dès 2,99 $ · Abonnements dès 6,99 $/mois
             </motion.p>
         </div>
     );
@@ -143,7 +140,7 @@ export default function Hero() {
     return (
         <section
             id="home"
-            className="relative min-h-[84vh]  overflow-hidden bg-background py-14 sm:py-32"
+            className="relative min-h-[84vh] overflow-hidden bg-background py-14 sm:py-32"
             style={HERO_BG ? { backgroundImage: `url(${HERO_BG})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
         >
             {HERO_BG && <div className="absolute inset-0 bg-slate-950/60" />}

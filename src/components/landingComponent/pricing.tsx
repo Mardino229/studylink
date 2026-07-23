@@ -1,19 +1,17 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { CheckCircle2, Loader2, Mic, Sparkles, Zap } from "lucide-react";
+import { CheckCircle2, Gem, Loader2, Sparkles, Zap } from "lucide-react";
 import { useGetPlans } from "../../utils/plan";
 import { useGetPublicTokenPacks } from "../../utils/billing";
 
 const TIER_FEATURES = [
-    { label: "Accéder à ses outils de révision",   free: true,  tokens: true,    pro: true,  ultra: true  },
-    { label: "Sources YouTube (vidéos publiques)", free: true,  tokens: true,    pro: true,  ultra: true  },
-    { label: "Épreuves",                           free: false, tokens: "1 🪙",  pro: true,  ultra: true  },
-    { label: "Créer résumés / flashcards / quiz", free: false, tokens: "1 🪙", pro: true,  ultra: true  },
-    { label: "Chat (tranche 10 msgs)",             free: false, tokens: "1 🪙",  pro: true,  ultra: true  },
-    { label: "Corrigés d'examens",                 free: false, tokens: "2 🪙",  pro: true,  ultra: true  },
-    { label: "Résumés audio",                      free: false, tokens: "2 🪙",  pro: false, ultra: true  },
-    { label: "Podcasts",          free: false, tokens: "2 🪙",  pro: false, ultra: true  },
+    { label: "Conservation des outils de révision générés", free: true,  tokens: true,    pro: true,  ultra: true  },
+    { label: "Résumés, quiz, flashcards (vidéos YouTube ou fichiers de cours et images)", free: false, tokens: "1 🪙", pro: true, ultra: true },
+    { label: "Discussion avec l'assistant IA (10 messages)", free: false, tokens: "1 🪙",  pro: true,  ultra: true  },
+    { label: "Bibliothèque d'épreuves",                     free: false, tokens: "1 🪙",  pro: true,  ultra: true  },
+    { label: "Corrigés des épreuves",                       free: false, tokens: "2 🪙",  pro: true,  ultra: true  },
+    { label: "Résumés audio des documents et podcasts",                 free: false, tokens: "2 🪙",  pro: false, ultra: true  },
 ];
 
 function Check() {
@@ -43,7 +41,7 @@ export default function Pricing() {
                         viewport={{ once: true, amount: 0.5 }}
                         className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground"
                     >
-                        Des tarifs clairs, sans surprise
+                        Nos offres
                     </motion.h2>
                     <motion.p
                         initial={{ opacity: 0, y: 8 }}
@@ -52,7 +50,7 @@ export default function Pricing() {
                         viewport={{ once: true, amount: 0.5 }}
                         className="mt-4 text-lg text-foreground/70"
                     >
-                        Gratuit, jetons à la demande, Pro illimité   ou Ultra pour débloquer les podcasts et résumés audio.
+                        Choisissez la formule qui vous convient : le plan gratuit, l'achat de jetons ou un abonnement Pro ou Ultra.
                     </motion.p>
                 </div>
 
@@ -76,7 +74,7 @@ export default function Pricing() {
                                     <span className="inline-flex items-center gap-1"><Sparkles size={14} /> Pro</span>
                                 </th>
                                 <th className="px-4 py-4 text-center font-semibold text-violet-600 dark:text-violet-400">
-                                    <span className="inline-flex items-center gap-1"><Mic size={14} /> Ultra</span>
+                                    <span className="inline-flex items-center gap-1"><Gem size={14} className="text-violet-500" /> Ultra</span>
                                 </th>
                             </tr>
                         </thead>
@@ -114,9 +112,9 @@ export default function Pricing() {
                 <div className="mt-20">
                     <div className="text-center mb-10">
                         <p className="text-xs font-semibold uppercase tracking-widest text-amber-600 dark:text-amber-400 mb-2">Packs de jetons</p>
-                        <h3 className="text-2xl sm:text-3xl font-bold text-foreground">Payez uniquement ce que vous utilisez</h3>
+                        <h3 className="text-2xl sm:text-3xl font-bold text-foreground">Payez uniquement ce dont vous avez besoin.</h3>
                         <p className="mt-3 text-foreground/60 max-w-xl mx-auto">
-                            Chaque jeton = 1 génération (résumé, flashcards, quiz…). Épreuves : 1 jeton · Corrigés : 2 jetons. Aucune date d'expiration.
+                            1 jeton = 1 génération (résumé, flashcards, quiz, etc.). 1 épreuve = 1 jeton. 1 corrigé = 2 jetons. Les jetons n'expirent pas.
                         </p>
                     </div>
 
@@ -154,9 +152,6 @@ export default function Pricing() {
                                     </div>
                                     <p className="mt-2 text-sm text-foreground/60">
                                         🪙 <strong>{pack.tokens} jetons</strong>
-                                        <span className="ml-1 text-foreground/40">
-                                            ({(Number(pack.price_cad) / pack.tokens).toFixed(2)} $/jeton)
-                                        </span>
                                     </p>
                                     <Link
                                         to="/register"
@@ -178,9 +173,9 @@ export default function Pricing() {
                 <div className="mt-20">
                     <div className="text-center mb-10">
                         <p className="text-xs font-semibold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-2">Abonnements</p>
-                        <h3 className="text-2xl sm:text-3xl font-bold text-foreground">Tout illimité, sans compter les jetons</h3>
+                        <h3 className="text-2xl sm:text-3xl font-bold text-foreground">Profitez de toutes les fonctionnalités disponibles sans vous soucier des jetons.</h3>
                         <p className="mt-3 text-foreground/60 max-w-xl mx-auto">
-                            Pro pour un accès illimité à tous vos outils de révision et corrigés. Ultra pour tout ça, plus les podcasts et résumés audio inclus.
+                            L'abonnement Pro pour un accès illimité aux fonctionnalités et corrigés. L'abonnement Ultra pour des fonctionnalités exclusives en plus, telles que les résumés audios et les podcasts.
                         </p>
 
                         {/* Billing toggle */}
@@ -232,7 +227,7 @@ export default function Pricing() {
                                 <div className={`relative flex flex-col rounded-2xl border-2 ${accent.border} bg-gradient-to-br ${accent.from} to-white p-8 shadow-xl dark:to-card dark:shadow-none`}>
                                     <div className={`absolute -top-3 left-1/2 -translate-x-1/2 rounded-full ${accent.badge} px-4 py-0.5 text-xs font-bold uppercase tracking-wider text-white`}>
                                         {isUltra
-                                            ? <><Mic size={11} className="inline mr-1 -mt-0.5" />{plan.name}</>
+                                            ? <><Gem size={11} className="inline mr-1 -mt-0.5" />{plan.name}</>
                                             : <><Sparkles size={11} className="inline mr-1 -mt-0.5" />{plan.name}</>
                                         }
                                     </div>
@@ -242,7 +237,7 @@ export default function Pricing() {
                                     )}
                                     {isUltra && (
                                         <span className="mt-3 inline-flex items-center gap-1.5 self-start rounded-full bg-violet-100 dark:bg-violet-900/30 px-2.5 py-1 text-xs font-semibold text-violet-700 dark:text-violet-300">
-                                            <Mic size={11} /> Podcasts & Audio inclus
+                                            <Gem size={11} /> Podcasts & Audio inclus
                                         </span>
                                     )}
                                     <div className="mt-6 flex items-baseline gap-1">

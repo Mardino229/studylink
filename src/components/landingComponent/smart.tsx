@@ -8,7 +8,7 @@ const STEPS = [
         color: "bg-blue-500/10 text-blue-500 dark:bg-blue-500/15 dark:text-blue-400",
         badge: "bg-blue-600",
         title: "Importez vos sources",
-        desc: "Déposez un PDF, DOCX, PPTX   ou collez un lien YouTube. Notre app lit ou regarde la vidéo, en extrait le contenu et l'indexe comme n'importe quelle source.",
+        desc: "Déposez vos fichiers de cours, des images ou collez un lien YouTube. GoStudyEasy lit le fichier ou regarde la vidéo, puis transforme le contenu en support de travail et de révision.",
     },
     {
         n: "2",
@@ -16,7 +16,7 @@ const STEPS = [
         color: "bg-purple-500/10 text-purple-500 dark:bg-purple-500/15 dark:text-purple-400",
         badge: "bg-purple-600",
         title: "Générez vos outils de révision",
-        desc: "En un clic : résumé audio, podcast, flashcards ou quiz. Chaque outils coûte 1 jeton   ou zéro avec l'abonnement Pro ou Ultra.",
+        desc: "Utilisez vos jetons ou votre abonnement Pro ou Ultra pour générer en un clic des résumés, des flashcards, des quiz ou des podcasts audio.",
     },
     {
         n: "3",
@@ -24,7 +24,7 @@ const STEPS = [
         color: "bg-cyan-500/10 text-cyan-500 dark:bg-cyan-500/15 dark:text-cyan-400",
         badge: "bg-cyan-600",
         title: "Révisez avec un assistant",
-        desc: "Posez vos questions à un assistant qui s'appuie sur vos propres documents pour vous répondre avec précision.",
+        desc: "Posez vos questions à un assistant IA qui s'appuie sur vos propres documents pour vous répondre avec précision.",
     },
     {
         n: "4",
@@ -32,7 +32,7 @@ const STEPS = [
         color: "bg-emerald-500/10 text-emerald-500 dark:bg-emerald-500/15 dark:text-emerald-400",
         badge: "bg-emerald-600",
         title: "Suivez votre progression",
-        desc: "Vos statistiques, notebooks et outils de révision restent accessibles en permanence, même après désabonnement.",
+        desc: "Vos statistiques, documents de révisions et espaces de travail restent accessibles en permanence, même après désabonnement.",
     },
 ];
 
@@ -56,7 +56,7 @@ export default function Smart() {
                                 variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } }}
                                 className="text-xs font-semibold text-center uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-3"
                             >
-                                Fonctionnement
+                                Comment ça marche ?
                             </motion.p>
                             <motion.h2
                                 variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
@@ -64,14 +64,14 @@ export default function Smart() {
                             >
                                 Un chemin simple pour réviser{" "}
                                 <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                                    sans se disperser
+                                    l'essentiel
                                 </span>
                             </motion.h2>
                             <motion.p
                                 variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
                                 className="mt-4 text-lg text-foreground/70"
                             >
-                                GoStudyEasy centralise vos cours, vos résumés, vos examens, votre assistant et vos statistiques.
+                                GoStudyEasy organise tes cours, génère tes résumés, examens et statistiques, et te donne un assistant IA pour t'accompagner.
                             </motion.p>
                         </motion.div>
 
