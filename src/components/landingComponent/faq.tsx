@@ -38,7 +38,7 @@ export default function Faq() {
     const toggle = (i: number) => setOpenIndex(prev => (prev === i ? null : i));
 
     return (
-        <section className="py-16 sm:py-28 bg-background" id="faq">
+        <section className="py-12 sm:py-28 bg-background" id="faq">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
 
                 {/* Header */}

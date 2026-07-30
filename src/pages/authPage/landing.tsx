@@ -29,30 +29,32 @@ export default function Landing() {
                 title="BlueCurve   Révisez plus vite, plus efficacement"
                 description="Résumés, flashcards, quiz, bibliothèque d'épreuves et chat pour les étudiants de l'Université d'Ottawa."
             />
-            <div className="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden">
+            <div className="relative flex size-full min-h-screen flex-col bg-background group/design-root overflow-x-hidden">
                 <div className="layout-container flex h-full grow flex-col">
                     <Header />
                     <main className="flex-1">
                         {/* 1. Hook   Valeur en une phrase, CTA principal */}
-                        <Hero />
+                        <div className="p-2 xl:max-w-[calc(90vw)] xl:mx-auto">
+                            <Hero />
 
-                        {/* 2. Parcours   Comment ça marche en 4 étapes (montrer la simplicité TÔT) */}
-                        <Smart />
+                            {/* 2. Parcours   Comment ça marche en 4 étapes (montrer la simplicité TÔT) */}
+                            <Smart />
 
-                        {/* 3. Fonctionnalités   Maintenant qu'ils comprennent le flux, détailler ce qu'ils obtiennent */}
-                        <AboutFeatures />
+                            {/* 3. Fonctionnalités   Maintenant qu'ils comprennent le flux, détailler ce qu'ils obtiennent */}
+                            <AboutFeatures />
 
-                        {/* 4. Cas d'usage   Pic du désir : "des étudiants comme moi l'utilisent ainsi" */}
-                        {/*<Testimonial />*/}
+                            {/* 4. Cas d'usage   Pic du désir : "des étudiants comme moi l'utilisent ainsi" */}
+                            {/*<Testimonial />*/}
 
-                        {/* 5. Offres   Le désir est au max, montrer le prix maintenant */}
-                        <Pricing />
+                            {/* 5. Offres   Le désir est au max, montrer le prix maintenant */}
+                            <Pricing />
 
-                        {/* 6. FAQ   Lever les dernières objections (jetons, annulation, Pro vs tokens) */}
-                        <Faq />
+                            {/* 6. FAQ   Lever les dernières objections (jetons, annulation, Pro vs tokens) */}
+                            <Faq />
 
-                        {/* 7. CTA final */}
-                        <Cta />
+                            {/* 7. CTA final */}
+                            <Cta />
+                        </div>
                     </main>
                     <Footer />
                 </div>

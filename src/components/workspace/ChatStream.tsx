@@ -518,12 +518,12 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                                             'max-w-[90%] sm:max-w-[80%] text-sm sm:text-base leading-relaxed',
                                             sender === 'user'
                                                 ? 'bg-brand-500 dark:bg-brand-600 px-5 py-3 rounded-3xl rounded-tr-sm text-white shadow-xs'
-                                                : 'px-1 py-1 text-slate-700 dark:text-slate-200'
+                                                : 'px-1 py-1'
                                         )}>
                                             {sender === 'user' ? (
                                                 msg.content
                                             ) : (
-                                                <div className="prose prose-sm max-w-none">
+                                                <div className="prose text-slate-700 dark:text-slate-200 prose-sm max-w-none">
                                                     <ReactMarkdown>{msg.content}</ReactMarkdown>
                                                 </div>
                                             )}

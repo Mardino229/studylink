@@ -309,7 +309,7 @@ const AppSidebar: React.FC = () => {
           !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
         }`}
       >
-        <Link to="/" className="flex items-center gap-2">
+        <Link to="/home" className="flex items-center gap-2">
           <img src={logo} alt="BlueCurve" className="h-12 w-auto shrink-0" />
           {(isExpanded || isHovered || isMobileOpen) && (
             <span className="text-lg font-bold text-foreground whitespace-nowrap">BlueCurve</span>

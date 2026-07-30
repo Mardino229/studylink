@@ -164,7 +164,7 @@ const Chat = () => {
                                     "max-w-[85%] sm:max-w-[75%] text-sm sm:text-base leading-relaxed",
                                     msg.sender === "user"
                                         ? "bg-slate-100 dark:bg-slate-800 px-5 py-3 rounded-3xl rounded-tr-sm text-slate-800 dark:text-slate-100"
-                                        : "px-1 py-1 text-slate-700 dark:text-slate-200"
+                                        : "px-1 py-1 "
                                 )}>
                                     {msg.text}
                                 </div>

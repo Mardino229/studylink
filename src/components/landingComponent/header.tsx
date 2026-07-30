@@ -112,7 +112,7 @@ export default function Header() {
                         : "bg-background/80"
                 }`}
             >
-                <div className="container mx-auto flex items-center justify-between sm:px-6 lg:px-8 py-3">
+                <div className="container mx-auto flex items-center justify-between p-2 sm:px-6 lg:px-8 py-3">
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-3 text-foreground">
                         <img src={logo} alt="BlueCurve" className="sm:h-12 h-8 w-auto" />

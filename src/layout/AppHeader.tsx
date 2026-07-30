@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useLogout } from "../utils/auth";
 import ConfirmModal from "../components/ui/ConfirmModal";
+import ThemeToggle from "../components/common/ThemeToggle.tsx";
 
 // ── Regular user navigation ──────────────────────────────────────
 const USER_NAV = [
@@ -188,7 +189,7 @@ const AppHeader: React.FC = () => {
                     </button>
 
                     {/* Mobile logo */}
-                    <Link to="/" className="lg:hidden">
+                    <Link to="/home" className="lg:hidden">
                         <img src={logo} alt="BlueCurve" className="h-12 w-auto" />
                     </Link>
 
@@ -301,6 +302,7 @@ const AppHeader: React.FC = () => {
                         <TokenStatusBadge />
                         {/*<NotificationDropdown />*/}
                     </div>
+                    <ThemeToggle />
                     <UserDropdown />
                 </div>
             </div>

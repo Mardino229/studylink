@@ -14,6 +14,11 @@
     --animation-typing: typing 2s steps(20) infinite alternate, blink 0.7s infinite;
 }
 
+html {
+    scroll-behavior: smooth;
+    font-size: 90%;
+}
+
 body {
     font-family: 'Figtree', sans-serif;
 }

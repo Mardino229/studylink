@@ -78,7 +78,7 @@ const HeroContent = memo(function HeroContent() {
                     variants={{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.7 } } }}
                     className={`text-4xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tighter ${textColor}`}
                 >
-                    Réviser mieux avec BlueCurve.
+                    Révisez mieux avec BlueCurve.
                 </motion.h1>
 
                 <motion.p
@@ -140,7 +140,7 @@ export default function Hero() {
     return (
         <section
             id="home"
-            className="relative min-h-[84vh] overflow-hidden bg-background py-14 sm:py-32"
+            className="relative rounded-2xl overflow-hidden bg-background py-14 sm:py-32"
             style={HERO_BG ? { backgroundImage: `url(${HERO_BG})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
         >
             {HERO_BG && <div className="absolute inset-0 bg-slate-950/60" />}
