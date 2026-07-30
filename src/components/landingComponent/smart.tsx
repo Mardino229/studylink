@@ -40,7 +40,7 @@ const STEPS = [
 export default function Smart() {
     return (
         <section className="py-12 sm:py-28 bg-background" id="how-it-works">
-            <div className="container mx-auto px-2 sm:px-6 lg:px-8">
+            <div className="container mx-auto sm:px-6 lg:px-8">
                 <div className="grid lg:gap-14 lg:grid-cols-2 lg:items-center">
 
                     {/* Left   steps */}
@@ -59,7 +59,7 @@ export default function Smart() {
                             </motion.p>
                             <motion.h2
                                 variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
-                                className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground"
+                                className="text-3xl text-center sm:text-4xl font-bold tracking-tight text-foreground"
                             >
                                 Un chemin simple pour réviser{" "}
                                 <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -68,15 +68,14 @@ export default function Smart() {
                             </motion.h2>
                             <motion.p
                                 variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
-                                className="mt-4 text-lg text-foreground/70"
+                                className="mt-4 text-center text-lg text-foreground/70"
                             >
                                 BlueCurve organise tes cours, génère tes résumés, examens et statistiques, et te donne un assistant IA pour t'accompagner.
                             </motion.p>
                         </motion.div>
-
+                            
                         <div className="relative mt-10">
                             {/* Connecting line */}
-                            <div className="absolute left-5 top-6 bottom-6 w-px bg-gradient-to-b from-blue-400 via-purple-400 via-cyan-400 to-emerald-400 opacity-25" />
 
                             <motion.div
                                 initial="hidden"

@@ -130,7 +130,7 @@ const HeroContent = memo(function HeroContent() {
                 transition={{ delay: 0.6 }}
                 className={`mt-6 text-sm ${HERO_BG ? "text-white/50" : "text-foreground/40"}`}
             >
-                Gratuit pour essayer · Packs de jetons dès 2,99 $ · Abonnements dès 6,99 $/mois
+                Gratuit pour essayer · Packs de jetons dès 2,99 $ CAD · Abonnements dès 6,99 $ CAD/mois
             </motion.p>
         </div>
     );

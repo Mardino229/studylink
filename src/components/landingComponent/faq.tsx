@@ -39,15 +39,15 @@ export default function Faq() {
 
     return (
         <section className="py-12 sm:py-28 bg-background" id="faq">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="container mx-auto sm:px-6 lg:px-8">
 
                 {/* Header */}
                 <div className="text-center mb-12">
                     <p className="text-xs text-blue-600 dark:text-blue-400 font-semibold uppercase tracking-[0.2em] mb-4">
                         Questions fréquentes
                     </p>
-                    <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">
-                        Frequently<br />Asked Questions
+                    <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">
+                        Frequently Asked Questions
                     </h2>
                 </div>
 

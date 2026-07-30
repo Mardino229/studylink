@@ -30,7 +30,7 @@ export default function Pricing() {
 
     return (
         <section className="py-12 sm:py-28 bg-background" id="pricing">
-            <div className="container mx-auto px-2 sm:px-6 lg:px-8">
+            <div className="container mx-auto sm:px-6 lg:px-8">
 
                 {/* Header */}
                 <div className="text-center max-w-3xl mx-auto">
