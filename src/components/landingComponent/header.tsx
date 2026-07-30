@@ -115,7 +115,7 @@ export default function Header() {
                 <div className="container mx-auto flex items-center justify-between sm:px-6 lg:px-8 py-3">
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-3 text-foreground">
-                        <img src={logo} alt="BlueCurve" className="sm:h-12 h-10 w-auto" />
+                        <img src={logo} alt="BlueCurve" className="sm:h-12 h-8 w-auto" />
                          <span className="text-2xl font-bold leading-tight tracking-tighter">BlueCurve</span> 
                     </Link>
 
