@@ -109,7 +109,9 @@ const WorkspaceNotebook: React.FC = () => {
     // Audio (podcast) is free only on Ultra; text artefacts are free on Pro or Ultra
     const canGenerate = generationModal === 'podcast'
         ? (isUltra || tokenBalance >= AUDIO_COST)
-        : (isPro || tokenBalance >= ARTEFACT_COST);
+        : (isPro || isUltra || tokenBalance >= ARTEFACT_COST);
+
+    console.log(isPro, isUltra, tokenBalance, canGenerate, generationModal);
 
     const handle402 = (error: unknown) => {
         const status = (error as { response?: { status?: number } })?.response?.status;

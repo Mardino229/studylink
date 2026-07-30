@@ -13,7 +13,9 @@ import SubmitExamModal from './exam-library/SubmitExamModal';
 
 export default function ExamLibrary() {
     const navigate = useNavigate();
-    const { isPro, tokenBalance } = useBilling();
+    const { isPro, isUltra, tokenBalance } = useBilling();
+
+    console.log('Billing info:', { isPro, isUltra, tokenBalance });
 
     const [courseId, setCourseId] = useState('');
     const [academicYear, setAcademicYear] = useState('');
@@ -49,12 +51,12 @@ export default function ExamLibrary() {
 
     const viewExam = (exam: ExamItem) => {
         const params = new URLSearchParams({ title: exam.name, endpoint: `/exam-library/${exam.id}/download`, cost: '1' });
-        if (!exam.is_exam_paid || isPro) navigate(`/exam-library/solution/${exam.id}?${params}`);
+        if (!exam.is_exam_paid || isPro || isUltra) navigate(`/exam-library/solution/${exam.id}?${params}`);
         else setConfirmViewExam(exam);
     };
 
     const viewSolution = (exam: ExamItem) => {
-        if (!exam.is_solution_paid || isPro || unlockedExams.has(exam.id)) {
+        if (!exam.is_solution_paid || isPro || isUltra || unlockedExams.has(exam.id)) {
             navigate(`/exam-library/solution/${exam.id}?title=${encodeURIComponent(exam.name)}`);
         } else {
             setConfirmExam(exam);
@@ -69,7 +71,7 @@ export default function ExamLibrary() {
             <div className="space-y-5 pt-4">
                 <div className="flex items-center justify-between">
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Contribuez en soumettant vos épreuves   gagnez des coins !
+                        Contribuez en soumettant vos épreuves et gagnez des coins !
                     </p>
                     <button
                         onClick={() => setSubmitOpen(true)}
@@ -117,7 +119,7 @@ export default function ExamLibrary() {
                             <ExamCard
                                 key={exam.id}
                                 exam={exam}
-                                isPro={isPro}
+                                isPro={isPro || isUltra}
                                 tokenBalance={tokenBalance}
                                 isUnlocked={unlockedExams.has(exam.id)}
                                 onViewExam={() => viewExam(exam)}
