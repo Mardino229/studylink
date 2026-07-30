@@ -177,7 +177,7 @@ export default function Header() {
                         transition={{ duration: 0.18 }}
                         className="xl:hidden border-t border-border bg-background/95 backdrop-blur-sm"
                     >
-                        <div className="px-4 sm:px-6 py-4 space-y-3">
+                        <div className="px-4 sm:px-6 flex justify-between items-center flex-col justify-between gap-6 py-4 space-y-3">
                             {NAV_LINKS.map(({ label, hash }) => (
                                 <a
                                     key={hash}
@@ -188,7 +188,7 @@ export default function Header() {
                                     {label}
                                 </a>
                             ))}
-                            <div className="pt-2 flex items-center gap-4 border-t border-border">
+                            <div className="pt-2 flex flex-col items-center gap-4 border-t border-border">
                                 <Link to="/login" className="text-base text-foreground/70 hover:text-foreground" onClick={() => setMobileOpen(false)}>
                                     Connexion
                                 </Link>
