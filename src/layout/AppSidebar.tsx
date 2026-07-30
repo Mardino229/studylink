@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import logo from "../assets/study-removebg-preview.png";
+import logo from "../assets/mylogo.png";
 
 // Assume these icons are imported from an icon library
 import {
@@ -310,9 +310,9 @@ const AppSidebar: React.FC = () => {
         }`}
       >
         <Link to="/" className="flex items-center gap-2">
-          <img src={logo} alt="GoStudyEasy" className="h-8 w-auto shrink-0" />
+          <img src={logo} alt="BlueCurve" className="h-12 w-auto shrink-0" />
           {(isExpanded || isHovered || isMobileOpen) && (
-            <span className="text-lg font-bold text-foreground whitespace-nowrap">GoStudyEasy</span>
+            <span className="text-lg font-bold text-foreground whitespace-nowrap">BlueCurve</span>
           )}
         </Link>
       </div>

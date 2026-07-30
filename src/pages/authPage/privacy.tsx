@@ -8,8 +8,8 @@ export default function Privacy() {
     return (
         <>
             <PageMeta
-                title="Politique de confidentialité • GoStudyEasy"
-                description="Comment GoStudyEasy collecte, utilise et protège vos données personnelles."
+                title="Politique de confidentialité • BlueCurve"
+                description="Comment BlueCurve collecte, utilise et protège vos données personnelles."
             />
             <div className="relative flex min-h-screen flex-col bg-muted dark:bg-background">
                 <div className="layout-container flex h-full grow flex-col">
@@ -32,7 +32,7 @@ export default function Privacy() {
                             <div className="space-y-10 text-foreground/80 [&_h2]:mb-3 [&_h2]:mt-10 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-foreground [&_p]:leading-relaxed [&_ul]:mt-3 [&_ul]:space-y-2 [&_ul]:pl-5 [&_ul]:text-foreground/75 [&_li]:list-disc [&_li]:leading-relaxed">
 
                                 <p>
-                                    GoStudyEasy (<strong>"nous"</strong>, <strong>"notre"</strong>) prend la confidentialité de
+                                    BlueCurve (<strong>"nous"</strong>, <strong>"notre"</strong>) prend la confidentialité de
                                     vos données au sérieux. Cette politique explique quelles informations nous collectons,
                                     comment nous les utilisons et quels sont vos droits, conformément à la{" "}
                                     <em>Loi sur la protection des renseignements personnels et les documents électroniques</em>{" "}
@@ -42,7 +42,7 @@ export default function Privacy() {
                                 <section>
                                     <h2>1. Données collectées</h2>
                                     <p>
-                                        Lorsque vous utilisez GoStudyEasy, nous collectons les catégories de données suivantes :
+                                        Lorsque vous utilisez BlueCurve, nous collectons les catégories de données suivantes :
                                     </p>
                                     <ul>
                                         <li>
@@ -78,7 +78,7 @@ export default function Privacy() {
                                     <h2>2. Utilisation de vos données</h2>
                                     <p>Vos données sont utilisées pour :</p>
                                     <ul>
-                                        <li>Fournir et maintenir le service GoStudyEasy.</li>
+                                        <li>Fournir et maintenir le service BlueCurve.</li>
                                         <li>
                                             Créer les outils de révision que vous demandez (résumés, flashcards, quiz, réponses du
                                             chat).
@@ -97,7 +97,7 @@ export default function Privacy() {
 
                                 <section>
                                     <h2>3. Services tiers</h2>
-                                    <p>GoStudyEasy fait appel aux services tiers suivants :</p>
+                                    <p>BlueCurve fait appel aux services tiers suivants :</p>
                                     <ul>
                                         <li>
                                             <strong>Google : </strong>   vos fichiers et
@@ -149,7 +149,7 @@ export default function Privacy() {
                                 <section>
                                     <h2>6. Cookies et stockage local</h2>
                                     <p>
-                                        GoStudyEasy utilise des cookies de session et du stockage local du navigateur
+                                        BlueCurve utilise des cookies de session et du stockage local du navigateur
                                         uniquement à des fins d'authentification et de préférences d'interface (thème clair /
                                         sombre). Nous n'utilisons pas de cookies publicitaires ou de traceurs tiers.
                                     </p>
@@ -180,7 +180,7 @@ export default function Privacy() {
                                         Pour toute question relative à cette politique ou à vos données personnelles :
                                     </p>
                                     <p className="mt-2">
-                                        <strong>GoStudyEasy</strong>
+                                        <strong>BlueCurve</strong>
                                         <br />
                                         <a
                                             href="mailto:studylink.uni@gmail.com"

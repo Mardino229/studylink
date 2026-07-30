@@ -61,7 +61,7 @@ const USE_CASES = [
 export default function Testimonial() {
     return (
         <section className="py-12 sm:py-28 bg-background" id="testimonials">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="container mx-auto px-2 sm:px-6 lg:px-8">
                 <motion.div
                     initial="hidden"
                     whileInView="show"
@@ -81,7 +81,7 @@ export default function Testimonial() {
                     >
                         Ce que vous pouvez faire avec{" "}
                         <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                            GoStudyEasy
+                            BlueCurve
                         </span>
                     </motion.h2>
                     <motion.p

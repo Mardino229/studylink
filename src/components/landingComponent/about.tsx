@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 export default function About() {
   return (
     <section className="py-20 sm:py-24 bg-background border-t border-border/60">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-2 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto text-center mb-12">
           <motion.h2
             initial={{ opacity: 0, y: 12 }}
@@ -13,7 +13,7 @@ export default function About() {
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground"
           >
-            À propos de GoStudyEasy
+            À propos de BlueCurve
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 8 }}

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { CheckCircle2, Gem, Loader2, Sparkles, Zap } from "lucide-react";
-import { useGetPlans } from "../../utils/plan";
+import { useGetPublicPlans } from "../../utils/plan";
 import { useGetPublicTokenPacks } from "../../utils/billing";
 
 const TIER_FEATURES = [
@@ -23,14 +23,14 @@ function Cross() {
 
 export default function Pricing() {
     const [billingType, setBillingType] = useState<"monthly" | "annual">("monthly");
-    const { data: plans = [], isLoading: isLoadingPlans } = useGetPlans();
+    const { data: plans = [], isLoading: isLoadingPlans } = useGetPublicPlans();
     const { data: packs = [], isLoading: isLoadingPacks } = useGetPublicTokenPacks();
 
     const proPlans = plans ?? null;
 
     return (
         <section className="py-12 sm:py-28 bg-background" id="pricing">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="container mx-auto px-2 sm:px-6 lg:px-8">
 
                 {/* Header */}
                 <div className="text-center max-w-3xl mx-auto">

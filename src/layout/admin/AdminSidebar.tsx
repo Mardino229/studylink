@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import logo from "../../assets/study-removebg-preview.png";
+import logo from "../../assets/mylogo.png";
 import { useSidebar } from "../../context/SidebarContext";
 import { LayoutDashboard, Users, BadgeCheck, Layers, CreditCard, Megaphone, MessageSquare, BarChart3, Settings as SettingsIcon, BookMarked, Zap } from "lucide-react";
 
@@ -33,9 +33,9 @@ export default function AdminSidebar() {
     >
       <div className={`py-8 flex ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"}`}>
         <Link to="/admin/home" className="flex items-center gap-2">
-          <img src={logo} alt="GoStudyEasy" className="h-8 w-auto shrink-0" />
+          <img src={logo} alt="BlueCurve" className="h-12 w-auto shrink-0" />
           {(isExpanded || isHovered || isMobileOpen) && (
-            <span className="text-lg font-bold text-foreground whitespace-nowrap">GoStudyEasy</span>
+            <span className="text-lg font-bold text-foreground whitespace-nowrap">BlueCurve</span>
           )}
         </Link>
       </div>

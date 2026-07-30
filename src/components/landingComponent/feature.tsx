@@ -5,7 +5,7 @@ export default function Feature() {
 
     return (
         <section className="py-20 sm:py-28 bg-background" id="key-features">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="container mx-auto px-2 sm:px-6 lg:px-8">
                 <div className="text-center">
                     <motion.h2
                         initial={{ opacity: 0, y: 12 }}
@@ -25,7 +25,7 @@ export default function Feature() {
                         className="mt-4 text-lg text-foreground/70 max-w-2xl mx-auto"
                     >
                         Discover the powerful tools that make
-                        GoStudyEasy the ultimate academic companion.
+                        BlueCurve the ultimate academic companion.
                     </motion.p>
                 </div>
                 <motion.div

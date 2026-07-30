@@ -1,12 +1,12 @@
 const FAQS = [
     {
-        q: "Que permet GoStudyEasy ?",
-        a: "GoStudyEasy génère l'ensemble de tes outils d'étude et de révision à partir des contenus que tu lui fournis : résumés, flashcards et quiz à partir de tes fichiers ou de vidéos YouTube. Tu disposes aussi d'une bibliothèque d'épreuves dont certaines sont corrigées, d'un assistant de révision, de podcasts audio et d'outils de suivi de ta progression.",
+        q: "Que permet BlueCurve ?",
+        a: "BlueCurve génère l'ensemble de tes outils d'étude et de révision à partir des contenus que tu lui fournis : résumés, flashcards et quiz à partir de tes fichiers ou de vidéos YouTube. Tu disposes aussi d'une bibliothèque d'épreuves dont certaines sont corrigées, d'un assistant de révision, de podcasts audio et d'outils de suivi de ta progression.",
         open: true,
     },
     {
         q: "Puis-je utiliser une vidéo YouTube comme source ?",
-        a: "Oui. Colle l'URL d'une vidéo YouTube publique dans l'espace dédié de ton espace de travail. GoStudyEasy en extrait le contenu et le rend disponible comme n'importe quelle autre source. Génère ensuite des résumés, des flashcards et des quiz à partir de la vidéo. Les vidéos privées ou non listées ne sont pas prises en charge, et la durée maximale est d'environ 1 heure.",
+        a: "Oui. Colle l'URL d'une vidéo YouTube publique dans l'espace dédié de ton espace de travail. BlueCurve en extrait le contenu et le rend disponible comme n'importe quelle autre source. Génère ensuite des résumés, des flashcards et des quiz à partir de la vidéo. Les vidéos privées ou non listées ne sont pas prises en charge, et la durée maximale est d'environ 1 heure.",
     },
     {
         q: "Comment fonctionne le système de jetons ?",
@@ -25,7 +25,7 @@ const FAQS = [
         a: "Non. Tes créations déjà générées (résumés, flashcards, quiz) restent accessibles indéfiniment, même si ton solde de jetons tombe à zéro ou si ton abonnement expire.",
     },
     {
-        q: "Puis-je utiliser GoStudyEasy sur mobile ?",
+        q: "Puis-je utiliser BlueCurve sur mobile ?",
         a: "Oui. Le site et l'application s'adaptent automatiquement à ton téléphone, pour une expérience aussi fluide que sur ordinateur.",
     },
 ];
@@ -33,7 +33,7 @@ const FAQS = [
 export default function Faq() {
     return (
         <section className="py-12 sm:py-28 bg-muted" id="faq">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="container mx-auto px-2 sm:px-6 lg:px-8">
                 <div className="text-center">
                     <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">Questions fréquentes</h2>
                 </div>

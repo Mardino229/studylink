@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Header from "../../components/landingComponent/header.tsx";
 import Hero from "../../components/landingComponent/hero.tsx";
 import AboutFeatures from "../../components/landingComponent/aboutFeatures.tsx";
@@ -10,10 +12,21 @@ import Pricing from "../../components/landingComponent/pricing.tsx";
 import PageMeta from "../../components/common/PageMeta.tsx";
 
 export default function Landing() {
+    const { hash } = useLocation();
+
+    useEffect(() => {
+        if (!hash) return;
+        const id = hash.replace("#", "");
+        const timer = setTimeout(() => {
+            document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 80);
+        return () => clearTimeout(timer);
+    }, [hash]);
+
     return (
         <>
             <PageMeta
-                title="GoStudyEasy   Révisez plus vite, plus efficacement"
+                title="BlueCurve   Révisez plus vite, plus efficacement"
                 description="Résumés, flashcards, quiz, bibliothèque d'épreuves et chat pour les étudiants de l'Université d'Ottawa."
             />
             <div className="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden">

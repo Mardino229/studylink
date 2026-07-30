@@ -6,7 +6,7 @@ import PageMeta from "../../components/common/PageMeta.tsx";
 export default function About() {
   return (
     <>
-      <PageMeta title="À propos • GoStudyEasy" description="Notre mission, notre approche et nos valeurs." />
+      <PageMeta title="À propos • BlueCurve" description="Notre mission, notre approche et nos valeurs." />
       <div className="relative flex min-h-screen flex-col bg-white dark:bg-background">
         <div className="layout-container flex h-full grow flex-col">
           <Header />

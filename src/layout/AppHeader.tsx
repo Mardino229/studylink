@@ -5,7 +5,7 @@ import UserDropdown from "../components/header/UserDropdown";
 import NotificationDropdown from "../components/header/NotificationDropdown.tsx";
 import { useBilling } from "../context/BillingContext";
 import { useUser } from "../components/layout/userContext.tsx";
-import logo from "../assets/study-removebg-preview.png";
+import logo from "../assets/mylogo.png";
 import {
     BarChart3, BadgeCheck, Bell, BookMarked, BookOpen,
     CreditCard, Layers, LayoutDashboard, LogOut, Megaphone,
@@ -25,7 +25,7 @@ const USER_NAV = [
     { label: "Paramètres",               desc: "Préférences de compte",        path: "/settings",                icon: Settings },
     { label: "Abonnement & jetons",      desc: "Plans Pro et packs de jetons",  path: "/subscription",  icon: CreditCard },
     { label: "Historique des paiements", desc: "Mes transactions",             path: "/settings/payments",       icon: Receipt },
-    { label: "Annonces",                 desc: "Actualités GoStudyEasy",       path: "/settings/announcements",  icon: Bell },
+    { label: "Annonces",                 desc: "Actualités BlueCurve",       path: "/settings/announcements",  icon: Bell },
     { label: "Feedback",                 desc: "Donnez votre avis",            path: "/settings/feedback",       icon: MessageSquare },
 ];
 
@@ -189,7 +189,7 @@ const AppHeader: React.FC = () => {
 
                     {/* Mobile logo */}
                     <Link to="/" className="lg:hidden">
-                        <img src={logo} alt="GoStudyEasy" className="h-8 w-auto" />
+                        <img src={logo} alt="BlueCurve" className="h-12 w-auto" />
                     </Link>
 
                     {/* Mobile menu toggle + logout */}

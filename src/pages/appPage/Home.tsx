@@ -96,7 +96,7 @@ export default function Home() {
 
     return (
         <>
-            <PageMeta title="Dashboard" description="Tableau de bord GoStudyEasy" />
+            <PageMeta title="Dashboard" description="Tableau de bord BlueCurve" />
             <PageBreadcrumb pageTitle="Dashboard" />
 
             <div className="space-y-6 pb-6">

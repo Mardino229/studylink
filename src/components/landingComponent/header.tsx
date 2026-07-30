@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import logo from "../../assets/study-removebg-preview.png";
+import logo from "../../assets/mylogo.png";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState, useCallback } from "react";
 import ThemeToggle from "../common/ThemeToggle";
@@ -98,7 +98,6 @@ export default function Header() {
         { label: "Fonctionnalités", hash: "#key-features" },
         { label: "Offres",          hash: "#pricing" },
         { label: "FAQ",             hash: "#faq" },
-        {/*{ label: "Aperçu",          hash: "#testimonials" },*/},
     ];
 
     return (
@@ -113,11 +112,11 @@ export default function Header() {
                         : "bg-background/80"
                 }`}
             >
-                <div className="container mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4">
+                <div className="container mx-auto flex items-center justify-between sm:px-6 lg:px-8 py-3">
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-3 text-foreground">
-                        <img src={logo} alt="GoStudyEasy" className="h-8 w-auto" />
-                        <span className="text-2xl font-bold leading-tight tracking-tighter">GoStudyEasy</span>
+                        <img src={logo} alt="BlueCurve" className="sm:h-12 h-10 w-auto" />
+                         <span className="text-2xl font-bold leading-tight tracking-tighter">BlueCurve</span> 
                     </Link>
 
                     {/* Desktop nav */}
@@ -176,7 +175,7 @@ export default function Header() {
                         initial={{ opacity: 0, y: -6 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.18 }}
-                        className="md:hidden border-t border-border bg-background/95 backdrop-blur-sm"
+                        className="xl:hidden border-t border-border bg-background/95 backdrop-blur-sm"
                     >
                         <div className="px-4 sm:px-6 py-4 space-y-3">
                             {NAV_LINKS.map(({ label, hash }) => (

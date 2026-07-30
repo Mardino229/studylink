@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Upload, Sparkles, MessageCircle, TrendingUp, BookOpen, Layers, Bot, BarChart2 } from "lucide-react";
+import { Upload, Sparkles, MessageCircle, TrendingUp } from "lucide-react";
 
 const STEPS = [
     {
@@ -8,7 +8,7 @@ const STEPS = [
         color: "bg-blue-500/10 text-blue-500 dark:bg-blue-500/15 dark:text-blue-400",
         badge: "bg-blue-600",
         title: "Importez vos sources",
-        desc: "Déposez vos fichiers de cours, des images ou collez un lien YouTube. GoStudyEasy lit le fichier ou regarde la vidéo, puis transforme le contenu en support de travail et de révision.",
+        desc: "Déposez vos fichiers de cours, des images ou collez un lien YouTube. BlueCurve lit le fichier ou regarde la vidéo, puis transforme le contenu en support de travail et de révision.",
     },
     {
         n: "2",
@@ -32,16 +32,15 @@ const STEPS = [
         color: "bg-emerald-500/10 text-emerald-500 dark:bg-emerald-500/15 dark:text-emerald-400",
         badge: "bg-emerald-600",
         title: "Suivez votre progression",
-        desc: "Vos statistiques, documents de révisions et espaces de travail restent accessibles en permanence, même après désabonnement.",
+        desc: "Vos statistiques, documents de révision et espaces de travail restent accessibles en permanence, même après désabonnement.",
     },
 ];
 
-const SIDEBAR_ICONS = [BookOpen, Layers, Bot, BarChart2];
 
 export default function Smart() {
     return (
         <section className="py-12 sm:py-28 bg-background" id="how-it-works">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="container mx-auto px-2 sm:px-6 lg:px-8">
                 <div className="grid lg:gap-14 lg:grid-cols-2 lg:items-center">
 
                     {/* Left   steps */}
@@ -71,7 +70,7 @@ export default function Smart() {
                                 variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
                                 className="mt-4 text-lg text-foreground/70"
                             >
-                                GoStudyEasy organise tes cours, génère tes résumés, examens et statistiques, et te donne un assistant IA pour t'accompagner.
+                                BlueCurve organise tes cours, génère tes résumés, examens et statistiques, et te donne un assistant IA pour t'accompagner.
                             </motion.p>
                         </motion.div>
 

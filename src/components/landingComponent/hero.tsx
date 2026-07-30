@@ -78,14 +78,14 @@ const HeroContent = memo(function HeroContent() {
                     variants={{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.7 } } }}
                     className={`text-4xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tighter ${textColor}`}
                 >
-                    Réviser mieux avec GoStudyEasy.
+                    Réviser mieux avec BlueCurve.
                 </motion.h1>
 
                 <motion.p
                     variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
                     className={`mt-5 text-lg sm:text-xl ${mutedColor} max-w-2xl mx-auto`}
                 >
-                    À partir de tes cours, PDF ou vidéos YouTube, GoStudyEasy génère des résumés, flashcards, quiz, chat IA et podcasts, le tout dans une seule interface.
+                    Génère des résumés, des flashcards, des podcasts éducatifs et des quiz à partir de tes cours et de vidéos YouTube, et dispose d'un assistant IA pour te guider dans tes révisions, le tout dans une seule interface.
                 </motion.p>
             </motion.div>
 

@@ -6,7 +6,7 @@ import { CheckCircle2 } from "lucide-react";
 const BULLETS = [
     "Gratuit pour commencer",
     "Packs de jetons sans expiration",
-    "Abonnements Pro et Ultra annulable à tout moment",
+    "Abonnements Pro et Ultra annulables à tout moment",
 ];
 
 export default function Cta() {
@@ -26,7 +26,7 @@ export default function Cta() {
 
     return (
         <section className="py-20 sm:py-28 bg-background">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="container mx-auto px-2 sm:px-6 lg:px-8">
                 <motion.div
                     initial={{ opacity: 0, y: 24 }}
                     whileInView={{ opacity: 1, y: 0 }}

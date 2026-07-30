@@ -19,7 +19,7 @@ const FEATURES = [
         span: "lg:col-span-2",
         wide: false,
         title: "Flashcards",
-        desc: "Importe un document, GoStudyEasy le transforme en jeu de flashcards question-réponse. Révise question par question, à ton rythme.",
+        desc: "Importe un document, BlueCurve le transforme en jeu de flashcards question-réponse. Révise question par question, à ton rythme.",
         n: "02",
     },
     {
@@ -29,7 +29,7 @@ const FEATURES = [
         span: "lg:col-span-2",
         wide: false,
         title: "Quiz",
-        desc: "GoStudyEasy génère des questionnaires à choix multiples pour te tester sur ton matériel de cours. Obtiens ton score et les corrections instantanément.",
+        desc: "BlueCurve génère des questionnaires à choix multiples pour te tester sur ton matériel de cours. Obtiens ton score et les corrections instantanément.",
         n: "03",
     },
     {
@@ -59,7 +59,7 @@ const FEATURES = [
         span: "lg:col-span-2",
         wide: false,
         title: "Résumés de vidéos YouTube",
-        desc: "À partir du lien d'une vidéo YouTube, GoStudyEasy te génère un résumé, des flashcards et des quiz pour tes révisions.",
+        desc: "À partir du lien d'une vidéo YouTube, BlueCurve te génère un résumé, des flashcards et des quiz pour tes révisions.",
         n: "06",
     },
     {
@@ -79,7 +79,7 @@ const FEATURES = [
         span: "lg:col-span-6",
         wide: true,
         title: "Audio & Podcasts",
-        desc: "GoStudyEasy transforme tes résumés en briefings audio et génère des podcasts complets à partir de tes documents. Les podcasts prennent la forme d'une discussion éducative entre un professeur et un élève. Écoute tes révisions en déplacement et à tout moment où tes mains ne sont pas libres. Disponible en exclusivité avec le plan Ultra.",
+        desc: "BlueCurve transforme tes résumés en briefings audio et génère des podcasts complets à partir de tes documents. Les podcasts prennent la forme d'une discussion éducative entre un professeur et un élève. Écoute tes révisions en déplacement et à tout moment où tes mains ne sont pas libres. Disponible en exclusivité avec le plan Ultra.",
         n: "08",
         badge: "",
     },
@@ -88,7 +88,7 @@ const FEATURES = [
 export default function AboutFeatures() {
     return (
         <section className="py-12 sm:py-28 bg-background" id="key-features">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="container mx-auto px-2 sm:px-6 lg:px-8">
                 <motion.div
                     initial="hidden"
                     whileInView="show"
@@ -106,9 +106,9 @@ export default function AboutFeatures() {
                         variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
                         className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
                     >
-                        Découvrez comment GoStudyEasy{" "}
+                        Découvrez comment BlueCurve{" "}
                         <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                            vous aide en détails !
+                            vous aide en détail !
                         </span>
                     </motion.h2>
                 </motion.div>
