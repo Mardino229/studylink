@@ -1,0 +1,193 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "how_it_works": "Comment ça marche",
+    "features": "Fonctionnalités",
+    "pricing": "Offres",
+    "faq": "FAQ",
+    "login": "Connexion",
+    "get_started": "Commencer"
+  },
+  "hero": {
+    "tag": "Outil de révision IA",
+    "title": "Révisez mieux avec BlueCurve.",
+    "subtitle": "Génère des résumés, des flashcards, des podcasts éducatifs et des quiz à partir de tes cours et de vidéos YouTube, et dispose d'un assistant IA pour te guider dans tes révisions, le tout dans une seule interface.",
+    "cta_primary": "Commence gratuitement",
+    "cta_secondary": "Voir les offres",
+    "pricing_note": "Gratuit pour essayer · Packs de jetons dès 2,99 $ CAD · Abonnements dès 6,99 $ CAD/mois",
+    "phrases": [
+      "Transforme une vidéo YouTube en outils de révision",
+      "Prépare des quiz de révision",
+      "Discute avec un assistant IA",
+      "Crée des flashcards à partir de tes documents de cours",
+      "Organise ton espace de révision",
+      "Génère des résumés en quelques secondes",
+      "Consulte des épreuves et des corrigés",
+      "Crée des podcasts audio à partir de tes cours"
+    ],
+    "chips": ["Résumés", "Flashcards", "Podcasts", "Quiz", "Examens", "Assistant IA"]
+  },
+  "smart": {
+    "section_label": "Comment ça marche ?",
+    "title": "Un chemin simple pour réviser",
+    "title_highlight": "l'essentiel",
+    "subtitle": "BlueCurve organise tes cours, génère tes résumés, examens et statistiques, et te donne un assistant IA pour t'accompagner.",
+    "steps": [
+      {
+        "title": "Importez vos sources",
+        "desc": "Déposez vos fichiers de cours, des images ou collez un lien YouTube. BlueCurve lit le fichier ou regarde la vidéo, puis transforme le contenu en support de travail et de révision."
+      },
+      {
+        "title": "Générez vos outils de révision",
+        "desc": "Utilisez vos jetons ou votre abonnement Pro ou Ultra pour générer en un clic des résumés, des flashcards, des quiz ou des podcasts audio."
+      },
+      {
+        "title": "Révisez avec un assistant",
+        "desc": "Posez vos questions à un assistant IA qui s'appuie sur vos propres documents pour vous répondre avec précision."
+      },
+      {
+        "title": "Suivez votre progression",
+        "desc": "Vos statistiques, documents de révision et espaces de travail restent accessibles en permanence, même après désabonnement."
+      }
+    ]
+  },
+  "features": {
+    "section_label": "Fonctionnalités",
+    "title": "Découvrez comment BlueCurve",
+    "title_highlight": "vous aide en détail !",
+    "items": [
+      {
+        "title": "Cours & Résumés",
+        "desc": "Crée tes résumés structurés en quelques secondes à partir de tes fichiers de cours, d'images et de vidéos YouTube."
+      },
+      {
+        "title": "Flashcards",
+        "desc": "Importe un document, BlueCurve le transforme en jeu de flashcards question-réponse. Révise question par question, à ton rythme."
+      },
+      {
+        "title": "Quiz",
+        "desc": "BlueCurve génère des questionnaires à choix multiples pour te tester sur ton matériel de cours. Obtiens ton score et les corrections instantanément."
+      },
+      {
+        "title": "Assistant de révision",
+        "desc": "Pose tes questions à l'assistant IA, obtiens des réponses précises basées sur tes propres documents. Idéal pour approfondir certaines notions et améliorer sa compréhension du cours."
+      },
+      {
+        "title": "Bibliothèque d'épreuves",
+        "desc": "Accède à une banque d'épreuves triées selon la matière, la session ou encore l'année ainsi qu'à leurs corrigés avec tes jetons. Ouvrir une épreuve nécessite un jeton, ouvrir un corrigé en nécessite deux, l'ouverture étant permanente. L'abonnement Pro ou Ultra te permet d'accéder sans jetons à toutes les épreuves et à leurs corrigés sans limites."
+      },
+      {
+        "title": "Résumés de vidéos YouTube",
+        "desc": "À partir du lien d'une vidéo YouTube, BlueCurve te génère un résumé, des flashcards et des quiz pour tes révisions."
+      },
+      {
+        "title": "Espace de travail & Statistiques",
+        "desc": "Organise tes cours par dossier. Suis ta progression et garde une vue d'ensemble de tes révisions."
+      },
+      {
+        "title": "Audio & Podcasts",
+        "desc": "BlueCurve transforme tes résumés en briefings audio et génère des podcasts complets à partir de tes documents. Les podcasts prennent la forme d'une discussion éducative entre un professeur et un élève. Écoute tes révisions en déplacement et à tout moment où tes mains ne sont pas libres. Disponible en exclusivité avec le plan Ultra."
+      }
+    ]
+  },
+  "faq": {
+    "section_label": "Questions fréquentes",
+    "title": "Foire aux questions",
+    "items": [
+      {
+        "q": "Que permet BlueCurve ?",
+        "a": "BlueCurve génère l'ensemble de tes outils d'étude et de révision à partir des contenus que tu lui fournis : résumés, flashcards et quiz à partir de tes fichiers ou de vidéos YouTube. Tu disposes aussi d'une bibliothèque d'épreuves dont certaines sont corrigées, d'un assistant de révision, de podcasts audio et d'outils de suivi de ta progression."
+      },
+      {
+        "q": "Puis-je utiliser une vidéo YouTube comme source ?",
+        "a": "Oui. Colle l'URL d'une vidéo YouTube publique dans l'espace dédié de ton espace de travail. BlueCurve en extrait le contenu et le rend disponible comme n'importe quelle autre source. Génère ensuite des résumés, des flashcards et des quiz à partir de la vidéo. Les vidéos privées ou non listées ne sont pas prises en charge, et la durée maximale est d'environ 1 heure."
+      },
+      {
+        "q": "Comment fonctionne le système de jetons ?",
+        "a": "Si tu ne disposes pas d'un abonnement, chaque fonctionnalité consomme des jetons : 1 jeton pour générer un résumé, des flashcards ou un quiz, 1 jeton par tranche de 10 messages de chat, 1 jeton pour accéder à une épreuve et 2 jetons pour accéder à un corrigé payant. Tu achètes un pack de jetons (Starter, Standard ou Maxi) et tu les utilises à ton rythme, sans date d'expiration pour les jetons."
+      },
+      {
+        "q": "Quelle est la différence entre l'abonnement Pro et les packs de jetons ?",
+        "a": "Avec les packs de jetons, vous payez à la consommation. L'abonnement Pro donne un accès illimité à toutes les fonctionnalités, sans jamais déduire de jetons pendant toute la durée de l'abonnement. Pro est idéal si vous générez beaucoup de contenu chaque mois."
+      },
+      {
+        "q": "Les épreuves et corrigés sont-ils tous payants ?",
+        "a": "Oui. L'accès à une épreuve nécessite 1 jeton, et l'accès à son corrigé nécessite 2 jetons, sauf avec un abonnement Pro ou Ultra actif qui donne un accès illimité aux deux."
+      },
+      {
+        "q": "Mes anciens résumés et générations disparaissent-ils si je n'ai plus de jetons ?",
+        "a": "Non. Tes créations déjà générées (résumés, flashcards, quiz) restent accessibles indéfiniment, même si ton solde de jetons tombe à zéro ou si ton abonnement expire."
+      },
+      {
+        "q": "Puis-je utiliser BlueCurve sur mobile ?",
+        "a": "Oui. Le site et l'application s'adaptent automatiquement à ton téléphone, pour une expérience aussi fluide que sur ordinateur."
+      }
+    ]
+  },
+  "cta": {
+    "section_label": "Commencez maintenant",
+    "title": "Prêt à mieux réviser ?",
+    "subtitle": "Crée ton compte, importe tes fichiers ou colle un lien YouTube, et génère résumés, flashcards, quiz et podcasts en quelques secondes.",
+    "cta_primary": "Commencer gratuitement",
+    "cta_secondary": "Voir les offres",
+    "bullets": [
+      "Gratuit pour commencer",
+      "Packs de jetons sans expiration",
+      "Abonnements Pro et Ultra annulables à tout moment"
+    ]
+  },
+  "pricing": {
+    "title": "Nos offres",
+    "subtitle": "Choisissez la formule qui vous convient : le plan gratuit, l'achat de jetons ou un abonnement Pro ou Ultra.",
+    "table": {
+      "feature_col": "Fonctionnalité",
+      "free_col": "Gratuit",
+      "features": [
+        "Conservation des outils de révision générés",
+        "Résumés, quiz, flashcards (vidéos YouTube ou fichiers de cours et images)",
+        "Discussion avec l'assistant IA (10 messages)",
+        "Bibliothèque d'épreuves",
+        "Corrigés des épreuves",
+        "Résumés audio des documents et podcasts"
+      ]
+    },
+    "packs": {
+      "label": "Packs de jetons",
+      "title": "Payez uniquement ce dont vous avez besoin.",
+      "desc": "1 jeton = 1 génération (résumé, flashcards, quiz, etc.). 1 épreuve = 1 jeton. 1 corrigé = 2 jetons. Les jetons n'expirent pas.",
+      "best_value": "Meilleur rapport",
+      "tokens_label": "jetons",
+      "buy_btn": "Acheter",
+      "error": "Impossible de charger les packs pour le moment."
+    },
+    "subscriptions": {
+      "label": "Abonnements",
+      "title": "Profitez de toutes les fonctionnalités disponibles sans vous soucier des jetons.",
+      "desc": "L'abonnement Pro pour un accès illimité aux fonctionnalités et corrigés. L'abonnement Ultra pour des fonctionnalités exclusives en plus, telles que les résumés audios et les podcasts.",
+      "monthly": "Mensuel",
+      "annual": "Annuel",
+      "per_month": "mois",
+      "per_year": "an",
+      "annual_note": "Ou {{price}} $ CAD/an — économisez 40 %",
+      "ultra_badge": "Podcasts & Audio inclus",
+      "start_with": "Commencer avec",
+      "error": "Impossible de charger les abonnements pour le moment."
+    },
+    "footer_note": "Paiements sécurisés via Stripe. Annulation d'abonnement à tout moment."
+  },
+  "footer": {
+    "tagline": "Une plateforme pour résumer, réviser et organiser vos études plus simplement.",
+    "platform": "Plateforme",
+    "company": "Entreprise",
+    "legal": "Légal",
+    "features": "Fonctionnalités",
+    "pricing": "Offres",
+    "login": "Connexion",
+    "about": "À propos",
+    "faq": "FAQ",
+    "contact": "Contact",
+    "privacy": "Confidentialité",
+    "terms": "Conditions",
+    "copyright": "© 2026 BlueCurve. Tous droits réservés."
+  }
+}

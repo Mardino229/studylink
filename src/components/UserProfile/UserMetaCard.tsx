@@ -21,7 +21,8 @@ type UpdateProfileFormData = UpdateProfileRequest & {
 const updateProfileSchema = z.object({
   first_name: z.string().min(2, "Prénom requis"),
   last_name: z.string().min(2, "Nom requis"),
-  email: z.email("Email invalide").nonempty("Email is required"),
+  email: z.email("Email invalide").nonempty("Email is required")
+      .refine((v) => v.endsWith("@uottawa.ca"), { message: "Seuls les emails @uottawa.ca sont acceptés" }),
   study_level_id: z.string().min(1, "Sélectionnez un programme d'étude"),
   faculty_id: z.string().optional(),
   program_id: z.string().optional(),

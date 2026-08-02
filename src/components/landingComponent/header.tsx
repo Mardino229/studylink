@@ -2,7 +2,9 @@ import { Link, useLocation } from "react-router-dom";
 import logo from "../../assets/mylogo.png";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import ThemeToggle from "../common/ThemeToggle";
+import LanguageSwitcher from "../common/LanguageSwitcher";
 
 const SECTION_IDS = ["key-features", "how-it-works", "pricing", "testimonials", "faq"];
 
@@ -64,6 +66,8 @@ export default function Header() {
         };
     }, []); // ← runs once, no dependencies
 
+    const { t } = useTranslation('landing');
+
     const isActive = (hash: string) => activeSection === hash;
 
     const handleSmoothClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, targetHash: string) => {
@@ -93,11 +97,11 @@ export default function Header() {
         }`;
 
     const NAV_LINKS = [
-        { label: "Accueil",         hash: "#" },
-        { label: "Comment ça marche",  hash: "#how-it-works" },
-        { label: "Fonctionnalités", hash: "#key-features" },
-        { label: "Offres",          hash: "#pricing" },
-        { label: "FAQ",             hash: "#faq" },
+        { label: t('nav.home'),         hash: "#" },
+        { label: t('nav.how_it_works'), hash: "#how-it-works" },
+        { label: t('nav.features'),     hash: "#key-features" },
+        { label: t('nav.pricing'),      hash: "#pricing" },
+        { label: t('nav.faq'),          hash: "#faq" },
     ];
 
     return (
@@ -122,32 +126,33 @@ export default function Header() {
                     {/* Desktop nav */}
                     <nav className="hidden xl:flex items-center gap-8">
                         {NAV_LINKS.map(({ label, hash }) => (
-                            <a
+                            <Link
                                 key={hash}
-                                href={hash}
+                                to={{ pathname: "/", hash: hash }}
                                 onClick={(e) => handleSmoothClick(e, hash)}
                                 className={linkCls(hash)}
                             >
                                 {label}
                                 <span className={underline(hash)} />
-                            </a>
+                            </Link>
                         ))}
                     </nav>
 
                     {/* Actions */}
                     <div className="flex items-center gap-3">
+                        <LanguageSwitcher />
                         <ThemeToggle />
                         <Link
                             to="/login"
                             className="hidden sm:inline-block text-base font-medium text-foreground/70 hover:text-foreground transition-colors"
                         >
-                            Connexion
+                            {t('nav.login')}
                         </Link>
                         <Link
                             to="/register"
                             className="hidden md:flex items-center justify-center rounded-full h-10 px-5 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-bold shadow hover:opacity-90 transition-opacity"
                         >
-                            Commencer
+                            {t('nav.get_started')}
                         </Link>
                         {/* Mobile hamburger */}
                         <button
@@ -179,25 +184,25 @@ export default function Header() {
                     >
                         <div className="px-4 sm:px-6 flex justify-between items-center flex-col justify-between gap-6 py-4 space-y-3">
                             {NAV_LINKS.map(({ label, hash }) => (
-                                <a
+                                <Link
                                     key={hash}
-                                    href={hash}
-                                    onClick={(e) => handleSmoothClick(e, hash)}
+                                    to={{ pathname: "/", hash: hash }}
+                                    
                                     className={`block text-base ${isActive(hash) ? "text-foreground font-semibold" : "text-foreground/70"} hover:text-foreground transition-colors`}
                                 >
                                     {label}
-                                </a>
+                                </Link>
                             ))}
                             <div className="pt-2 flex flex-col items-center gap-4 border-t border-border">
                                 <Link to="/login" className="text-base text-foreground/70 hover:text-foreground" onClick={() => setMobileOpen(false)}>
-                                    Connexion
+                                    {t('nav.login')}
                                 </Link>
                                 <Link
                                     to="/register"
                                     className="inline-flex items-center justify-center rounded-full h-10 px-5 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-semibold shadow"
                                     onClick={() => setMobileOpen(false)}
                                 >
-                                    Commencer
+                                    {t('nav.get_started')}
                                 </Link>
                             </div>
                         </div>

@@ -1,91 +1,22 @@
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { BookOpen, Bot, Layers, HelpCircle, BookMarked, FolderKanban, Mic, Video } from "lucide-react";
 
-const FEATURES = [
-    {
-        icon: BookOpen,
-        color: "bg-blue-500/10 text-blue-500 dark:bg-blue-500/15 dark:text-blue-400",
-        glow: "bg-blue-400",
-        span: "lg:col-span-4",
-        wide: true,
-        title: "Cours & Résumés",
-        desc: "Crée tes résumés structurés en quelques secondes à partir de tes fichiers de cours, d'images et de vidéos YouTube.",
-        n: "01",
-    },
-    {
-        icon: Layers,
-        color: "bg-purple-500/10 text-purple-500 dark:bg-purple-500/15 dark:text-purple-400",
-        glow: "bg-purple-400",
-        span: "lg:col-span-2",
-        wide: false,
-        title: "Flashcards",
-        desc: "Importe un document, BlueCurve le transforme en jeu de flashcards question-réponse. Révise question par question, à ton rythme.",
-        n: "02",
-    },
-    {
-        icon: HelpCircle,
-        color: "bg-amber-500/10 text-amber-500 dark:bg-amber-500/15 dark:text-amber-400",
-        glow: "bg-amber-400",
-        span: "lg:col-span-2",
-        wide: false,
-        title: "Quiz",
-        desc: "BlueCurve génère des questionnaires à choix multiples pour te tester sur ton matériel de cours. Obtiens ton score et les corrections instantanément.",
-        n: "03",
-    },
-    {
-        icon: Bot,
-        color: "bg-cyan-500/10 text-cyan-500 dark:bg-cyan-500/15 dark:text-cyan-400",
-        glow: "bg-cyan-400",
-        span: "lg:col-span-4",
-        wide: true,
-        title: "Assistant de révision",
-        desc: "Pose tes questions à l'assistant IA, obtiens des réponses précises basées sur tes propres documents. Idéal pour approfondir certaines notions et améliorer sa compréhension du cours.",
-        n: "04",
-    },
-    {
-        icon: BookMarked,
-        color: "bg-emerald-500/10 text-emerald-500 dark:bg-emerald-500/15 dark:text-emerald-400",
-        glow: "bg-emerald-400",
-        span: "lg:col-span-2",
-        wide: false,
-        title: "Bibliothèque d'épreuves",
-        desc: "Accède à une banque d'épreuves triées selon la matière, la session ou encore l'année ainsi qu'à leurs corrigés avec tes jetons. Ouvrir une épreuve nécessite un jeton, ouvrir un corrigé en nécessite deux, l'ouverture étant permanente. L'abonnement Pro ou Ultra te permet d'accéder sans jetons à toutes les épreuves et à leurs corrigés sans limites.",
-        n: "05",
-    },
-    {
-        icon: Video,
-        color: "bg-red-500/10 text-red-500 dark:bg-red-500/15 dark:text-red-400",
-        glow: "bg-red-400",
-        span: "lg:col-span-2",
-        wide: false,
-        title: "Résumés de vidéos YouTube",
-        desc: "À partir du lien d'une vidéo YouTube, BlueCurve te génère un résumé, des flashcards et des quiz pour tes révisions.",
-        n: "06",
-    },
-    {
-        icon: FolderKanban,
-        color: "bg-orange-500/10 text-orange-500 dark:bg-orange-500/15 dark:text-orange-400",
-        glow: "bg-orange-400",
-        span: "lg:col-span-2",
-        wide: false,
-        title: "Espace de travail & Statistiques",
-        desc: "Organise tes cours par dossier. Suis ta progression et garde une vue d'ensemble de tes révisions.",
-        n: "07",
-    },
-    {
-        icon: Mic,
-        color: "bg-violet-500/10 text-violet-500 dark:bg-violet-500/15 dark:text-violet-400",
-        glow: "bg-violet-400",
-        span: "lg:col-span-6",
-        wide: true,
-        title: "Audio & Podcasts",
-        desc: "BlueCurve transforme tes résumés en briefings audio et génère des podcasts complets à partir de tes documents. Les podcasts prennent la forme d'une discussion éducative entre un professeur et un élève. Écoute tes révisions en déplacement et à tout moment où tes mains ne sont pas libres. Disponible en exclusivité avec le plan Ultra.",
-        n: "08",
-        badge: "",
-    },
+const FEATURE_META = [
+    { icon: BookOpen,      color: "bg-blue-500/10 text-blue-500 dark:bg-blue-500/15 dark:text-blue-400",     glow: "bg-blue-400",    span: "lg:col-span-4", wide: true,  n: "01", badge: false },
+    { icon: Layers,        color: "bg-purple-500/10 text-purple-500 dark:bg-purple-500/15 dark:text-purple-400", glow: "bg-purple-400",  span: "lg:col-span-2", wide: false, n: "02", badge: false },
+    { icon: HelpCircle,    color: "bg-amber-500/10 text-amber-500 dark:bg-amber-500/15 dark:text-amber-400",  glow: "bg-amber-400",   span: "lg:col-span-2", wide: false, n: "03", badge: false },
+    { icon: Bot,           color: "bg-cyan-500/10 text-cyan-500 dark:bg-cyan-500/15 dark:text-cyan-400",     glow: "bg-cyan-400",    span: "lg:col-span-4", wide: true,  n: "04", badge: false },
+    { icon: BookMarked,    color: "bg-emerald-500/10 text-emerald-500 dark:bg-emerald-500/15 dark:text-emerald-400", glow: "bg-emerald-400", span: "lg:col-span-2", wide: false, n: "05", badge: false },
+    { icon: Video,         color: "bg-red-500/10 text-red-500 dark:bg-red-500/15 dark:text-red-400",         glow: "bg-red-400",     span: "lg:col-span-2", wide: false, n: "06", badge: false },
+    { icon: FolderKanban,  color: "bg-orange-500/10 text-orange-500 dark:bg-orange-500/15 dark:text-orange-400", glow: "bg-orange-400",  span: "lg:col-span-2", wide: false, n: "07", badge: false },
+    { icon: Mic,           color: "bg-violet-500/10 text-violet-500 dark:bg-violet-500/15 dark:text-violet-400", glow: "bg-violet-400",  span: "lg:col-span-6", wide: true,  n: "08", badge: true },
 ];
 
 export default function AboutFeatures() {
+    const { t } = useTranslation('landing');
+    const items = t('features.items', { returnObjects: true }) as { title: string; desc: string }[];
+
     return (
         <section className="py-12 sm:py-28 bg-background" id="key-features">
             <div className="container mx-auto sm:px-6 lg:px-8">
@@ -100,15 +31,15 @@ export default function AboutFeatures() {
                         variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } }}
                         className="mb-3 text-xs font-semibold uppercase tracking-widest text-blue-600 dark:text-blue-400"
                     >
-                        Fonctionnalités
+                        {t('features.section_label')}
                     </motion.p>
                     <motion.h2
                         variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
                         className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
                     >
-                        Découvrez comment BlueCurve{" "}
+                        {t('features.title')}{" "}
                         <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                            vous aide en détail !
+                            {t('features.title_highlight')}
                         </span>
                     </motion.h2>
                 </motion.div>
@@ -120,51 +51,45 @@ export default function AboutFeatures() {
                     variants={{ hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } } }}
                     className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6"
                 >
-                    {FEATURES.map(({ icon: Icon, color, glow, span, wide, title, desc, n, badge }) => (
-                        <motion.div
-                            key={title}
-                            variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } }}
-                            className={`group relative overflow-hidden rounded-3xl border p-7 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg ${span} ${badge ? "border-violet-400/40 bg-gradient-to-br from-violet-50/60 to-card dark:from-violet-950/20 dark:to-card" : "border-border bg-card"}`}
-                        >
-                            {/* Hover glow blob */}
-                            <div
-                                className={`pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-20 ${glow}`}
-                            />
+                    {FEATURE_META.map(({ icon: Icon, color, glow, span, wide, n, badge }, i) => {
+                        const { title, desc } = items[i] ?? { title: "", desc: "" };
+                        return (
+                            <motion.div
+                                key={n}
+                                variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } }}
+                                className={`group relative overflow-hidden rounded-3xl border p-7 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg ${span} ${badge ? "border-violet-400/40 bg-gradient-to-br from-violet-50/60 to-card dark:from-violet-950/20 dark:to-card" : "border-border bg-card"}`}
+                            >
+                                <div className={`pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-20 ${glow}`} />
+                                <span className="absolute right-5 top-3 select-none text-5xl font-black leading-none text-foreground/[0.05]">{n}</span>
 
-                            {/* Decorative number */}
-                            <span className="absolute right-5 top-3 select-none text-5xl font-black leading-none text-foreground/[0.05]">
-                                {n}
-                            </span>
+                                {badge && (
+                                    <span className="absolute top-5 right-5 inline-flex items-center gap-1 rounded-full bg-violet-500 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white">
+                                        <Mic size={11} /> Ultra
+                                    </span>
+                                )}
 
-                            {/* Ultra badge */}
-                            {badge && (
-                                <span className="absolute top-5 right-5 inline-flex items-center gap-1 rounded-full bg-violet-500 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white">
-                                    <Mic size={11} />
-                                    {badge}
-                                </span>
-                            )}
-
-                            {wide ? (
-                                <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:gap-8">
-                                    <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${color}`}>
-                                        <Icon size={26} />
+                                {wide ? (
+                                    <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:gap-8">
+                                        <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${color}`}>
+                                            <Icon size={26} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-xl font-bold text-foreground">{title}</h3>
+                                            <p className="mt-2 text-sm leading-relaxed text-foreground/70">{desc}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h3 className="text-xl font-bold text-foreground">{title}</h3>
+                                ) : (
+                                    <>
+                                        <div className={`mb-5 flex h-12 w-12 items-center justify-center rounded-2xl ${color}`}>
+                                            <Icon size={22} />
+                                        </div>
+                                        <h3 className="text-lg font-bold text-foreground">{title}</h3>
                                         <p className="mt-2 text-sm leading-relaxed text-foreground/70">{desc}</p>
-                                    </div>
-                                </div>
-                            ) : (
-                                <>
-                                    <div className={`mb-5 flex h-12 w-12 items-center justify-center rounded-2xl ${color}`}>
-                                        <Icon size={22} />
-                                    </div>
-                                    <h3 className="text-lg font-bold text-foreground">{title}</h3>
-                                    <p className="mt-2 text-sm leading-relaxed text-foreground/70">{desc}</p>
-                                </>
-                            )}
-                        </motion.div>
-                    ))}
+                                    </>
+                                )}
+                            </motion.div>
+                        );
+                    })}
                 </motion.div>
             </div>
         </section>

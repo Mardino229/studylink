@@ -1,17 +1,19 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { CheckCircle2, Gem, Loader2, Sparkles, Zap } from "lucide-react";
 import { useGetPublicPlans } from "../../utils/plan";
+import type { SubscriptionPlan } from "../../utils/type";
 import { useGetPublicTokenPacks } from "../../utils/billing";
 
-const TIER_FEATURES = [
-    { label: "Conservation des outils de révision générés", free: true,  tokens: true,    pro: true,  ultra: true  },
-    { label: "Résumés, quiz, flashcards (vidéos YouTube ou fichiers de cours et images)", free: false, tokens: "1 🪙", pro: true, ultra: true },
-    { label: "Discussion avec l'assistant IA (10 messages)", free: false, tokens: "1 🪙",  pro: true,  ultra: true  },
-    { label: "Bibliothèque d'épreuves",                     free: false, tokens: "1 🪙",  pro: true,  ultra: true  },
-    { label: "Corrigés des épreuves",                       free: false, tokens: "2 🪙",  pro: true,  ultra: true  },
-    { label: "Résumés audio des documents et podcasts",                 free: false, tokens: "2 🪙",  pro: false, ultra: true  },
+const TIER_LOGIC = [
+    { free: true,  tokens: true,    pro: true,  ultra: true  },
+    { free: false, tokens: "1 🪙",  pro: true,  ultra: true  },
+    { free: false, tokens: "1 🪙",  pro: true,  ultra: true  },
+    { free: false, tokens: "1 🪙",  pro: true,  ultra: true  },
+    { free: false, tokens: "2 🪙",  pro: true,  ultra: true  },
+    { free: false, tokens: "2 🪙",  pro: false, ultra: true  },
 ];
 
 function Check() {
@@ -22,17 +24,17 @@ function Cross() {
 }
 
 export default function Pricing() {
+    const { t } = useTranslation('landing');
     const [billingType, setBillingType] = useState<"monthly" | "annual">("monthly");
-    const { data: plans = [], isLoading: isLoadingPlans } = useGetPublicPlans();
-    const { data: packs = [], isLoading: isLoadingPacks } = useGetPublicTokenPacks();
+    const { data: plans, isLoading: isLoadingPlans, isError: isPlansError } = useGetPublicPlans();
+    const { data: packs, isLoading: isLoadingPacks, isError: isPacksError } = useGetPublicTokenPacks();
 
-    const proPlans = plans ?? null;
+    const featureLabels = t('pricing.table.features', { returnObjects: true }) as string[];
 
     return (
         <section className="py-12 sm:py-28 bg-background" id="pricing">
             <div className="container mx-auto sm:px-6 lg:px-8">
 
-                {/* Header */}
                 <div className="text-center max-w-3xl mx-auto">
                     <motion.h2
                         initial={{ opacity: 0, y: 12 }}
@@ -41,7 +43,7 @@ export default function Pricing() {
                         viewport={{ once: true, amount: 0.5 }}
                         className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground"
                     >
-                        Nos offres
+                        {t('pricing.title')}
                     </motion.h2>
                     <motion.p
                         initial={{ opacity: 0, y: 8 }}
@@ -50,11 +52,11 @@ export default function Pricing() {
                         viewport={{ once: true, amount: 0.5 }}
                         className="mt-4 text-lg text-foreground/70"
                     >
-                        Choisissez la formule qui vous convient : le plan gratuit, l'achat de jetons ou un abonnement Pro ou Ultra.
+                        {t('pricing.subtitle')}
                     </motion.p>
                 </div>
 
-                {/* ── Tier comparison ── */}
+                {/* Tier comparison table */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -65,8 +67,8 @@ export default function Pricing() {
                     <table className="w-full min-w-[620px] text-sm">
                         <thead>
                             <tr className="border-b border-border">
-                                <th className="px-6 py-4 text-left font-medium text-foreground/50 w-2/5">Fonctionnalité</th>
-                                <th className="px-4 py-4 text-center font-semibold text-foreground/70">Gratuit</th>
+                                <th className="px-6 py-4 text-left font-medium text-foreground/50 w-2/5">{t('pricing.table.feature_col')}</th>
+                                <th className="px-4 py-4 text-center font-semibold text-foreground/70">{t('pricing.table.free_col')}</th>
                                 <th className="px-4 py-4 text-center font-semibold text-amber-600 dark:text-amber-400">
                                     <span className="inline-flex items-center gap-1"><Zap size={14} /> Jetons</span>
                                 </th>
@@ -79,9 +81,9 @@ export default function Pricing() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border bg-card">
-                            {TIER_FEATURES.map(({ label, free, tokens, pro, ultra }) => (
-                                <tr key={label} className="hover:bg-muted/40 transition-colors">
-                                    <td className="px-6 py-3.5 text-foreground/80">{label}</td>
+                            {TIER_LOGIC.map(({ free, tokens, pro, ultra }, i) => (
+                                <tr key={i} className="hover:bg-muted/40 transition-colors">
+                                    <td className="px-6 py-3.5 text-foreground/80">{featureLabels[i]}</td>
                                     <td className="px-4 py-3.5 text-center">
                                         {free ? <div className="flex justify-center"><Check /></div> : <div className="flex justify-center"><Cross /></div>}
                                     </td>
@@ -108,20 +110,20 @@ export default function Pricing() {
                     </table>
                 </motion.div>
 
-                {/* ── Token packs ── */}
+                {/* Token packs */}
                 <div className="mt-20">
                     <div className="text-center mb-10">
-                        <p className="text-xs font-semibold uppercase tracking-widest text-amber-600 dark:text-amber-400 mb-2">Packs de jetons</p>
-                        <h3 className="text-2xl sm:text-3xl font-bold text-foreground">Payez uniquement ce dont vous avez besoin.</h3>
-                        <p className="mt-3 text-foreground/60 max-w-xl mx-auto">
-                            1 jeton = 1 génération (résumé, flashcards, quiz, etc.). 1 épreuve = 1 jeton. 1 corrigé = 2 jetons. Les jetons n'expirent pas.
-                        </p>
+                        <p className="text-xs font-semibold uppercase tracking-widest text-amber-600 dark:text-amber-400 mb-2">{t('pricing.packs.label')}</p>
+                        <h3 className="text-2xl sm:text-3xl font-bold text-foreground">{t('pricing.packs.title')}</h3>
+                        <p className="mt-3 text-foreground/60 max-w-xl mx-auto">{t('pricing.packs.desc')}</p>
                     </div>
 
                     {isLoadingPacks ? (
                         <div className="flex justify-center py-8">
                             <Loader2 className="animate-spin size-8 text-amber-500" />
                         </div>
+                    ) : isPacksError ? (
+                        <p className="text-center text-sm text-foreground/40 py-8">{t('pricing.packs.error')}</p>
                     ) : (
                         <motion.div
                             initial="hidden"
@@ -130,7 +132,7 @@ export default function Pricing() {
                             variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1 } } }}
                             className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto"
                         >
-                            {packs.map((pack, i) => (
+                            {(packs ?? []).map((pack, i) => (
                                 <motion.div
                                     key={pack.id}
                                     variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } }}
@@ -142,7 +144,7 @@ export default function Pricing() {
                                 >
                                     {i === 1 && (
                                         <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-amber-500 px-3 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white whitespace-nowrap">
-                                            Meilleur rapport
+                                            {t('pricing.packs.best_value')}
                                         </span>
                                     )}
                                     <p className="text-lg font-bold text-foreground">{pack.name}</p>
@@ -151,7 +153,7 @@ export default function Pricing() {
                                         <span className="text-foreground/50 font-medium">$ CAD</span>
                                     </div>
                                     <p className="mt-2 text-sm text-foreground/60">
-                                        🪙 <strong>{pack.tokens} jetons</strong>
+                                        🪙 <strong>{pack.tokens} {t('pricing.packs.tokens_label')}</strong>
                                     </p>
                                     <Link
                                         to="/register"
@@ -161,7 +163,7 @@ export default function Pricing() {
                                                 : "bg-foreground/10 text-foreground hover:bg-foreground/15"
                                         }`}
                                     >
-                                        Acheter
+                                        {t('pricing.packs.buy_btn')}
                                     </Link>
                                 </motion.div>
                             ))}
@@ -169,16 +171,13 @@ export default function Pricing() {
                     )}
                 </div>
 
-                {/* ── Subscriptions ── */}
+                {/* Subscriptions */}
                 <div className="mt-20">
                     <div className="text-center mb-10">
-                        <p className="text-xs font-semibold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-2">Abonnements</p>
-                        <h3 className="text-2xl sm:text-3xl font-bold text-foreground">Profitez de toutes les fonctionnalités disponibles sans vous soucier des jetons.</h3>
-                        <p className="mt-3 text-foreground/60 max-w-xl mx-auto">
-                            L'abonnement Pro pour un accès illimité aux fonctionnalités et corrigés. L'abonnement Ultra pour des fonctionnalités exclusives en plus, telles que les résumés audios et les podcasts.
-                        </p>
+                        <p className="text-xs font-semibold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-2">{t('pricing.subscriptions.label')}</p>
+                        <h3 className="text-2xl sm:text-3xl font-bold text-foreground">{t('pricing.subscriptions.title')}</h3>
+                        <p className="mt-3 text-foreground/60 max-w-xl mx-auto">{t('pricing.subscriptions.desc')}</p>
 
-                        {/* Billing toggle */}
                         <div className="mt-6 inline-flex items-center gap-0 rounded-full border border-border bg-muted p-1">
                             <button
                                 onClick={() => setBillingType("monthly")}
@@ -188,7 +187,7 @@ export default function Pricing() {
                                         : "text-foreground/50 hover:text-foreground/70"
                                 }`}
                             >
-                                Mensuel
+                                {t('pricing.subscriptions.monthly')}
                             </button>
                             <button
                                 onClick={() => setBillingType("annual")}
@@ -198,7 +197,7 @@ export default function Pricing() {
                                         : "text-foreground/50 hover:text-foreground/70"
                                 }`}
                             >
-                                Annuel
+                                {t('pricing.subscriptions.annual')}
                                 <span className="ml-1.5 rounded-full bg-green-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
                                     -40%
                                 </span>
@@ -210,77 +209,76 @@ export default function Pricing() {
                             <div className="flex justify-center py-8">
                                 <Loader2 className="animate-spin size-8 text-blue-500" />
                             </div>
-                        ) : proPlans ? proPlans.map((plan) => {
+                        ) : isPlansError ? (
+                            <p className="text-center text-sm text-foreground/40 py-8">{t('pricing.subscriptions.error')}</p>
+                        ) : (plans ?? []).map((plan: SubscriptionPlan) => {
                             const isUltra = plan.includes_audio;
                             const accent = isUltra
                                 ? { border: "border-violet-500", from: "from-violet-50 dark:from-violet-950/10", badge: "bg-violet-600", btn: "from-violet-500 to-purple-600", check: "text-violet-500" }
                                 : { border: "border-blue-500",   from: "from-blue-50 dark:from-blue-950/10",   badge: "bg-blue-600",   btn: "from-blue-500 to-purple-600",   check: "text-blue-500"   };
                             return (
-                            <motion.div
-                                key={plan.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.55, ease: "easeOut" }}
-                                viewport={{ once: true, amount: 0.3 }}
-                                className="max-w-md mx-auto w-full"
-                            >
-                                <div className={`relative flex flex-col rounded-2xl border-2 ${accent.border} bg-gradient-to-br ${accent.from} to-white p-8 shadow-xl dark:to-card dark:shadow-none`}>
-                                    <div className={`absolute -top-3 left-1/2 -translate-x-1/2 rounded-full ${accent.badge} px-4 py-0.5 text-xs font-bold uppercase tracking-wider text-white`}>
-                                        {isUltra
-                                            ? <><Gem size={11} className="inline mr-1 -mt-0.5" />{plan.name}</>
-                                            : <><Sparkles size={11} className="inline mr-1 -mt-0.5" />{plan.name}</>
-                                        }
+                                <motion.div
+                                    key={plan.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.55, ease: "easeOut" }}
+                                    viewport={{ once: true, amount: 0.3 }}
+                                    className="max-w-md mx-auto w-full"
+                                >
+                                    <div className={`relative flex flex-col rounded-2xl border-2 ${accent.border} bg-gradient-to-br ${accent.from} to-white p-8 shadow-xl dark:to-card dark:shadow-none`}>
+                                        <div className={`absolute -top-3 left-1/2 -translate-x-1/2 rounded-full ${accent.badge} px-4 py-0.5 text-xs font-bold uppercase tracking-wider text-white`}>
+                                            {isUltra
+                                                ? <><Gem size={11} className="inline mr-1 -mt-0.5" />{plan.name}</>
+                                                : <><Sparkles size={11} className="inline mr-1 -mt-0.5" />{plan.name}</>
+                                            }
+                                        </div>
+                                        <h3 className="text-xl font-bold text-foreground">{plan.name}</h3>
+                                        {plan.description && (
+                                            <p className="mt-1 text-sm text-foreground/60">{plan.description}</p>
+                                        )}
+                                        {isUltra && (
+                                            <span className="mt-3 inline-flex items-center gap-1.5 self-start rounded-full bg-violet-100 dark:bg-violet-900/30 px-2.5 py-1 text-xs font-semibold text-violet-700 dark:text-violet-300">
+                                                <Gem size={11} /> {t('pricing.subscriptions.ultra_badge')}
+                                            </span>
+                                        )}
+                                        <div className="mt-6 flex items-baseline gap-1">
+                                            <span className="text-5xl font-black text-foreground">
+                                                {billingType === "monthly" ? plan.price : plan.annual_price}
+                                            </span>
+                                            <span className="text-foreground/50 font-medium">
+                                                $ CAD/{billingType === "monthly" ? t('pricing.subscriptions.per_month') : t('pricing.subscriptions.per_year')}
+                                            </span>
+                                        </div>
+                                        {billingType === "monthly" && (
+                                            <p className="mt-1 text-xs text-foreground/40">
+                                                {t('pricing.subscriptions.annual_note', { price: plan.annual_price })}
+                                            </p>
+                                        )}
+                                        <Link
+                                            to="/register"
+                                            className={`mt-8 flex items-center justify-center rounded-full h-13 px-8 bg-gradient-to-r ${accent.btn} text-white font-bold text-base shadow-lg hover:shadow-xl hover:opacity-90 transition-all`}
+                                        >
+                                            {t('pricing.subscriptions.start_with')} {plan.name}
+                                        </Link>
+                                        {plan.benefits_description?.length > 0 && (
+                                            <ul className="mt-8 space-y-3">
+                                                {plan.benefits_description.map((b: string, i: number) => (
+                                                    <li key={i} className="flex items-center gap-2.5 text-sm text-foreground/70">
+                                                        <CheckCircle2 size={16} className={`${accent.check} shrink-0`} />
+                                                        {b}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
                                     </div>
-                                    <h3 className="text-xl font-bold text-foreground">{plan.name}</h3>
-                                    {plan.description && (
-                                        <p className="mt-1 text-sm text-foreground/60">{plan.description}</p>
-                                    )}
-                                    {isUltra && (
-                                        <span className="mt-3 inline-flex items-center gap-1.5 self-start rounded-full bg-violet-100 dark:bg-violet-900/30 px-2.5 py-1 text-xs font-semibold text-violet-700 dark:text-violet-300">
-                                            <Gem size={11} /> Podcasts & Audio inclus
-                                        </span>
-                                    )}
-                                    <div className="mt-6 flex items-baseline gap-1">
-                                        <span className="text-5xl font-black text-foreground">
-                                            {billingType === "monthly" ? plan.price : plan.annual_price}
-                                        </span>
-                                        <span className="text-foreground/50 font-medium">
-                                            $ CAD/{billingType === "monthly" ? "mois" : "an"}
-                                        </span>
-                                    </div>
-                                    {billingType === "monthly" && (
-                                        <p className="mt-1 text-xs text-foreground/40">
-                                            Ou {plan.annual_price} $ CAD/an   économisez 40 %
-                                        </p>
-                                    )}
-                                    <Link
-                                        to="/register"
-                                        className={`mt-8 flex items-center justify-center rounded-full h-13 px-8 bg-gradient-to-r ${accent.btn} text-white font-bold text-base shadow-lg hover:shadow-xl hover:opacity-90 transition-all`}
-                                    >
-                                        Commencer avec {plan.name}
-                                    </Link>
-                                    {plan.benefits_description?.length > 0 && (
-                                        <ul className="mt-8 space-y-3">
-                                            {plan.benefits_description.map((b, i) => (
-                                                <li key={i} className="flex items-center gap-2.5 text-sm text-foreground/70">
-                                                    <CheckCircle2 size={16} className={`${accent.check} shrink-0`} />
-                                                    {b}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                </div>
-                            </motion.div>
+                                </motion.div>
                             );
-                        }) : (
-                            <p className="text-center text-foreground/40 py-8">Plans en cours de configuration.</p>
-                        )}
-                        </div>
+                        })}
                     </div>
+                </div>
 
-                {/* Bottom note */}
                 <p className="mt-14 text-center text-sm text-foreground/40">
-                    Paiements sécurisés via Stripe. Annulation d'abonnement à tout moment.
+                    {t('pricing.footer_note')}
                 </p>
             </div>
         </section>

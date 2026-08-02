@@ -1,0 +1,193 @@
+{
+  "nav": {
+    "home": "Home",
+    "how_it_works": "How it works",
+    "features": "Features",
+    "pricing": "Pricing",
+    "faq": "FAQ",
+    "login": "Login",
+    "get_started": "Get Started"
+  },
+  "hero": {
+    "tag": "AI Study Tool",
+    "title": "Study smarter with BlueCurve.",
+    "subtitle": "Generate summaries, flashcards, educational podcasts and quizzes from your course files and YouTube videos, with an AI assistant to guide your revision — all in one interface.",
+    "cta_primary": "Start for free",
+    "cta_secondary": "See plans",
+    "pricing_note": "Free to try · Token packs from $2.99 CAD · Subscriptions from $6.99 CAD/month",
+    "phrases": [
+      "Transform a YouTube video into study tools",
+      "Prepare revision quizzes",
+      "Chat with an AI assistant",
+      "Create flashcards from your course documents",
+      "Organize your study workspace",
+      "Generate summaries in seconds",
+      "Browse past exams and solutions",
+      "Create audio podcasts from your courses"
+    ],
+    "chips": ["Summaries", "Flashcards", "Podcasts", "Quiz", "Exams", "AI Assistant"]
+  },
+  "smart": {
+    "section_label": "How does it work?",
+    "title": "A simple path to master",
+    "title_highlight": "the essentials",
+    "subtitle": "BlueCurve organizes your courses, generates summaries, exams and statistics, and gives you an AI assistant to guide you.",
+    "steps": [
+      {
+        "title": "Import your sources",
+        "desc": "Drop your course files, images or paste a YouTube link. BlueCurve reads the file or watches the video, then transforms the content into study material."
+      },
+      {
+        "title": "Generate your study tools",
+        "desc": "Use your tokens or your Pro or Ultra subscription to generate summaries, flashcards, quizzes or audio podcasts in one click."
+      },
+      {
+        "title": "Study with an assistant",
+        "desc": "Ask questions to an AI assistant that draws on your own documents to answer you precisely."
+      },
+      {
+        "title": "Track your progress",
+        "desc": "Your stats, study materials and workspaces remain accessible at all times, even after unsubscribing."
+      }
+    ]
+  },
+  "features": {
+    "section_label": "Features",
+    "title": "Discover how BlueCurve",
+    "title_highlight": "helps you in detail!",
+    "items": [
+      {
+        "title": "Courses & Summaries",
+        "desc": "Create structured summaries in seconds from your course files, images and YouTube videos."
+      },
+      {
+        "title": "Flashcards",
+        "desc": "Import a document, BlueCurve transforms it into a question-and-answer flashcard deck. Review question by question, at your own pace."
+      },
+      {
+        "title": "Quiz",
+        "desc": "BlueCurve generates multiple-choice quizzes to test you on your course material. Get your score and corrections instantly."
+      },
+      {
+        "title": "Study Assistant",
+        "desc": "Ask the AI assistant questions and get precise answers based on your own documents. Ideal for deepening certain concepts and improving your understanding."
+      },
+      {
+        "title": "Exam Library",
+        "desc": "Access a bank of past exams sorted by subject, session or year, along with their solutions using your tokens. Opening an exam costs 1 token, opening a solution costs 2, and access is permanent. A Pro or Ultra subscription gives unlimited access to all exams and solutions."
+      },
+      {
+        "title": "YouTube Video Summaries",
+        "desc": "From a YouTube video link, BlueCurve generates a summary, flashcards and quizzes for your revision."
+      },
+      {
+        "title": "Workspace & Statistics",
+        "desc": "Organize your courses in folders. Track your progress and keep an overview of your revision."
+      },
+      {
+        "title": "Audio & Podcasts",
+        "desc": "BlueCurve transforms your summaries into audio briefings and generates complete podcasts from your documents. Podcasts take the form of an educational discussion between a teacher and a student. Listen to your revision on the go and any time your hands aren't free. Available exclusively with the Ultra plan."
+      }
+    ]
+  },
+  "faq": {
+    "section_label": "Frequently asked questions",
+    "title": "Frequently Asked Questions",
+    "items": [
+      {
+        "q": "What does BlueCurve do?",
+        "a": "BlueCurve generates all your study and revision tools from the content you provide: summaries, flashcards and quizzes from your files or YouTube videos. You also have access to an exam library with some solutions, a revision assistant, audio podcasts and progress-tracking tools."
+      },
+      {
+        "q": "Can I use a YouTube video as a source?",
+        "a": "Yes. Paste the URL of a public YouTube video into the dedicated space in your workspace. BlueCurve extracts the content and makes it available like any other source. You can then generate summaries, flashcards and quizzes from the video. Private or unlisted videos are not supported, and the maximum length is approximately 1 hour."
+      },
+      {
+        "q": "How does the token system work?",
+        "a": "If you don't have a subscription, each feature consumes tokens: 1 token to generate a summary, flashcards or a quiz, 1 token per 10 chat messages, 1 token to access an exam and 2 tokens to access a paid solution. You buy a token pack (Starter, Standard or Maxi) and use them at your own pace — tokens never expire."
+      },
+      {
+        "q": "What's the difference between the Pro subscription and token packs?",
+        "a": "With token packs, you pay per use. The Pro subscription gives unlimited access to all features without ever deducting tokens for the duration of the subscription. Pro is ideal if you generate a lot of content each month."
+      },
+      {
+        "q": "Are all exams and solutions paid?",
+        "a": "Yes. Accessing an exam costs 1 token, and accessing its solution costs 2 tokens, unless you have an active Pro or Ultra subscription which gives unlimited access to both."
+      },
+      {
+        "q": "Do my old summaries and generations disappear if I run out of tokens?",
+        "a": "No. Your already-generated content (summaries, flashcards, quizzes) remains accessible indefinitely, even if your token balance drops to zero or your subscription expires."
+      },
+      {
+        "q": "Can I use BlueCurve on mobile?",
+        "a": "Yes. The site and app automatically adapt to your phone for an experience as smooth as on a computer."
+      }
+    ]
+  },
+  "cta": {
+    "section_label": "Start now",
+    "title": "Ready to study smarter?",
+    "subtitle": "Create your account, import your files or paste a YouTube link, and generate summaries, flashcards, quizzes and podcasts in seconds.",
+    "cta_primary": "Start for free",
+    "cta_secondary": "See plans",
+    "bullets": [
+      "Free to start",
+      "Token packs without expiry",
+      "Pro and Ultra subscriptions cancellable anytime"
+    ]
+  },
+  "pricing": {
+    "title": "Our plans",
+    "subtitle": "Choose the plan that suits you: the free plan, token purchases, or a Pro or Ultra subscription.",
+    "table": {
+      "feature_col": "Feature",
+      "free_col": "Free",
+      "features": [
+        "Retention of generated study tools",
+        "Summaries, quizzes, flashcards (YouTube videos or course files and images)",
+        "AI assistant chat (10 messages)",
+        "Exam library",
+        "Exam solutions",
+        "Audio summaries of documents and podcasts"
+      ]
+    },
+    "packs": {
+      "label": "Token packs",
+      "title": "Pay only for what you need.",
+      "desc": "1 token = 1 generation (summary, flashcards, quiz, etc.). 1 exam = 1 token. 1 solution = 2 tokens. Tokens never expire.",
+      "best_value": "Best value",
+      "tokens_label": "tokens",
+      "buy_btn": "Buy",
+      "error": "Unable to load packs at the moment."
+    },
+    "subscriptions": {
+      "label": "Subscriptions",
+      "title": "Enjoy all available features without worrying about tokens.",
+      "desc": "The Pro subscription for unlimited access to features and solutions. The Ultra subscription for additional exclusive features, such as audio summaries and podcasts.",
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "per_month": "month",
+      "per_year": "year",
+      "annual_note": "Or {{price}} $ CAD/year — save 40%",
+      "ultra_badge": "Podcasts & Audio included",
+      "start_with": "Start with",
+      "error": "Unable to load subscriptions at the moment."
+    },
+    "footer_note": "Secure payments via Stripe. Cancel subscription anytime."
+  },
+  "footer": {
+    "tagline": "A platform to summarize, study and organize your learning more easily.",
+    "platform": "Platform",
+    "company": "Company",
+    "legal": "Legal",
+    "features": "Features",
+    "pricing": "Pricing",
+    "login": "Login",
+    "about": "About",
+    "faq": "FAQ",
+    "contact": "Contact",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "copyright": "© 2026 BlueCurve. All rights reserved."
+  }
+}

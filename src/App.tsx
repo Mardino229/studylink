@@ -53,6 +53,7 @@ import Workspaces from './pages/appPage/Workspaces.tsx';
 import WorkspaceNotebook from './pages/appPage/WorkspaceNotebook.tsx';
 import MySubmissions from './pages/appPage/MySubmissions.tsx';
 import CoinsWallet from './pages/appPage/CoinsWallet.tsx';
+import NotFound from './pages/NotFound.tsx';
 
 function App() {
 
@@ -116,6 +117,7 @@ function App() {
                     </Route>
                 </Route>
 
+                <Route path="*" element={<NotFound />} />
             </Routes>
         </Router>
     )

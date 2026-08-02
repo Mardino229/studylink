@@ -1,62 +1,58 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { memo, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import heroPic from "../../assets/hero_pic.jpg";
 
 const HERO_BG = heroPic;
 
-const PHRASES = [
-    "Transforme une vidéo YouTube en outils de révision",
-    "Prépare des quiz de révision",
-    "Discute avec un assistant IA",
-    "Crée des flashcards à partir de tes documents de cours",
-    "Organise ton espace de révision",
-    "Génère des résumés en quelques secondes",
-    "Consulte des épreuves et des corrigés",
-    "Crée des podcasts audio à partir de tes cours",
-];
-
 const TypingText = memo(function TypingText({ cursorColor, mutedColor }: { cursorColor: string; mutedColor: string }) {
+    const { t } = useTranslation('landing');
+    const phrases = t('hero.phrases', { returnObjects: true }) as string[];
+
     const [phraseIndex, setPhraseIndex] = useState(0);
     const [displayText, setDisplayText] = useState("");
     const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
-        const current = PHRASES[phraseIndex % PHRASES.length] ?? "";
+        const current = phrases[phraseIndex % phrases.length] ?? "";
         const speed = isDeleting ? 38 : 65;
         const timer = setTimeout(() => {
             if (!isDeleting) {
                 const next = current.slice(0, displayText.length + 1);
                 setDisplayText(next);
-                if (next === current) setTimeout(() => setIsDeleting(true), 1200);
+                if (next === current) setTimeout(() => setIsDeleting(true), 1600);
             } else {
-                const next = current.slice(0, Math.max(0, displayText.length - 1));
+                const next = current.slice(0, displayText.length - 1);
                 setDisplayText(next);
-                if (next.length === 0) {
+                if (next === "") {
                     setIsDeleting(false);
-                    setPhraseIndex(i => (i + 1) % PHRASES.length);
+                    setPhraseIndex(i => i + 1);
                 }
             }
         }, speed);
         return () => clearTimeout(timer);
-    }, [displayText, isDeleting, phraseIndex]);
+    }, [displayText, isDeleting, phraseIndex, phrases]);
 
     return (
-        <p className={`mt-5 h-7 text-base sm:text-lg font-medium ${mutedColor}`}>
-            {displayText}
-            <span className={`ml-0.5 inline-block w-0.5 h-5 align-middle ${cursorColor} animate-pulse`} />
+        <p className={`mt-6 h-7 text-base sm:text-lg font-medium ${mutedColor}`}>
+            <span>{displayText}</span>
+            <span className={`inline-block w-0.5 h-5 ml-0.5 align-middle animate-pulse ${cursorColor}`} />
         </p>
     );
 });
 
-const HeroContent = memo(function HeroContent() {
-    const textColor = HERO_BG ? "text-white" : "text-foreground";
-    const mutedColor = HERO_BG ? "text-white/80" : "text-foreground/70";
-    const cursorColor = HERO_BG ? "bg-white/90" : "bg-foreground/80";
-    const chipStyle = HERO_BG
-        ? "border-white/20 bg-white/10 text-white"
-        : "border-border bg-background text-foreground/70";
-    const secondaryBtn = HERO_BG
+const HeroContent = memo(function HeroContent({ dark }: { dark: boolean }) {
+    const { t } = useTranslation('landing');
+    const chips = t('hero.chips', { returnObjects: true }) as string[];
+
+    const textColor   = dark ? "text-white"        : "text-foreground";
+    const mutedColor  = dark ? "text-white/70"     : "text-foreground/70";
+    const cursorColor = dark ? "bg-white"          : "bg-foreground";
+    const chipStyle   = dark
+        ? "bg-white/10 border border-white/20 text-white hover:bg-white/15"
+        : "bg-foreground text-background hover:opacity-90";
+    const secondaryBtn = dark
         ? "bg-white/10 border border-white/20 text-white hover:bg-white/15"
         : "bg-foreground text-background hover:opacity-90";
 
@@ -71,21 +67,21 @@ const HeroContent = memo(function HeroContent() {
                     variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
                     className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-4"
                 >
-                    Outil de révision
+                    {t('hero.tag')}
                 </motion.p>
 
                 <motion.h1
                     variants={{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.7 } } }}
                     className={`text-4xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tighter ${textColor}`}
                 >
-                    Révisez mieux avec BlueCurve.
+                    {t('hero.title')}
                 </motion.h1>
 
                 <motion.p
                     variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
                     className={`mt-5 text-lg sm:text-xl ${mutedColor} max-w-2xl mx-auto`}
                 >
-                    Génère des résumés, des flashcards, des podcasts éducatifs et des quiz à partir de tes cours et de vidéos YouTube, et dispose d'un assistant IA pour te guider dans tes révisions, le tout dans une seule interface.
+                    {t('hero.subtitle')}
                 </motion.p>
             </motion.div>
 
@@ -97,7 +93,7 @@ const HeroContent = memo(function HeroContent() {
                 transition={{ duration: 0.5, delay: 0.3 }}
                 className="mt-8 flex flex-wrap justify-center gap-2"
             >
-                {["Résumés", "Flashcards", "Podcasts", "Quiz", "Examens", "Assistant IA"].map(item => (
+                {chips.map(item => (
                     <span key={item} className={`rounded-full border px-4 py-1.5 text-sm font-medium ${chipStyle}`}>
                         {item}
                     </span>
@@ -114,13 +110,13 @@ const HeroContent = memo(function HeroContent() {
                     to="/register"
                     className="flex w-full sm:w-auto min-w-[160px] items-center justify-center rounded-full h-14 px-8 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-base font-bold shadow-lg hover:opacity-90 transition-opacity"
                 >
-                    Commence gratuitement
+                    {t('hero.cta_primary')}
                 </Link>
                 <a
                     href="#pricing"
                     className={`flex w-full sm:w-auto min-w-[160px] items-center justify-center rounded-full h-14 px-8 ${secondaryBtn} text-base font-bold shadow-md transition-all`}
                 >
-                    Voir les offres
+                    {t('hero.cta_secondary')}
                 </a>
             </motion.div>
 
@@ -130,7 +126,7 @@ const HeroContent = memo(function HeroContent() {
                 transition={{ delay: 0.6 }}
                 className={`mt-6 text-sm ${HERO_BG ? "text-white/50" : "text-foreground/40"}`}
             >
-                Gratuit pour essayer · Packs de jetons dès 2,99 $ CAD · Abonnements dès 6,99 $ CAD/mois
+                {t('hero.pricing_note')}
             </motion.p>
         </div>
     );
@@ -140,13 +136,13 @@ export default function Hero() {
     return (
         <section
             id="home"
-            className="relative rounded-2xl overflow-hidden bg-background py-14 sm:py-32"
-            style={HERO_BG ? { backgroundImage: `url(${HERO_BG})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
+            className="relative flex min-h-[92vh] rounded-2xl items-center justify-center overflow-hidden py-20"
+            style={HERO_BG ? { backgroundImage: `url(${HERO_BG})`, backgroundSize: "cover", backgroundPosition: "center" } : {}}
         >
-            {HERO_BG && <div className="absolute inset-0 bg-slate-950/60" />}
-            <div className="relative container mx-auto flex md:min-h-[66vh] items-center px-4 sm:px-6 lg:px-8">
-                <HeroContent />
+            {HERO_BG && <div className="absolute inset-0 bg-black/55" />}
+            <div className="relative z-10 w-full px-4 sm:px-6 lg:px-8">
+                <HeroContent dark={!!HERO_BG} />
             </div>
-        </section>
+        </section> 
     );
 }

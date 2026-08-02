@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useVerify, useResendOtp } from "../../utils/auth.ts";
 import FormLayout from "../layout/formLayout.tsx";
 
@@ -12,7 +13,7 @@ function useQuery() {
 }
 
 const codeSchema = z.object({
-    code: z.array(z.string().length(1)).length(5),
+    code: z.array(z.string().length(1)).length(6),
 });
 
 type FormData = z.infer<typeof codeSchema>;
@@ -20,6 +21,7 @@ type FormData = z.infer<typeof codeSchema>;
 const COOLDOWN_SECONDS = 60;
 
 export default function ConfirmForm() {
+    const { t } = useTranslation('auth');
     const query = useQuery();
     const email = query.get("email");
     const navigate = useNavigate();
@@ -28,7 +30,7 @@ export default function ConfirmForm() {
 
     const form = useForm<FormData>({
         resolver: zodResolver(codeSchema),
-        defaultValues: { code: ["", "", "", "", ""] },
+        defaultValues: { code: ["", "", "", "", "", ""] },
         mode: "onSubmit",
     });
 
@@ -42,19 +44,16 @@ export default function ConfirmForm() {
         navigate('/login');
     }
 
-    // Focus first input on mount
     useEffect(() => {
         inputRefs.current[0]?.focus();
     }, []);
 
-    // Cooldown ticker
     useEffect(() => {
         if (cooldown <= 0) return;
         const timer = setTimeout(() => setCooldown(c => c - 1), 1000);
         return () => clearTimeout(timer);
     }, [cooldown]);
 
-    // Auto-submit when code is complete
     useEffect(() => {
         let submitted = false;
         const subscription = form.watch((value) => {
@@ -77,7 +76,7 @@ export default function ConfirmForm() {
         setIsCodeValid(verify.isSuccess);
         setIsSubmitting(false);
         if (!verify.isSuccess) {
-            inputRefs.current[4]?.blur();
+            inputRefs.current[5]?.blur();
         }
     }
 
@@ -86,8 +85,7 @@ export default function ConfirmForm() {
         resendOtp.mutate(email, {
             onSuccess: (data) => {
                 if (data.message !== "Account already activated") {
-                    // Reset inputs and start cooldown
-                    form.reset({ code: ["", "", "", "", ""] });
+                    form.reset({ code: ["", "", "", "", "", ""] });
                     setIsCodeValid(null);
                     setCooldown(COOLDOWN_SECONDS);
                     setTimeout(() => inputRefs.current[0]?.focus(), 50);
@@ -99,7 +97,7 @@ export default function ConfirmForm() {
     const handleChange = (value: string, index: number) => {
         if (!/^\d?$/.test(value)) return;
         form.setValue(`code.${index}`, value);
-        if (value && index < 4) {
+        if (value && index < 5) {
             inputRefs.current[index + 1]?.focus();
         }
     };
@@ -112,12 +110,12 @@ export default function ConfirmForm() {
 
     const handlePaste = (e: React.ClipboardEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const pasteData = e.clipboardData.getData("text").slice(0, 5);
+        const pasteData = e.clipboardData.getData("text").slice(0, 6);
         if (!/^\d+$/.test(pasteData)) return;
         pasteData.split("").forEach((digit, idx) => {
             form.setValue(`code.${idx}`, digit);
         });
-        inputRefs.current[Math.min(pasteData.length - 1, 4)]?.focus();
+        inputRefs.current[Math.min(pasteData.length - 1, 5)]?.focus();
     };
 
     const getInputBorderClass = () => {
@@ -129,12 +127,12 @@ export default function ConfirmForm() {
 
     const maskedEmail = email
         ? email.replace(/(.{2}).+(@.+)/, "$1•••$2")
-        : "votre adresse e-mail";
+        : "your email";
 
     return (
         <FormLayout
-            title="Confirmez votre compte"
-            description={`Un code à 5 chiffres a été envoyé à **${maskedEmail}**`}
+            title={t('confirm.title')}
+            description={t('confirm.description', { email: maskedEmail })}
         >
             <Form {...form}>
                 <form className="flex justify-center gap-2 sm:gap-3 mb-8" onPaste={handlePaste} autoComplete="off" noValidate>
@@ -169,11 +167,11 @@ export default function ConfirmForm() {
             </Form>
 
             {isCodeValid === false && (
-                <p className="text-red-500 text-center text-sm mb-4">Code invalide. Veuillez réessayer.</p>
+                <p className="text-red-500 text-center text-sm mb-4">{t('confirm.invalid_code')}</p>
             )}
 
             <p className="text-center text-sm text-gray-600 dark:text-gray-400">
-                Vous n'avez pas reçu de code ?{" "}
+                {t('confirm.no_code')}{" "}
                 <button
                     type="button"
                     onClick={handleResend}
@@ -181,10 +179,10 @@ export default function ConfirmForm() {
                     className="font-semibold text-[var(--primary-color)] hover:text-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
                 >
                     {resendOtp.isPending
-                        ? "Envoi…"
+                        ? t('confirm.resending')
                         : cooldown > 0
-                        ? `Renvoyer (${cooldown}s)`
-                        : "Renvoyer le code"}
+                        ? t('confirm.resend_cooldown', { seconds: cooldown })
+                        : t('confirm.resend')}
                 </button>
             </p>
         </FormLayout>

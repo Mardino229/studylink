@@ -1,0 +1,25 @@
+{
+  "email": {
+    "invalid": "Invalid email address",
+    "required": "Email is required",
+    "uottawa": "Only @uottawa.ca emails are accepted"
+  },
+  "password": {
+    "min": "Password must be at least 8 characters",
+    "uppercase": "Password must contain an uppercase letter",
+    "lowercase": "Password must contain a lowercase letter",
+    "number": "Password must contain a number",
+    "special": "Password must contain a special character",
+    "required": "Current password is required",
+    "new_min": "New password must be at least 8 characters",
+    "confirm_required": "Confirmation is required",
+    "mismatch": "Passwords do not match"
+  },
+  "otp": {
+    "length": "The OTP code must contain 6 digits"
+  },
+  "name": {
+    "first_required": "First name required",
+    "last_required": "Last name required"
+  }
+}

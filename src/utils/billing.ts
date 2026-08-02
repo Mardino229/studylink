@@ -59,22 +59,13 @@ export const useGetPublicTokenPacks = () => {
     return useQuery({
         queryKey: ["token-packs-public"],
         queryFn: async () => {
-            try {
-                const res = await axiosClient.get<{ data: TokenPack[] }>("/tokens/packs");
-                return res.data.data;
-            } catch {
-                return FALLBACK_PACKS;
-            }
+            const res = await axiosClient.get<{ data: TokenPack[] }>("/tokens/packs");
+            return res.data.data;
         },
         staleTime: 5 * 60_000,
+        retry: 2,
     });
 };
-
-const FALLBACK_PACKS: TokenPack[] = [
-    { id: 'starter',  name: 'Starter',  tokens: 10, price_cad: '2.99',  is_active: true },
-    { id: 'standard', name: 'Standard', tokens: 35, price_cad: '7.99',  is_active: true },
-    { id: 'maxi',     name: 'Maxi',     tokens: 80, price_cad: '14.99', is_active: true },
-];
 
 export const useBuyTokenPack = () => {
     const axiosPrivate = useAxiosPrivate();

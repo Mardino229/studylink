@@ -1,0 +1,15 @@
+{
+  "save": "Enregistrer",
+  "cancel": "Annuler",
+  "confirm": "Confirmer",
+  "delete": "Supprimer",
+  "edit": "Modifier",
+  "close": "Fermer",
+  "back": "Retour",
+  "next": "Suivant",
+  "loading": "Chargement...",
+  "error": "Erreur",
+  "success": "Succès",
+  "email": "Email",
+  "password": "Mot de passe"
+}

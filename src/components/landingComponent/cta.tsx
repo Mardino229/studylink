@@ -1,15 +1,13 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { CheckCircle2 } from "lucide-react";
 
-const BULLETS = [
-    "Gratuit pour commencer",
-    "Packs de jetons sans expiration",
-    "Abonnements Pro et Ultra annulables à tout moment",
-];
-
 export default function Cta() {
+    const { t } = useTranslation('landing');
+    const bullets = t('cta.bullets', { returnObjects: true }) as string[];
+
     const fireConfetti = useCallback(() => {
         import("canvas-confetti").then(({ default: confetti }) => {
             const count = 90;
@@ -34,7 +32,6 @@ export default function Cta() {
                     viewport={{ once: true, amount: 0.4 }}
                     className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-blue-500 to-purple-600 p-10 sm:p-16 text-center"
                 >
-                    {/* Background glow */}
                     <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
 
                     <motion.p
@@ -44,18 +41,18 @@ export default function Cta() {
                         viewport={{ once: true }}
                         className="text-xs font-semibold uppercase tracking-widest text-blue-200 mb-4"
                     >
-                        Commencez maintenant
+                        {t('cta.section_label')}
                     </motion.p>
 
                     <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
-                        Prêt à mieux réviser ?
+                        {t('cta.title')}
                     </h2>
                     <p className="mt-4 text-lg text-blue-100 max-w-xl mx-auto">
-                        Crée ton compte, importe tes fichiers ou colle un lien YouTube, et génère résumés, flashcards, quiz et podcasts en quelques secondes.
+                        {t('cta.subtitle')}
                     </p>
 
                     <div className="mt-8 flex flex-wrap justify-center gap-3 text-sm text-blue-200">
-                        {BULLETS.map((b) => (
+                        {bullets.map((b) => (
                             <span key={b} className="inline-flex items-center gap-1.5">
                                 <CheckCircle2 size={14} className="text-blue-300" />
                                 {b}
@@ -69,13 +66,13 @@ export default function Cta() {
                             onClick={fireConfetti}
                             className="flex w-full sm:w-auto min-w-[180px] items-center justify-center rounded-full h-14 px-8 bg-white text-blue-600 text-base font-bold shadow-lg hover:bg-white/90 hover:shadow-xl transition-all duration-300"
                         >
-                            Commencer gratuitement
+                            {t('cta.cta_primary')}
                         </Link>
                         <a
                             href="#pricing"
                             className="flex w-full sm:w-auto min-w-[180px] items-center justify-center rounded-full h-14 px-8 border border-white/30 bg-white/10 text-white text-base font-bold hover:bg-white/15 transition-all duration-300"
                         >
-                            Voir les offres
+                            {t('cta.cta_secondary')}
                         </a>
                     </div>
                 </motion.div>

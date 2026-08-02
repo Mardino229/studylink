@@ -6,6 +6,14 @@ import { useUser } from "../components/layout/userContext.tsx";
 import { clearUnlockedSolutions } from "./exam.ts";
 import type { LoginFormRequest, RegisterFormRequest, ValidationError } from "./type.ts";
 import type { AxiosError } from "axios";
+import i18n from '../i18n/index.ts';
+
+// Rate-limit body is {"error": "..."}, distinct from the standard {"detail": "..."}
+const getRateLimitMsg = (error: AxiosError): string | null => {
+    if (error.response?.status !== 429) return null;
+    const data = error.response.data as Record<string, string>;
+    return data?.error ?? data?.detail ?? i18n.t('auth:common.too_many_title');
+};
 
 
 const useLogin = () => {
@@ -15,18 +23,15 @@ const useLogin = () => {
         mutationFn: async (data: LoginFormRequest) => {
             const response = await axiosClient.post('auth/login', data)
             const userData = response.data.data.user;
-            console.log(userData)
             setUser(userData)
-            console.log(response.data)
             return {
                 success: true,
                 user: userData,
             };
         },
         onSuccess: (data) => {
-
-            toast.success('Connexion réussie', {
-                description: "Welcome back !",
+            toast.success(i18n.t('auth:login.toast_success_title'), {
+                description: i18n.t('auth:login.toast_success_desc'),
             });
 
             if (data.user.is_active) {
@@ -47,9 +52,15 @@ const useLogin = () => {
             const axiosError = error as AxiosError;
 
             if (!axiosError.response) {
-                toast.error("Login failed", {
-                    description: "Service unavailable. Please try again later.",
+                toast.error(i18n.t('auth:login.toast_failed'), {
+                    description: i18n.t('auth:common.service_unavailable'),
                 });
+                return;
+            }
+
+            const rateLimitMsg = getRateLimitMsg(axiosError);
+            if (rateLimitMsg) {
+                toast.error(i18n.t('auth:common.too_many_title'), { description: rateLimitMsg });
                 return;
             }
 
@@ -62,7 +73,7 @@ const useLogin = () => {
                 };
             }
             if (err.response.status === 403) {
-                const err = error as unknown as {
+                const err403 = error as unknown as {
                     response: {
                         data: {
                             detail: {
@@ -73,12 +84,12 @@ const useLogin = () => {
                         status: number,
                     };
                 }
-                toast.error("Please validate your account", {
-                    description: err.response.data.detail.message,
+                toast.error(i18n.t('auth:login.toast_validate_title'), {
+                    description: err403.response.data.detail.message,
                 });
-                navigate(`/confirm?email=${err.response.data.detail.email}`);
+                navigate(`/confirm?email=${err403.response.data.detail.email}`);
             } else {
-                toast.error("Connexion failed", {
+                toast.error(i18n.t('auth:login.toast_failed'), {
                     description: err.response.data.detail,
                 });
             }
@@ -103,22 +114,25 @@ const useRegister = () => {
             })
             navigate(`/confirm?email=${data.email}`);
         },
-        onSuccess: () => {
-            // Optionnel: vous pouvez mettre du code ici si nécessaire
-        },
+        onSuccess: () => {},
         onError: (error) => {
             console.error(error);
 
             const axiosError = error as AxiosError;
 
             if (!axiosError.response) {
-                toast.error("Inscription failed", {
-                    description: "Service unavailable. Please try again later.",
+                toast.error(i18n.t('auth:register.toast_failed'), {
+                    description: i18n.t('auth:common.service_unavailable'),
                 });
                 return;
             }
 
-            // Si on arrive ici, on a une réponse du serveur
+            const rateLimitMsg = getRateLimitMsg(axiosError);
+            if (rateLimitMsg) {
+                toast.error(i18n.t('auth:common.too_many_title'), { description: rateLimitMsg });
+                return;
+            }
+
             const err = error as unknown as {
                 response: {
                     data: {
@@ -136,18 +150,16 @@ const useRegister = () => {
                         }
                     };
                 };
-                toast.error("Inscription failed", {
+                toast.error(i18n.t('auth:register.toast_failed'), {
                     description: `${validationErr.response.data.detail[0].loc[1]}: ${validationErr.response.data.detail[0].msg}`,
                 });
             } else {
-                toast.error("Inscription failed", {
+                toast.error(i18n.t('auth:register.toast_failed'), {
                     description: typeof err.response.data.detail === 'string'
                         ? err.response.data.detail
                         : "An error occurred",
                 });
             }
-
-
         },
     });
 }
@@ -164,12 +176,16 @@ const useVerify = () => {
         },
         onSuccess: ({ user }) => {
             if (user) {
-                toast.success("Compte activé !", { description: "Bienvenue sur BlueCurve." });
+                toast.success(i18n.t('auth:confirm.toast_activated_title'), {
+                    description: i18n.t('auth:confirm.toast_activated_desc'),
+                });
                 if (user.role?.name === 'admin') navigate('/admin/home');
                 else if (user.study_level_id === null) navigate('/complete-profile');
                 else navigate('/home');
             } else {
-                toast.success("Compte déjà activé", { description: "Connectez-vous avec votre mot de passe." });
+                toast.success(i18n.t('auth:confirm.toast_already_title'), {
+                    description: i18n.t('auth:confirm.toast_already_desc'),
+                });
                 navigate('/login');
             }
         },
@@ -178,9 +194,21 @@ const useVerify = () => {
             const axiosError = error as AxiosError;
 
             if (!axiosError.response) {
-                toast.error("Operation failed", {
-                    description: "Service unavailable. Please try again later.",
+                toast.error(i18n.t('auth:common.operation_failed'), {
+                    description: i18n.t('auth:common.service_unavailable'),
                 });
+                return;
+            }
+
+            if (axiosError.response.status === 429) {
+                const data = axiosError.response.data as Record<string, string>;
+                if (data?.detail?.toLowerCase().includes("too many failed")) {
+                    toast.error(i18n.t('auth:common.too_many_otp_title'), {
+                        description: i18n.t('auth:common.too_many_otp_desc'),
+                    });
+                } else {
+                    toast.error(i18n.t('auth:common.too_many_title'), { description: getRateLimitMsg(axiosError)! });
+                }
                 return;
             }
 
@@ -193,18 +221,18 @@ const useVerify = () => {
                 };
             }
             if (err.response.status === 422) {
-                const err = error as unknown as {
+                const err422 = error as unknown as {
                     response: {
                         data: {
                             detail: ValidationError[]
                         }
                     };
                 }
-                toast.error("Validation failed", {
-                    description: `${err.response.data.detail[0].loc[1]}: ${err.response.data.detail[0].msg}`,
+                toast.error(i18n.t('auth:common.validation_failed'), {
+                    description: `${err422.response.data.detail[0].loc[1]}: ${err422.response.data.detail[0].msg}`,
                 })
             } else {
-                toast.error("Échec de la vérification", {
+                toast.error(i18n.t('auth:common.verification_failed'), {
                     description: err.response.data.detail,
                 })
             }
@@ -222,7 +250,7 @@ const useLogout = () => {
             clearUnlockedSolutions(user?.id);
             queryClient.clear();
             setUser({});
-            toast.success("Logout successful");
+            toast.success(i18n.t('auth:common.logout_success'));
         },
         onSuccess: () => {
             navigate(`/`);
@@ -230,8 +258,8 @@ const useLogout = () => {
         onError: (error) => {
             const axiosError = error as AxiosError;
             if (!axiosError.response) {
-                toast.error("Logout failed", {
-                    description: "Service unavailable. Please try again later.",
+                toast.error(i18n.t('auth:common.logout_failed'), {
+                    description: i18n.t('auth:common.service_unavailable'),
                 });
                 return;
             }
@@ -247,18 +275,22 @@ const useRequestPassword = () => {
                 description: "We've sent a reset password link to your email",
             })
         },
-        onSuccess: () => {
-
-        },
+        onSuccess: () => {},
         onError: (error) => {
             console.error(error);
 
             const axiosError = error as AxiosError;
 
             if (!axiosError.response) {
-                toast.error("Operation failed", {
-                    description: "Service unavailable. Please try again later.",
+                toast.error(i18n.t('auth:common.operation_failed'), {
+                    description: i18n.t('auth:common.service_unavailable'),
                 });
+                return;
+            }
+
+            const rateLimitMsg = getRateLimitMsg(axiosError);
+            if (rateLimitMsg) {
+                toast.error(i18n.t('auth:common.too_many_title'), { description: rateLimitMsg });
                 return;
             }
 
@@ -270,20 +302,19 @@ const useRequestPassword = () => {
                     status: number,
                 };
             }
-            console.log(err.response.status === 422)
             if (err.response.status === 422) {
-                const err = error as unknown as {
+                const err422 = error as unknown as {
                     response: {
                         data: {
                             detail: ValidationError[]
                         }
                     };
                 }
-                toast.error("Password Request failed", {
-                    description: `${err.response.data.detail[0].loc[1]}: ${err.response.data.detail[0].msg}`,
+                toast.error(i18n.t('auth:reset.toast_failed'), {
+                    description: `${err422.response.data.detail[0].loc[1]}: ${err422.response.data.detail[0].msg}`,
                 })
             } else {
-                toast.error("Password Request failed", {
+                toast.error(i18n.t('auth:reset.toast_failed'), {
                     description: err.response.data.detail,
                 })
             }
@@ -298,7 +329,7 @@ const useResetPassword = () => {
         mutationFn: async (data: { token: string | null, password: string, confirmPassword: string }) => {
             const response = await axiosClient.post('/auth/reset-password', data);
             toast.success(response.data.message, {
-                description: "You can log you in with your new password",
+                description: i18n.t('auth:reset_password.toast_success_desc'),
             })
         },
         onSuccess: () => {
@@ -310,9 +341,15 @@ const useResetPassword = () => {
             const axiosError = error as AxiosError;
 
             if (!axiosError.response) {
-                toast.error("Operation failed", {
-                    description: "Service unavailable. Please try again later.",
+                toast.error(i18n.t('auth:common.operation_failed'), {
+                    description: i18n.t('auth:common.service_unavailable'),
                 });
+                return;
+            }
+
+            const rateLimitMsg = getRateLimitMsg(axiosError);
+            if (rateLimitMsg) {
+                toast.error(i18n.t('auth:common.too_many_title'), { description: rateLimitMsg });
                 return;
             }
 
@@ -324,20 +361,19 @@ const useResetPassword = () => {
                     status: number,
                 };
             }
-            console.log(err.response.status === 422)
             if (err.response.status === 422) {
-                const err = error as unknown as {
+                const err422 = error as unknown as {
                     response: {
                         data: {
                             detail: ValidationError[]
                         }
                     };
                 }
-                toast.error("Password Reset failed", {
-                    description: `${err.response.data.detail[0].loc[1]}: ${err.response.data.detail[0].msg}`,
+                toast.error(i18n.t('auth:reset_password.toast_failed'), {
+                    description: `${err422.response.data.detail[0].loc[1]}: ${err422.response.data.detail[0].msg}`,
                 })
             } else {
-                toast.error("Password Reset failed", {
+                toast.error(i18n.t('auth:reset_password.toast_failed'), {
                     description: err.response.data.detail,
                 })
             }
@@ -355,19 +391,32 @@ const useResendOtp = () => {
         },
         onSuccess: (data) => {
             if (data.message === "Account already activated") {
-                toast.success("Compte déjà activé", { description: "Vous pouvez vous connecter directement." });
+                toast.success(i18n.t('auth:confirm.toast_already_title'), {
+                    description: i18n.t('auth:confirm.toast_already_desc'),
+                });
                 navigate('/login');
             } else {
-                toast.success("Code renvoyé", { description: "Vérifiez votre boîte mail." });
+                toast.success(i18n.t('auth:confirm.toast_resent_title'), {
+                    description: i18n.t('auth:confirm.toast_resent_desc'),
+                });
             }
         },
         onError: (error) => {
             const axiosError = error as AxiosError;
             if (!axiosError.response) {
-                toast.error("Service indisponible", { description: "Veuillez réessayer plus tard." });
-            } else {
-                toast.error("Erreur", { description: (axiosError.response.data as { detail?: string })?.detail ?? "Une erreur est survenue." });
+                toast.error(i18n.t('auth:common.service_unavailable_title'), {
+                    description: i18n.t('auth:common.service_unavailable'),
+                });
+                return;
             }
+            const rateLimitMsg = getRateLimitMsg(axiosError);
+            if (rateLimitMsg) {
+                toast.error(i18n.t('auth:common.too_many_title'), { description: rateLimitMsg });
+                return;
+            }
+            toast.error(i18n.t('auth:common.error'), {
+                description: (axiosError.response.data as { detail?: string })?.detail ?? "An error occurred.",
+            });
         },
     });
 };
