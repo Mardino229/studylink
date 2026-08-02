@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { LucideIcon } from 'lucide-react';
 import {  Hash, Target } from 'lucide-react';
 import type { Theme, PaginatedResponse } from '../../../types/workspace';
@@ -29,6 +30,7 @@ const themeColors = [
 ];
 
 export const OverviewTab: React.FC<OverviewTabProps> = ({ stats, themes, isLoadingThemes }) => {
+    const { t } = useTranslation('workspace');
     const themesList = themes?.items ?? [];
 
     const getBadgeTone = (index: number) => (index % 4 === 2 ? 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500' : 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500');
@@ -67,11 +69,11 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats, themes, isLoadi
                         <Target size={16} />
                     </div>
                     <div>
-                        <h3 className="text-sm font-bold text-foreground">Thèmes détectés</h3>
+                        <h3 className="text-sm font-bold text-foreground">{t('tabs.overview.detected_themes')}</h3>
                         <p className="text-xs text-foreground/50">
                             {isLoadingThemes
-                                ? 'Récupération des thèmes en cours…'
-                                : `${themesList.length} concept${themesList.length > 1 ? 's' : ''} identifié${themesList.length > 1 ? 's' : ''}`
+                                ? t('tabs.overview.themes_loading')
+                                : t('tabs.overview.themes_count', { count: themesList.length })
                             }
                         </p>
                     </div>
@@ -107,9 +109,9 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats, themes, isLoadi
                         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gray-100 text-gray-400 dark:bg-white/[0.04] dark:text-gray-500 mb-3">
                             <Hash size={22} />
                         </div>
-                        <p className="text-sm font-medium text-foreground/70">Aucun thème détecté</p>
+                        <p className="text-sm font-medium text-foreground/70">{t('tabs.overview.no_themes')}</p>
                         <p className="mt-1 text-xs text-foreground/40 max-w-xs">
-                            Les thèmes sont automatiquement extraits de vos sources documentaires.
+                            {t('tabs.overview.themes_auto_extract')}
                         </p>
                     </div>
                 )}

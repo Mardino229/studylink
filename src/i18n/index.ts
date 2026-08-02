@@ -1,22 +1,29 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-import enCommon  from '../locales/en/common.json';
-import enAuth    from '../locales/en/auth.json';
-import enLanding from '../locales/en/landing.json';
-import enErrors  from '../locales/en/errors.json';
-import frCommon  from '../locales/fr/common.json';
-import frAuth    from '../locales/fr/auth.json';
-import frLanding from '../locales/fr/landing.json';
-import frErrors  from '../locales/fr/errors.json';
+import enCommon    from '../locales/en/common.json';
+import enAuth      from '../locales/en/auth.json';
+import enLanding   from '../locales/en/landing.json';
+import enErrors    from '../locales/en/errors.json';
+import enApp       from '../locales/en/app.json';
+import enWorkspace from '../locales/en/workspace.json';
+import enExams     from '../locales/en/exams.json';
+
+import frCommon    from '../locales/fr/common.json';
+import frAuth      from '../locales/fr/auth.json';
+import frLanding   from '../locales/fr/landing.json';
+import frErrors    from '../locales/fr/errors.json';
+import frApp       from '../locales/fr/app.json';
+import frWorkspace from '../locales/fr/workspace.json';
+import frExams     from '../locales/fr/exams.json';
 
 const savedLang = localStorage.getItem('lang');
 const browserLang = navigator.language.startsWith('fr') ? 'fr' : 'en';
 
 i18n.use(initReactI18next).init({
     resources: {
-        en: { common: enCommon, auth: enAuth, landing: enLanding, errors: enErrors },
-        fr: { common: frCommon, auth: frAuth, landing: frLanding, errors: frErrors },
+        en: { common: enCommon, auth: enAuth, landing: enLanding, errors: enErrors, app: enApp, workspace: enWorkspace, exams: enExams },
+        fr: { common: frCommon, auth: frAuth, landing: frLanding, errors: frErrors, app: frApp, workspace: frWorkspace, exams: frExams },
     },
     lng: savedLang ?? browserLang,
     fallbackLng: 'en',

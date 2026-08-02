@@ -5,10 +5,12 @@ import { Button } from "../../components/ui/button.tsx";
 import { useNavigate } from "react-router-dom";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Settings as SettingsIcon, Pencil, CreditCard, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function Profile() {
-  const { user, setUser } = useUser();
+  const { user } = useUser();
   const navigate = useNavigate();
+  const { t } = useTranslation('app');
 
   const avatarUrl = useMemo(() => {
     const first = user?.first_name || "";
@@ -29,25 +31,25 @@ export default function Profile() {
   const { statusLabel, daysLeftText } = useMemo(() => {
     const now = new Date();
     const end = plan.endDate ? new Date(plan.endDate) : null;
-    let label = plan.trial ? "Phase d'essai" : "Abonnement actif";
+    let label = plan.trial ? t('profile.trial_active') : t('profile.sub_active');
     let daysText = "";
     if (end && !isNaN(end.getTime())) {
       const diffMs = end.getTime() - now.getTime();
       const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
       if (days < 0) {
-        label = plan.trial ? "Essai expiré" : "Abonnement expiré";
-        daysText = "Expiré";
+        label = plan.trial ? t('profile.trial_expired') : t('profile.sub_expired');
+        daysText = t('profile.expired');
       } else if (days === 0) {
-        daysText = "Expire aujourd'hui";
+        daysText = t('profile.expires_today');
       } else {
-        daysText = `${days} jour${days > 1 ? "s" : ""} restant${days > 1 ? "s" : ""}`;
+        daysText = t('profile.days_left', { count: days });
       }
     }
     return { statusLabel: label, daysLeftText: daysText };
-  }, [plan]);
+  }, [plan, t]);
 
   const progression = useMemo(() => ({
-    overall: 68, // progression globale en %
+    overall: 68,
   }), []);
 
   const usage = useMemo(() => ({
@@ -62,12 +64,11 @@ export default function Profile() {
   const offsetRef = useRef(0);
 
   useEffect(() => {
-    // Initialize at mid-screen
     setDragY(window.innerHeight / 2);
 
     const onMove = (clientY: number) => {
-      const min = 72; // keep clear of header
-      const max = window.innerHeight - 72; // keep above footer
+      const min = 72;
+      const max = window.innerHeight - 72;
       const next = Math.min(Math.max(clientY - offsetRef.current, min), max);
       setDragY(next);
     };
@@ -111,11 +112,10 @@ export default function Profile() {
               />
             </div>
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight">Mon profil</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Gérez vos informations et suivez votre progression.</p>
+              <h1 className="text-2xl font-semibold tracking-tight">{t('profile.page_title')}</h1>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('profile.profile_desc')}</p>
             </div>
           </div>
-          {/* Actions déplacées dans le mini drawer à droite */}
         </div>
       </section>
 
@@ -124,18 +124,18 @@ export default function Profile() {
         <div className="lg:col-span-2 space-y-6">
           {/* Infos personnelles */}
           <section className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm">
-            <h2 className="text-base font-semibold mb-4">Infos personnelles</h2>
+            <h2 className="text-base font-semibold mb-4">{t('profile.personal_info')}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="rounded-lg border border-gray-200 dark:border-gray-800 p-4 bg-gray-50 dark:bg-gray-900/40">
-                <div className="text-xs text-gray-500">Prénom</div>
+                <div className="text-xs text-gray-500">{t('user_profile.first_name')}</div>
                 <div className="mt-1 font-medium">{user?.first_name || "-"}</div>
               </div>
               <div className="rounded-lg border border-gray-200 dark:border-gray-800 p-4 bg-gray-50 dark:bg-gray-900/40">
-                <div className="text-xs text-gray-500">Nom</div>
+                <div className="text-xs text-gray-500">{t('user_profile.last_name')}</div>
                 <div className="mt-1 font-medium">{user?.last_name || "-"}</div>
               </div>
               <div className="rounded-lg border border-gray-200 dark:border-gray-800 p-4 bg-gray-50 dark:bg-gray-900/40 sm:col-span-1">
-                <div className="text-xs text-gray-500">E-mail</div>
+                <div className="text-xs text-gray-500">{t('user_profile.email')}</div>
                 <div className="mt-1 font-medium break-all">{user?.email || "-"}</div>
               </div>
             </div>
@@ -143,12 +143,12 @@ export default function Profile() {
 
           {/* Résumé d'utilisation */}
           <section className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm">
-            <h2 className="text-base font-semibold mb-4">Résumé d’utilisation</h2>
+            <h2 className="text-base font-semibold mb-4">{t('profile.usage_summary')}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
-                { label: "Cours générés", value: usage.coursesGenerated },
-                { label: "Résumés générés", value: usage.summariesGenerated },
-                { label: "Épreuves générées", value: usage.examsGenerated },
+                { label: t('profile.courses_generated'), value: usage.coursesGenerated },
+                { label: t('profile.summaries_generated'), value: usage.summariesGenerated },
+                { label: t('profile.exams_generated'), value: usage.examsGenerated },
               ].map((card) => (
                 <div key={card.label} className="rounded-lg border border-gray-200 dark:border-gray-800 p-5 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-900/40 shadow-xs">
                   <div className="text-xs text-gray-500">{card.label}</div>
@@ -163,12 +163,12 @@ export default function Profile() {
         <div className="space-y-6">
           {/* Plan et crédits */}
           <section className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm">
-            <h2 className="text-base font-semibold">Mon plan</h2>
-            <Button className="mt-2" size="sm" variant="outline" onClick={() => navigate("/subscription")}>Changer de plan</Button>
+            <h2 className="text-base font-semibold">{t('profile.my_plan')}</h2>
+            <Button className="mt-2" size="sm" variant="outline" onClick={() => navigate("/subscription")}>{t('profile.change_plan')}</Button>
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-xs text-gray-500">Plan actuel</div>
-                <div className="font-medium">{plan.name}{plan.trial ? " (Essai)" : ""}</div>
+                <div className="text-xs text-gray-500">{t('profile.current_plan')}</div>
+                <div className="font-medium">{plan.name}{plan.trial ? ` ${t('profile.trial')}` : ""}</div>
                 <div className="mt-1 text-xs">
                   <span className={`inline-flex items-center px-2 py-0.5 rounded-full mr-2 ${plan.trial ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}`}>
                     {statusLabel}
@@ -176,7 +176,7 @@ export default function Profile() {
                   <span className="text-gray-600 dark:text-gray-400">{daysLeftText}</span>
                 </div>
               </div>
-              <div className="text-xs text-gray-500">{plan.credits.used}/{plan.credits.total} crédits</div>
+              <div className="text-xs text-gray-500">{t('profile.credits_usage', { used: plan.credits.used, total: plan.credits.total })}</div>
             </div>
             <div className="mt-3 h-2 w-full rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden">
               <div
@@ -188,9 +188,9 @@ export default function Profile() {
 
           {/* Progression globale */}
           <section className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm">
-            <h2 className="text-base font-semibold mb-3">Progression globale</h2>
+            <h2 className="text-base font-semibold mb-3">{t('profile.global_progress')}</h2>
             <div className="flex justify-between text-xs text-gray-500">
-              <span>Avancement</span>
+              <span>{t('profile.progress')}</span>
               <span>{progression.overall}%</span>
             </div>
             <div className="mt-2 h-2 w-full rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden">
@@ -208,7 +208,7 @@ export default function Profile() {
     <Dialog.Root>
       <Dialog.Trigger asChild>
         <button
-          aria-label="Ouvrir le panneau d’actions"
+          aria-label={t('profile.open_actions')}
           className="fixed right-5 z-40 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 p-3 cursor-grab active:cursor-grabbing"
           style={{ top: dragY }}
           onMouseDown={(e) => {
@@ -227,18 +227,18 @@ export default function Profile() {
         <Dialog.Overlay className="fixed inset-0 bg-black/40 z-40 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0" />
         <Dialog.Content className="fixed right-0 top-0 h-full w-80 max-w-[85vw] z-50 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800 shadow-xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:slide-in-from-right data-[state=closed]:slide-out-to-right focus:outline-none">
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
-            <div className="font-semibold">Actions</div>
+            <div className="font-semibold">{t('profile.actions')}</div>
             <Dialog.Close className="rounded-md p-1 hover:bg-gray-100 dark:hover:bg-gray-800">
               <X className="w-4 h-4" />
-              <span className="sr-only">Fermer</span>
+              <span className="sr-only">{t('profile.close')}</span>
             </Dialog.Close>
           </div>
           <div className="p-4 space-y-3 mt-6">
-            <Button className="w-full justify-start" variant="outline" onClick={() => navigate("/settings/profile")}> 
-              <Pencil className="w-4 h-4 mr-2" /> Modifier le profil
+            <Button className="w-full justify-start" variant="outline" onClick={() => navigate("/settings/profile")}>
+              <Pencil className="w-4 h-4 mr-2" /> {t('profile.edit_profile_btn')}
             </Button>
             <Button className="w-full justify-start" onClick={() => navigate("/subscription")}>
-              <CreditCard className="w-4 h-4 mr-2" /> Gérer l’abonnement
+              <CreditCard className="w-4 h-4 mr-2" /> {t('profile.manage_subscription')}
             </Button>
           </div>
         </Dialog.Content>

@@ -3,6 +3,7 @@ import { Loader2, Sparkles, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Modal } from './modal/index.tsx';
 import { useGetTokenPacks, useBuyTokenPack } from '../../utils/billing';
+import { useTranslation } from 'react-i18next';
 
 type UpgradeModalProps = {
     isOpen: boolean;
@@ -12,6 +13,7 @@ type UpgradeModalProps = {
 export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
     const { data: packs = [], isLoading } = useGetTokenPacks();
     const buyPack = useBuyTokenPack();
+    const { t } = useTranslation('app');
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} className="max-w-md p-6">
@@ -20,8 +22,8 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                     <Zap size={20} className="text-amber-600 dark:text-amber-400" />
                 </div>
                 <div>
-                    <h3 className="text-base font-semibold text-gray-900 dark:text-white">Jetons insuffisants</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Recharge pour continuer à générer du contenu.</p>
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-white">{t('upgrade_modal.title')}</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('upgrade_modal.recharge_desc')}</p>
                 </div>
             </div>
 
@@ -42,12 +44,12 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                         >
                             {i === 1 && (
                                 <span className="absolute -top-2.5 left-3 rounded-full bg-blue-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-                                    Recommandé
+                                    {t('upgrade_modal.recommended')}
                                 </span>
                             )}
                             <div>
                                 <p className="text-sm font-semibold text-gray-900 dark:text-white">{pack.name}</p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">🪙 {pack.tokens} jetons</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">🪙 {pack.tokens} {t('upgrade_modal.tokens_unit')}</p>
                             </div>
                             <div className="flex items-center gap-3">
                                 <span className="text-sm font-bold text-gray-900 dark:text-white">{pack.price_cad} $</span>
@@ -59,7 +61,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                                     {buyPack.isPending ? (
                                         <Loader2 size={12} className="animate-spin" />
                                     ) : (
-                                        'Acheter'
+                                        t('upgrade_modal.buy_btn')
                                     )}
                                 </button>
                             </div>
@@ -73,15 +75,15 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                     <Sparkles size={15} className="text-white" />
                 </div>
                 <div className="flex-1">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white">Passer à Pro</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Tout illimité dès 6,99 $/mois</p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{t('upgrade_modal.go_pro')}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('upgrade_modal.pro_desc')}</p>
                 </div>
                 <Link
                     to="/subscription"
                     onClick={onClose}
                     className="rounded-lg border border-blue-600 px-3 py-1.5 text-xs font-semibold text-blue-600 transition-colors hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20"
                 >
-                    Voir les plans
+                    {t('upgrade_modal.view_plans')}
                 </Link>
             </div>
         </Modal>

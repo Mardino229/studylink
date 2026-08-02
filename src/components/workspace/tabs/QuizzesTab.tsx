@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { HelpCircle, Trash2, Clock, Menu, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import QuizRunner from '../../summary/quiz/quiz';
@@ -27,6 +28,7 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
     notebookId,
     formatDate,
 }) => {
+    const { t } = useTranslation('workspace');
     const [selectedQuizId, setSelectedQuizId] = useState<string | null>(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
@@ -102,7 +104,7 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
                                 className="w-full text-left pr-8"
                             >
                                 <p className="truncate text-sm font-semibold text-foreground">
-                                    {quiz.title || 'Quiz'} ({quiz.questions?.length ?? '…'} questions)
+                                    {quiz.title || t('tabs.quizzes.quiz_default_title')} ({quiz.questions?.length ?? '…'})
                                 </p>
                                 <div className="mt-1 flex items-center gap-1 text-xs text-foreground/50">
                                     <Clock size={12} />
@@ -112,12 +114,12 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    handleDelete('Supprimer ce quiz ?', async () => {
+                                    handleDelete(t('tabs.quizzes.confirm_delete'), async () => {
                                         await deleteQuiz.mutateAsync({ notebookId, quizId: quiz.id });
                                     });
                                 }}
                                 className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg text-gray-400 opacity-0 group-hover:opacity-100 focus:opacity-100 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all"
-                                title="Supprimer"
+                                title={t('tabs.quizzes.delete_title')}
                             >
                                 <Trash2 size={14} />
                             </button>
@@ -126,7 +128,7 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
                 })}
                 {quizzesList.length === 0 && !isLoadingQuizzes && (
                     <div className="py-8 text-center text-xs text-gray-500 dark:text-gray-400">
-                        Aucun quiz généré.
+                        {t('tabs.quizzes.no_quizzes')}
                     </div>
                 )}
             </div>
@@ -186,7 +188,7 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
                                 type="button"
                                 onClick={() => setDesktopSidebarOpen(prev => !prev)}
                                 className="hidden xl:inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-background hover:bg-foreground/5 text-foreground/70 hover:text-foreground transition-all"
-                                title={desktopSidebarOpen ? "Fermer la liste" : "Ouvrir la liste"}
+                                title={desktopSidebarOpen ? t('tabs.quizzes.close_list') : t('tabs.quizzes.open_list')}
                             >
                                 <svg className={`w-4 h-4 transition-transform ${desktopSidebarOpen ? '' : 'rotate-180'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
@@ -200,19 +202,19 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
                                 <Menu size={18} />
                             </button>
                             <h3 className="text-sm font-bold text-foreground truncate max-w-[200px] sm:max-w-xs">
-                                {selectedQuiz?.title || 'Détails du Quiz'}
+                                {selectedQuiz?.title || t('tabs.quizzes.detail_default')}
                             </h3>
                         </div>
 
                         {selectedQuiz && (
                             <button
-                                onClick={() => handleDelete('Supprimer ce quiz ?', async () => {
+                                onClick={() => handleDelete(t('tabs.quizzes.confirm_delete'), async () => {
                                     await deleteQuiz.mutateAsync({ notebookId, quizId: selectedQuiz.id });
                                 })}
                                 className="inline-flex items-center gap-1 text-xs text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-950/20 dark:hover:bg-red-950/40 px-2.5 py-1.5 rounded-full font-medium transition-all"
                             >
                                 <Trash2 size={12} />
-                                <span className="hidden sm:block">Supprimer</span>
+                                <span className="hidden sm:block">{t('tabs.quizzes.delete_btn')}</span>
                             </button>
                         )}
                     </div>
@@ -221,7 +223,7 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
                     <div className="flex-1 overflow-y-auto p-4 sm:p-6 scroll-smooth">
                         {isLoadingSelectedQuiz ? (
                             <div className="flex h-full items-center justify-center py-20 text-sm text-foreground/50">
-                                Chargement du quiz…
+                                {t('tabs.quizzes.loading')}
                             </div>
                         ) : selectedQuizForRunner.length > 0 ? (
                             <div className="w-full max-w-3xl mx-auto">
@@ -232,9 +234,9 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
                                 <div className="w-16 h-16 bg-brand-50 dark:bg-brand-950/30 rounded-2xl flex items-center justify-center mb-4 border border-brand-100 dark:border-brand-900/50 text-brand-500">
                                     <HelpCircle size={28} />
                                 </div>
-                                <h4 className="text-base font-bold text-foreground">Aucun quiz sélectionné</h4>
+                                <h4 className="text-base font-bold text-foreground">{t('tabs.quizzes.empty')}</h4>
                                 <p className="mt-2 text-sm text-muted-foreground max-w-sm">
-                                    Sélectionnez un quiz dans la liste ou générez-en un nouveau.
+                                    {t('tabs.quizzes.empty_hint')}
                                 </p>
                                 <button
                                     onClick={() => openGenerationModal('quiz')}
@@ -242,7 +244,7 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
                                     className="mt-4 inline-flex items-center gap-2 rounded-full bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 text-sm font-semibold shadow-sm transition-all"
                                 >
                                     <Sparkles size={16} />
-                                    Préparer un quiz
+                                    {t('tabs.quizzes.create_btn')}
                                 </button>
                             </div>
                         )}

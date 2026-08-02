@@ -10,6 +10,15 @@ COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
 COPY . .
+
+# Injected at build time so Vite can embed the URL in the bundle
+ARG VITE_API_URL
+ENV VITE_API_URL=${VITE_API_URL}
+ARG VITE_LANDING_DOMAIN
+ENV VITE_LANDING_DOMAIN=${VITE_LANDING_DOMAIN}
+ARG VITE_APP_DOMAIN
+ENV VITE_APP_DOMAIN=${VITE_APP_DOMAIN}
+
 RUN bun run build
 
 # ── Stage 2: serve ──────────────────────────────────────────────────────────

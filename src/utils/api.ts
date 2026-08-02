@@ -1,7 +1,7 @@
 import axios from "axios";
 import i18n from "../i18n/index.ts";
 
-export const baseUrl = "http://localhost:8000/api/v1";
+export const baseUrl = import.meta.env.VITE_API_URL ?? "http://localhost:8000/api/v1";
 
 const defaultHeaders = {
     "Content-Type": "application/json",

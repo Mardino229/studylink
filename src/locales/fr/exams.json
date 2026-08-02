@@ -1,0 +1,92 @@
+{
+  "library": {
+    "page_title": "Bibliothèque d'épreuves",
+    "submit_btn": "Soumettre une épreuve",
+    "empty": "Aucune épreuve trouvée",
+    "view_exam": "Voir l'épreuve",
+    "access_note": "Il est définitif — vous ne repayez pas pour rouvrir cette épreuve.",
+    "your_balance": "Votre solde",
+    "unlock_solution": "Débloquer le corrigé",
+    "solution_note": "Vous ne repayez pas pour rouvrir ce corrigé.",
+    "filters": {
+      "year_placeholder": "Année (ex: 2024)",
+      "all_sessions": "Toutes les sessions",
+      "fall": "Automne",
+      "winter": "Hiver",
+      "spring_summer": "Printemps/Été",
+      "all_types": "Tous les types",
+      "intra": "Intra",
+      "final": "Final",
+      "quiz": "Quiz",
+      "other": "Autre",
+      "search": "Rechercher"
+    }
+  },
+  "card": {
+    "pro_badge": "Pro",
+    "already_bought": "Déjà acheté"
+  },
+  "solution": {
+    "page_title": "Consulter le corrigé",
+    "back": "Retour",
+    "loading": "Chargement du corrigé…",
+    "unauthorized_title": "Accès non autorisé",
+    "paywall_desc": "Ce fichier est payant. Il faut {{count}} jeton(s) pour y accéder.",
+    "paywall_note": "L'accès est ensuite définitif — vous ne repayez pas pour rouvrir ce fichier.",
+    "buy_tokens": "Acheter des jetons",
+    "go_pro": "Passer à Pro",
+    "back_to_library": "Retour à la bibliothèque",
+    "unavailable_title": "Corrigé indisponible",
+    "unavailable_desc": "Aucun corrigé n'a encore été uploadé pour cette épreuve.",
+    "error_title": "Une erreur est survenue",
+    "error_desc": "Impossible de charger le corrigé. Réessayez plus tard."
+  },
+  "submit_modal": {
+    "title": "Soumettre une épreuve",
+    "name_placeholder": "Titre *",
+    "course_label": "Cours",
+    "year_label": "Année",
+    "session_fall": "Automne",
+    "session_winter": "Hiver",
+    "session_spring": "Printemps/Été",
+    "type_intra": "Intra",
+    "type_final": "Final",
+    "type_quiz": "Quiz",
+    "type_other": "Autre"
+  },
+  "generate": {
+    "select_label": "Sélection des cours et chapitres",
+    "course_label": "Cours",
+    "chapter_label": "Chapitres",
+    "next": "Suivant",
+    "question_types": "Types de questions",
+    "back": "Retour",
+    "generated": "Examen généré",
+    "answer_placeholder": "Votre réponse",
+    "search_placeholder": "Rechercher par titre, filière, programme, année"
+  },
+  "submissions": {
+    "page_title": "Mes soumissions",
+    "tab_exams": "Epreuves",
+    "tab_solutions": "Corrigés",
+    "tab_contribute": "Contribuer",
+    "status_validated": "Validée",
+    "status_pending": "En attente",
+    "status_rejected": "Refusée",
+    "coins_banner": "Gagnez des coins 🪙 — chaque épreuve ou corrigé validé...",
+    "no_solution_banner": "Ces épreuves n'ont pas encore de corrigé. Soumettez le vôtre pour gagner 0,5 coin...",
+    "resubmit_exam": "Re-soumettre l'épreuve",
+    "resubmit_solution": "Re-soumettre le corrigé",
+    "submit_solution": "Soumettre un corrigé",
+    "cancel": "Annuler",
+    "resubmit": "Re-soumettre",
+    "sending": "Envoi…",
+    "submit": "Soumettre",
+    "solution_for": "Corrigé pour",
+    "unknown_exam": "Épreuve inconnue",
+    "delete_title": "Supprimer la soumission",
+    "delete_confirm": "Êtes-vous sûr de vouloir supprimer cette soumission ?",
+    "delete_btn": "Supprimer",
+    "cancel_btn": "Annuler"
+  }
+}

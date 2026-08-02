@@ -26,10 +26,14 @@ import {
   Zap,
 } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function SettingsSubscription() {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation('app');
   const [billingType, setBillingType] = useState<"monthly" | "annual">("monthly");
+
+  const locale = i18n.language.startsWith('fr') ? 'fr-CA' : 'en-CA';
 
   const { data: plans, isLoading: isLoadingPlans } = useGetPlans();
   const { data: activeSubscription, isLoading: isLoadingSub } = useGetMyActiveSubscription();
@@ -47,7 +51,7 @@ export default function SettingsSubscription() {
   const pendingPlanId = activeSubscription?.pending_plan_id ?? null;
   const pendingPlan = pendingPlanId ? plans?.find(p => p.id === pendingPlanId) : null;
   const endDateFormatted = activeSubscription?.end_date
-    ? new Date(activeSubscription.end_date).toLocaleDateString("fr-CA", { year: "numeric", month: "long", day: "numeric" })
+    ? new Date(activeSubscription.end_date).toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" })
     : "";
 
   const handleChoosePlan = async (planId: string) => {
@@ -74,10 +78,13 @@ export default function SettingsSubscription() {
 
   const isMutating = changePlan.isPending || createCheckout.isPending;
 
+  // suppress unused warning — isPro used for future gating
+  void isPro;
+
   return (
     <>
-      <PageMeta title="Paramètres • Abonnement" description="Gérer votre plan d'abonnement" />
-      <PageBreadcrumb pageTitle="Mon Abonnement" />
+      <PageMeta title={t('settings_subscription.page_title')} description={t('settings_subscription.page_desc')} />
+      <PageBreadcrumb pageTitle={t('settings_subscription.title')} />
 
       <div className="pt-6">
         <button
@@ -85,7 +92,7 @@ export default function SettingsSubscription() {
           className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700 transition-colors"
         >
           <ArrowLeft size={16} />
-          <span>Retour aux paramètres</span>
+          <span>{t('settings_subscription.back')}</span>
         </button>
       </div>
 
@@ -93,12 +100,12 @@ export default function SettingsSubscription() {
 
         {/* ── Current subscription status ── */}
         <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-white/[0.05] dark:bg-white/[0.03] lg:shadow-sm">
-          <h2 className="text-xl font-bold text-gray-800 dark:text-white/90">Statut de l'abonnement</h2>
+          <h2 className="text-xl font-bold text-gray-800 dark:text-white/90">{t('settings_subscription.status')}</h2>
 
           {isLoadingSub ? (
             <div className="mt-4 flex items-center gap-2 text-blue-500">
               <Loader2 className="animate-spin size-5" />
-              <span className="text-sm">Chargement…</span>
+              <span className="text-sm">{t('settings_subscription.loading')}</span>
             </div>
           ) : activeSubscription ? (
             <div className="mt-4 space-y-3">
@@ -117,12 +124,15 @@ export default function SettingsSubscription() {
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900 dark:text-white">
-                      Plan {activeSubscription.plan?.name ?? "Actif"}
-                      {activeSubscription.billing_type === "monthly" ? " · Mensuel" : " · Annuel"}
+                      {activeSubscription.billing_type === "monthly"
+                        ? t('settings_subscription.plan_monthly', { name: activeSubscription.plan?.name ?? t('settings_subscription.active') })
+                        : t('settings_subscription.plan_annual', { name: activeSubscription.plan?.name ?? t('settings_subscription.active') })}
                     </p>
                     {endDateFormatted && (
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        {isCancelScheduled ? `Accès jusqu'au ${endDateFormatted}` : `Prochain renouvellement : ${endDateFormatted}`}
+                        {isCancelScheduled
+                          ? t('settings_subscription.access_until', { date: endDateFormatted })
+                          : t('settings_subscription.next_renewal', { date: endDateFormatted })}
                       </p>
                     )}
                   </div>
@@ -133,7 +143,7 @@ export default function SettingsSubscription() {
                     : "bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400"
                 }`}>
                   <CheckCircle2 size={12} className="mr-1" />
-                  {isCancelScheduled ? "Résiliation programmée" : "Actif"}
+                  {isCancelScheduled ? t('settings_subscription.scheduled_cancel') : t('settings_subscription.active')}
                 </span>
               </div>
 
@@ -141,9 +151,9 @@ export default function SettingsSubscription() {
               {pendingPlan && !isCancelScheduled && (
                 <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm dark:border-amber-800/40 dark:bg-amber-900/10">
                   <CalendarClock size={16} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
-                  <p className="text-amber-800 dark:text-amber-300">
-                    Votre plan passera à <strong>{pendingPlan.name}</strong> le {endDateFormatted}. Vous conservez tous vos avantages actuels jusqu'à cette date.
-                  </p>
+                  <p className="text-amber-800 dark:text-amber-300"
+                     dangerouslySetInnerHTML={{ __html: t('settings_subscription.downgrade_desc', { name: `<strong>${pendingPlan.name}</strong>`, date: endDateFormatted }) }}
+                  />
                 </div>
               )}
 
@@ -152,9 +162,9 @@ export default function SettingsSubscription() {
                 <div className="flex items-start justify-between gap-4 rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-800/40 dark:bg-red-900/10">
                   <div className="flex items-start gap-3">
                     <AlertTriangle size={16} className="mt-0.5 shrink-0 text-red-500" />
-                    <p className="text-sm text-red-700 dark:text-red-300">
-                      Votre abonnement se termine le <strong>{endDateFormatted}</strong>. Vous gardez l'accès jusqu'à cette date.
-                    </p>
+                    <p className="text-sm text-red-700 dark:text-red-300"
+                       dangerouslySetInnerHTML={{ __html: t('settings_subscription.cancel_desc', { date: `<strong>${endDateFormatted}</strong>` }) }}
+                    />
                   </div>
                   <button
                     onClick={() => undoCancel.mutate(activeSubscription.id)}
@@ -162,7 +172,7 @@ export default function SettingsSubscription() {
                     className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
                   >
                     {undoCancel.isPending ? <Loader2 size={12} className="animate-spin" /> : <RotateCcw size={12} />}
-                    Annuler la résiliation
+                    {t('settings_subscription.cancel_downgrade')}
                   </button>
                 </div>
               )}
@@ -176,7 +186,7 @@ export default function SettingsSubscription() {
                     className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-2 text-xs font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50 dark:border-red-900/30 dark:bg-transparent dark:hover:bg-red-900/10"
                   >
                     {cancelSubscription.isPending ? <Loader2 size={12} className="animate-spin" /> : <XCircle size={12} />}
-                    Annuler l'abonnement
+                    {t('settings_subscription.cancel_subscription')}
                   </button>
                 </div>
               )}
@@ -184,34 +194,34 @@ export default function SettingsSubscription() {
           ) : (
             <div className="mt-4 flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 p-4 dark:border-white/[0.05] dark:bg-white/[0.02]">
               <XCircle className="text-gray-400 size-5 shrink-0" />
-              <p className="text-sm text-gray-600 dark:text-gray-400">Aucun abonnement actif pour le moment.</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings_subscription.no_subscription')}</p>
             </div>
           )}
         </div>
 
-                {/* ── Plan selection ── */}
+        {/* ── Plan selection ── */}
         <div className="space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h2 className="text-xl font-bold text-gray-800 dark:text-white/90">
-                {hasSub ? "Changer de plan" : "Choisir un plan"}
+                {hasSub ? t('settings_subscription.change_plan') : t('settings_subscription.choose_plan')}
               </h2>
               <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
-                Ultra est un sur-ensemble de Pro   il inclut tout Pro plus l'audio et les podcasts illimités.
+                {t('settings_subscription.ultra_superset')}
               </p>
             </div>
             <div className="inline-flex p-1 bg-gray-100 dark:bg-white/[0.05] rounded-lg">
-              {(["monthly", "annual"] as const).map(t => (
+              {(["monthly", "annual"] as const).map(bt => (
                 <button
-                  key={t}
-                  onClick={() => setBillingType(t)}
+                  key={bt}
+                  onClick={() => setBillingType(bt)}
                   className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
-                    billingType === t
+                    billingType === bt
                       ? "bg-white dark:bg-white/10 text-blue-600 dark:text-blue-400 shadow-sm"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
-                  {t === "monthly" ? "Mensuel" : "Annuel"}
+                  {bt === "monthly" ? t('settings_subscription.monthly') : t('settings_subscription.annual')}
                 </button>
               ))}
             </div>
@@ -233,20 +243,22 @@ export default function SettingsSubscription() {
                 let buttonDisabled = false;
 
                 if (isActiveCurrentCombo) {
-                  buttonLabel = "Plan actuel";
+                  buttonLabel = t('settings_subscription.current_plan');
                   buttonDisabled = true;
                 } else if (isMutating) {
                   buttonLabel = "…";
                   buttonDisabled = true;
                 } else if (isPendingThis) {
-                  buttonLabel = `Programmé pour le ${endDateFormatted}`;
+                  buttonLabel = t('settings_subscription.scheduled_for', { date: endDateFormatted });
                   buttonDisabled = true;
                 } else if (hasSub) {
                   const currentPrice = Number(activeSubscription?.plan?.price ?? 0);
                   const targetPrice = Number(p.price);
-                  buttonLabel = targetPrice > currentPrice ? `Upgrader vers ${p.name}` : `Passer à ${p.name}`;
+                  buttonLabel = targetPrice > currentPrice
+                    ? t('settings_subscription.upgrade_to', { name: p.name })
+                    : t('settings_subscription.switch_to', { name: p.name });
                 } else {
-                  buttonLabel = `S'abonner (${p.name})`;
+                  buttonLabel = t('settings_subscription.subscribe', { name: p.name });
                 }
 
                 return (
@@ -264,7 +276,7 @@ export default function SettingsSubscription() {
                       <div className="absolute -top-3 left-6">
                         <span className="inline-flex items-center gap-1 rounded-full bg-purple-600 px-3 py-0.5 text-[10px] font-bold text-white">
                           <Mic size={9} />
-                          Audio inclus
+                          {t('settings_subscription.audio_included')}
                         </span>
                       </div>
                     )}
@@ -276,7 +288,7 @@ export default function SettingsSubscription() {
                           {billingType === "monthly" ? p.price : p.annual_price}$
                         </span>
                         <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                          CAD/{billingType === "monthly" ? "mois" : "an"}
+                          {billingType === "monthly" ? t('settings_subscription.per_month') : t('settings_subscription.per_year')}
                         </span>
                       </div>
                       <p className="mt-3 text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{p.description}</p>
@@ -320,22 +332,21 @@ export default function SettingsSubscription() {
           )}
         </div>
 
-        {/* ── Token balance + packs (non-Pro only) ── */}
-        
+        {/* ── Token balance + packs ── */}
         <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-white/[0.05] dark:bg-white/[0.03] lg:shadow-sm space-y-5">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div>
-              <h2 className="text-xl font-bold text-gray-800 dark:text-white/90">Jetons</h2>
+              <h2 className="text-xl font-bold text-gray-800 dark:text-white/90">{t('settings_subscription.tokens')}</h2>
               <p className="text-sm text-gray-500 mt-0.5 dark:text-gray-400">
-                Solde actuel :{" "}
+                {t('settings_subscription.token_balance')}:{" "}
                 <span className="font-semibold text-gray-800 dark:text-white">
-                  🪙 {tokenBalance} jeton{tokenBalance !== 1 ? "s" : ""}
+                  🪙 {tokenBalance} {t('settings_subscription.tokens')}
                 </span>
               </p>
             </div>
             <div className="flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200 px-3 py-1.5 dark:bg-amber-900/20 dark:border-amber-800">
               <Zap size={13} className="text-amber-600 dark:text-amber-400" />
-              <span className="text-xs font-semibold text-amber-700 dark:text-amber-300">1 jeton = 1 génération</span>
+              <span className="text-xs font-semibold text-amber-700 dark:text-amber-300">{t('settings_subscription.token_desc')}</span>
             </div>
           </div>
 
@@ -356,7 +367,7 @@ export default function SettingsSubscription() {
                 >
                   {i === 1 && (
                     <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full bg-blue-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white whitespace-nowrap">
-                      Recommandé
+                      {t('settings_subscription.recommended')}
                     </span>
                   )}
                   <div>
@@ -366,21 +377,21 @@ export default function SettingsSubscription() {
                     </p>
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    🪙 <span className="font-semibold">{pack.tokens} jetons</span>
+                    🪙 <span className="font-semibold">{pack.tokens} {t('upgrade_modal.tokens_unit')}</span>
                   </p>
                   <button
                     onClick={() => buyPack.mutate(pack.id)}
                     disabled={buyPack.isPending}
                     className="mt-auto w-full rounded-xl bg-blue-600 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
                   >
-                    {buyPack.isPending ? <Loader2 className="animate-spin size-4 mx-auto" /> : "Acheter"}
+                    {buyPack.isPending ? <Loader2 className="animate-spin size-4 mx-auto" /> : t('upgrade_modal.buy_btn')}
                   </button>
                 </div>
               ))}
             </div>
           )}
         </div>
-        
+
       </section>
     </>
   );

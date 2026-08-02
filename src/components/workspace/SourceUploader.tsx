@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useUploadSource, useGetSources, useDeleteSource, useAddYoutubeSource } from '../../utils/workspace';
 import { FileIcon, ImageIcon, UploadCloudIcon, CheckCircleIcon, LoaderIcon, Trash2, Link2, XCircleIcon } from 'lucide-react';
 
@@ -40,6 +41,7 @@ function extractYoutubeId(url: string): string | null {
 }
 
 const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
+    const { t } = useTranslation('workspace');
     const queryClient = useQueryClient();
     const { data: sources, refetch: refetchSources } = useGetSources(notebookId, { perPage: 100 });
     const uploadMutation = useUploadSource();
@@ -59,7 +61,7 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
     const listenToSourceProgress = (sourceId: string, filename: string) => {
         setStreamingSources(prev => ({
             ...prev,
-            [sourceId]: { progress: 0, message: 'Démarrage...', status: 'pending', filename },
+            [sourceId]: { progress: 0, message: t('sources.uploading'), status: 'pending', filename },
         }));
 
         void fetchEventSource(`${baseUrl}/notebooks/${notebookId}/sources/${sourceId}/stream`, {
@@ -110,7 +112,7 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
                     [sourceId]: {
                         ...prev[sourceId],
                         status: 'error',
-                        message: 'Erreur de connexion au stream',
+                        message: t('sources.stream_error'),
                         filename: prev[sourceId]?.filename ?? filename,
                     },
                 }));
@@ -151,7 +153,7 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
         e.preventDefault();
         setUrlError('');
         if (!isValidYoutubeUrl(youtubeUrl)) {
-            setUrlError('URL invalide. Utilisez un lien youtube.com ou youtu.be.');
+            setUrlError(t('sources.url_invalid'));
             return;
         }
         try {
@@ -189,14 +191,12 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
     };
 
     const getUnsupportedMessage = (msg: string) =>
-        /unsupported file type/i.test(msg)
-            ? "Ce type de fichier n'est pas supporté — utilisez PDF, TXT, PPTX ou une image."
-            : msg;
+        /unsupported file type/i.test(msg) ? t('sources.unsupported_type') : msg;
 
     return (
         <div className="rounded-2xl bg-white dark:bg-transparent">
             <div className="border-b border-gray-100 px-6 py-5 dark:border-gray-800">
-                <h3 className="text-base font-medium text-gray-800 dark:text-white/90">Sources documentaires</h3>
+                <h3 className="text-base font-medium text-gray-800 dark:text-white/90">{t('sources.title')}</h3>
             </div>
 
             <div className="space-y-4 sm:p-6">
@@ -211,7 +211,7 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
                                 : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                         }`}
                     >
-                        <UploadCloudIcon size={15} /> Fichier
+                        <UploadCloudIcon size={15} /> {t('sources.file_mode')}
                     </button>
                     <button
                         type="button"
@@ -239,10 +239,10 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
                     >
                         <UploadCloudIcon className={`mb-2 ${isDragging ? 'text-blue-400' : 'text-gray-400'}`} size={32} />
                         <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                            {isDragging ? 'Déposez vos fichiers ici' : 'Glissez-déposez ou cliquez pour importer'}
+                            {isDragging ? t('sources.drop_here') : t('sources.drag_to_import')}
                         </span>
                         <span className="mt-1 text-xs text-gray-400">
-                            PDF, TXT, PPT, PPTX, JPG, PNG, WEBP, GIF · Plusieurs fichiers acceptés
+                            {t('sources.file_types_hint')}
                         </span>
                         <input
                             type="file"
@@ -258,7 +258,7 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
                             <div className="mb-3 flex items-center gap-2">
                                 <YoutubeIcon size={18} className="shrink-0 text-red-500" />
                                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Lien vidéo YouTube
+                                    {t('sources.youtube_link_label')}
                                 </span>
                             </div>
                             <div className="flex flex-wrap justify-end gap-2">
@@ -280,11 +280,11 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
                                     disabled={youtubeM.isPending || !youtubeUrl}
                                     className="flex shrink-0 items-center justify-center item-ends rounded-xl bg-red-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-600 disabled:opacity-50"
                                 >
-                                    {youtubeM.isPending ? <LoaderIcon size={15} className="animate-spin" /> : 'Ajouter'}
+                                    {youtubeM.isPending ? <LoaderIcon size={15} className="animate-spin" /> : t('sources.add')}
                                 </button>
                             </div>
                             {urlError && <p className="mt-2 text-xs text-red-500">{urlError}</p>}
-                            <p className="mt-2 text-xs text-gray-400">Vidéos publiques uniquement · ~1 h max</p>
+                            <p className="mt-2 text-xs text-gray-400">{t('sources.youtube_hint')}</p>
                         </div>
                     </form>
                 )}
@@ -321,7 +321,7 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
                                             type="button"
                                             onClick={() => dismissStreaming(id)}
                                             className="text-red-400 hover:text-red-600 dark:text-red-500 dark:hover:text-red-300"
-                                            aria-label="Fermer"
+                                            aria-label={t('list.close')}
                                         >
                                             ×
                                         </button>
@@ -391,7 +391,7 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
                                     onClick={() => handleDeleteSource(source.id)}
                                     disabled={deleteMutation.isPending}
                                     className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50 dark:hover:bg-red-900/20"
-                                    title="Supprimer la source"
+                                    title={t('sources.delete_source')}
                                 >
                                     <Trash2 size={16} />
                                 </button>
@@ -400,17 +400,17 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
                     })}
                     {sources?.items?.length === 0 && Object.keys(streamingSources).length === 0 && (
                         <p className="py-4 text-center text-xs text-gray-400">
-                            Aucune source uploadée pour ce notebook.
+                            {t('sources.no_sources')}
                         </p>
                     )}
                 </div>
 
                 <ConfirmModal
                     isOpen={confirmOpen}
-                    title="Supprimer la source"
-                    message="Supprimer cette source et ses vecteurs ?"
-                    confirmLabel="Supprimer"
-                    cancelLabel="Annuler"
+                    title={t('sources.delete_confirm_title')}
+                    message={t('sources.delete_confirm_msg')}
+                    confirmLabel={t('sources.delete_confirm_btn')}
+                    cancelLabel={t('sources.cancel')}
                     onConfirm={handleConfirmDelete}
                     onCancel={() => setConfirmOpen(false)}
                 />

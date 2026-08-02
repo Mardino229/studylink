@@ -15,6 +15,7 @@ import Onboarding from "./pages/authPage/Onboarding.tsx";
 import Home from "./pages/appPage/Home.tsx";
 import AppLayout from "./layout/AppLayout.tsx";
 import { ScrollToTop } from "./components/common/ScrollToTop.tsx";
+import { DomainRedirect } from "./components/common/DomainRedirect.tsx";
 import RequireAuth from "./context/RequireAuth.tsx";
 import AdminGuard from "./context/AdminGuard.tsx";
 import MyCourse from "./pages/appPage/Course.tsx";
@@ -60,6 +61,7 @@ function App() {
     return (
         <Router>
             <ScrollToTop />
+            <DomainRedirect />
             <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/register" element={<Register />} />

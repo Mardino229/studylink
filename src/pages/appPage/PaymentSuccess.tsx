@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle2, Loader2, AlertCircle, Sparkles, Zap } from "lucide-react";
+import { CheckCircle2, Loader2, AlertCircle, Zap } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import Button from "../../components/ui/button/Button";
 import PageMeta from "../../components/common/PageMeta";
@@ -8,6 +8,7 @@ import { useGetTransactions } from "../../utils/subscription";
 import { useGetTokenTransactions } from "../../utils/billing";
 import type { Transaction } from "../../utils/type";
 import type { TokenTransaction } from "../../utils/type";
+import { useTranslation } from "react-i18next";
 
 type TxType = "subscription" | "token_pack";
 type PageStatus = "loading" | "success" | "failed" | "timeout";
@@ -18,6 +19,7 @@ const POLL_INTERVAL = 2500;
 export default function PaymentSuccess() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const { t } = useTranslation('app');
 
     const txType = (localStorage.getItem("pending_transaction_type") ?? "subscription") as TxType;
     const pendingTxId = localStorage.getItem("pending_transaction_id");
@@ -44,7 +46,7 @@ export default function PaymentSuccess() {
             if (txType === "subscription") {
                 if (!pendingTxId) { setStatus("failed"); return; }
                 await refetchSub();
-                const tx = subTransactions?.items?.find((t: Transaction) => t.id === pendingTxId);
+                const tx = subTransactions?.items?.find((tx: Transaction) => tx.id === pendingTxId);
                 if (tx?.status === "completed") {
                     setConfirmedTx({ label: tx.plan?.name ?? "Pro", amount: Number(tx.amount) });
                     setStatus("success");
@@ -60,8 +62,8 @@ export default function PaymentSuccess() {
                 // token_pack   look for a "purchase" transaction created after checkout
                 await refetchToken();
                 const tx = (tokenTransactions as TokenTransaction[] | undefined)?.find(
-                    t => t.type === "purchase" && t.amount > 0 &&
-                         new Date(t.created_at).getTime() > checkoutTime - 5000
+                    tx => tx.type === "purchase" && tx.amount > 0 &&
+                         new Date(tx.created_at).getTime() > checkoutTime - 5000
                 );
                 if (tx) {
                     setConfirmedTx({ amount: tx.amount });
@@ -83,8 +85,8 @@ export default function PaymentSuccess() {
     return (
         <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center">
             <PageMeta
-                title="Paiement confirmé"
-                description={isSubscription ? "Confirmation de votre abonnement" : "Confirmation de votre achat de jetons"}
+                title={t('payment_success.page_confirming')}
+                description={isSubscription ? t('payment_success.page_sub_confirming') : t('payment_success.page_credits_confirming')}
             />
 
             <div className="max-w-md w-full p-8 rounded-2xl bg-white dark:bg-white/[0.03]  dark:border-white/[0.05]">
@@ -96,15 +98,13 @@ export default function PaymentSuccess() {
                             <Loader2 className="size-16 text-blue-500 animate-spin" />
                         </div>
                         <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">
-                            Confirmation en cours…
+                            {t('payment_success.loading')}
                         </h1>
                         <p className="text-gray-500 dark:text-gray-400">
-                            {isSubscription
-                                ? "Nous finalisons votre abonnement. Cela ne devrait prendre que quelques secondes."
-                                : "Nous créditons vos jetons. Cela ne devrait prendre que quelques secondes."}
+                            {isSubscription ? t('payment_success.sub_loading') : t('payment_success.credits_loading')}
                         </p>
                         <p className="text-xs text-gray-400">
-                            Tentative {attempts + 1} sur {MAX_ATTEMPTS}
+                            {t('payment_success.attempt', { current: attempts + 1, total: MAX_ATTEMPTS })}
                         </p>
                     </div>
                 )}
@@ -120,14 +120,14 @@ export default function PaymentSuccess() {
                             <>
                                 <div className="flex items-center justify-center gap-2">
                                     <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">
-                                        Abonnement {confirmedTx?.label ?? "Pro"} activé !
+                                        {t('payment_success.sub_success_title', { name: confirmedTx?.label ?? "Pro" })}
                                     </h1>
                                 </div>
                                 <p className="text-gray-500 dark:text-gray-400">
-                                    Votre abonnement est désormais actif. Vous avez accès illimité à toutes les fonctionnalités sans jamais consommer de jetons.
+                                    {t('payment_success.sub_success_desc')}
                                 </p>
                                 <Button className="w-full" onClick={() => navigate("/subscription")}>
-                                    Voir mon abonnement
+                                    {t('payment_success.view_subscription')}
                                 </Button>
                             </>
                         ) : (
@@ -135,18 +135,18 @@ export default function PaymentSuccess() {
                                 <div className="flex items-center justify-center gap-2">
                                     <Zap size={20} className="text-amber-500" />
                                     <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">
-                                        {confirmedTx?.amount ?? "?"} jetons crédités !
+                                        {t('payment_success.credits_success_title', { count: confirmedTx?.amount ?? "?" })}
                                     </h1>
                                 </div>
                                 <p className="text-gray-500 dark:text-gray-400">
-                                    Vos jetons ont été ajoutés à votre solde. Chaque génération (résumé, flashcards, quiz) consomme 1 jeton.
+                                    {t('payment_success.credits_success_desc')}
                                 </p>
                                 <div className="flex flex-col gap-3">
                                     <Button className="w-full" onClick={() => navigate("/workspaces")}>
-                                        Commencer à créer vous outils de révision
+                                        {t('payment_success.start_creating')}
                                     </Button>
                                     <Button variant="outline" className="w-full" onClick={() => navigate("/subscription")}>
-                                        Voir mon solde
+                                        {t('payment_success.view_wallet')}
                                     </Button>
                                 </div>
                             </>
@@ -161,27 +161,27 @@ export default function PaymentSuccess() {
                             <AlertCircle className="size-12 text-red-600" />
                         </div>
                         <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">
-                            {status === "timeout" ? "Traitement différé" : "Une erreur est survenue"}
+                            {status === "timeout" ? t('payment_success.delayed_title') : t('payment_success.error_title')}
                         </h1>
                         <p className="text-gray-500 dark:text-gray-400">
                             {status === "timeout"
                                 ? isSubscription
-                                    ? "L'activation de votre abonnement prend plus de temps que prévu. Vous serez actif d'ici quelques minutes   rafraîchissez la page paramètres."
-                                    : "Le crédit de vos jetons prend plus de temps que prévu. Votre solde sera mis à jour d'ici quelques minutes."
-                                : "Nous n'avons pas pu confirmer votre paiement. Si vous avez été débité, contactez le support."}
+                                    ? t('payment_success.delayed_desc')
+                                    : t('payment_success.credits_delayed_desc')
+                                : t('payment_success.failed_desc')}
                         </p>
                         <div className="flex flex-col gap-3">
                             <Button
                                 className="w-full"
-                                onClick={() => navigate(isSubscription ? "/subscription" : "/subscription")}
+                                onClick={() => navigate("/subscription")}
                             >
-                                {isSubscription ? "Voir mes abonnements" : "Voir mon solde"}
+                                {isSubscription ? t('payment_success.view_subscriptions') : t('payment_success.view_wallet')}
                             </Button>
                             <Button variant="outline" className="w-full" onClick={() => {
                                 setStatus("loading");
                                 setAttempts(0);
                             }}>
-                                Réessayer la vérification
+                                {t('payment_success.retry')}
                             </Button>
                         </div>
                     </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Layers, Trash2, Clock, Menu, Sparkles, Bookmark } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StackPreview } from '../../summary/flashcards/flashcards';
@@ -27,6 +28,7 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
     notebookId,
     formatDate,
 }) => {
+    const { t } = useTranslation('workspace');
     const [selectedFlashcardBatchId, setSelectedFlashcardBatchId] = useState<string | null>(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
@@ -108,7 +110,7 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
                                     : 'text-muted-foreground hover:text-foreground'
                             }`}
                         >
-                            Toutes
+                            {t('tabs.flashcards.all')}
                         </button>
                         <button
                             onClick={() => setFilter('flagged')}
@@ -119,7 +121,7 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
                             }`}
                         >
                             <Bookmark size={10} fill={filter === 'flagged' ? 'currentColor' : 'none'} />
-                            À revoir
+                            {t('tabs.flashcards.to_review')}
                             {flaggedCount > 0 && (
                                 <span className="ml-0.5 rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 px-1 text-[9px] font-bold">
                                     {flaggedCount}
@@ -152,7 +154,7 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
                                 className="w-full text-left pr-8"
                             >
                                 <p className="truncate text-sm font-semibold text-foreground">
-                                    {batch.title || 'Flashcards'} ({batch.items.length} cartes)
+                                    {batch.title || t('tabs.flashcards.default_title')} ({batch.items.length})
                                 </p>
                                 <div className="mt-1 flex items-center gap-3 text-xs text-foreground/50">
                                     <span className="flex items-center gap-1">
@@ -170,12 +172,12 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    handleDelete('Supprimer ce lot de flashcards ?', async () => {
+                                    handleDelete(t('tabs.flashcards.confirm_delete'), async () => {
                                         await deleteFlashcard.mutateAsync({ notebookId, flashcardId: batch.id });
                                     });
                                 }}
                                 className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg text-gray-400 opacity-0 group-hover:opacity-100 focus:opacity-100 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all"
-                                title="Supprimer"
+                                title={t('tabs.flashcards.delete_title')}
                             >
                                 <Trash2 size={14} />
                             </button>
@@ -184,7 +186,7 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
                 })}
                 {flashcardBatchesList.length === 0 && !isLoadingFlashcards && (
                     <div className="py-8 text-center text-xs text-gray-500 dark:text-gray-400">
-                        Aucun lot généré.
+                        {t('tabs.flashcards.no_batches')}
                     </div>
                 )}
             </div>
@@ -244,7 +246,7 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
                                 type="button"
                                 onClick={() => setDesktopSidebarOpen(prev => !prev)}
                                 className="hidden xl:inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-background hover:bg-foreground/5 text-foreground/70 hover:text-foreground transition-all"
-                                title={desktopSidebarOpen ? "Fermer la liste" : "Ouvrir la liste"}
+                                title={desktopSidebarOpen ? t('tabs.flashcards.close_list') : t('tabs.flashcards.open_list')}
                             >
                                 <svg className={`w-4 h-4 transition-transform ${desktopSidebarOpen ? '' : 'rotate-180'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
@@ -258,7 +260,7 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
                                 <Menu size={18} />
                             </button>
                             <h3 className="text-sm font-bold text-foreground truncate max-w-[200px] sm:max-w-xs">
-                                {selectedFlashcardBatch?.title || 'Détails des Flashcards'}
+                                {selectedFlashcardBatch?.title || t('tabs.flashcards.detail_default')}
                             </h3>
                         </div>
 
@@ -270,7 +272,7 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
                                 className="inline-flex items-center gap-1 text-xs text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-950/20 dark:hover:bg-red-950/40 px-2.5 py-1.5 rounded-full font-medium transition-all"
                             >
                                 <Trash2 size={12} />
-                                Supprimer
+                                {t('tabs.flashcards.delete_btn')}
                             </button>
                         )}
                     </div>
@@ -292,15 +294,15 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
                                 <div className="w-16 h-16 bg-amber-50 dark:bg-amber-500/10 rounded-2xl flex items-center justify-center mb-4 border border-amber-100 dark:border-amber-500/20 text-amber-500">
                                     <Bookmark size={28} />
                                 </div>
-                                <h4 className="text-base font-bold text-foreground">Aucune carte marquée</h4>
+                                <h4 className="text-base font-bold text-foreground">{t('tabs.flashcards.no_marked')}</h4>
                                 <p className="mt-2 text-sm text-muted-foreground max-w-sm">
-                                    Marquez des cartes avec l'icône <Bookmark size={12} className="inline" /> pendant la révision pour les retrouver ici.
+                                    {t('tabs.flashcards.no_marked_hint')}
                                 </p>
                                 <button
                                     onClick={() => setFilter('all')}
                                     className="mt-4 text-sm text-brand-500 hover:text-brand-600 font-medium transition-colors"
                                 >
-                                    Afficher toutes les cartes
+                                    {t('tabs.flashcards.show_all')}
                                 </button>
                             </div>
                         ) : (
@@ -308,9 +310,9 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
                                 <div className="w-16 h-16 bg-brand-50 dark:bg-brand-950/30 rounded-2xl flex items-center justify-center mb-4 border border-brand-100 dark:border-brand-900/50 text-brand-500">
                                     <Layers size={28} />
                                 </div>
-                                <h4 className="text-base font-bold text-foreground">Aucune flashcard sélectionnée</h4>
+                                <h4 className="text-base font-bold text-foreground">{t('tabs.flashcards.empty')}</h4>
                                 <p className="mt-2 text-sm text-muted-foreground max-w-sm">
-                                    Sélectionnez un lot de flashcards dans la liste ou générez-en un nouveau lot.
+                                    {t('tabs.flashcards.empty_hint')}
                                 </p>
                                 <button
                                     onClick={() => openGenerationModal('flashcards')}
@@ -318,7 +320,7 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
                                     className="mt-4 inline-flex items-center gap-2 rounded-full bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 text-sm font-semibold shadow-sm transition-all"
                                 >
                                     <Sparkles size={16} />
-                                    Préparer les flashcards
+                                    {t('tabs.flashcards.create_btn')}
                                 </button>
                             </div>
                         )}

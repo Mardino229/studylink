@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FileText, Sparkles, Trash2, Clock, Menu, Loader2, Volume2, Play } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
@@ -35,6 +36,7 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
     notebookId,
     formatDate,
 }) => {
+    const { t } = useTranslation('workspace');
     const [selectedSummaryId, setSelectedSummaryId] = useState<string | null>(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
@@ -84,10 +86,10 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
     const selectedSummary = mergedSummariesList.find((summary) => summary.id === selectedSummaryId) ?? mergedSummariesList[0] ?? null;
 
     const getAudioStatusLabel = (status?: ArtefactSummary['audio_status']) => {
-        if (status === 'processing') return 'Audio en cours';
-        if (status === 'completed') return 'Audio prêt';
-        if (status === 'error') return 'Audio en erreur';
-        if (status === 'pending') return 'Audio en attente';
+        if (status === 'processing') return t('tabs.summaries.status_processing');
+        if (status === 'completed') return t('tabs.summaries.status_completed');
+        if (status === 'error') return t('tabs.summaries.status_error');
+        if (status === 'pending') return t('tabs.summaries.status_pending');
         return null;
     };
 
@@ -250,7 +252,7 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
             <div className="flex items-center justify-between p-4">
                 <h4 className="flex items-center gap-2 text-sm font-bold text-foreground">
                     <FileText size={16} className="text-brand-500" />
-                    Historique
+                    {t('tabs.summaries.history_title')}
                 </h4>
                 <button
                     onClick={() => openGenerationModal('summary')}
@@ -258,7 +260,7 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                     className="inline-flex items-center gap-1.5 rounded-full bg-brand-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-all hover:bg-brand-600 disabled:opacity-50"
                 >
                     <PlusIcon size={12} />
-                    Créer
+                    {t('tabs.summaries.create_short')}
                 </button>
             </div>
 
@@ -283,7 +285,7 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                                 }}
                                 className="w-full pr-8 text-left"
                             >
-                                <p className="truncate text-sm font-semibold text-foreground">{summary.title || 'Résumé'}</p>
+                                <p className="truncate text-sm font-semibold text-foreground">{summary.title || t('tabs.summaries.default_title')}</p>
                                 <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-foreground/50">
                                     <Clock size={12} />
                                     <span>{formatDate(summary.created_at)}</span>
@@ -298,7 +300,7 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    handleDelete('Supprimer ce résumé ?', async () => {
+                                    handleDelete(t('tabs.summaries.confirm_delete'), async () => {
                                         await deleteSummary.mutateAsync({ notebookId, summaryId: summary.id });
                                         if (selectedSummaryId === summary.id) {
                                             setSelectedSummaryId(null);
@@ -306,7 +308,7 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                                     });
                                 }}
                                 className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 text-gray-400 opacity-0 transition-all hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 focus:opacity-100 dark:hover:bg-red-950/20"
-                                title="Supprimer"
+                                title={t('tabs.summaries.delete_title')}
                             >
                                 <Trash2 size={14} />
                             </button>
@@ -316,7 +318,7 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
 
                 {mergedSummariesList.length === 0 && !isLoadingSummaries && (
                     <div className="py-8 text-center text-xs text-gray-500 dark:text-gray-400">
-                        Aucun résumé.
+                        {t('tabs.summaries.no_summaries')}
                     </div>
                 )}
             </div>
@@ -372,7 +374,7 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                                 type="button"
                                 onClick={() => setDesktopSidebarOpen((prev) => !prev)}
                                 className="hidden h-9 w-9 items-center justify-center rounded-xl border border-border bg-background text-foreground/70 transition-all hover:bg-foreground/5 hover:text-foreground xl:inline-flex"
-                                title={desktopSidebarOpen ? "Fermer l'historique" : "Ouvrir l'historique"}
+                                title={desktopSidebarOpen ? t('tabs.summaries.close_history') : t('tabs.summaries.open_history')}
                             >
                                 <svg className={`h-4 w-4 transition-transform ${desktopSidebarOpen ? '' : 'rotate-180'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
@@ -386,7 +388,7 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                                 <Menu size={18} />
                             </button>
                             <h3 className="max-w-[200px] truncate text-sm font-bold text-foreground sm:max-w-xs">
-                                {selectedSummary?.title || 'Détails du résumé'}
+                                {selectedSummary?.title || t('tabs.summaries.detail_default')}
                             </h3>
                         </div>
 
@@ -399,7 +401,7 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                                 >
                                     {audioRequestSummaryId === selectedSummary.id ? <Loader2 size={12} className="animate-spin" /> : <Volume2 size={12} />}
                                     <span className="">
-                                        {selectedSummary.audio_status === 'completed' ? 'Régénérer audio' : 'Générer audio'}
+                                        {selectedSummary.audio_status === 'completed' ? t('tabs.summaries.regenerate_audio') : t('tabs.summaries.generate_audio')}
                                     </span>
                                 </button>
                             )}
@@ -413,7 +415,7 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                                     className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-500 transition-all hover:bg-red-100 hover:text-red-600 dark:bg-red-950/20 dark:hover:bg-red-950/40"
                                 >
                                     <Trash2 size={12} />
-                                    <span className="hidden sm:block">Supprimer</span>
+                                    <span className="hidden sm:block">{t('tabs.summaries.delete_btn')}</span>
                                 </button>
                             )}
                         </div>
@@ -424,7 +426,7 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                             <div className="mx-auto max-w-4xl space-y-6">
                                 {selectedSummary.audio_status === 'processing' && (
                                     <div className="rounded-2xl border border-amber-200 bg-amber-50 px-2 py-3 text-sm text-amber-800 dark:border-amber-900/40 dark:bg-amber-950/20 dark:text-amber-100">
-                                        L'audio du résumé est en génération. Le lecteur apparaîtra automatiquement dès qu'il sera prêt.
+                                        {t('tabs.summaries.audio_generating')}
                                     </div>
                                 )}
 
@@ -432,7 +434,7 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                                     <div className="p-2">
                                         <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-emerald-800 dark:text-emerald-100">
                                             <Play size={16} />
-                                            Lecture audio du résumé
+                                            {t('tabs.summaries.audio_label')}
                                         </div>
                                         <audio controls preload="metadata" src={selectedSummary.audio_url} className="w-full" />
                                     </div>
@@ -440,7 +442,7 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
 
                                 {selectedSummary.audio_status === 'error' && !selectedSummary.audio_url && (
                                     <div className="rounded-2xl border border-red-200 bg-red-50 px-2 py-3 text-sm text-red-700 dark:border-red-900/40 dark:bg-red-950/20 dark:text-red-100">
-                                        La génération audio a échoué. Tu peux relancer la génération.
+                                        {t('tabs.summaries.audio_failed')}
                                     </div>
                                 )}
 
@@ -453,9 +455,9 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                                 <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-brand-100 bg-brand-50 text-brand-500 dark:border-brand-900/50 dark:bg-brand-950/30">
                                     <FileText size={28} />
                                 </div>
-                                <h4 className="text-base font-bold text-foreground">Aucun résumé sélectionné</h4>
+                                <h4 className="text-base font-bold text-foreground">{t('tabs.summaries.empty')}</h4>
                                 <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-                                    Sélectionnez un résumé existant dans l'historique ou générez-en un nouveau dès maintenant.
+                                    {t('tabs.summaries.empty_hint')}
                                 </p>
                                 <button
                                     onClick={() => openGenerationModal('summary')}
@@ -463,8 +465,8 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                                     className="mt-4 inline-flex items-center gap-2 rounded-full bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-brand-600"
                                 >
                                     <PlusIcon size={16} />
-                                    Créer un résumé
-                                </button> 
+                                    {t('tabs.summaries.create_btn')}
+                                </button>
                             </div>
                         )}
                     </div>

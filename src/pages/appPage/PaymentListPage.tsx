@@ -6,9 +6,11 @@ import ComponentCard from "../../components/common/ComponentCard.tsx";
 import { useRef, useState } from "react";
 import Select from "../../components/form/Select.tsx";
 import HistoryPaymentTableOne from "../../components/table/BasicTables/HistoryPaymentTableOne.tsx";
+import { useTranslation } from "react-i18next";
 
 export default function PaymentListPage() {
     const navigate = useNavigate();
+    const { t } = useTranslation('app');
     const [searchTerm, setSearchTerm] = useState("");
     const [byPage, setByPage] = useState(10);
     const listPage = [2, 5, 10, 20, 50];
@@ -25,27 +27,27 @@ export default function PaymentListPage() {
 
     return (
         <div>
-            <PageMeta title="Historique des paiements" description="Consultez votre historique de paiements" />
-            <PageBreadcrumb pageTitle="Historique des paiements" />
-            
+            <PageMeta title={t('payment_list.page_title')} description={t('payment_list.page_desc')} />
+            <PageBreadcrumb pageTitle={t('payment_list.page_title')} />
+
             <div className="pt-6">
                 <button
                     onClick={() => navigate("/settings")}
                     className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700 transition-colors"
                 >
                     <ArrowLeft size={16} className="sm:w-[18px] sm:h-[18px]" />
-                    <span>Retour aux paramètres</span>
+                    <span>{t('payment_list.back')}</span>
                 </button>
             </div>
 
             <div className="space-y-6 pt-6">
-                <ComponentCard title="Liste des paiements">
+                <ComponentCard title={t('payment_list.title')}>
                     <div className="flex gap-4 flex-wrap justify-between">
                         <div>
                             <Select
                                 options={pageOptions}
                                 defaultValue={byPage.toString()}
-                                placeholder="Entrée par page"
+                                placeholder={t('payment_list.per_page')}
                                 onChange={handlePageChange}
                                 className={`dark:bg-dark-900`}
                             />
@@ -72,7 +74,7 @@ export default function PaymentListPage() {
                                 <input
                                     ref={inputRef}
                                     type="text"
-                                    placeholder="Rechercher par plan, type..."
+                                    placeholder={t('payment_list.search_placeholder')}
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-200 bg-transparent py-2.5 pl-12 pr-14 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[430px]"

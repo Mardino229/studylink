@@ -17,21 +17,26 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "../../components/ui/form.tsx";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 
-// Schéma de validation avec Zod pour le formulaire de création de résumé
-const summarySchema = z.object({
-    summary_name: z.string().min(1, "Le nom du résumé est requis").min(3, "Le nom doit contenir au moins 3 caractères"),
-    file: z.instanceof(File, { message: "Veuillez sélectionner un fichier" })
-        .refine((file) => file.size <= 10 * 1024 * 1024, "Le fichier ne doit pas dépasser 10 Mo")
-        .refine(
-            (file) => ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/msword", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "application/vnd.ms-powerpoint"].includes(file.type),
-            "Format de fichier non supporté. Utilisez PDF, DOC, DOCX, PPT ou PPTX"
-        ),
-});
+type SummaryFormData = z.infer<ReturnType<typeof buildSchema>>;
 
-type SummaryFormData = z.infer<typeof summarySchema>;
+function buildSchema(t: (key: string) => string) {
+    return z.object({
+        summary_name: z.string().min(1, t('summary_list.name_required')).min(3, t('summary_list.name_min')),
+        file: z.instanceof(File, { message: t('summary_list.file_required') })
+            .refine((file) => file.size <= 10 * 1024 * 1024, t('summary_list.file_size'))
+            .refine(
+                (file) => ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/msword", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "application/vnd.ms-powerpoint"].includes(file.type),
+                t('summary_list.file_type')
+            ),
+    });
+}
 
 export default function SummaryList() {
+    const { t } = useTranslation('app');
+    const summarySchema = buildSchema(t);
+
     const [open, setOpen] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [summaryToDelete, setSummaryToDelete] = useState<string | null>(null);
@@ -46,7 +51,6 @@ export default function SummaryList() {
 
     const currentCourseName = courseName ? decodeURIComponent(courseName) : courses?.find(c => c.id === courseId)?.course_name;
 
-    // Configuration de React Hook Form avec Zod
     const form = useForm<SummaryFormData>({
         resolver: zodResolver(summarySchema),
         defaultValues: {
@@ -55,7 +59,6 @@ export default function SummaryList() {
         },
     });
 
-    // Gestion de la soumission du formulaire
     const onSubmit = (data: SummaryFormData) => {
         if (!courseId) return;
 
@@ -65,7 +68,7 @@ export default function SummaryList() {
                 form.reset();
             }
         });
-    }
+    };
 
     const handleRename = (id: string, newTitle: string) => {
         updateSummary.mutate({ id: id.toString(), summary_name: newTitle });
@@ -90,13 +93,13 @@ export default function SummaryList() {
     return (
         <>
             <PageMeta
-                title="Summary"
-                description="This is your summary list"
+                title={t('summary_list.new_summary')}
+                description={t('summary_list.search_placeholder')}
             />
-            <PageBreadcrumb 
-                pageTitle={currentCourseName || "My Summary"} 
+            <PageBreadcrumb
+                pageTitle={currentCourseName || t('summary_list.new_summary')}
                 items={[
-                    { label: "My Courses", path: "/my-courses" }
+                    { label: t('summary_list.back'), path: "/my-courses" }
                 ]}
             />
 
@@ -107,8 +110,8 @@ export default function SummaryList() {
                         className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700 transition-colors"
                     >
                         <ArrowLeft size={16} className="sm:w-[18px] sm:h-[18px]" />
-                        <span className="hidden xs:inline sm:inline">Retour aux cours</span>
-                        <span className="inline xs:hidden sm:hidden">Retour</span>
+                        <span className="hidden xs:inline sm:inline">{t('summary_list.back')}</span>
+                        <span className="inline xs:hidden sm:hidden">{t('summary.back')}</span>
                     </button>
                     <div className="gap-3 sm:gap-4 flex-wrap-reverse flex justify-end w-full sm:w-auto">
                         <div className="relative">
@@ -131,7 +134,7 @@ export default function SummaryList() {
                             </span>
                             <input
                                 type="text"
-                                placeholder="Rechercher par nom..."
+                                placeholder={t('summary_list.search_placeholder')}
                                 className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-200 bg-transparent py-2.5 pl-12 pr-14 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[430px]"
                             />
                         </div>
@@ -142,34 +145,34 @@ export default function SummaryList() {
                             startIcon={<PlusIcon className="size-5" />}
                             onClick={() => setOpen(true)}
                         >
-                             <span></span> <span className="md:flex hidden">New summary</span>
+                             <span></span> <span className="md:flex hidden">{t('summary_list.new_summary')}</span>
                         </Button>
 
                         <Modal isOpen={open} onClose={() => setOpen(false)} className="max-w-md p-6">
                             <div className="text-lg font-semibold text-foreground mb-4">
-                                Créer un résumé
+                                {t('summary_list.create_title')}
                             </div>
                             <Form {...form}>
                                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                                     <div>
-                                        <Label className="mb-1.5">Cours</Label>
+                                        <Label className="mb-1.5">{t('summary_list.course_label')}</Label>
                                         <Input
                                             className="form-input block w-full appearance-none cursor-not-allowed rounded-lg border border-gray-300 px-3 py-3 placeholder-gray-400 shadow-sm focus:border-[var(--primary-color)] focus:outline-none focus:ring-[var(--primary-color)] sm:text-sm"
-                                            value={currentCourseName || "Chargement..."}
+                                            value={currentCourseName || t('summary_list.loading_course')}
                                             disabled
                                         />
                                     </div>
-                                    
+
                                     <FormField
                                         control={form.control}
                                         name="summary_name"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Nom du résumé</FormLabel>
+                                                <FormLabel>{t('summary_list.name_label')}</FormLabel>
                                                 <FormControl>
                                                     <Input
                                                         className="form-input block w-full appearance-none rounded-lg border border-gray-300 px-3 py-3 placeholder-gray-400 shadow-sm focus:border-[var(--primary-color)] focus:outline-none focus:ring-[var(--primary-color)] sm:text-sm"
-                                                        placeholder="Ex: Chapitre 3 - Thermodynamique"
+                                                        placeholder={t('summary_list.name_placeholder')}
                                                         disabled={createSummary.isPending}
                                                         {...field}
                                                     />
@@ -178,13 +181,13 @@ export default function SummaryList() {
                                             </FormItem>
                                         )}
                                     />
-                                    
+
                                     <FormField
                                         control={form.control}
                                         name="file"
                                         render={({ field: { value, onChange, ...fieldProps } }) => (
                                             <FormItem>
-                                                <FormLabel>Fichier</FormLabel>
+                                                <FormLabel>{t('summary_list.file_label')}</FormLabel>
                                                 <FormControl>
                                                     <Input
                                                         type="file"
@@ -202,26 +205,25 @@ export default function SummaryList() {
                                             </FormItem>
                                         )}
                                     />
-                                    
-                                    {/* Stepper de progression - affiché uniquement pendant la création */}
+
                                     { courseId && (
                                         <div className="pt-2">
                                             <StepTracker courseId={courseId} />
                                         </div>
                                     )}
-                                    
+
                                     <div className="flex justify-end gap-2 pt-2">
-                                        <button 
-                                            type="button" 
-                                            onClick={() => setOpen(false)} 
+                                        <button
+                                            type="button"
+                                            onClick={() => setOpen(false)}
                                             className="px-4 py-2 rounded-md border border-border bg-background text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                                             disabled={createSummary.isPending}
                                         >
-                                            {createSummary.isPending ? "Traitement..." : "Annuler"}
+                                            {createSummary.isPending ? t('summary_list.processing') : t('summary_list.cancel')}
                                         </button>
-                                        <button 
-                                            type="submit" 
-                                            disabled={createSummary.isPending} 
+                                        <button
+                                            type="submit"
+                                            disabled={createSummary.isPending}
                                             className="px-4 py-2 rounded-md bg-primary text-background disabled:opacity-50 flex items-center justify-center min-w-[100px]"
                                         >
                                             {createSummary.isPending ? (
@@ -233,7 +235,7 @@ export default function SummaryList() {
                                                     animationDuration="0.75"
                                                     ariaLabel="rotating-lines-loading"
                                                 />
-                                            ) : "Créer"}
+                                            ) : t('summary_list.create')}
                                         </button>
                                     </div>
                                 </form>
@@ -242,10 +244,10 @@ export default function SummaryList() {
 
                         <Modal isOpen={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} className="max-w-md p-6">
                             <div className="text-lg font-semibold text-foreground mb-4">
-                                Confirmer la suppression
+                                {t('summary_list.delete_confirm_title')}
                             </div>
                             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-                                Êtes-vous sûr de vouloir supprimer ce résumé ? Cette action est irréversible.
+                                {t('summary_list.delete_confirm_msg')}
                             </p>
                             <div className="flex justify-end gap-2">
                                 <button
@@ -253,7 +255,7 @@ export default function SummaryList() {
                                     onClick={() => setDeleteModalOpen(false)}
                                     className="px-4 py-2 rounded-md border border-border bg-background text-foreground hover:bg-gray-50 dark:hover:bg-white/5"
                                 >
-                                    Annuler
+                                    {t('summary_list.cancel')}
                                 </button>
                                 <button
                                     type="button"
@@ -267,9 +269,9 @@ export default function SummaryList() {
                                             strokeWidth="5"
                                             width="20"
                                             strokeColor="#ffffff"
-                                                ariaLabel="rotating-lines-loading"
+                                            ariaLabel="rotating-lines-loading"
                                         />
-                                    ) : "Supprimer"}
+                                    ) : t('summary_list.delete')}
                                 </button>
                             </div>
                         </Modal>
@@ -277,7 +279,7 @@ export default function SummaryList() {
                 </div>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {isLoading ? (
-                        <p className="text-sm text-foreground/60 col-span-full">Chargement des résumés...</p>
+                        <p className="text-sm text-foreground/60 col-span-full">{t('summary_list.loading_summaries')}</p>
                     ) : summaries?.length === 0 ? (
                         <div className="col-span-full flex flex-col items-center justify-center py-16 sm:py-24">
                             <div className="flex flex-col items-center gap-4 text-center">
@@ -286,10 +288,10 @@ export default function SummaryList() {
                                 </div>
                                 <div className="space-y-2">
                                     <p className="text-lg font-medium text-gray-900 dark:text-white">
-                                        Aucun résumé pour ce cours
+                                        {t('summary_list.empty_title')}
                                     </p>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        Créez-en un pour commencer à organiser vos notes !
+                                        {t('summary_list.empty_desc')}
                                     </p>
                                 </div>
                             </div>
@@ -299,8 +301,7 @@ export default function SummaryList() {
                             <SummaryCard
                                 key={summary.id}
                                 title={summary.summary_name}
-                                date={summary.generation_date ? new Date(summary.generation_date).toLocaleDateString() : "Récemment"}
-                                
+                                date={summary.generation_date ? new Date(summary.generation_date).toLocaleDateString() : t('summary_list.recently')}
                                 isUpdating={updateSummary.isPending && updateSummary.variables?.id === summary.id.toString()}
                                 onClick={() => navigate(`/my-courses/${courseId}/${encodeURIComponent(currentCourseName || courseName || '')}/summaries/${summary.id}`)}
                                 onRename={(newTitle) => handleRename(summary.id, newTitle)}

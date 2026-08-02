@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    useGetFolders, 
-    useGetNotebooks, 
-    useCreateFolder, 
+import {
+    useGetFolders,
+    useGetNotebooks,
+    useCreateFolder,
     useCreateNotebook,
     useGetUnassignedNotebooks,
     useGetFolderNotebooks,
@@ -10,10 +10,10 @@ import {
     useDeleteFolder,
     useDeleteNotebook
 } from '../../utils/workspace';
-import { 
-    FolderIcon, 
-    BookIcon, 
-    PlusIcon, 
+import {
+    FolderIcon,
+    BookIcon,
+    PlusIcon,
     ChevronRightIcon,
     FolderTreeIcon,
     LayoutGridIcon,
@@ -25,6 +25,7 @@ import { Link } from 'react-router-dom';
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
 import ComponentCard from '../../components/common/ComponentCard.tsx';
+import { useTranslation } from 'react-i18next';
 
 // --- Move Notebook Modal Component ---
 interface MoveNotebookModalProps {
@@ -42,16 +43,17 @@ const MoveNotebookModal: React.FC<MoveNotebookModalProps> = ({
     folders,
     onMove
 }) => {
+    const { t } = useTranslation('workspace');
     if (!isOpen || !notebook) return null;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs transition-opacity duration-300 animate-fadeIn">
             <div className="relative w-full max-w-md bg-white dark:bg-gray-900 rounded-3xl p-6 shadow-2xl border border-gray-100 dark:border-gray-800 animate-scaleUp">
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-                    Classer dans un dossier
+                    {t('list.classify_title')}
                 </h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-                    Sélectionnez le dossier de destination pour : <strong className="text-gray-800 dark:text-gray-200">"{notebook.name}"</strong>
+                    {t('list.classify_desc')} <strong className="text-gray-800 dark:text-gray-200">"{notebook.name}"</strong>
                 </p>
 
                 <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
@@ -69,10 +71,10 @@ const MoveNotebookModal: React.FC<MoveNotebookModalProps> = ({
                     >
                         <span className="flex items-center gap-2">
                             <BookIcon size={18} />
-                            Racine (Aucun dossier)
+                            {t('list.root_no_folder')}
                         </span>
                         {notebook.folder_id === null && (
-                            <span className="text-xs bg-brand-100 dark:bg-brand-900/40 text-brand-600 dark:text-brand-400 px-2.5 py-0.5 rounded-full font-medium">Actuel</span>
+                            <span className="text-xs bg-brand-100 dark:bg-brand-900/40 text-brand-600 dark:text-brand-400 px-2.5 py-0.5 rounded-full font-medium">{t('list.current_badge')}</span>
                         )}
                     </button>
 
@@ -97,7 +99,7 @@ const MoveNotebookModal: React.FC<MoveNotebookModalProps> = ({
                                     <span className="truncate">{folder.name}</span>
                                 </span>
                                 {isCurrent && (
-                                    <span className="text-xs bg-brand-100 dark:bg-brand-900/40 text-brand-600 dark:text-brand-400 px-2.5 py-0.5 rounded-full font-medium">Actuel</span>
+                                    <span className="text-xs bg-brand-100 dark:bg-brand-900/40 text-brand-600 dark:text-brand-400 px-2.5 py-0.5 rounded-full font-medium">{t('list.current_badge')}</span>
                                 )}
                             </button>
                         );
@@ -109,7 +111,7 @@ const MoveNotebookModal: React.FC<MoveNotebookModalProps> = ({
                         onClick={onClose}
                         className="py-2 px-4 text-sm font-medium text-gray-700 bg-gray-100 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition-colors"
                     >
-                        Fermer
+                        {t('list.close')}
                     </button>
                 </div>
             </div>
@@ -133,6 +135,7 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
     description,
     onConfirm
 }) => {
+    const { t } = useTranslation('workspace');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     if (!isOpen) return null;
@@ -159,7 +162,7 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
                         disabled={isSubmitting}
                         className="py-2.5 px-5 text-sm font-medium text-gray-700 bg-gray-100 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-2xl transition-colors disabled:opacity-50"
                     >
-                        Annuler
+                        {t('list.cancel')}
                     </button>
                     <button
                         onClick={async () => {
@@ -174,7 +177,7 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
                         disabled={isSubmitting}
                         className="py-2.5 px-5 text-sm font-medium text-white bg-rose-500 hover:bg-rose-600 dark:bg-rose-600 dark:hover:bg-rose-700 rounded-2xl shadow-sm hover:shadow transition-colors disabled:opacity-50 flex items-center gap-2"
                     >
-                        {isSubmitting ? 'Suppression...' : 'Confirmer la suppression'}
+                        {isSubmitting ? t('list.deleting') : t('list.delete_confirm_btn')}
                     </button>
                 </div>
             </div>
@@ -184,14 +187,13 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
 
 // --- Main Workspaces Component ---
 const Workspaces: React.FC = () => {
+    const { t } = useTranslation('workspace');
     const [viewMode, setViewMode] = useState<'folders' | 'simple'>('simple');
     const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
 
-    // Notebook organization modal states
     const [selectedNotebookToMove, setSelectedNotebookToMove] = useState<{ id: string; name: string; folder_id: string | null } | null>(null);
     const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
 
-    // Custom deletion modal states
     const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string; type: 'folder' | 'notebook' } | null>(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -204,7 +206,7 @@ const Workspaces: React.FC = () => {
     const [isCreatingNotebook, setIsCreatingNotebook] = useState(false);
     const [newFolderName, setNewFolderName] = useState('');
     const [newNotebookName, setNewNotebookName] = useState('');
-    
+
     const createFolderMutation = useCreateFolder();
     const createNotebookMutation = useCreateNotebook();
     const updateNotebookMutation = useUpdateNotebook();
@@ -212,9 +214,8 @@ const Workspaces: React.FC = () => {
     const deleteNotebookMutation = useDeleteNotebook();
 
     const activeFolder = folders?.items?.find(f => f.id === selectedFolderId);
-    const activeFolderName = activeFolder?.name ?? 'Dossier';
+    const activeFolderName = activeFolder?.name ?? t('list.folders');
 
-    // Refetch folder-specific notebooks when folder selection changes
     useEffect(() => {
         if (selectedFolderId) {
             void refetchFolderNotebooks();
@@ -232,15 +233,13 @@ const Workspaces: React.FC = () => {
     const handleCreateNotebook = async () => {
         if (!newNotebookName.trim()) return;
         const targetFolderId = viewMode === 'folders' ? selectedFolderId : null;
-        await createNotebookMutation.mutateAsync({ 
-            name: newNotebookName, 
-            description: '', 
-            folder_id: targetFolderId 
+        await createNotebookMutation.mutateAsync({
+            name: newNotebookName,
+            description: '',
+            folder_id: targetFolderId
         });
         setNewNotebookName('');
         setIsCreatingNotebook(false);
-        
-        // Refresh lists
         void refetchAllNotebooks();
         void refetchUnassignedNotebooks();
         if (targetFolderId) {
@@ -254,8 +253,6 @@ const Workspaces: React.FC = () => {
             id: selectedNotebookToMove.id,
             data: { folder_id: folderId }
         });
-        
-        // Refresh list queries
         void refetchAllNotebooks();
         void refetchUnassignedNotebooks();
         void refetchFolderNotebooks();
@@ -277,24 +274,24 @@ const Workspaces: React.FC = () => {
 
     return (
         <>
-            <PageMeta title="Espaces de travail" description="Gérez vos espaces de travail interactifs" />
-            <PageBreadcrumb pageTitle="Espaces de travail" />
+            <PageMeta title={t('list.page_title')} description={t('list.page_desc')} />
+            <PageBreadcrumb pageTitle={t('list.page_title')} />
             <div className="relative overflow-hidden dark:bg-background min-h-dvh rounded-none">
                 <div className="p-2 sm:p-6 space-y-6">
-                    
+
                     {/* View Switcher Segmented Control */}
                     <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-4 mb-6">
                         <div className="flex items-center gap-2 bg-gray-100 dark:bg-white/[0.04] p-1 rounded-xl">
                             <button
-                                    onClick={() => setViewMode('simple')}
-                                    className={`flex items-center gap-2 text-xs sm:text-sm font-medium px-4 py-2 rounded-lg transition-all ${
-                                        viewMode === 'simple'
-                                            ? 'bg-white dark:bg-gray-800 text-brand-500 shadow-xs'
-                                            : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
-                                    }`}
-                                >
-                                    <LayoutGridIcon size={16} />
-                                    Simple (Tous)
+                                onClick={() => setViewMode('simple')}
+                                className={`flex items-center gap-2 text-xs sm:text-sm font-medium px-4 py-2 rounded-lg transition-all ${
+                                    viewMode === 'simple'
+                                        ? 'bg-white dark:bg-gray-800 text-brand-500 shadow-xs'
+                                        : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                                }`}
+                            >
+                                <LayoutGridIcon size={16} />
+                                {t('list.view_simple')}
                             </button>
                             <button
                                 onClick={() => { setViewMode('folders'); setSelectedFolderId(null); }}
@@ -305,7 +302,7 @@ const Workspaces: React.FC = () => {
                                 }`}
                             >
                                 <FolderTreeIcon size={16} />
-                                Par Dossier
+                                {t('list.view_folders')}
                             </button>
                         </div>
                     </div>
@@ -319,36 +316,36 @@ const Workspaces: React.FC = () => {
                                     {/* Dossiers Section */}
                                     <div className="space-y-4">
                                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                            <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Dossiers</h3>
-                                            <button 
+                                            <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">{t('list.folders')}</h3>
+                                            <button
                                                 onClick={() => setIsCreatingFolder(true)}
                                                 className="inline-flex justify-end items-center gap-2 text-sm font-medium text-brand-500 hover:text-brand-600 transition-colors"
                                             >
-                                                <PlusIcon size={18} /> Nouveau Dossier
+                                                <PlusIcon size={18} /> {t('list.new_folder')}
                                             </button>
                                         </div>
 
-                                        <ComponentCard title="Vos Dossiers">
+                                        <ComponentCard title={t('list.your_folders')}>
                                             {isCreatingFolder && (
                                                 <div className="flex flex-col sm:flex-row gap-3 mb-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 animate-fadeIn">
-                                                    <input 
+                                                    <input
                                                         className="flex-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-brand-500 focus:border-brand-500 block p-2.5"
-                                                        placeholder="Nom du dossier..."
+                                                        placeholder={t('list.folder_placeholder')}
                                                         value={newFolderName}
                                                         onChange={(e) => setNewFolderName(e.target.value)}
                                                         autoFocus
                                                     />
                                                     <div className="flex justify-end gap-2">
-                                                        <button onClick={handleCreateFolder} className="text-white bg-brand-500 hover:bg-brand-600 focus:ring-4 focus:ring-brand-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-brand-600 dark:hover:bg-brand-700 focus:outline-none transition-colors">Créer</button>
-                                                        <button onClick={() => setIsCreatingFolder(false)} className="py-2.5 px-5 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 transition-colors">Annuler</button>
+                                                        <button onClick={handleCreateFolder} className="text-white bg-brand-500 hover:bg-brand-600 focus:ring-4 focus:ring-brand-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-brand-600 dark:hover:bg-brand-700 focus:outline-none transition-colors">{t('list.create')}</button>
+                                                        <button onClick={() => setIsCreatingFolder(false)} className="py-2.5 px-5 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 transition-colors">{t('list.cancel')}</button>
                                                     </div>
                                                 </div>
                                             )}
 
                                             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-6">
                                                 {folders?.items?.map(folder => (
-                                                    <div 
-                                                        key={folder.id} 
+                                                    <div
+                                                        key={folder.id}
                                                         onClick={() => setSelectedFolderId(folder.id)}
                                                         className="group rounded-2xl border border-gray-100 bg-gray-50 px-6 py-6 dark:border-gray-800 dark:bg-white/[0.03] xl:py-[27px] hover:shadow-md hover:border-brand-300 dark:hover:border-brand-700 transition-all cursor-pointer animate-fadeIn"
                                                     >
@@ -357,13 +354,13 @@ const Workspaces: React.FC = () => {
                                                                 <FolderIcon className="text-yellow-500" size={36} fill="currentColor" />
                                                             </div>
                                                             <div className="relative inline-block" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
-                                                                <button 
+                                                                <button
                                                                     onClick={() => {
                                                                         setDeleteTarget({ id: folder.id, name: folder.name, type: 'folder' });
                                                                         setIsDeleteModalOpen(true);
                                                                     }}
                                                                     className="text-gray-400 hover:text-rose-500 dark:hover:text-rose-400 p-2 rounded-xl hover:bg-gray-200/50 dark:hover:bg-gray-800 transition-colors"
-                                                                    title="Supprimer le dossier"
+                                                                    title={t('list.delete_folder_title')}
                                                                 >
                                                                     <Trash2Icon size={18} />
                                                                 </button>
@@ -372,7 +369,7 @@ const Workspaces: React.FC = () => {
                                                         <h4 className="mb-1 text-sm font-medium text-gray-800 dark:text-white/90 truncate">{folder.name}</h4>
                                                         <div className="flex items-center justify-between mt-4">
                                                             <span className="block text-xs text-gray-500 dark:text-gray-400">
-                                                                {folder.created_at ? new Date(folder.created_at).toLocaleDateString() : 'Aujourd\'hui'}
+                                                                {folder.created_at ? new Date(folder.created_at).toLocaleDateString() : t('list.today')}
                                                             </span>
                                                             <ChevronRightIcon className="text-gray-400 group-hover:text-brand-500 transition-colors" size={16} />
                                                         </div>
@@ -380,12 +377,12 @@ const Workspaces: React.FC = () => {
                                                 ))}
                                                 {folders?.items?.length === 0 && !isLoadingFolders && (
                                                     <div className="col-span-full py-8 text-center text-gray-500 dark:text-gray-400 text-sm">
-                                                        Aucun dossier créé pour le moment.
+                                                        {t('list.no_folders_empty')}
                                                     </div>
                                                 )}
                                                 {isLoadingFolders && (
                                                     <div className="col-span-full py-8 text-center text-brand-500 text-sm animate-pulse">
-                                                        Chargement des dossiers...
+                                                        {t('list.loading_folders')}
                                                     </div>
                                                 )}
                                             </div>
@@ -395,28 +392,28 @@ const Workspaces: React.FC = () => {
                                     {/* Notebooks Hors Dossier Section */}
                                     <div className="space-y-4 pt-4 border-t border-gray-100 dark:border-gray-800">
                                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                            <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Notebooks sans dossier</h3>
-                                            <button 
+                                            <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">{t('list.no_folder')}</h3>
+                                            <button
                                                 onClick={() => setIsCreatingNotebook(true)}
                                                 className="inline-flex justify-end items-center gap-2 text-sm font-medium text-brand-500 hover:text-brand-600 transition-colors"
                                             >
-                                                <PlusIcon size={18} /> Nouveau Notebook
+                                                <PlusIcon size={18} /> {t('list.new_notebook')}
                                             </button>
                                         </div>
 
-                                        <ComponentCard title="Espaces de travail isolés">
+                                        <ComponentCard title={t('list.isolated')}>
                                             {isCreatingNotebook && (
                                                 <div className="flex flex-col sm:flex-row gap-3 mb-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 animate-fadeIn">
-                                                    <input 
+                                                    <input
                                                         className="flex-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-brand-500 focus:border-brand-500 block p-2.5"
-                                                        placeholder="Nom du notebook..."
+                                                        placeholder={t('list.notebook_placeholder')}
                                                         value={newNotebookName}
                                                         onChange={(e) => setNewNotebookName(e.target.value)}
                                                         autoFocus
                                                     />
                                                     <div className="flex justify-end gap-2">
-                                                        <button onClick={handleCreateNotebook} className="text-white bg-brand-500 hover:bg-brand-600 focus:ring-4 focus:ring-brand-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-brand-600 dark:hover:bg-brand-700 focus:outline-none transition-colors">Créer</button>
-                                                        <button onClick={() => setIsCreatingNotebook(false)} className="py-2.5 px-5 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 transition-colors">Annuler</button>
+                                                        <button onClick={handleCreateNotebook} className="text-white bg-brand-500 hover:bg-brand-600 focus:ring-4 focus:ring-brand-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-brand-600 dark:hover:bg-brand-700 focus:outline-none transition-colors">{t('list.create')}</button>
+                                                        <button onClick={() => setIsCreatingNotebook(false)} className="py-2.5 px-5 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 transition-colors">{t('list.cancel')}</button>
                                                     </div>
                                                 </div>
                                             )}
@@ -431,23 +428,23 @@ const Workspaces: React.FC = () => {
                                                                         <BookIcon className="text-brand-500" size={28} />
                                                                     </div>
                                                                     <div className="flex items-center gap-1" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
-                                                                        <button 
+                                                                        <button
                                                                             onClick={() => {
                                                                                 setSelectedNotebookToMove({ id: notebook.id, name: notebook.name, folder_id: notebook.folder_id });
                                                                                 setIsMoveModalOpen(true);
                                                                             }}
                                                                             className="text-gray-400 hover:text-brand-500 dark:hover:text-brand-400 p-2 rounded-xl hover:bg-gray-200/50 dark:hover:bg-gray-800 transition-colors"
-                                                                            title="Classer dans un dossier"
+                                                                            title={t('list.classify_title')}
                                                                         >
                                                                             <FolderInputIcon size={18} />
                                                                         </button>
-                                                                        <button 
+                                                                        <button
                                                                             onClick={() => {
                                                                                 setDeleteTarget({ id: notebook.id, name: notebook.name, type: 'notebook' });
                                                                                 setIsDeleteModalOpen(true);
                                                                             }}
                                                                             className="text-gray-400 hover:text-rose-500 dark:hover:text-rose-400 p-2 rounded-xl hover:bg-gray-200/50 dark:hover:bg-gray-800 transition-colors"
-                                                                            title="Supprimer le notebook"
+                                                                            title={t('list.delete_notebook_title')}
                                                                         >
                                                                             <Trash2Icon size={18} />
                                                                         </button>
@@ -457,7 +454,7 @@ const Workspaces: React.FC = () => {
                                                                     <h4 className="mb-1 text-sm font-medium text-gray-800 dark:text-white/90 truncate">{notebook.name}</h4>
                                                                     <div className="flex items-center justify-between mt-4">
                                                                         <span className="block text-xs text-gray-500 dark:text-gray-400">
-                                                                            Espace de travail
+                                                                            {t('list.workspace_label')}
                                                                         </span>
                                                                         <ChevronRightIcon className="text-gray-400 group-hover:text-brand-500 transition-colors" size={16} />
                                                                     </div>
@@ -468,12 +465,12 @@ const Workspaces: React.FC = () => {
                                                 ))}
                                                 {unassignedNotebooks?.items?.length === 0 && !isLoadingUnassignedNotebooks && (
                                                     <div className="col-span-full py-8 text-center text-gray-500 dark:text-gray-400 text-sm">
-                                                        Aucun notebook à la racine.
+                                                        {t('list.no_notebooks_root')}
                                                     </div>
                                                 )}
                                                 {isLoadingUnassignedNotebooks && (
                                                     <div className="col-span-full py-8 text-center text-brand-500 text-sm animate-pulse">
-                                                        Chargement des notebooks...
+                                                        {t('list.loading_notebooks')}
                                                     </div>
                                                 )}
                                             </div>
@@ -485,16 +482,16 @@ const Workspaces: React.FC = () => {
                                 <div className="space-y-6 animate-fadeIn">
                                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                         <div className="flex items-center gap-3">
-                                            <button 
+                                            <button
                                                 onClick={() => setSelectedFolderId(null)}
                                                 className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 dark:border-gray-800 bg-background text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/[0.04] transition-all"
-                                                title="Retour aux dossiers"
+                                                title={t('list.back_to_folders')}
                                             >
                                                 <ArrowLeftIcon size={18} />
                                             </button>
                                             <div>
                                                 <div className="flex items-center gap-1.5 text-xs text-gray-400 font-medium">
-                                                    <span>Dossiers</span>
+                                                    <span>{t('list.folders')}</span>
                                                     <ChevronRightIcon size={12} />
                                                     <span className="truncate max-w-[100px]">{activeFolderName}</span>
                                                 </div>
@@ -505,27 +502,27 @@ const Workspaces: React.FC = () => {
                                             </div>
                                         </div>
 
-                                        <button 
+                                        <button
                                             onClick={() => setIsCreatingNotebook(true)}
                                             className="inline-flex justify-end items-center gap-2 text-sm font-medium text-brand-500 hover:text-brand-600 transition-colors"
                                         >
-                                            <PlusIcon size={18} /> Nouveau Notebook
+                                            <PlusIcon size={18} /> {t('list.new_notebook')}
                                         </button>
                                     </div>
 
-                                    <ComponentCard title={`Espaces de travail dans : ${activeFolderName}`}>
+                                    <ComponentCard title={t('list.workspaces_in_folder', { name: activeFolderName })}>
                                         {isCreatingNotebook && (
                                             <div className="flex flex-col sm:flex-row gap-3 mb-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 animate-fadeIn">
-                                                <input 
+                                                <input
                                                     className="flex-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-brand-500 focus:border-brand-500 block p-2.5"
-                                                    placeholder="Nom du notebook..."
+                                                    placeholder={t('list.notebook_placeholder')}
                                                     value={newNotebookName}
                                                     onChange={(e) => setNewNotebookName(e.target.value)}
                                                     autoFocus
                                                 />
                                                 <div className="flex justify-end gap-2">
-                                                    <button onClick={handleCreateNotebook} className="text-white bg-brand-500 hover:bg-brand-600 focus:ring-4 focus:ring-brand-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-brand-600 dark:hover:bg-brand-700 focus:outline-none transition-colors">Créer</button>
-                                                    <button onClick={() => setIsCreatingNotebook(false)} className="py-2.5 px-5 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 transition-colors">Annuler</button>
+                                                    <button onClick={handleCreateNotebook} className="text-white bg-brand-500 hover:bg-brand-600 focus:ring-4 focus:ring-brand-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-brand-600 dark:hover:bg-brand-700 focus:outline-none transition-colors">{t('list.create')}</button>
+                                                    <button onClick={() => setIsCreatingNotebook(false)} className="py-2.5 px-5 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 transition-colors">{t('list.cancel')}</button>
                                                 </div>
                                             </div>
                                         )}
@@ -540,23 +537,23 @@ const Workspaces: React.FC = () => {
                                                                     <BookIcon className="text-brand-500" size={28} />
                                                                 </div>
                                                                 <div className="flex items-center gap-1" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
-                                                                    <button 
+                                                                    <button
                                                                         onClick={() => {
                                                                             setSelectedNotebookToMove({ id: notebook.id, name: notebook.name, folder_id: notebook.folder_id });
                                                                             setIsMoveModalOpen(true);
                                                                         }}
                                                                         className="text-gray-400 hover:text-brand-500 dark:hover:text-brand-400 p-2 rounded-xl hover:bg-gray-200/50 dark:hover:bg-gray-800 transition-colors"
-                                                                        title="Déplacer dans un autre dossier"
+                                                                        title={t('list.move_title')}
                                                                     >
                                                                         <FolderInputIcon size={18} />
                                                                     </button>
-                                                                    <button 
+                                                                    <button
                                                                         onClick={() => {
                                                                             setDeleteTarget({ id: notebook.id, name: notebook.name, type: 'notebook' });
                                                                             setIsDeleteModalOpen(true);
                                                                         }}
                                                                         className="text-gray-400 hover:text-rose-500 dark:hover:text-rose-400 p-2 rounded-xl hover:bg-gray-200/50 dark:hover:bg-gray-800 transition-colors"
-                                                                        title="Supprimer le notebook"
+                                                                        title={t('list.delete_notebook_title')}
                                                                     >
                                                                         <Trash2Icon size={18} />
                                                                     </button>
@@ -566,7 +563,7 @@ const Workspaces: React.FC = () => {
                                                                 <h4 className="mb-1 text-sm font-medium text-gray-800 dark:text-white/90 truncate">{notebook.name}</h4>
                                                                 <div className="flex items-center justify-between mt-4">
                                                                     <span className="block text-xs text-gray-500 dark:text-gray-400">
-                                                                        Espace de travail
+                                                                        {t('list.workspace_label')}
                                                                     </span>
                                                                     <ChevronRightIcon className="text-gray-400 group-hover:text-brand-500 transition-colors" size={16} />
                                                                 </div>
@@ -577,12 +574,12 @@ const Workspaces: React.FC = () => {
                                             ))}
                                             {folderNotebooks?.items?.length === 0 && !isLoadingFolderNotebooks && (
                                                 <div className="col-span-full py-8 text-center text-gray-500 dark:text-gray-400 text-sm">
-                                                    Aucun notebook dans ce dossier.
+                                                    {t('list.no_notebooks_root')}
                                                 </div>
                                             )}
                                             {isLoadingFolderNotebooks && (
                                                 <div className="col-span-full py-8 text-center text-brand-500 text-sm animate-pulse">
-                                                    Chargement des notebooks...
+                                                    {t('list.loading_notebooks')}
                                                 </div>
                                             )}
                                         </div>
@@ -596,28 +593,28 @@ const Workspaces: React.FC = () => {
                     {viewMode === 'simple' && (
                         <div className="space-y-4 animate-fadeIn">
                             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Tous vos Notebooks</h3>
-                                <button 
+                                <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">{t('list.all_notebooks')}</h3>
+                                <button
                                     onClick={() => setIsCreatingNotebook(true)}
                                     className="inline-flex justify-end items-center gap-2 text-sm font-medium text-brand-500 hover:text-brand-600 transition-colors"
                                 >
-                                    <PlusIcon size={18} /> Nouveau Notebook
+                                    <PlusIcon size={18} /> {t('list.new_notebook')}
                                 </button>
                             </div>
 
-                            <ComponentCard title="Liste complète des espaces de travail">
+                            <ComponentCard title={t('list.all_notebooks_desc')}>
                                 {isCreatingNotebook && (
                                     <div className="flex flex-col sm:flex-row gap-3 mb-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 animate-fadeIn">
-                                        <input 
+                                        <input
                                             className="flex-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-brand-500 focus:border-brand-500 block p-2.5"
-                                            placeholder="Nom du notebook..."
+                                            placeholder={t('list.notebook_placeholder')}
                                             value={newNotebookName}
                                             onChange={(e) => setNewNotebookName(e.target.value)}
                                             autoFocus
                                         />
                                         <div className="flex justify-end gap-2">
-                                            <button onClick={handleCreateNotebook} className="text-white bg-brand-500 hover:bg-brand-600 focus:ring-4 focus:ring-brand-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-brand-600 dark:hover:bg-brand-700 focus:outline-none transition-colors">Créer</button>
-                                            <button onClick={() => setIsCreatingNotebook(false)} className="py-2.5 px-5 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 transition-colors">Annuler</button>
+                                            <button onClick={handleCreateNotebook} className="text-white bg-brand-500 hover:bg-brand-600 focus:ring-4 focus:ring-brand-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-brand-600 dark:hover:bg-brand-700 focus:outline-none transition-colors">{t('list.create')}</button>
+                                            <button onClick={() => setIsCreatingNotebook(false)} className="py-2.5 px-5 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 transition-colors">{t('list.cancel')}</button>
                                         </div>
                                     </div>
                                 )}
@@ -632,23 +629,23 @@ const Workspaces: React.FC = () => {
                                                             <BookIcon className="text-brand-500" size={28} />
                                                         </div>
                                                         <div className="flex items-center gap-1" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
-                                                            <button 
+                                                            <button
                                                                 onClick={() => {
                                                                     setSelectedNotebookToMove({ id: notebook.id, name: notebook.name, folder_id: notebook.folder_id });
                                                                     setIsMoveModalOpen(true);
                                                                 }}
                                                                 className="text-gray-400 hover:text-brand-500 dark:hover:text-brand-400 p-2 rounded-xl hover:bg-gray-200/50 dark:hover:bg-gray-800 transition-colors"
-                                                                title="Classer dans un dossier"
+                                                                title={t('list.classify_title')}
                                                             >
                                                                 <FolderInputIcon size={18} />
                                                             </button>
-                                                            <button 
+                                                            <button
                                                                 onClick={() => {
                                                                     setDeleteTarget({ id: notebook.id, name: notebook.name, type: 'notebook' });
                                                                     setIsDeleteModalOpen(true);
                                                                 }}
                                                                 className="text-gray-400 hover:text-rose-500 dark:hover:text-rose-400 p-2 rounded-xl hover:bg-gray-200/50 dark:hover:bg-gray-800 transition-colors"
-                                                                title="Supprimer le notebook"
+                                                                title={t('list.delete_notebook_title')}
                                                             >
                                                                 <Trash2Icon size={18} />
                                                             </button>
@@ -658,7 +655,7 @@ const Workspaces: React.FC = () => {
                                                         <h4 className="mb-1 text-sm font-medium text-gray-800 dark:text-white/90 truncate">{notebook.name}</h4>
                                                         <div className="flex items-center justify-between mt-4">
                                                             <span className="block text-xs text-gray-500 dark:text-gray-400">
-                                                                Espace de travail
+                                                                {t('list.workspace_label')}
                                                             </span>
                                                             <ChevronRightIcon className="text-gray-400 group-hover:text-brand-500 transition-colors" size={16} />
                                                         </div>
@@ -669,12 +666,12 @@ const Workspaces: React.FC = () => {
                                     ))}
                                     {allNotebooks?.items?.length === 0 && !isLoadingAllNotebooks && (
                                         <div className="col-span-full py-8 text-center text-gray-500 dark:text-gray-400 text-sm">
-                                            Aucun notebook disponible.
+                                            {t('list.no_notebooks_empty')}
                                         </div>
                                     )}
                                     {isLoadingAllNotebooks && (
                                         <div className="col-span-full py-8 text-center text-brand-500 text-sm animate-pulse">
-                                            Chargement des notebooks...
+                                            {t('list.loading_notebooks')}
                                         </div>
                                     )}
                                 </div>
@@ -696,18 +693,18 @@ const Workspaces: React.FC = () => {
                 onMove={handleMoveNotebook}
             />
 
-            {/* Premium Custom Delete Confirmation Modal */}
+            {/* Custom Delete Confirmation Modal */}
             <DeleteConfirmationModal
                 isOpen={isDeleteModalOpen}
                 onClose={() => {
                     setIsDeleteModalOpen(false);
                     setDeleteTarget(null);
                 }}
-                title={deleteTarget?.type === 'folder' ? 'Supprimer le dossier' : 'Supprimer le notebook'}
+                title={deleteTarget?.type === 'folder' ? t('list.delete_folder_title') : t('list.delete_notebook_title')}
                 description={
-                    deleteTarget?.type === 'folder' 
-                        ? `Êtes-vous sûr de vouloir supprimer définitivement le dossier "${deleteTarget.name}" ? Les notebooks qu'il contient ne seront pas supprimés et retourneront automatiquement à la racine.`
-                        : `Êtes-vous sûr de vouloir supprimer définitivement le notebook "${deleteTarget?.name}" ? Cette action est irréversible et détruira toutes les flashcards, résumés, quiz et podcasts associés.`
+                    deleteTarget?.type === 'folder'
+                        ? t('list.delete_folder_desc', { name: deleteTarget?.name ?? '' })
+                        : t('list.delete_notebook_desc', { name: deleteTarget?.name ?? '' })
                 }
                 onConfirm={handleConfirmDelete}
             />

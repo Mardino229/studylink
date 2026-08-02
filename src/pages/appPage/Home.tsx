@@ -11,6 +11,7 @@ import { useUser } from "../../components/layout/userContext.tsx";
 import { useBilling } from "../../context/BillingContext";
 import { useGetTokenStats } from "../../utils/billing";
 import { useGetNotebooks } from "../../utils/workspace";
+import { useTranslation } from "react-i18next";
 
 const container = {
     hidden: {},
@@ -22,6 +23,7 @@ export default function Home() {
     const { isPro, isUltra, tokenBalance, subscription } = useBilling();
     const { data: tokenStats } = useGetTokenStats();
     const { data: notebooks } = useGetNotebooks(undefined, { perPage: 1 });
+    const { t, i18n } = useTranslation('app');
 
     const notebookCount = notebooks?.pagination.total ?? 0;
     const artefactCount = tokenStats?.consumption?.artefact?.count ?? 0;
@@ -31,18 +33,20 @@ export default function Home() {
 
     const hourOfDay = new Date().getHours();
     const greeting =
-        hourOfDay < 12 ? "Bonjour" : hourOfDay < 18 ? "Bon après-midi" : "Bonsoir";
-    const firstName = user?.first_name ?? "étudiant";
+        hourOfDay < 12 ? t('home.greeting_morning') : hourOfDay < 18 ? t('home.greeting_afternoon') : t('home.greeting_evening');
+    const firstName = user?.first_name ?? t('home.user_fallback');
+
+    const locale = i18n.language.startsWith('fr') ? 'fr-CA' : 'en-CA';
 
     const KPI_CARDS = [
         {
             value: isUltra ? "Ultra" : isPro ? "Pro" : String(tokenBalance),
-            label: isUltra ? "Abonnement Ultra" : isPro ? "Abonnement Pro" : "Jetons disponibles",
+            label: isUltra ? t('home.plan_ultra') : isPro ? t('home.plan_pro') : t('home.tokens_label'),
             sub: isPro
                 ? subscription?.end_date
-                    ? `Jusqu'au ${new Date(subscription.end_date).toLocaleDateString("fr-CA")}`
-                    : "Accès illimité"
-                : tokenBalance === 0 ? "Solde vide   rechargez" : `${tokenPurchased} achetés au total`,
+                    ? t('home.access_until', { date: new Date(subscription.end_date).toLocaleDateString(locale) })
+                    : t('home.unlimited')
+                : tokenBalance === 0 ? t('home.balance_empty') : t('home.of_purchased', { total: tokenPurchased }),
             icon: isPro ? Sparkles : Zap,
             color: isUltra
                 ? "bg-purple-50 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400"
@@ -55,24 +59,24 @@ export default function Home() {
         },
         {
             value: String(notebookCount),
-            label: "Notebooks",
-            sub: "Espaces de travail actifs",
+            label: t('home.stat_notebooks'),
+            sub: t('home.stat_workspaces'),
             icon: BookOpen,
             color: "bg-purple-50 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400",
             href: "/workspaces",
         },
         {
             value: String(artefactCount),
-            label: "Outils de révision générés",
-            sub: "Résumés, flashcards & quiz",
+            label: t('home.stat_tools'),
+            sub: t('home.stat_tools_desc'),
             icon: Layers,
             color: "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400",
             href: "/workspaces",
         },
         {
             value: String(chatCount),
-            label: "Sessions de chat",
-            sub: "Avec votre assistant",
+            label: t('home.stat_chats'),
+            sub: t('home.stat_chats_desc'),
             icon: MessageSquare,
             color: "bg-cyan-50 text-cyan-600 dark:bg-cyan-500/10 dark:text-cyan-400",
             href: "/chat",
@@ -80,23 +84,47 @@ export default function Home() {
     ];
 
     const QUICK_ACTIONS = [
-        { label: "Nouveau notebook", desc: "Créez un espace de travail", icon: BookOpen, href: "/workspaces", color: "from-blue-500 to-blue-600" },
-        { label: "Bibliothèque d'épreuves", desc: "Examens & corrigés", icon: BookMarked, href: "/exam-library", color: "from-emerald-500 to-emerald-600" },
-        { label: "Chat", desc: "Posez vos questions", icon: Bot, href: "/workspaces", color: "from-purple-500 to-purple-600" },
-        { label: "Mon abonnement", desc: "Jetons & plans", icon: CreditCard, href: "/subscription", color: "from-amber-500 to-amber-600" },
+        { label: t('home.action_new_notebook'), desc: t('home.action_create_workspace'), icon: BookOpen, href: "/workspaces", color: "from-blue-500 to-blue-600" },
+        { label: t('home.action_exam_library'), desc: t('home.action_exams_desc'), icon: BookMarked, href: "/exam-library", color: "from-emerald-500 to-emerald-600" },
+        { label: t('home.action_chat'), desc: t('home.action_chat_desc'), icon: Bot, href: "/workspaces", color: "from-purple-500 to-purple-600" },
+        { label: t('home.action_subscription'), desc: t('home.action_subscription_desc'), icon: CreditCard, href: "/subscription", color: "from-amber-500 to-amber-600" },
     ];
 
     const consumptions = [
-        { label: "Résumés / Flashcards / Quiz", icon: FileText, count: tokenStats?.consumption?.artefact?.tokensSpent ?? 0, color: "bg-blue-500" },
-        { label: "Corrigés d'examens", icon: HelpCircle, count: tokenStats?.consumption?.corrige?.tokensSpent ?? 0, color: "bg-emerald-500" },
-        { label: "Chat (tranches 10 msgs)", icon: MessageSquare, count: tokenStats?.consumption?.chat?.tokensSpent ?? 0, color: "bg-purple-500" },
-        { label: "Audio & Podcasts", icon: Mic, count: tokenStats?.consumption?.audio?.tokensSpent ?? 0, color: "bg-amber-500" },
+        { label: t('home.usage_summaries'), icon: FileText, count: tokenStats?.consumption?.artefact?.tokensSpent ?? 0, color: "bg-blue-500" },
+        { label: t('home.usage_solutions'), icon: HelpCircle, count: tokenStats?.consumption?.corrige?.tokensSpent ?? 0, color: "bg-emerald-500" },
+        { label: t('home.usage_chat'), icon: MessageSquare, count: tokenStats?.consumption?.chat?.tokensSpent ?? 0, color: "bg-purple-500" },
+        { label: t('home.usage_audio'), icon: Mic, count: tokenStats?.consumption?.audio?.tokensSpent ?? 0, color: "bg-amber-500" },
     ];
     const totalConsumed = consumptions.reduce((s, c) => s + c.count, 0) || 1;
 
+    const STUDY_TIPS = [
+        {
+            icon: Layers,
+            color: "text-purple-600 bg-purple-50 dark:bg-purple-500/10",
+            title: t('home.tip_flashcards_title'),
+            body: t('home.tip_flashcards_body'),
+            href: "/workspaces",
+        },
+        {
+            icon: HelpCircle,
+            color: "text-amber-600 bg-amber-50 dark:bg-amber-500/10",
+            title: t('home.tip_quiz_title'),
+            body: t('home.tip_quiz_body'),
+            href: "/workspaces",
+        },
+        {
+            icon: BookMarked,
+            color: "text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10",
+            title: t('home.tip_exams_title'),
+            body: t('home.tip_exams_body'),
+            href: "/exam-library",
+        },
+    ];
+
     return (
         <>
-            <PageMeta title="Dashboard" description="Tableau de bord BlueCurve" />
+            <PageMeta title={t('home.dashboard_title')} description={t('home.dashboard_title')} />
             <PageBreadcrumb pageTitle="Dashboard" />
 
             <div className="space-y-6 pb-6">
@@ -108,7 +136,6 @@ export default function Home() {
                     transition={{ duration: 0.45, ease: "easeOut" }}
                     className="relative overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50 p-6 sm:p-8 dark:border-blue-900/30 dark:from-blue-900/20 dark:to-indigo-900/10"
                 >
-                    {/* Grain texture — multiply sur fond clair = grain sombre visible */}
                     <svg
                         className="pointer-events-none absolute inset-0 h-full w-full rounded-2xl"
                         style={{ mixBlendMode: 'multiply', opacity: 0.38 } as React.CSSProperties}
@@ -141,14 +168,14 @@ export default function Home() {
                                 className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition-colors"
                             >
                                 <BookOpen size={15} />
-                                Mes notebooks
+                                {t('home.my_notebooks')}
                             </Link>
                             <Link
                                 to="/exam-library"
                                 className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white/70 px-4 py-2 text-sm font-semibold text-blue-700 hover:bg-white transition-colors dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50"
                             >
                                 <BookMarked size={15} />
-                                Épreuves
+                                {t('home.exams_btn')}
                             </Link>
                         </div>
                     </div>
@@ -195,7 +222,7 @@ export default function Home() {
                         className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900/80"
                     >
                         <h2 className="mb-4 text-sm font-semibold text-gray-400 dark:text-gray-500">
-                            Actions rapides
+                            {t('home.quick_actions')}
                         </h2>
                         <div className="grid grid-cols-1 gap-3">
                             {QUICK_ACTIONS.map(({ label, desc, icon: Icon, href, color }) => (
@@ -229,21 +256,19 @@ export default function Home() {
                     >
                         <div className="mb-4 flex items-center justify-between">
                             <h2 className="text-sm font-semibold text-gray-400 dark:text-gray-500">
-                                Consommation de jetons
+                                {t('home.token_usage')}
                             </h2>
                             <TrendingUp size={16} className="text-gray-400" />
                         </div>
 
-                        {/* Summary line */}
                         <div className="mb-5 flex items-end gap-2">
                             <span className="text-3xl font-black text-gray-900 dark:text-white">{tokenSpent}</span>
                             <span className="mb-1 text-sm text-gray-500 dark:text-gray-400">
-                                jetons utilisés
-                                {tokenPurchased > 0 && ` sur ${tokenPurchased} achetés`}
+                                {t('home.tokens_used')}
+                                {tokenPurchased > 0 && ` ${t('home.of_purchased', { total: tokenPurchased })}`}
                             </span>
                         </div>
 
-                        {/* Breakdown bars */}
                         <div className="space-y-4">
                             {consumptions.map(({ label, icon: Icon, count, color }) => {
                                 const pct = Math.round((count / totalConsumed) * 100);
@@ -274,7 +299,7 @@ export default function Home() {
 
                         {tokenSpent === 0 && (
                             <p className="mt-4 text-center text-xs text-gray-400 dark:text-gray-600">
-                                Aucune consommation pour l'instant. Générez votre premier artefact !
+                                {t('home.no_consumption')}
                             </p>
                         )}
 
@@ -283,7 +308,7 @@ export default function Home() {
                             className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 py-2.5 text-xs font-semibold text-gray-600 transition-colors hover:bg-gray-50 dark:border-gray-800 dark:text-gray-400 dark:hover:bg-white/5"
                         >
                             <Settings size={13} />
-                            Gérer mon abonnement
+                            {t('home.manage_subscription')}
                         </Link>
                     </motion.div>
                 </div>
@@ -296,29 +321,7 @@ export default function Home() {
                     viewport={{ once: true, amount: 0.3 }}
                     className="grid grid-cols-1 gap-4 sm:grid-cols-3"
                 >
-                    {[
-                        {
-                            icon: Layers,
-                            color: "text-purple-600 bg-purple-50 dark:bg-purple-500/10",
-                            title: "Flashcards",
-                            body: "Transformez vos notes en flashcards question-réponse pour mémoriser plus vite.",
-                            href: "/workspaces",
-                        },
-                        {
-                            icon: HelpCircle,
-                            color: "text-amber-600 bg-amber-50 dark:bg-amber-500/10",
-                            title: "Quiz IA",
-                            body: "Testez vos connaissances avant un examen avec des questions générées.",
-                            href: "/workspaces",
-                        },
-                        {
-                            icon: BookMarked,
-                            color: "text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10",
-                            title: "Épreuves passées",
-                            body: "Entraînez-vous sur les vraies épreuves de l'uOttawa avec corrigés.",
-                            href: "/exam-library",
-                        },
-                    ].map(({ icon: Icon, color, title, body, href }) => (
+                    {STUDY_TIPS.map(({ icon: Icon, color, title, body, href }) => (
                         <Link
                             key={title}
                             to={href}

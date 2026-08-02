@@ -7,13 +7,19 @@ import { useUser } from '../../components/layout/userContext.tsx';
 import AuthLayout from '../../components/layout/authLayout.tsx';
 import { Input } from '../../components/ui/input.tsx';
 import { Button } from '../../components/ui/button.tsx';
-
-const STEPS = ['Inscription', 'Profil', 'Premier notebook'];
+import { useTranslation } from 'react-i18next';
 
 export default function Onboarding() {
     const navigate = useNavigate();
+    const { t } = useTranslation('app');
     const { user } = useUser();
     const createNotebook = useCreateNotebook();
+
+    const STEPS = [
+        t('onboarding.step_register'),
+        t('onboarding.step_profile'),
+        t('onboarding.step_notebook'),
+    ];
 
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
@@ -22,7 +28,7 @@ export default function Onboarding() {
     const handleCreate = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!name.trim()) {
-            setError('Donnez un nom à votre notebook.');
+            setError(t('onboarding.error_name'));
             return;
         }
         try {
@@ -38,7 +44,7 @@ export default function Onboarding() {
     };
 
     return (
-        <AuthLayout title="Onboarding" description="Créez votre premier notebook">
+        <AuthLayout title="Onboarding" description={t('onboarding.subtitle')}>
             {/* Decorative cylinders (same as login) */}
             <div className="cylinder1" />
             <div className="cylinder2" />
@@ -87,10 +93,10 @@ export default function Onboarding() {
                     {/* Title */}
                     <div className="mb-6">
                         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 dark:text-white">
-                            {user?.first_name ? `Bienvenue, ${user.first_name} !` : 'Bienvenue !'}
+                            {user?.first_name ? t('onboarding.welcome', { name: user.first_name }) : t('onboarding.welcome', { name: '' }).trim()}
                         </h1>
                         <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                            Créez votre premier notebook pour commencer à réviser. Un notebook regroupe vos sources — PDF, PPTX, vidéos YouTube — et tous vos outils de révision générés (résumés, flashcards, quiz…).
+                            {t('onboarding.subtitle')}
                         </p>
                     </div>
 
@@ -98,13 +104,13 @@ export default function Onboarding() {
                         {/* Name */}
                         <div className="space-y-1.5">
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Nom du notebook
+                                {t('onboarding.name_label')}
                             </label>
                             <Input
                                 type="text"
                                 value={name}
                                 onChange={e => { setName(e.target.value); setError(''); }}
-                                placeholder="Ex : Physique S2, Droit constitutionnel…"
+                                placeholder={t('onboarding.name_placeholder')}
                                 autoFocus
                                 className="form-input block w-full appearance-none rounded-lg border border-gray-300 px-3 py-3 placeholder-gray-400 shadow-sm focus:border-[var(--primary-color)] focus:outline-none focus:ring-[var(--primary-color)] sm:text-sm"
                             />
@@ -114,12 +120,12 @@ export default function Onboarding() {
                         {/* Description */}
                         <div className="space-y-1.5">
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Description <span className="font-normal text-gray-400">— optionnel</span>
+                                {t('onboarding.desc_label')} <span className="font-normal text-gray-400">{t('onboarding.desc_optional')}</span>
                             </label>
                             <textarea
                                 value={description}
                                 onChange={e => setDescription(e.target.value)}
-                                placeholder="Quelques mots sur ce notebook…"
+                                placeholder={t('onboarding.desc_placeholder')}
                                 rows={2}
                                 className="block w-full appearance-none resize-none rounded-lg border border-gray-300 px-3 py-3 text-sm placeholder-gray-400 shadow-sm outline-none focus:border-[var(--primary-color)] focus:ring-1 focus:ring-[var(--primary-color)] dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder-gray-500"
                             />
@@ -134,11 +140,11 @@ export default function Onboarding() {
                             {createNotebook.isPending ? (
                                 <span className="inline-flex items-center gap-2">
                                     <Loader2 size={15} className="animate-spin" />
-                                    Création…
+                                    {t('onboarding.creating')}
                                 </span>
                             ) : (
                                 <span className="inline-flex items-center gap-2">
-                                    Créer et démarrer
+                                    {t('onboarding.submit')}
                                     <ArrowRight size={15} />
                                 </span>
                             )}
@@ -150,7 +156,7 @@ export default function Onboarding() {
                         onClick={() => navigate('/home')}
                         className="mt-4 w-full text-center text-sm text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                     >
-                        Passer pour l'instant
+                        {t('onboarding.skip')}
                     </button>
                 </div>
             </motion.div>

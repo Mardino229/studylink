@@ -1,0 +1,92 @@
+{
+  "library": {
+    "page_title": "Exam library",
+    "submit_btn": "Submit an exam",
+    "empty": "No exams found",
+    "view_exam": "View exam",
+    "access_note": "This is permanent — you don't pay again to reopen this exam.",
+    "your_balance": "Your balance",
+    "unlock_solution": "Unlock solution",
+    "solution_note": "You don't pay again to reopen this solution.",
+    "filters": {
+      "year_placeholder": "Year (e.g. 2024)",
+      "all_sessions": "All sessions",
+      "fall": "Fall",
+      "winter": "Winter",
+      "spring_summer": "Spring/Summer",
+      "all_types": "All types",
+      "intra": "Midterm",
+      "final": "Final",
+      "quiz": "Quiz",
+      "other": "Other",
+      "search": "Search"
+    }
+  },
+  "card": {
+    "pro_badge": "Pro",
+    "already_bought": "Already purchased"
+  },
+  "solution": {
+    "page_title": "View solution",
+    "back": "Back",
+    "loading": "Loading solution...",
+    "unauthorized_title": "Unauthorized access",
+    "paywall_desc": "This file requires {{count}} token(s) to access.",
+    "paywall_note": "Access is then permanent — you don't pay again to reopen this file.",
+    "buy_tokens": "Buy tokens",
+    "go_pro": "Go Pro",
+    "back_to_library": "Back to library",
+    "unavailable_title": "Solution unavailable",
+    "unavailable_desc": "No solution has been uploaded for this exam yet.",
+    "error_title": "An error occurred",
+    "error_desc": "Unable to load the solution. Try again later."
+  },
+  "submit_modal": {
+    "title": "Submit an exam",
+    "name_placeholder": "Exam name *",
+    "course_label": "Course",
+    "year_label": "Year",
+    "session_fall": "Fall",
+    "session_winter": "Winter",
+    "session_spring": "Spring/Summer",
+    "type_intra": "Midterm",
+    "type_final": "Final",
+    "type_quiz": "Quiz",
+    "type_other": "Other"
+  },
+  "generate": {
+    "select_label": "Course and chapter selection",
+    "course_label": "Course",
+    "chapter_label": "Chapters",
+    "next": "Next",
+    "question_types": "Question types",
+    "back": "Back",
+    "generated": "Generated exam",
+    "answer_placeholder": "Your answer",
+    "search_placeholder": "Search by title, field, program, year"
+  },
+  "submissions": {
+    "page_title": "My Submissions",
+    "tab_exams": "Exams",
+    "tab_solutions": "Solutions",
+    "tab_contribute": "Contribute",
+    "status_validated": "Validated",
+    "status_pending": "Pending",
+    "status_rejected": "Rejected",
+    "coins_banner": "Earn coins 🪙 — every validated exam or solution...",
+    "no_solution_banner": "These exams don't have a solution yet. Submit yours to earn 0.5 coin...",
+    "resubmit_exam": "Resubmit exam",
+    "resubmit_solution": "Resubmit solution",
+    "submit_solution": "Submit a solution",
+    "cancel": "Cancel",
+    "resubmit": "Resubmit",
+    "sending": "Sending...",
+    "submit": "Submit",
+    "solution_for": "Solution for",
+    "unknown_exam": "Unknown exam",
+    "delete_title": "Delete submission",
+    "delete_confirm": "Are you sure you want to delete this submission?",
+    "delete_btn": "Delete",
+    "cancel_btn": "Cancel"
+  }
+}

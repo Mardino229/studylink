@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Modal } from '../../components/ui/modal/index.tsx';
 import {
     ArrowLeftIcon,
@@ -49,6 +50,7 @@ import SummariesTab from '../../components/workspace/tabs/SummariesTab.tsx';
 
 const WorkspaceNotebook: React.FC = () => {
     const { notebookId } = useParams<{ notebookId: string }>();
+    const { t } = useTranslation('workspace');
     const [activeTab, setActiveTab] = useState<'overview' | 'sources' | 'summaries' | 'flashcards' | 'quizzes' | 'podcasts' | 'chat'>('overview');
     const [generationModal, setGenerationModal] = useState<'summary' | 'flashcards' | 'quiz' | 'podcast' | null>(null);
     const [generationTitle, setGenerationTitle] = useState('');
@@ -118,14 +120,14 @@ const WorkspaceNotebook: React.FC = () => {
         if (status === 402) setUpgradeModalOpen(true);
     };
 
-    if (!notebookId) return <div>Notebook non trouvé</div>;
+    if (!notebookId) return <div>{t('notebook.not_found')}</div>;
 
     const tabs = [
-        { id: 'overview', label: 'Vue d\'ensemble', icon: BookOpen },
+        { id: 'overview', label: t('notebook.tab_overview'), icon: BookOpen },
         { id: 'sources', label: 'Sources', icon: FileText },
-        { id: 'summaries', label: 'Résumés', value: summaries?.items?.length ?? 0, hint: isLoadingSummaries ? 'Chargement...' : 'Résumés générés', icon: Sparkles },
+        { id: 'summaries', label: t('notebook.tab_summaries'), icon: Sparkles },
         { id: 'flashcards', label: 'Flashcards', icon: Layers },
-        { id: 'quizzes', label: 'Quiz', icon: HelpCircle },
+        { id: 'quizzes', label: t('notebook.tab_quizzes'), icon: HelpCircle },
         { id: 'podcasts', label: 'Podcasts', icon: Mic },
         { id: 'chat', label: 'Chat', icon: MessageSquare },
     ] as const;
@@ -139,14 +141,14 @@ const WorkspaceNotebook: React.FC = () => {
         (generationModal === 'podcast' && createPodcast.isPending);
 
     const stats = [
-        { label: 'Sources', value: sources?.items?.length ?? 0, hint: isLoadingSources ? 'Chargement...' : 'Documents importés', icon: FileText },
-        { label: 'Thèmes', value: themes?.items?.length ?? 0, hint: isLoadingThemes ? 'Chargement...' : 'Concepts détectés', icon: Target },
-        { label: 'Résumé', value: summaries?.items?.length ?? 0, hint: isLoadingSummaries ? 'Chargement...' : 'Résumés générés', icon: Sparkles },
-        { label: 'Artefacts', value: (summaries?.items?.length ?? 0) + (flashcards?.items?.length ?? 0) + (quizzes?.items?.length ?? 0) + (podcasts?.items?.length ?? 0), hint: 'Contenus au total', icon: Layers },
+        { label: t('notebook.stat_sources_label'), value: sources?.items?.length ?? 0, hint: isLoadingSources ? t('notebook.loading') : t('notebook.stat_sources_hint'), icon: FileText },
+        { label: t('notebook.stat_themes_label'), value: themes?.items?.length ?? 0, hint: isLoadingThemes ? t('notebook.loading') : t('notebook.stat_themes_hint'), icon: Target },
+        { label: t('notebook.stat_summaries_label'), value: summaries?.items?.length ?? 0, hint: isLoadingSummaries ? t('notebook.loading') : t('notebook.stat_summaries_hint'), icon: Sparkles },
+        { label: t('notebook.stat_artefacts_label'), value: (summaries?.items?.length ?? 0) + (flashcards?.items?.length ?? 0) + (quizzes?.items?.length ?? 0) + (podcasts?.items?.length ?? 0), hint: t('notebook.stat_artefacts_hint'), icon: Layers },
     ];
 
     const formatDate = (date?: string) => {
-        if (!date) return 'Just now';
+        if (!date) return t('notebook.just_now');
         return new Date(date).toLocaleString();
     };
 
@@ -174,11 +176,11 @@ const WorkspaceNotebook: React.FC = () => {
     };
 
     const MOBILE_TAB_LABEL: Record<string, string> = {
-        overview:   'Aperçu',
+        overview:   t('notebook.mobile_overview'),
         sources:    'Sources',
-        summaries:  'Résumés',
-        flashcards: 'Cartes',
-        quizzes:    'Quiz',
+        summaries:  t('notebook.mobile_summaries'),
+        flashcards: t('notebook.mobile_flashcards'),
+        quizzes:    t('notebook.tab_quizzes'),
         chat:       'Chat',
     };
 
@@ -186,26 +188,26 @@ const WorkspaceNotebook: React.FC = () => {
         setGenerationModal(type);
         const notebookName = notebook?.name?.trim() || 'Notebook';
         if (type === 'summary') {
-            setGenerationTitle(`${notebookName} - Résumé`);
+            setGenerationTitle(`${notebookName} - ${t('notebook.gen_suffix_summary')}`);
         } else if (type === 'flashcards') {
-            setGenerationTitle(`${notebookName} - Flashcards`);
+            setGenerationTitle(`${notebookName} - ${t('notebook.gen_suffix_flashcards')}`);
         } else if (type === 'quiz') {
-            setGenerationTitle(`${notebookName} - Quiz`);
+            setGenerationTitle(`${notebookName} - ${t('notebook.gen_suffix_quiz')}`);
         } else {
-            setGenerationTitle(`${notebookName} - Podcast`);
+            setGenerationTitle(`${notebookName} - ${t('notebook.gen_suffix_podcast')}`);
         }
     };
 
     return (
         <>
-            <PageMeta title={notebook?.name || 'Notebook'} description="Espace de travail" />
+            <PageMeta title={notebook?.name || 'Notebook'} description={t('notebook.page_desc')} />
             <PageBreadcrumb
-                pageTitle={isLoadingNotebook ? 'Chargement...' : notebook?.name || 'Notebook'}
+                pageTitle={isLoadingNotebook ? t('notebook.loading') : notebook?.name || 'Notebook'}
                 titleAction={
                     <Link
                         to="/workspaces"
                         className="inline-flex items-center gap-1 rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-800 dark:hover:bg-gray-800 dark:hover:text-white"
-                        aria-label="Retour aux espaces de travail"
+                        aria-label={t('notebook.back_label')}
                     >
                         <ArrowLeftIcon size={20} />
                     </Link>
@@ -223,10 +225,10 @@ const WorkspaceNotebook: React.FC = () => {
                                         <Upload size={28} className="text-blue-500 dark:text-blue-400" />
                                     </div>
                                     <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                                        Ajoutez vos premiers documents
+                                        {t('notebook.add_sources_title')}
                                     </h2>
                                     <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                                        Importez vos documents (PDF, DOCX, PPTX…) pour commencer à créer des résumés, podcasts, flashcards et quiz.
+                                        {t('notebook.add_sources_desc')}
                                     </p>
                                 </div>
                                 <SourcesTab notebookId={notebookId} />
@@ -274,7 +276,7 @@ const WorkspaceNotebook: React.FC = () => {
                                                 className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700 transition-colors hover:bg-amber-100 dark:border-amber-800/40 dark:bg-amber-950/20 dark:text-amber-400"
                                             >
                                                 <Zap size={10} />
-                                                {tokenBalance} jeton{tokenBalance > 1 ? 's' : ''}
+                                                {t('notebook.token', { count: tokenBalance })}
                                             </button>
                                         ) : (
                                             <button
@@ -282,7 +284,7 @@ const WorkspaceNotebook: React.FC = () => {
                                                 className="inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-50 px-2.5 py-1 text-[11px] font-semibold text-red-600 transition-colors hover:bg-red-100 dark:border-red-900/40 dark:bg-red-950/20 dark:text-red-400"
                                             >
                                                 <Zap size={10} />
-                                                Recharger
+                                                {t('notebook.recharge')}
                                             </button>
                                         )}
                                     </div>
@@ -404,14 +406,14 @@ const WorkspaceNotebook: React.FC = () => {
             >
                 <div className="mb-5">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                        {generationModal === 'summary' && 'Préparer le résumé'}
-                        {generationModal === 'flashcards' && 'Préparer les flashcards'}
-                        {generationModal === 'quiz' && 'Préparer le quiz'}
-                        {generationModal === 'podcast' && 'Préparer le podcast'}
+                        {generationModal === 'summary' && t('notebook.modal_prepare_summary')}
+                        {generationModal === 'flashcards' && t('notebook.modal_prepare_flashcards')}
+                        {generationModal === 'quiz' && t('notebook.modal_prepare_quiz')}
+                        {generationModal === 'podcast' && t('notebook.modal_prepare_podcast')}
                     </h3>
                     {!isCurrentlyGenerating && (
                         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            Choisis les sources et les thèmes, puis lance la génération finale.
+                            {t('notebook.modal_choose_hint')}
                         </p>
                     )}
                 </div>
@@ -424,13 +426,13 @@ const WorkspaceNotebook: React.FC = () => {
                         </div>
                         <div className="text-center space-y-1">
                             <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">
-                                {generationModal === 'summary' && 'Génération du résumé en cours…'}
-                                {generationModal === 'flashcards' && 'Génération des flashcards en cours…'}
-                                {generationModal === 'quiz' && 'Génération du quiz en cours…'}
-                                {generationModal === 'podcast' && 'Génération du podcast en cours…'}
+                                {generationModal === 'summary' && t('notebook.modal_gen_summary')}
+                                {generationModal === 'flashcards' && t('notebook.modal_gen_flashcards')}
+                                {generationModal === 'quiz' && t('notebook.modal_gen_quiz')}
+                                {generationModal === 'podcast' && t('notebook.modal_gen_podcast')}
                             </p>
                             <p className="text-xs text-gray-400 dark:text-gray-500">
-                                Cela peut prendre quelques instants. Ne fermez pas cette fenêtre.
+                                {t('notebook.modal_gen_wait')}
                             </p>
                         </div>
                     </div>
@@ -438,7 +440,7 @@ const WorkspaceNotebook: React.FC = () => {
                     <>
                         <div className="mb-5 grid gap-4 sm:grid-cols-2">
                             <div>
-                                <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-200">Titre</label>
+                                <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-200">{t('notebook.gen_title_label')}</label>
                                 <input
                                     type="text"
                                     //value={generationTitle}
@@ -447,7 +449,7 @@ const WorkspaceNotebook: React.FC = () => {
                                 />
                             </div>
                             <div>
-                                <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-200">Langue</label>
+                                <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-200">{t('notebook.gen_language_label')}</label>
                                 <select
                                     value={generationLanguage}
                                     onChange={(e) => setGenerationLanguage(e.target.value)}
@@ -464,7 +466,7 @@ const WorkspaceNotebook: React.FC = () => {
                             </div>
                             {generationModal === 'flashcards' && (
                                 <div>
-                                    <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-200">Nombre de cartes</label>
+                                    <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-200">{t('notebook.gen_cards_label')}</label>
                                     <input
                                         type="number"
                                         min={1}
@@ -477,7 +479,7 @@ const WorkspaceNotebook: React.FC = () => {
                             )}
                             {generationModal === 'quiz' && (
                                 <div>
-                                    <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-200">Nombre de questions</label>
+                                    <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-200">{t('notebook.gen_questions_label')}</label>
                                     <input
                                         type="number"
                                         min={1}
@@ -492,7 +494,7 @@ const WorkspaceNotebook: React.FC = () => {
 
                         <div className="grid gap-4 lg:grid-cols-2">
                             <div>
-                                <p className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-200">Sources à inclure</p>
+                                <p className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-200">{t('notebook.gen_sources_label')}</p>
                                 <div className="max-h-36 sm:max-h-52 lg:max-h-64 space-y-2 overflow-y-auto overflow-x-hidden pr-1">
                                     {sources?.items?.map(source => {
                                         const currentTarget = generationModal === 'summary' ? summaryTarget : generationModal === 'flashcards' ? flashcardTarget : generationModal === 'quiz' ? quizTarget : podcastTarget;
@@ -509,12 +511,12 @@ const WorkspaceNotebook: React.FC = () => {
                                             </label>
                                         );
                                     })}
-                                    {sources?.items?.length === 0 && <p className="text-xs text-gray-400">Aucune source disponible.</p>}
+                                    {sources?.items?.length === 0 && <p className="text-xs text-gray-400">{t('notebook.no_source')}</p>}
                                 </div>
                             </div>
 
                             <div>
-                                <p className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-200">Thèmes à inclure</p>
+                                <p className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-200">{t('notebook.gen_themes_label')}</p>
                                 <div className="max-h-36 sm:max-h-52 lg:max-h-64 space-y-2 overflow-y-auto overflow-x-hidden pr-1">
                                     {themes?.items?.map(theme => {
                                         const currentTarget = generationModal === 'summary' ? summaryTarget : generationModal === 'flashcards' ? flashcardTarget : generationModal === 'quiz' ? quizTarget : podcastTarget;
@@ -531,7 +533,7 @@ const WorkspaceNotebook: React.FC = () => {
                                             </label>
                                         );
                                     })}
-                                    {themes?.items?.length === 0 && <p className="text-xs text-gray-400">Aucun thème disponible.</p>}
+                                    {themes?.items?.length === 0 && <p className="text-xs text-gray-400">{t('notebook.no_theme')}</p>}
                                 </div>
                             </div>
                         </div>
@@ -545,7 +547,7 @@ const WorkspaceNotebook: React.FC = () => {
                                 }}
                                 className="rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-white/5"
                             >
-                                Annuler
+                                {t('list.cancel')}
                             </button>
                             <button
                                 type="button"
@@ -581,7 +583,7 @@ const WorkspaceNotebook: React.FC = () => {
                             >
                                 {canGenerate ? (
                                     <>
-                                        Lancer la génération
+                                        {t('notebook.modal_generate')}
                                         {generationModal === 'podcast' ? (
                                             !isUltra && (
                                                 <span className="inline-flex items-center gap-0.5 rounded-full bg-blue-500/30 px-1.5 py-0.5 text-[10px] font-bold">
@@ -601,7 +603,7 @@ const WorkspaceNotebook: React.FC = () => {
                                 ) : (
                                     <>
                                         <Zap size={13} />
-                                        Aucun jeton
+                                        {t('notebook.no_tokens')}
                                     </>
                                 )}
                             </button>
@@ -612,10 +614,10 @@ const WorkspaceNotebook: React.FC = () => {
 
             <ConfirmModal
                 isOpen={confirmOpen}
-                title="Confirmer la suppression"
+                title={t('notebook.confirm_delete_title')}
                 message={confirmMessage}
-                confirmLabel="Supprimer"
-                cancelLabel="Annuler"
+                confirmLabel={t('notebook.confirm_delete_btn')}
+                cancelLabel={t('list.cancel')}
                 onConfirm={handleConfirm}
                 onCancel={() => setConfirmOpen(false)}
             />
