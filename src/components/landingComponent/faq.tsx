@@ -10,7 +10,7 @@ export default function Faq() {
     const toggle = (i: number) => setOpenIndex(prev => (prev === i ? null : i));
 
     return (
-        <section className="py-12 sm:py-28 bg-background" id="faq">
+        <section className="py-12 sm:py-28 bg-muted rounded-xl" id="faq">
             <div className="container mx-auto sm:px-6 lg:px-8">
 
                 <div className="text-center mb-12">
@@ -23,7 +23,7 @@ export default function Faq() {
                 </div>
 
                 <div className="max-w-7xl grid xl:grid-cols-2 xl:gap-6 xl:space-y-0 mx-auto space-y-3 items-start">
-                    {faqs.map(({ q, a }, i) => {
+                    {/*{faqs.map(({ q, a }, i) => {
                         const isOpen = openIndex === i;
                         return (
                             <div
@@ -71,7 +71,23 @@ export default function Faq() {
                                 </AnimatePresence>
                             </div>
                         );
-                    })}
+                    })}*/}
+
+                    {faqs.map(({ q, a }) => (
+                        <details key={q} className="group border-b border-border pb-4" open={false}>
+                            <summary className="flex cursor-pointer items-center justify-between gap-4">
+                                <h3 className="text-lg font-semibold text-foreground">{q}</h3>
+                                <svg
+                                    className="size-6 shrink-0 text-foreground/60 transition-transform duration-300 group-open:rotate-180"
+                                    fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
+                                    strokeWidth="2" viewBox="0 0 24 24"
+                                >
+                                    <path d="m6 9 6 6 6-6" />
+                                </svg>
+                            </summary>
+                            <p className="mt-4 text-foreground/70 leading-relaxed">{a}</p>
+                        </details>
+                    ))}
                 </div>
             </div>
         </section>
