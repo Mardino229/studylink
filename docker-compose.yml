@@ -35,7 +35,11 @@ services:
       - web
 
 networks:
+  # Externe : partagé avec d'autres projets docker-compose sur ce serveur (voir le backend,
+  # app/docker-compose.yml, qui rejoint ce même réseau au lieu d'avoir son propre Traefik).
+  # Bootstrap une seule fois sur le serveur : `docker network create web`
   web:
+    external: true
 
 volumes:
   letsencrypt:
