@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 env:
-  IMAGE: ghcr.io/${{ github.repository_owner }}/studylink-frontend
+  IMAGE: ghcr.io/${{ github.repository_owner }}/studylink
 
 jobs:
   build-and-push:
