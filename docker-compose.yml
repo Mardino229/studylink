@@ -23,7 +23,7 @@ services:
       - web
 
   frontend:
-    image: ghcr.io/${GITHUB_OWNER}/studylink-frontend:latest
+    image: ghcr.io/${GITHUB_OWNER}/studylink:latest
     restart: unless-stopped
     labels:
       - traefik.enable=true

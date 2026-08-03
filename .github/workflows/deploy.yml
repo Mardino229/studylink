@@ -4,9 +4,6 @@ on:
   push:
     branches: [main]
 
-env:
-  IMAGE: ghcr.io/${{ github.repository_owner }}/studylink
-
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -17,6 +14,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set lowercase image name
+        run: echo "IMAGE=ghcr.io/$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')/studylink" >> $GITHUB_ENV
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
