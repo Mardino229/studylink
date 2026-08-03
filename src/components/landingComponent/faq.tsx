@@ -22,7 +22,7 @@ export default function Faq() {
                     </h2>
                 </div>
 
-                <div className="max-w-7xl grid xl:grid-cols-2 xl:gap-6 xl:space-y-0 mx-auto space-y-3 items-start">
+                <div className="max-w-7xl grid xl:grid-cols-2 p-4 xl:gap-6 xl:space-y-0 mx-auto space-y-3 items-start">
                     {/*{faqs.map(({ q, a }, i) => {
                         const isOpen = openIndex === i;
                         return (
