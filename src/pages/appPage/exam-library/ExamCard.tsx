@@ -14,13 +14,13 @@ export const TYPE_COLORS: Record<ExamType, string> = {
     other:   'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
 };
 
-export default function ExamCard({ exam, isPro, tokenBalance, isUnlocked, onViewExam, onViewSolution }: {
-    exam: ExamItem; isPro: boolean; tokenBalance: number; isUnlocked: boolean;
+export default function ExamCard({ exam, isPro, tokenBalance, isSolutionUnlocked, isExamUnlocked, onViewExam, onViewSolution }: {
+    exam: ExamItem; isPro: boolean; tokenBalance: number; isSolutionUnlocked: boolean; isExamUnlocked: boolean;
     onViewExam: () => void; onViewSolution: () => void;
 }) {
-    const examFreeAccess = !exam.is_exam_paid || isPro;
+    const examFreeAccess = !exam.is_exam_paid || isPro || isExamUnlocked;
     const hasSolution = !!exam.solution_file_url;
-    const solutionFreeAccess = !exam.is_solution_paid || isPro || isUnlocked;
+    const solutionFreeAccess = !exam.is_solution_paid || isPro || isSolutionUnlocked;
     const canAccessWithTokens = tokenBalance >= 2;
 
     const solutionTitle = !hasSolution
@@ -29,7 +29,7 @@ export default function ExamCard({ exam, isPro, tokenBalance, isUnlocked, onView
         ? 'Voir le corrigé (gratuit)'
         : isPro
         ? 'Voir le corrigé (inclus Pro)'
-        : isUnlocked
+        : isSolutionUnlocked
         ? 'Voir le corrigé (déjà acheté)'
         : canAccessWithTokens
         ? 'Voir le corrigé (🪙 2 jetons)'
@@ -47,7 +47,7 @@ export default function ExamCard({ exam, isPro, tokenBalance, isUnlocked, onView
                     <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
                         <Sparkles size={10} />Pro
                     </span>
-                ) : isUnlocked && (
+                ) : isSolutionUnlocked && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
                         <CheckCircle2 size={10} />Déjà acheté
                     </span>
@@ -70,7 +70,7 @@ export default function ExamCard({ exam, isPro, tokenBalance, isUnlocked, onView
                 {exam.is_exam_paid && !isPro && (
                     <span className="rounded-full bg-violet-50 px-2 py-0.5 text-xs font-medium text-violet-700 dark:bg-violet-900/30 dark:text-violet-400">🪙 1 jeton</span>
                 )}
-                {hasSolution && exam.is_solution_paid && !isPro && !isUnlocked && (
+                {hasSolution && exam.is_solution_paid && !isPro && !isSolutionUnlocked && (
                     <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">🪙 2 jetons</span>
                 )}
             </div>

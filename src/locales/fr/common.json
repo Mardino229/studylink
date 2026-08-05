@@ -11,5 +11,11 @@
   "error": "Erreur",
   "success": "Succès",
   "email": "Email",
-  "password": "Mot de passe"
+  "password": "Mot de passe",
+  "not_found": {
+    "title": "Page introuvable",
+    "desc": "La page que tu cherches n'existe pas ou a été déplacée. Vérifie l'URL ou retourne à l'accueil.",
+    "back_home": "Retour à l'accueil",
+    "back": "Page précédente"
+  }
 }

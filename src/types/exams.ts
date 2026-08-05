@@ -27,6 +27,8 @@ export type ExamItem = {
     admin_note?: string | null;
     creation_date?: string;
     creator_user_id?: string;
+    has_exam_access: boolean;
+    has_solution_access: boolean;
 };
 
 export type SolutionSubmission = {

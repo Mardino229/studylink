@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import {
-    AlertCircle, BookOpen, CheckCircle2, Clock,
+    AlertCircle, CheckCircle2, Clock,
     FileText, RefreshCw, Trash2, Upload, XCircle,
 } from 'lucide-react';
 import PageMeta from '../../components/common/PageMeta';
@@ -14,30 +15,33 @@ import {
 } from '../../utils/exam';
 import type { ExamItem, SolutionSubmission, SubmissionStatus } from '../../types/exams';
 
-const STATUS_CONFIG: Record<SubmissionStatus, { label: string; icon: typeof CheckCircle2; className: string }> = {
+const STATUS_CONFIG: Record<SubmissionStatus, { icon: typeof CheckCircle2; className: string }> = {
     validated: {
-        label: 'Validée',
         icon: CheckCircle2,
         className: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
     },
     pending: {
-        label: 'En attente',
         icon: Clock,
         className: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
     },
     rejected: {
-        label: 'Refusée',
         icon: XCircle,
         className: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
     },
 };
 
 function StatusBadge({ status }: { status: SubmissionStatus }) {
-    const { label, icon: Icon, className } = STATUS_CONFIG[status];
+    const { t } = useTranslation('exams');
+    const { icon: Icon, className } = STATUS_CONFIG[status];
+    const labels: Record<SubmissionStatus, string> = {
+        validated: t('submissions.status_validated'),
+        pending: t('submissions.status_pending'),
+        rejected: t('submissions.status_rejected'),
+    };
     return (
         <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${className}`}>
             <Icon size={11} />
-            {label}
+            {labels[status]}
         </span>
     );
 }
@@ -45,6 +49,7 @@ function StatusBadge({ status }: { status: SubmissionStatus }) {
 type Tab = 'exams' | 'solutions' | 'contribute';
 
 export default function MySubmissions() {
+    const { t } = useTranslation('exams');
     const [tab, setTab] = useState<Tab>('exams');
 
     const { data: myExams = [], isLoading: loadingExams } = useGetMySubmissions();
@@ -57,40 +62,42 @@ export default function MySubmissions() {
     const deleteExamSubmission = useDeleteMyExamSubmission();
     const deleteSolSubmission = useDeleteMySolutionSubmission();
 
-    // Resubmit exam modal
     const [resubmitExamId, setResubmitExamId] = useState<string | null>(null);
     const [newExamFile, setNewExamFile] = useState<File | null>(null);
 
-    // Resubmit solution modal
     const [resubmitSolId, setResubmitSolId] = useState<string | null>(null);
     const [newSolFile, setNewSolFile] = useState<File | null>(null);
 
-    // Delete confirms
     const [deleteExamId, setDeleteExamId] = useState<string | null>(null);
     const [deleteSolId, setDeleteSolId] = useState<string | null>(null);
 
-    // Submit solution for missing exam
     const [submitSolExamId, setSubmitSolExamId] = useState<string | null>(null);
     const [submitSolExamName, setSubmitSolExamName] = useState('');
     const [submitSolFile, setSubmitSolFile] = useState<File | null>(null);
 
     const TABS: { key: Tab; label: string; count?: number }[] = [
-        { key: 'exams', label: 'Epreuves', count: myExams.length },
-        { key: 'solutions', label: 'Corrigés', count: mySolutions.length },
-        { key: 'contribute', label: 'Contribuer' },
+        { key: 'exams', label: t('submissions.tab_exams'), count: myExams.length },
+        { key: 'solutions', label: t('submissions.tab_solutions'), count: mySolutions.length },
+        { key: 'contribute', label: t('submissions.tab_contribute') },
     ];
 
     return (
         <>
-            <PageMeta title="Mes soumissions" description="Suivre l'état de vos épreuves et corrigés soumis" />
-            <PageBreadcrumb pageTitle="Mes soumissions" />
+            <PageMeta title={t('submissions.page_title')} description={t('submissions.page_desc')} />
+            <PageBreadcrumb pageTitle={t('submissions.page_title')} />
 
             {/* Coins info banner */}
             <div className="mb-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/30 dark:bg-amber-900/10">
                 <p className="text-sm text-amber-800 dark:text-amber-300">
-                    <span className="font-semibold">Gagnez des coins 🪙</span>   chaque épreuve ou corrigé validé par l'équipe vous rapporte <strong>0,5 coin</strong>.
-                    Convertissez <strong>5 coins → 1 jeton</strong> depuis votre{' '}
-                    <a href="/coins" className="underline underline-offset-2">wallet</a>.
+                    <Trans
+                        i18nKey="submissions.coins_banner"
+                        ns="exams"
+                        components={{
+                            bold: <span className="font-semibold" />,
+                            str: <strong />,
+                            a: <a href="/coins" className="underline underline-offset-2" />,
+                        }}
+                    />
                 </p>
             </div>
 
@@ -120,7 +127,7 @@ export default function MySubmissions() {
             {tab === 'exams' && (
                 <SubmissionList
                     isLoading={loadingExams}
-                    empty={{ icon: FileText, text: "Vous n'avez pas encore soumis d'épreuve." }}
+                    empty={{ icon: FileText, text: t('submissions.empty_exams') }}
                 >
                     {myExams.map(exam => (
                         <ExamSubmissionCard
@@ -137,7 +144,7 @@ export default function MySubmissions() {
             {tab === 'solutions' && (
                 <SubmissionList
                     isLoading={loadingSolutions}
-                    empty={{ icon: Upload, text: "Vous n'avez pas encore soumis de corrigé." }}
+                    empty={{ icon: Upload, text: t('submissions.empty_solutions') }}
                 >
                     {mySolutions.map(sol => (
                         <SolutionSubmissionCard
@@ -154,11 +161,15 @@ export default function MySubmissions() {
             {tab === 'contribute' && (
                 <div className="space-y-4">
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Ces épreuves n'ont pas encore de corrigé. Soumettez le vôtre pour gagner <strong>0,5 coin</strong> si il est validé.
+                        <Trans
+                            i18nKey="submissions.no_solution_banner"
+                            ns="exams"
+                            components={{ str: <strong /> }}
+                        />
                     </p>
                     <SubmissionList
                         isLoading={loadingMissing}
-                        empty={{ icon: CheckCircle2, text: 'Toutes les épreuves ont déjà un corrigé   revenez plus tard !' }}
+                        empty={{ icon: CheckCircle2, text: t('submissions.contribute_empty') }}
                     >
                         {missingSolutions.map(exam => (
                             <MissingSolutionCard
@@ -176,9 +187,9 @@ export default function MySubmissions() {
 
             {/* ── Modal : Re-submit exam ── */}
             <Modal isOpen={!!resubmitExamId} onClose={() => { setResubmitExamId(null); setNewExamFile(null); }} className="max-w-md p-6">
-                <h3 className="mb-4 text-base font-semibold text-gray-900 dark:text-white">Re-soumettre l'épreuve</h3>
+                <h3 className="mb-4 text-base font-semibold text-gray-900 dark:text-white">{t('submissions.resubmit_exam')}</h3>
                 <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
-                    Vous pouvez uploader un nouveau fichier corrigé (optionnel si seules les métadonnées changent).
+                    {t('submissions.resubmit_exam_desc')}
                 </p>
                 <input
                     type="file"
@@ -191,7 +202,7 @@ export default function MySubmissions() {
                         onClick={() => { setResubmitExamId(null); setNewExamFile(null); }}
                         className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:text-gray-300 dark:hover:bg-white/5"
                     >
-                        Annuler
+                        {t('submissions.cancel')}
                     </button>
                     <button
                         onClick={() => {
@@ -205,14 +216,14 @@ export default function MySubmissions() {
                         className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
                     >
                         <RefreshCw size={14} />
-                        {resubmitExam.isPending ? 'Envoi…' : 'Re-soumettre'}
+                        {resubmitExam.isPending ? t('submissions.sending') : t('submissions.resubmit')}
                     </button>
                 </div>
             </Modal>
 
             {/* ── Modal : Re-submit solution ── */}
             <Modal isOpen={!!resubmitSolId} onClose={() => { setResubmitSolId(null); setNewSolFile(null); }} className="max-w-md p-6">
-                <h3 className="mb-4 text-base font-semibold text-gray-900 dark:text-white">Re-soumettre le corrigé</h3>
+                <h3 className="mb-4 text-base font-semibold text-gray-900 dark:text-white">{t('submissions.resubmit_solution')}</h3>
                 <input
                     type="file"
                     accept=".pdf"
@@ -221,7 +232,7 @@ export default function MySubmissions() {
                 />
                 <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                     <button onClick={() => { setResubmitSolId(null); setNewSolFile(null); }} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:text-gray-300 dark:hover:bg-white/5">
-                        Annuler
+                        {t('submissions.cancel')}
                     </button>
                     <button
                         onClick={() => {
@@ -235,17 +246,17 @@ export default function MySubmissions() {
                         className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
                     >
                         <RefreshCw size={14} />
-                        {resubmitSolution.isPending ? 'Envoi…' : 'Re-soumettre'}
+                        {resubmitSolution.isPending ? t('submissions.sending') : t('submissions.resubmit')}
                     </button>
                 </div>
             </Modal>
 
             <ConfirmModal
                 isOpen={!!deleteExamId}
-                title="Supprimer la soumission"
-                message="Cette épreuve sera retirée définitivement. Cette action est irréversible."
-                confirmLabel="Supprimer"
-                cancelLabel="Annuler"
+                title={t('submissions.delete_title')}
+                message={t('submissions.delete_exam_msg')}
+                confirmLabel={t('submissions.delete_btn')}
+                cancelLabel={t('submissions.cancel_btn')}
                 onConfirm={() => {
                     if (!deleteExamId) return;
                     deleteExamSubmission.mutate(deleteExamId, { onSuccess: () => setDeleteExamId(null) });
@@ -255,10 +266,10 @@ export default function MySubmissions() {
 
             <ConfirmModal
                 isOpen={!!deleteSolId}
-                title="Supprimer la soumission"
-                message="Ce corrigé sera retiré définitivement. Cette action est irréversible."
-                confirmLabel="Supprimer"
-                cancelLabel="Annuler"
+                title={t('submissions.delete_title')}
+                message={t('submissions.delete_sol_msg')}
+                confirmLabel={t('submissions.delete_btn')}
+                cancelLabel={t('submissions.cancel_btn')}
                 onConfirm={() => {
                     if (!deleteSolId) return;
                     deleteSolSubmission.mutate(deleteSolId, { onSuccess: () => setDeleteSolId(null) });
@@ -268,7 +279,7 @@ export default function MySubmissions() {
 
             {/* ── Modal : Submit solution for missing ── */}
             <Modal isOpen={!!submitSolExamId} onClose={() => { setSubmitSolExamId(null); setSubmitSolFile(null); }} className="max-w-md p-6">
-                <h3 className="mb-1 text-base font-semibold text-gray-900 dark:text-white">Soumettre un corrigé</h3>
+                <h3 className="mb-1 text-base font-semibold text-gray-900 dark:text-white">{t('submissions.submit_solution')}</h3>
                 <p className="mb-4 text-sm text-gray-500 dark:text-gray-400 truncate">{submitSolExamName}</p>
                 <input
                     type="file"
@@ -278,7 +289,7 @@ export default function MySubmissions() {
                 />
                 <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                     <button onClick={() => { setSubmitSolExamId(null); setSubmitSolFile(null); }} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:text-gray-300 dark:hover:bg-white/5">
-                        Annuler
+                        {t('submissions.cancel')}
                     </button>
                     <button
                         onClick={() => {
@@ -292,7 +303,7 @@ export default function MySubmissions() {
                         className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
                     >
                         <Upload size={14} />
-                        {submitSolution.isPending ? 'Envoi…' : 'Soumettre'}
+                        {submitSolution.isPending ? t('submissions.sending') : t('submissions.submit')}
                     </button>
                 </div>
             </Modal>
@@ -332,6 +343,7 @@ function SubmissionList({ isLoading, empty, children }: {
 }
 
 function ExamSubmissionCard({ exam, onResubmit, onDelete }: { exam: ExamItem; onResubmit: () => void; onDelete: () => void }) {
+    const { t } = useTranslation('exams');
     const canDelete = exam.submission_status === 'pending' || exam.submission_status === 'rejected';
     return (
         <div className="flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-5 lg:shadow-sm dark:border-gray-800 dark:bg-gray-900/80">
@@ -363,7 +375,7 @@ function ExamSubmissionCard({ exam, onResubmit, onDelete }: { exam: ExamItem; on
                             className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-300"
                         >
                             <RefreshCw size={12} />
-                            Re-soumettre
+                            {t('submissions.resubmit')}
                         </button>
                     )}
                     <button
@@ -371,7 +383,7 @@ function ExamSubmissionCard({ exam, onResubmit, onDelete }: { exam: ExamItem; on
                         className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-600 transition-colors hover:bg-red-100 dark:border-red-900/40 dark:bg-red-900/10 dark:text-red-400"
                     >
                         <Trash2 size={12} />
-                        Supprimer
+                        {t('submissions.delete_btn')}
                     </button>
                 </div>
             )}
@@ -380,14 +392,15 @@ function ExamSubmissionCard({ exam, onResubmit, onDelete }: { exam: ExamItem; on
 }
 
 function SolutionSubmissionCard({ submission, onResubmit, onDelete }: { submission: SolutionSubmission; onResubmit: () => void; onDelete: () => void }) {
+    const { t } = useTranslation('exams');
     const canDelete = submission.submission_status === 'pending' || submission.submission_status === 'rejected';
     return (
         <div className="flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-5 lg:shadow-sm dark:border-gray-800 dark:bg-gray-900/80">
             <div className="flex items-start justify-between gap-2">
                 <div className="flex-1">
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mb-0.5">Corrigé pour</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mb-0.5">{t('submissions.solution_for')}</p>
                     <h3 className="text-sm font-semibold leading-snug text-gray-900 dark:text-white line-clamp-2">
-                        {submission.exam?.name ?? 'Épreuve inconnue'}
+                        {submission.exam?.name ?? t('submissions.unknown_exam')}
                     </h3>
                 </div>
                 <StatusBadge status={submission.submission_status} />
@@ -416,7 +429,7 @@ function SolutionSubmissionCard({ submission, onResubmit, onDelete }: { submissi
                             className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-300"
                         >
                             <RefreshCw size={12} />
-                            Re-soumettre
+                            {t('submissions.resubmit')}
                         </button>
                     )}
                     <button
@@ -424,7 +437,7 @@ function SolutionSubmissionCard({ submission, onResubmit, onDelete }: { submissi
                         className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-600 transition-colors hover:bg-red-100 dark:border-red-900/40 dark:bg-red-900/10 dark:text-red-400"
                     >
                         <Trash2 size={12} />
-                        Supprimer
+                        {t('submissions.delete_btn')}
                     </button>
                 </div>
             )}
@@ -433,6 +446,7 @@ function SolutionSubmissionCard({ submission, onResubmit, onDelete }: { submissi
 }
 
 function MissingSolutionCard({ exam, onSubmit }: { exam: ExamItem; onSubmit: () => void }) {
+    const { t } = useTranslation('exams');
     return (
         <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-gray-300 bg-white p-5 lg:shadow-sm dark:border-gray-700 dark:bg-gray-900/40">
             <div>
@@ -453,7 +467,7 @@ function MissingSolutionCard({ exam, onSubmit }: { exam: ExamItem; onSubmit: () 
                 className="mt-auto inline-flex items-center justify-center gap-1.5 rounded-xl bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
             >
                 <Upload size={12} />
-                Soumettre un corrigé
+                {t('submissions.submit_solution')}
             </button>
         </div>
     );

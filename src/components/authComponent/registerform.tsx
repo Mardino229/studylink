@@ -16,6 +16,7 @@ import type { RegisterFormRequest } from "../../utils/type.ts";
 export default function RegisterForm() {
     const { t } = useTranslation('auth');
     const { t: tErr } = useTranslation('errors');
+    const { t: tC } = useTranslation('common');
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
     const register = useRegister();
@@ -61,7 +62,7 @@ export default function RegisterForm() {
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                     <FormField name="email" control={form.control} render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Email</FormLabel>
+                            <FormLabel>{tC('email')}</FormLabel>
                             <FormControl>
                                 <input {...field} autoComplete="email"
                                        className="block w-full border-0 text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-white/20 focus:ring-2 focus:ring-inset focus:ring-[var(--primary-color)] sm:text-sm sm:leading-6 appearance-none rounded-md border-gray-300 px-2.5 py-2.5 placeholder-gray-400 focus:border-[var(--primary-color)] focus:outline-none"
@@ -72,7 +73,7 @@ export default function RegisterForm() {
                     )} />
                     <FormField name="password" control={form.control} render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Password</FormLabel>
+                            <FormLabel>{tC('password')}</FormLabel>
                             <FormControl>
                                 <div className="relative">
                                     <input {...field} autoComplete="new-password"
@@ -102,6 +103,9 @@ export default function RegisterForm() {
                             <FormMessage />
                         </FormItem>
                     )} />
+                    <div className="flex items-center justify-center gap-2 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 px-4 py-2.5 text-xs font-medium text-emerald-700 dark:text-emerald-400">
+                        {t('register.tokens_gift')}
+                    </div>
                     <Button variant={register.isPending ? 'outline' : 'default'} type="submit" className="text-sm font-semibold" disabled={register.isPending}>
                         {register.isPending ? <RotatingLines
                             visible={true}

@@ -5,14 +5,16 @@ import UserInfoCard from "../../components/UserProfile/UserInfoCard.tsx";
 import PasswordChangeCard from "../../components/common/PasswordChangeCard.tsx";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function UserProfiles() {
   const navigate = useNavigate();
+  const { t } = useTranslation('app');
 
   return (
     <div className="space-y-6">
-      <PageMeta title="Mon Profil" description="Gérez vos paramètres de profil" />
-      <PageBreadcrumb pageTitle="Mon Profil" />
+      <PageMeta title={t('profile.page_title')} description={t('profile.page_desc')} />
+      <PageBreadcrumb pageTitle={t('profile.page_title')} />
 
       <div className="flex items-center gap-4">
         <button
@@ -20,7 +22,7 @@ export default function UserProfiles() {
           className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700 transition-colors"
         >
           <ArrowLeft size={16} className="sm:w-[18px] sm:h-[18px]" />
-          <span>Retour aux paramètres</span>
+          <span>{t('profile.back')}</span>
         </button>
       </div>
 

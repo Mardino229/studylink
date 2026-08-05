@@ -2,7 +2,6 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSidebar } from "../context/SidebarContext";
 import UserDropdown from "../components/header/UserDropdown";
-import NotificationDropdown from "../components/header/NotificationDropdown.tsx";
 import { useBilling } from "../context/BillingContext";
 import { useUser } from "../components/layout/userContext.tsx";
 import logo from "../assets/mylogo.png";
@@ -15,38 +14,10 @@ import {
 import { useLogout } from "../utils/auth";
 import ConfirmModal from "../components/ui/ConfirmModal";
 import ThemeToggle from "../components/common/ThemeToggle.tsx";
+import { useTranslation } from "react-i18next";
 
-// ── Regular user navigation ──────────────────────────────────────
-const USER_NAV = [
-    { label: "Dashboard",                desc: "Tableau de bord",             path: "/home",                    icon: LayoutDashboard },
-    { label: "Workspaces",               desc: "Mes notebooks d'étude",        path: "/workspaces",              icon: BookOpen },
-    { label: "Bibliothèque d'épreuves",  desc: "Examens et corrigés",          path: "/exam-library",            icon: BookMarked },
-    { label: "Mon profil",               desc: "Informations personnelles",     path: "/profile",                 icon: User },
-    { label: "Statistiques",             desc: "Statistiques d'étude",         path: "/statistics",              icon: BarChart3 },
-    { label: "Paramètres",               desc: "Préférences de compte",        path: "/settings",                icon: Settings },
-    { label: "Abonnement & jetons",      desc: "Plans Pro et packs de jetons",  path: "/subscription",  icon: CreditCard },
-    { label: "Historique des paiements", desc: "Mes transactions",             path: "/settings/payments",       icon: Receipt },
-    { label: "Annonces",                 desc: "Actualités BlueCurve",       path: "/settings/announcements",  icon: Bell },
-    { label: "Feedback",                 desc: "Donnez votre avis",            path: "/settings/feedback",       icon: MessageSquare },
-];
-
-// ── Admin navigation ─────────────────────────────────────────────
-const ADMIN_NAV = [
-    { label: "Admin   Vue d'ensemble",    desc: "Tableau de bord admin",       path: "/admin/home",              icon: ShieldCheck },
-    { label: "Admin   Utilisateurs",      desc: "Gestion des comptes",         path: "/admin/users",             icon: Users },
-    { label: "Admin   Abonnements",       desc: "Abonnements actifs",          path: "/admin/subscriptions",     icon: BadgeCheck },
-    { label: "Admin   Plans",             desc: "Plans d'abonnement",          path: "/admin/plans",             icon: Layers },
-    { label: "Admin   Jetons",            desc: "Packs de jetons",             path: "/admin/token-packs",       icon: Zap },
-    { label: "Admin   Paiements",         desc: "Historique des transactions",  path: "/admin/payments",          icon: CreditCard },
-    { label: "Admin   Épreuves",          desc: "Bibliothèque d'épreuves",     path: "/admin/exam-library",      icon: BookMarked },
-    { label: "Admin   Annonces",          desc: "Annonces et sondages",        path: "/admin/announcements",     icon: Megaphone },
-    { label: "Admin   Feedbacks",         desc: "Retours utilisateurs",        path: "/admin/feedbacks",         icon: MessageSquare },
-    { label: "Admin   Rapports",          desc: "Rapports et statistiques",    path: "/admin/reports",           icon: BarChart3 },
-    { label: "Admin   Paramètres",        desc: "Configuration système",       path: "/admin/settings",          icon: Settings },
-];
-
-// ── Token badge ──────────────────────────────────────────────────
 function TokenStatusBadge() {
+    const { t } = useTranslation('app');
     const { isPro, isUltra, tokenBalance, isLoading } = useBilling();
     if (isLoading) return null;
 
@@ -71,20 +42,20 @@ function TokenStatusBadge() {
         return (
             <Link to="/subscription" className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700">
                 <Zap size={12} className="text-amber-500" />
-                {tokenBalance} jeton{tokenBalance > 1 ? "s" : ""}
+                {t('header.tokens', { count: tokenBalance })}
             </Link>
         );
     }
     return (
         <Link to="/subscription" className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 shadow-sm transition-colors hover:bg-red-100 dark:border-red-900/40 dark:bg-red-950/20 dark:text-red-400">
             <Zap size={12} />
-            Recharger
+            {t('header.recharge')}
         </Link>
     );
 }
 
-// ── Main header ──────────────────────────────────────────────────
 const AppHeader: React.FC = () => {
+    const { t } = useTranslation('app');
     const navigate = useNavigate();
     const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
     const { user } = useUser();
@@ -94,7 +65,33 @@ const AppHeader: React.FC = () => {
 
     const isAdmin = user?.role?.name === "admin";
 
-    // Search state
+    const USER_NAV = [
+        { label: t('header.nav_dashboard'),    desc: t('header.nav_dashboard_desc'),    path: "/home",                   icon: LayoutDashboard },
+        { label: t('header.nav_workspaces'),   desc: t('header.nav_workspaces_desc'),   path: "/workspaces",             icon: BookOpen },
+        { label: t('header.nav_exam_library'), desc: t('header.nav_exam_library_desc'), path: "/exam-library",           icon: BookMarked },
+        { label: t('header.nav_profile'),      desc: t('header.nav_profile_desc'),      path: "/profile",                icon: User },
+        { label: t('header.nav_statistics'),   desc: t('header.nav_statistics_desc'),   path: "/statistics",             icon: BarChart3 },
+        { label: t('header.nav_settings'),     desc: t('header.nav_settings_desc'),     path: "/settings",               icon: Settings },
+        { label: t('header.nav_subscription'), desc: t('header.nav_subscription_desc'), path: "/subscription",           icon: CreditCard },
+        { label: t('header.nav_payments'),     desc: t('header.nav_payments_desc'),     path: "/settings/payments",      icon: Receipt },
+        { label: t('header.nav_announcements'),desc: t('header.nav_announcements_desc'),path: "/settings/announcements", icon: Bell },
+        { label: t('header.nav_feedback'),     desc: t('header.nav_feedback_desc'),     path: "/settings/feedback",      icon: MessageSquare },
+    ];
+
+    const ADMIN_NAV = [
+        { label: t('header.nav_admin_home'),          desc: t('header.nav_admin_home_desc'),          path: "/admin/home",          icon: ShieldCheck },
+        { label: t('header.nav_admin_users'),         desc: t('header.nav_admin_users_desc'),         path: "/admin/users",         icon: Users },
+        { label: t('header.nav_admin_subscriptions'), desc: t('header.nav_admin_subscriptions_desc'), path: "/admin/subscriptions", icon: BadgeCheck },
+        { label: t('header.nav_admin_plans'),         desc: t('header.nav_admin_plans_desc'),         path: "/admin/plans",         icon: Layers },
+        { label: t('header.nav_admin_tokens'),        desc: t('header.nav_admin_tokens_desc'),        path: "/admin/token-packs",   icon: Zap },
+        { label: t('header.nav_admin_payments'),      desc: t('header.nav_admin_payments_desc'),      path: "/admin/payments",      icon: CreditCard },
+        { label: t('header.nav_admin_exams'),         desc: t('header.nav_admin_exams_desc'),         path: "/admin/exam-library",  icon: BookMarked },
+        { label: t('header.nav_admin_announcements'), desc: t('header.nav_admin_announcements_desc'), path: "/admin/announcements", icon: Megaphone },
+        { label: t('header.nav_admin_feedbacks'),     desc: t('header.nav_admin_feedbacks_desc'),     path: "/admin/feedbacks",     icon: MessageSquare },
+        { label: t('header.nav_admin_reports'),       desc: t('header.nav_admin_reports_desc'),       path: "/admin/reports",       icon: BarChart3 },
+        { label: t('header.nav_admin_settings'),      desc: t('header.nav_admin_settings_desc'),      path: "/admin/settings",      icon: Settings },
+    ];
+
     const [query, setQuery] = useState("");
     const [open, setOpen] = useState(false);
     const [activeIndex, setActiveIndex] = useState(0);
@@ -102,7 +99,6 @@ const AppHeader: React.FC = () => {
     const inputRef = useRef<HTMLInputElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    // Build the item list based on role
     const ALL_NAV = isAdmin ? ADMIN_NAV : USER_NAV;
 
     const filtered = query.trim()
@@ -125,7 +121,6 @@ const AppHeader: React.FC = () => {
         inputRef.current?.blur();
     }, [navigate]);
 
-    // ⌘K / Ctrl+K → focus input
     useEffect(() => {
         const handler = (e: KeyboardEvent) => {
             if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -138,7 +133,6 @@ const AppHeader: React.FC = () => {
         return () => document.removeEventListener("keydown", handler);
     }, []);
 
-    // Click outside → close
     useEffect(() => {
         const handler = (e: MouseEvent) => {
             if (
@@ -175,7 +169,6 @@ const AppHeader: React.FC = () => {
             <div className="flex flex-col items-center justify-between grow lg:flex-row lg:px-6">
                 <div className="flex items-center justify-between w-full gap-2 px-3 py-3 border-b border-gray-200 dark:border-gray-800 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4">
 
-                    {/* Sidebar toggle */}
                     <button
                         className="items-center justify-center w-10 h-10 text-gray-500 border-gray-200 rounded-lg z-99999 dark:border-gray-800 lg:flex dark:text-gray-400 lg:h-11 lg:w-11 lg:border"
                         onClick={handleToggle}
@@ -188,17 +181,15 @@ const AppHeader: React.FC = () => {
                         )}
                     </button>
 
-                    {/* Mobile logo */}
                     <Link to="/home" className="lg:hidden">
                         <img src={logo} alt="BlueCurve" className="h-12 w-auto" />
                     </Link>
 
-                    {/* Mobile menu toggle + logout */}
                     <div className="flex items-center gap-1 lg:hidden">
                         <button
                             onClick={() => setShowLogoutModal(true)}
                             className="flex items-center justify-center w-10 h-10 text-gray-500 rounded-lg hover:bg-red-50 hover:text-red-500 dark:text-gray-400 dark:hover:bg-red-500/10 dark:hover:text-red-400 transition-colors"
-                            aria-label="Déconnexion"
+                            aria-label={t('header.logout_title')}
                         >
                             <LogOut size={20} />
                         </button>
@@ -207,9 +198,7 @@ const AppHeader: React.FC = () => {
                         </button>
                     </div>
 
-                    {/* Search input   desktop only */}
                     <div className="relative hidden lg:block">
-                        {/* Input */}
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
                             <Search size={16} />
                         </span>
@@ -220,14 +209,13 @@ const AppHeader: React.FC = () => {
                             onChange={e => { setQuery(e.target.value); setOpen(true); setActiveIndex(0); }}
                             onFocus={() => setOpen(true)}
                             onKeyDown={handleKeyDown}
-                            placeholder="Rechercher une page…"
+                            placeholder={t('header.search_placeholder')}
                             className="h-11 w-[300px] xl:w-[400px] rounded-lg border border-gray-200 bg-transparent py-2.5 pl-10 pr-14 text-sm text-gray-800 shadow-sm placeholder:text-gray-400 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/10 dark:border-gray-800 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-blue-600"
                         />
                         <span className="absolute right-2.5 top-1/2 -translate-y-1/2 inline-flex items-center gap-0.5 rounded border border-gray-200 bg-gray-50 px-1.5 py-1 text-[10px] text-gray-500 dark:border-gray-800 dark:bg-white/[0.03] dark:text-gray-400">
                             ⌘K
                         </span>
 
-                        {/* Dropdown */}
                         {open && filtered.length > 0 && (
                             <div
                                 ref={dropdownRef}
@@ -235,7 +223,7 @@ const AppHeader: React.FC = () => {
                             >
                                 {query === "" && (
                                     <p className="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-600">
-                                        Navigation rapide
+                                        {t('header.quick_nav')}
                                     </p>
                                 )}
                                 <ul className="py-1">
@@ -279,28 +267,25 @@ const AppHeader: React.FC = () => {
                                 </ul>
                                 <div className="border-t border-gray-100 px-4 py-2 dark:border-gray-800">
                                     <p className="text-[10px] text-gray-400 dark:text-gray-600">
-                                        ↑↓ Naviguer · ↵ Ouvrir · Echap Fermer
+                                        {t('header.nav_hint')}
                                     </p>
                                 </div>
                             </div>
                         )}
 
-                        {/* No results */}
                         {open && query !== "" && filtered.length === 0 && (
                             <div ref={dropdownRef} className="absolute left-0 top-full mt-2 w-full min-w-[300px] rounded-2xl border border-gray-200 bg-white p-4 shadow-xl dark:border-gray-800 dark:bg-gray-900">
                                 <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-                                    Aucune page correspondante
+                                    {t('header.no_results')}
                                 </p>
                             </div>
                         )}
                     </div>
                 </div>
 
-                {/* Right side */}
                 <div className={`${isApplicationMenuOpen ? "flex" : "hidden"} items-center justify-between w-full gap-4 px-5 py-4 lg:flex shadow-theme-md lg:justify-end lg:px-0 lg:shadow-none`}>
                     <div className="flex items-center gap-2 2xsm:gap-3">
                         <TokenStatusBadge />
-                        {/*<NotificationDropdown />*/}
                     </div>
                     <ThemeToggle />
                     <UserDropdown />
@@ -308,10 +293,10 @@ const AppHeader: React.FC = () => {
             </div>
             <ConfirmModal
                 isOpen={showLogoutModal}
-                title="Déconnexion"
-                message="Êtes-vous sûr de vouloir vous déconnecter ?"
-                confirmLabel="Se déconnecter"
-                cancelLabel="Annuler"
+                title={t('header.logout_title')}
+                message={t('header.logout_msg')}
+                confirmLabel={t('header.logout_confirm')}
+                cancelLabel={t('header.logout_cancel')}
                 onConfirm={() => logout.mutate()}
                 onCancel={() => setShowLogoutModal(false)}
             />

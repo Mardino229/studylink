@@ -26,6 +26,7 @@ import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
 import ComponentCard from '../../components/common/ComponentCard.tsx';
 import { useTranslation } from 'react-i18next';
+import { RotatingLines } from 'react-loader-spinner';
 
 // --- Move Notebook Modal Component ---
 interface MoveNotebookModalProps {
@@ -336,8 +337,10 @@ const Workspaces: React.FC = () => {
                                                         autoFocus
                                                     />
                                                     <div className="flex justify-end gap-2">
-                                                        <button onClick={handleCreateFolder} className="text-white bg-brand-500 hover:bg-brand-600 focus:ring-4 focus:ring-brand-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-brand-600 dark:hover:bg-brand-700 focus:outline-none transition-colors">{t('list.create')}</button>
-                                                        <button onClick={() => setIsCreatingFolder(false)} className="py-2.5 px-5 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 transition-colors">{t('list.cancel')}</button>
+                                                        <button onClick={handleCreateFolder} disabled={createFolderMutation.isPending} className={`inline-flex items-center justify-center min-w-[80px] font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none transition-all border ${createFolderMutation.isPending ? 'bg-white border-brand-300 dark:bg-gray-900 dark:border-brand-600' : 'text-white bg-brand-500 hover:bg-brand-600 dark:bg-brand-600 dark:hover:bg-brand-700 border-transparent focus:ring-4 focus:ring-brand-300'}`}>
+                                                            {createFolderMutation.isPending ? <RotatingLines visible strokeWidth="5" width="18" strokeColor="#135bec" animationDuration="0.75" ariaLabel="loading" /> : t('list.create')}
+                                                        </button>
+                                                        <button onClick={() => setIsCreatingFolder(false)} disabled={createFolderMutation.isPending} className="py-2.5 px-5 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 transition-colors disabled:opacity-50">{t('list.cancel')}</button>
                                                     </div>
                                                 </div>
                                             )}
@@ -412,8 +415,10 @@ const Workspaces: React.FC = () => {
                                                         autoFocus
                                                     />
                                                     <div className="flex justify-end gap-2">
-                                                        <button onClick={handleCreateNotebook} className="text-white bg-brand-500 hover:bg-brand-600 focus:ring-4 focus:ring-brand-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-brand-600 dark:hover:bg-brand-700 focus:outline-none transition-colors">{t('list.create')}</button>
-                                                        <button onClick={() => setIsCreatingNotebook(false)} className="py-2.5 px-5 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 transition-colors">{t('list.cancel')}</button>
+                                                        <button onClick={handleCreateNotebook} disabled={createNotebookMutation.isPending} className={`inline-flex items-center justify-center min-w-[80px] font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none transition-all border ${createNotebookMutation.isPending ? 'bg-white border-brand-300 dark:bg-gray-900 dark:border-brand-600' : 'text-white bg-brand-500 hover:bg-brand-600 dark:bg-brand-600 dark:hover:bg-brand-700 border-transparent focus:ring-4 focus:ring-brand-300'}`}>
+                                                            {createNotebookMutation.isPending ? <RotatingLines visible strokeWidth="5" width="18" strokeColor="#135bec" animationDuration="0.75" ariaLabel="loading" /> : t('list.create')}
+                                                        </button>
+                                                        <button onClick={() => setIsCreatingNotebook(false)} disabled={createNotebookMutation.isPending} className="py-2.5 px-5 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 transition-colors disabled:opacity-50">{t('list.cancel')}</button>
                                                     </div>
                                                 </div>
                                             )}

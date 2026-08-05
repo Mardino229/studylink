@@ -3,7 +3,6 @@ import { axiosClient } from "./api.ts";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../components/layout/userContext.tsx";
-import { clearUnlockedSolutions } from "./exam.ts";
 import type { LoginFormRequest, RegisterFormRequest, ValidationError } from "./type.ts";
 import type { AxiosError } from "axios";
 import i18n from '../i18n/index.ts';
@@ -247,7 +246,6 @@ const useLogout = () => {
     return useMutation({
         mutationFn: async () => {
             await axiosClient.post('/auth/logout ');
-            clearUnlockedSolutions(user?.id);
             queryClient.clear();
             setUser({});
             toast.success(i18n.t('auth:common.logout_success'));

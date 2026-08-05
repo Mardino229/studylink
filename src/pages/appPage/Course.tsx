@@ -16,8 +16,10 @@ import { RotatingLines } from "react-loader-spinner";
 import { Dropdown } from "../../components/ui/dropdown/Dropdown.tsx";
 import { DropdownItem } from "../../components/ui/dropdown/DropdownItem.tsx";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function MyCourse() {
+    const { t } = useTranslation('app');
     const [open, setOpen] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
@@ -94,10 +96,10 @@ export default function MyCourse() {
     return (
         <>
             <PageMeta
-                title="My Courses"
-                description="This is your course list"
+                title={t('courses.page_title')}
+                description={t('courses.page_desc')}
             />
-            <PageBreadcrumb pageTitle="My Courses" />
+            <PageBreadcrumb pageTitle={t('courses.page_title')} />
             <div className="space-y-6">
                 <div className="flex gap-4 flex-wrap justify-between">
                     <div>
@@ -123,7 +125,7 @@ export default function MyCourse() {
                             </span>
                             <input
                                 type="text"
-                                placeholder="Search by name"
+                                placeholder={t('courses.search_placeholder')}
                                 className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-200 bg-transparent py-2.5 pl-12 pr-14 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[430px]"
                             />
                         </div>
@@ -133,13 +135,13 @@ export default function MyCourse() {
                             startIcon={<PlusIcon className="size-5" />}
                             onClick={startCreate}
                         >
-                            <span></span> <span className="md:flex hidden">New course</span>
+                            <span></span> <span className="md:flex hidden">{t('courses.new_course')}</span>
 
                         </Button>
 
                         <Modal isOpen={open} onClose={() => setOpen(false)} className="max-w-md p-6">
                             <div className="text-lg font-semibold text-foreground mb-4">
-                                {editingId ? "Modifier le cours" : "Nouveau cours"}
+                                {editingId ? t('courses.edit_title') : t('courses.create_title')}
                             </div>
                             <Form {...form}>
                                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -148,11 +150,11 @@ export default function MyCourse() {
                                         name="course_name"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Titre du cours</FormLabel>
+                                                <FormLabel>{t('courses.name_label')}</FormLabel>
                                                 <FormControl>
                                                     <Input
                                                         className="form-input block w-full appearance-none rounded-lg border border-gray-300 px-3 py-3 placeholder-gray-400 shadow-sm focus:border-[var(--primary-color)] focus:outline-none focus:ring-[var(--primary-color)] sm:text-sm"
-                                                        placeholder="Ex: Mathématiques"
+                                                        placeholder={t('courses.name_placeholder')}
                                                         {...field}
                                                     />
                                                 </FormControl>
@@ -165,11 +167,11 @@ export default function MyCourse() {
                                         name="course_color"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Couleur</FormLabel>
+                                                <FormLabel>{t('courses.color_label')}</FormLabel>
                                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                     <FormControl>
                                                         <SelectTrigger className="w-full px-3 py-3">
-                                                            <SelectValue placeholder="Sélectionner une couleur" />
+                                                            <SelectValue placeholder={t('courses.color_select')} />
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
@@ -185,7 +187,7 @@ export default function MyCourse() {
                                         )}
                                     />
                                     <div className="flex justify-end gap-2 pt-2">
-                                        <button type="button" onClick={() => setOpen(false)} className="px-4 py-2 rounded-md border border-border bg-background text-foreground">Annuler</button>
+                                        <button type="button" onClick={() => setOpen(false)} className="px-4 py-2 rounded-md border border-border bg-background text-foreground">{t('courses.cancel')}</button>
                                         <button type="submit" className={`${createCourse.isPending || updateCourse.isPending && "bg-background"} px-4 py-2 rounded-md bg-primary text-background`} disabled={createCourse.isPending || updateCourse.isPending}>
                                             {createCourse.isPending || updateCourse.isPending ?
                                                 <RotatingLines
@@ -195,7 +197,7 @@ export default function MyCourse() {
                                                     strokeColor="#135bec"
                                                     animationDuration="0.75"
                                                     ariaLabel="rotating-lines-loading"
-                                                /> : (editingId ? "Enregistrer" : "Créer")}
+                                                /> : (editingId ? t('courses.save') : t('courses.create'))}
                                         </button>
                                     </div>
                                 </form>
@@ -204,10 +206,10 @@ export default function MyCourse() {
 
                         <Modal isOpen={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} className="max-w-md p-6">
                             <div className="text-lg font-semibold text-foreground mb-4">
-                                Confirmer la suppression
+                                {t('courses.delete_title')}
                             </div>
                             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-                                Êtes-vous sûr de vouloir supprimer ce cours{courseToDelete && courses ? ` "${courses.find(c => c.id === courseToDelete)?.course_name}"` : ""} ? Cette action est irréversible et supprimera également tous les résumés associés.
+                                {t('courses.delete_msg', { name: courses?.find(c => c.id === courseToDelete)?.course_name ?? '' })}
                             </p>
                             <div className="flex justify-end gap-2">
                                 <button
@@ -215,7 +217,7 @@ export default function MyCourse() {
                                     onClick={() => setDeleteModalOpen(false)}
                                     className="px-4 py-2 rounded-md border border-border bg-background text-foreground hover:bg-gray-50 dark:hover:bg-white/5"
                                 >
-                                    Annuler
+                                    {t('courses.cancel')}
                                 </button>
                                 <button
                                     type="button"
@@ -232,7 +234,7 @@ export default function MyCourse() {
                                             animationDuration="0.75"
                                             ariaLabel="rotating-lines-loading"
                                         />
-                                    ) : "Supprimer"}
+                                    ) : t('courses.delete')}
                                 </button>
                             </div>
                         </Modal>
@@ -240,12 +242,12 @@ export default function MyCourse() {
                 </div>
 
                 {/* Compteur */}
-                <div className="text-sm text-foreground/70">Total cours: <span className="font-medium text-foreground">{courses?.length || 0}</span></div>
+                <div className="text-sm text-foreground/70">{t('courses.total')} <span className="font-medium text-foreground">{courses?.length || 0}</span></div>
 
                 {/* Liste dynamique des cours */}
                 <div className="flex flex-wrap sm:gap-8 gap-5 justify-start w-full">
                     {isLoading ? (
-                        <p className="text-sm text-foreground/60">Chargement...</p>
+                        <p className="text-sm text-foreground/60">{t('courses.loading')}</p>
                     ) : courses?.length === 0 ? (
                         <div className="w-full flex flex-col items-center justify-center py-16 sm:py-24">
                             <div className="flex flex-col items-center gap-4 text-center">
@@ -254,10 +256,10 @@ export default function MyCourse() {
                                 </div>
                                 <div className="space-y-2">
                                     <p className="text-lg font-medium text-gray-900 dark:text-white">
-                                        Aucun cours pour le moment
+                                        {t('courses.empty_title')}
                                     </p>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        Créez votre premier cours pour commencer !
+                                        {t('courses.empty_desc')}
                                     </p>
                                 </div>
                             </div>
@@ -293,11 +295,11 @@ export default function MyCourse() {
                                         >
                                             <DropdownItem onClick={() => startEdit(c)} className="flex items-center gap-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">
                                                 <Pencil size={14} />
-                                                <span>Modifier</span>
+                                                <span>{t('courses.edit')}</span>
                                             </DropdownItem>
                                             <DropdownItem onClick={() => removeCourse(c.id)} className="flex items-center gap-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
                                                 <Trash2 size={14} />
-                                                <span>Supprimer</span>
+                                                <span>{t('courses.delete')}</span>
                                             </DropdownItem>
                                         </Dropdown>
                                     </div>

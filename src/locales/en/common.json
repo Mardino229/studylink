@@ -11,5 +11,11 @@
   "error": "Error",
   "success": "Success",
   "email": "Email",
-  "password": "Password"
+  "password": "Password",
+  "not_found": {
+    "title": "Page not found",
+    "desc": "The page you're looking for doesn't exist or has been moved. Check the URL or go back home.",
+    "back_home": "Back to home",
+    "back": "Previous page"
+  }
 }

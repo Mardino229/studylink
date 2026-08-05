@@ -18,6 +18,7 @@ import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 export default function LoginForm() {
     const { t } = useTranslation('auth');
     const { t: tErr } = useTranslation('errors');
+    const { t: tC } = useTranslation('common');
     const login = useLogin();
     const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
@@ -50,7 +51,7 @@ export default function LoginForm() {
                     <div className="space-y-4">
                         <FormField name="email" control={form.control} render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Email</FormLabel>
+                                <FormLabel>{tC('email')}</FormLabel>
                                 <FormControl>
                                     <Input {...field} type="email" autoComplete="email" aria-invalid={!!form.formState.errors.email}
                                            placeholder={t('login.email_placeholder')}
@@ -64,7 +65,7 @@ export default function LoginForm() {
                         <FormField name="password" control={form.control} render={({ field }) => (
                             <FormItem>
                                 <div className="flex items-center justify-between">
-                                    <FormLabel>Password</FormLabel>
+                                    <FormLabel>{tC('password')}</FormLabel>
                                     <div className="text-sm">
                                         <ResetPassword />
                                     </div>
@@ -83,7 +84,7 @@ export default function LoginForm() {
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword((v) => !v)}
-                                            aria-label={showPassword ? "Hide password" : "Show password"}
+                                            aria-label={showPassword ? t('reset_password.hide_password') : t('reset_password.show_password')}
                                             className="absolute inset-y-0 right-2 my-auto h-7 w-7 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
                                         >
                                             {showPassword ?
@@ -112,7 +113,7 @@ export default function LoginForm() {
                         <Button
                             variant={login.isPending ? 'outline' : 'default'}
                             type="submit"
-                            className="w-full h-11 text-sm font-semibold"
+                            className="w-full h-9 text-sm font-semibold"
                             disabled={login.isPending}
                             aria-busy={login.isPending}
                         >
