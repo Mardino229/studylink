@@ -1,6 +1,6 @@
 import { Search } from 'lucide-react';
 import CourseCombobox from '../../../components/ui/CourseCombobox';
-import type { Course, ExamSession, ExamType } from '../../../types/exams';
+import type { ExamSession, ExamType } from '../../../types/exams';
 
 const inputCls = "h-10 w-full rounded-xl border border-gray-200 bg-white px-3 text-sm text-gray-800 outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white";
 const selectCls = "h-10 w-full rounded-xl border border-gray-200 bg-white px-3 text-sm text-gray-800 outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white";
@@ -10,21 +10,23 @@ export default function ExamFiltersPanel({
     academicYear, setAcademicYear,
     session, setSession,
     examType, setExamType,
+    typeNumber, setTypeNumber,
+    section, setSection,
     hasActiveFilters, onSearch, onReset,
-    courses,
 }: {
     courseId: string; setCourseId: (v: string) => void;
     academicYear: string; setAcademicYear: (v: string) => void;
     session: ExamSession | ''; setSession: (v: ExamSession | '') => void;
     examType: ExamType | ''; setExamType: (v: ExamType | '') => void;
+    typeNumber: string; setTypeNumber: (v: string) => void;
+    section: string; setSection: (v: string) => void;
     hasActiveFilters: boolean; onSearch: () => void; onReset: () => void;
-    courses: Course[];
 }) {
     return (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900/80">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 <div className="lg:col-span-2">
-                    <CourseCombobox value={courseId} onChange={setCourseId} courses={courses} />
+                    <CourseCombobox value={courseId} onChange={setCourseId} />
                 </div>
                 <input
                     type="number"
@@ -42,11 +44,31 @@ export default function ExamFiltersPanel({
                 </select>
                 <select value={examType} onChange={(e) => setExamType(e.target.value as ExamType | '')} className={selectCls}>
                     <option value="">Tous les types</option>
-                    <option value="midterm">Intra</option>
-                    <option value="final">Final</option>
-                    <option value="quiz">Quiz</option>
-                    <option value="other">Autre</option>
+                    <option value="Mi-session">Mi-session</option>
+                    <option value="Final">Final</option>
+                    <option value="Quiz">Quiz</option>
+                    <option value="Devoir">Devoir</option>
+                    <option value="Pratique">Pratique</option>
+                    <option value="DGD">DGD</option>
+                    <option value="Autre">Autre</option>
                 </select>
+                <input
+                    type="number"
+                    placeholder="N° (ex: 1)"
+                    value={typeNumber}
+                    onChange={(e) => setTypeNumber(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && onSearch()}
+                    className={inputCls}
+                    min={1}
+                    max={20}
+                />
+                <input
+                    placeholder="Section (ex: A)"
+                    value={section}
+                    onChange={(e) => setSection(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && onSearch()}
+                    className={inputCls}
+                />
             </div>
             <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
                 {hasActiveFilters && (

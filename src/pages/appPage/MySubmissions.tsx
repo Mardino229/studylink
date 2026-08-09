@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import {
     AlertCircle, CheckCircle2, Clock,
-    FileText, RefreshCw, Trash2, Upload, XCircle,
+    FileText, FilePlus2, Plus, RefreshCw, Trash2, Upload, XCircle,
 } from 'lucide-react';
 import PageMeta from '../../components/common/PageMeta';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
@@ -12,8 +12,12 @@ import {
     useGetMySubmissions, useResubmitExam, useDeleteMyExamSubmission,
     useGetMySolutionSubmissions, useResubmitSolution, useDeleteMySolutionSubmission,
     useGetMissingSolutions, useSubmitSolution,
+    useGetMissingExams, useGetMyExamFileSubmissions, useSubmitExamFile,
+    useResubmitExamFile, useDeleteExamFileSubmission,
 } from '../../utils/exam';
-import type { ExamItem, SolutionSubmission, SubmissionStatus } from '../../types/exams';
+import type { ExamFileSubmissionRead, ExamItem, SolutionSubmission, SubmissionStatus } from '../../types/exams';
+import { courseCode, courseName } from '../../types/exams';
+import SubmitExamModal from './exam-library/SubmitExamModal';
 
 const STATUS_CONFIG: Record<SubmissionStatus, { icon: typeof CheckCircle2; className: string }> = {
     validated: {
@@ -46,21 +50,28 @@ function StatusBadge({ status }: { status: SubmissionStatus }) {
     );
 }
 
-type Tab = 'exams' | 'solutions' | 'contribute';
+type Tab = 'exams' | 'solutions' | 'exam_files' | 'contribute';
 
 export default function MySubmissions() {
     const { t } = useTranslation('exams');
     const [tab, setTab] = useState<Tab>('exams');
 
+    const [submitOpen, setSubmitOpen] = useState(false);
+
     const { data: myExams = [], isLoading: loadingExams } = useGetMySubmissions();
     const { data: mySolutions = [], isLoading: loadingSolutions } = useGetMySolutionSubmissions();
+    const { data: myExamFiles = [], isLoading: loadingExamFiles } = useGetMyExamFileSubmissions();
     const { data: missingSolutions = [], isLoading: loadingMissing } = useGetMissingSolutions();
+    const { data: missingExams = [], isLoading: loadingMissingExams } = useGetMissingExams();
 
     const resubmitExam = useResubmitExam();
     const resubmitSolution = useResubmitSolution();
+    const resubmitExamFile = useResubmitExamFile();
     const submitSolution = useSubmitSolution();
+    const submitExamFile = useSubmitExamFile();
     const deleteExamSubmission = useDeleteMyExamSubmission();
     const deleteSolSubmission = useDeleteMySolutionSubmission();
+    const deleteExamFileSubmission = useDeleteExamFileSubmission();
 
     const [resubmitExamId, setResubmitExamId] = useState<string | null>(null);
     const [newExamFile, setNewExamFile] = useState<File | null>(null);
@@ -68,23 +79,42 @@ export default function MySubmissions() {
     const [resubmitSolId, setResubmitSolId] = useState<string | null>(null);
     const [newSolFile, setNewSolFile] = useState<File | null>(null);
 
+    const [resubmitExamFileId, setResubmitExamFileId] = useState<string | null>(null);
+    const [newExamFileFile, setNewExamFileFile] = useState<File | null>(null);
+
     const [deleteExamId, setDeleteExamId] = useState<string | null>(null);
     const [deleteSolId, setDeleteSolId] = useState<string | null>(null);
+    const [deleteExamFileId, setDeleteExamFileId] = useState<string | null>(null);
 
     const [submitSolExamId, setSubmitSolExamId] = useState<string | null>(null);
     const [submitSolExamName, setSubmitSolExamName] = useState('');
     const [submitSolFile, setSubmitSolFile] = useState<File | null>(null);
 
+    const [submitExamFileExamId, setSubmitExamFileExamId] = useState<string | null>(null);
+    const [submitExamFileExamName, setSubmitExamFileExamName] = useState('');
+    const [submitExamFileFile, setSubmitExamFileFile] = useState<File | null>(null);
+
     const TABS: { key: Tab; label: string; count?: number }[] = [
         { key: 'exams', label: t('submissions.tab_exams'), count: myExams.length },
         { key: 'solutions', label: t('submissions.tab_solutions'), count: mySolutions.length },
+        { key: 'exam_files', label: t('submissions.tab_exam_files'), count: myExamFiles.length },
         { key: 'contribute', label: t('submissions.tab_contribute') },
     ];
 
     return (
         <>
             <PageMeta title={t('submissions.page_title')} description={t('submissions.page_desc')} />
-            <PageBreadcrumb pageTitle={t('submissions.page_title')} />
+            <div className="flex items-center justify-between">
+                <PageBreadcrumb pageTitle={t('submissions.page_title')} />
+                <button
+                    onClick={() => setSubmitOpen(true)}
+                    className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+                >
+                    <Plus size={15} />
+                    <span className="sm:hidden">{t('library.submit_short')}</span>
+                    <span className="hidden sm:inline">{t('library.submit_btn')}</span>
+                </button>
+            </div>
 
             {/* Coins info banner */}
             <div className="mb-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/30 dark:bg-amber-900/10">
@@ -140,6 +170,23 @@ export default function MySubmissions() {
                 </SubmissionList>
             )}
 
+            {/* ── Mes fichiers épreuve ── */}
+            {tab === 'exam_files' && (
+                <SubmissionList
+                    isLoading={loadingExamFiles}
+                    empty={{ icon: FilePlus2, text: t('submissions.empty_exam_files') }}
+                >
+                    {myExamFiles.map(sub => (
+                        <ExamFileSubmissionCard
+                            key={sub.id}
+                            submission={sub}
+                            onResubmit={() => setResubmitExamFileId(sub.id)}
+                            onDelete={() => setDeleteExamFileId(sub.id)}
+                        />
+                    ))}
+                </SubmissionList>
+            )}
+
             {/* ── Mes corrigés ── */}
             {tab === 'solutions' && (
                 <SubmissionList
@@ -157,31 +204,60 @@ export default function MySubmissions() {
                 </SubmissionList>
             )}
 
-            {/* ── Contribuer (épreuves sans corrigé) ── */}
+            {/* ── Contribuer ── */}
             {tab === 'contribute' && (
-                <div className="space-y-4">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                        <Trans
-                            i18nKey="submissions.no_solution_banner"
-                            ns="exams"
-                            components={{ str: <strong /> }}
-                        />
-                    </p>
-                    <SubmissionList
-                        isLoading={loadingMissing}
-                        empty={{ icon: CheckCircle2, text: t('submissions.contribute_empty') }}
-                    >
-                        {missingSolutions.map(exam => (
-                            <MissingSolutionCard
-                                key={exam.id}
-                                exam={exam}
-                                onSubmit={() => {
-                                    setSubmitSolExamId(exam.id);
-                                    setSubmitSolExamName(exam.name);
-                                }}
+                <div className="space-y-8">
+                    {/* Épreuves sans corrigé */}
+                    <div className="space-y-4">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <Trans
+                                i18nKey="submissions.no_solution_banner"
+                                ns="exams"
+                                components={{ str: <strong /> }}
                             />
-                        ))}
-                    </SubmissionList>
+                        </p>
+                        <SubmissionList
+                            isLoading={loadingMissing}
+                            empty={{ icon: CheckCircle2, text: t('submissions.contribute_empty') }}
+                        >
+                            {missingSolutions.map(exam => (
+                                <MissingSolutionCard
+                                    key={exam.id}
+                                    exam={exam}
+                                    onSubmit={() => {
+                                        setSubmitSolExamId(exam.id);
+                                        setSubmitSolExamName(exam.name);
+                                    }}
+                                />
+                            ))}
+                        </SubmissionList>
+                    </div>
+
+                    {/* Corrigés sans épreuve */}
+                    <div className="space-y-4">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <Trans
+                                i18nKey="submissions.no_exam_banner"
+                                ns="exams"
+                                components={{ str: <strong /> }}
+                            />
+                        </p>
+                        <SubmissionList
+                            isLoading={loadingMissingExams}
+                            empty={{ icon: CheckCircle2, text: t('submissions.contribute_missing_exam_empty') }}
+                        >
+                            {missingExams.map(exam => (
+                                <MissingExamFileCard
+                                    key={exam.id}
+                                    exam={exam}
+                                    onSubmit={() => {
+                                        setSubmitExamFileExamId(exam.id);
+                                        setSubmitExamFileExamName(exam.name);
+                                    }}
+                                />
+                            ))}
+                        </SubmissionList>
+                    </div>
                 </div>
             )}
 
@@ -193,7 +269,7 @@ export default function MySubmissions() {
                 </p>
                 <input
                     type="file"
-                    accept=".pdf,.docx,.pptx,.ppt"
+                    accept=".pdf,image/*"
                     onChange={(e) => setNewExamFile(e.target.files?.[0] ?? null)}
                     className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-gray-100 file:px-3 file:py-1 file:text-xs dark:border-gray-800 dark:bg-gray-900 dark:text-white"
                 />
@@ -251,6 +327,67 @@ export default function MySubmissions() {
                 </div>
             </Modal>
 
+            {/* ── Modal : Re-submit exam file ── */}
+            <Modal isOpen={!!resubmitExamFileId} onClose={() => { setResubmitExamFileId(null); setNewExamFileFile(null); }} className="max-w-md p-6">
+                <h3 className="mb-4 text-base font-semibold text-gray-900 dark:text-white">{t('submissions.resubmit_exam_file')}</h3>
+                <input
+                    type="file"
+                    accept=".pdf,image/*"
+                    onChange={(e) => setNewExamFileFile(e.target.files?.[0] ?? null)}
+                    className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-gray-100 file:px-3 file:py-1 file:text-xs dark:border-gray-800 dark:bg-gray-900 dark:text-white"
+                />
+                <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                    <button onClick={() => { setResubmitExamFileId(null); setNewExamFileFile(null); }} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:text-gray-300 dark:hover:bg-white/5">
+                        {t('submissions.cancel')}
+                    </button>
+                    <button
+                        onClick={() => {
+                            if (!resubmitExamFileId || !newExamFileFile) return;
+                            resubmitExamFile.mutate(
+                                { submissionId: resubmitExamFileId, exam_file: newExamFileFile },
+                                { onSuccess: () => { setResubmitExamFileId(null); setNewExamFileFile(null); } }
+                            );
+                        }}
+                        disabled={!newExamFileFile || resubmitExamFile.isPending}
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+                    >
+                        <RefreshCw size={14} />
+                        {resubmitExamFile.isPending ? t('submissions.sending') : t('submissions.resubmit')}
+                    </button>
+                </div>
+            </Modal>
+
+            {/* ── Modal : Submit exam file for missing exam ── */}
+            <Modal isOpen={!!submitExamFileExamId} onClose={() => { setSubmitExamFileExamId(null); setSubmitExamFileFile(null); }} className="max-w-md p-6">
+                <h3 className="mb-1 text-base font-semibold text-gray-900 dark:text-white">{t('submissions.submit_exam_file')}</h3>
+                <p className="mb-4 text-sm text-gray-500 dark:text-gray-400 truncate">{submitExamFileExamName}</p>
+                <input
+                    type="file"
+                    accept=".pdf,image/*"
+                    onChange={(e) => setSubmitExamFileFile(e.target.files?.[0] ?? null)}
+                    className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-gray-100 file:px-3 file:py-1 file:text-xs dark:border-gray-800 dark:bg-gray-900 dark:text-white"
+                />
+                <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                    <button onClick={() => { setSubmitExamFileExamId(null); setSubmitExamFileFile(null); }} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:text-gray-300 dark:hover:bg-white/5">
+                        {t('submissions.cancel')}
+                    </button>
+                    <button
+                        onClick={() => {
+                            if (!submitExamFileExamId || !submitExamFileFile) return;
+                            submitExamFile.mutate(
+                                { examId: submitExamFileExamId, exam_file: submitExamFileFile },
+                                { onSuccess: () => { setSubmitExamFileExamId(null); setSubmitExamFileFile(null); } }
+                            );
+                        }}
+                        disabled={!submitExamFileFile || submitExamFile.isPending}
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+                    >
+                        <FilePlus2 size={14} />
+                        {submitExamFile.isPending ? t('submissions.sending') : t('submissions.submit')}
+                    </button>
+                </div>
+            </Modal>
+
             <ConfirmModal
                 isOpen={!!deleteExamId}
                 title={t('submissions.delete_title')}
@@ -276,6 +413,21 @@ export default function MySubmissions() {
                 }}
                 onCancel={() => setDeleteSolId(null)}
             />
+
+            <ConfirmModal
+                isOpen={!!deleteExamFileId}
+                title={t('submissions.delete_title')}
+                message={t('submissions.delete_exam_file_msg')}
+                confirmLabel={t('submissions.delete_btn')}
+                cancelLabel={t('submissions.cancel_btn')}
+                onConfirm={() => {
+                    if (!deleteExamFileId) return;
+                    deleteExamFileSubmission.mutate(deleteExamFileId, { onSuccess: () => setDeleteExamFileId(null) });
+                }}
+                onCancel={() => setDeleteExamFileId(null)}
+            />
+
+            <SubmitExamModal isOpen={submitOpen} onClose={() => setSubmitOpen(false)} />
 
             {/* ── Modal : Submit solution for missing ── */}
             <Modal isOpen={!!submitSolExamId} onClose={() => { setSubmitSolExamId(null); setSubmitSolFile(null); }} className="max-w-md p-6">
@@ -346,7 +498,7 @@ function ExamSubmissionCard({ exam, onResubmit, onDelete }: { exam: ExamItem; on
     const { t } = useTranslation('exams');
     const canDelete = exam.submission_status === 'pending' || exam.submission_status === 'rejected';
     return (
-        <div className="flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-5 lg:shadow-sm dark:border-gray-800 dark:bg-gray-900/80">
+        <div className="flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900/80">
             <div className="flex items-start justify-between gap-2">
                 <h3 className="flex-1 text-sm font-semibold leading-snug text-gray-900 dark:text-white line-clamp-2">{exam.name}</h3>
                 <StatusBadge status={exam.submission_status} />
@@ -358,7 +510,7 @@ function ExamSubmissionCard({ exam, onResubmit, onDelete }: { exam: ExamItem; on
             )}
             {exam.course && (
                 <span className="self-start rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                    {exam.course.name} ({exam.course.code})
+                    {courseName(exam.course)} ({courseCode(exam.course)})
                 </span>
             )}
             {exam.submission_status === 'rejected' && exam.admin_note && (
@@ -395,7 +547,7 @@ function SolutionSubmissionCard({ submission, onResubmit, onDelete }: { submissi
     const { t } = useTranslation('exams');
     const canDelete = submission.submission_status === 'pending' || submission.submission_status === 'rejected';
     return (
-        <div className="flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-5 lg:shadow-sm dark:border-gray-800 dark:bg-gray-900/80">
+        <div className="flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900/80">
             <div className="flex items-start justify-between gap-2">
                 <div className="flex-1">
                     <p className="text-xs text-gray-400 dark:text-gray-500 mb-0.5">{t('submissions.solution_for')}</p>
@@ -412,7 +564,7 @@ function SolutionSubmissionCard({ submission, onResubmit, onDelete }: { submissi
             )}
             {submission.exam?.course && (
                 <span className="self-start rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                    {submission.exam.course.name} ({submission.exam.course.code})
+                    {courseName(submission.exam.course)} ({courseCode(submission.exam.course)})
                 </span>
             )}
             {submission.submission_status === 'rejected' && submission.admin_note && (
@@ -445,6 +597,88 @@ function SolutionSubmissionCard({ submission, onResubmit, onDelete }: { submissi
     );
 }
 
+function ExamFileSubmissionCard({ submission, onResubmit, onDelete }: { submission: ExamFileSubmissionRead; onResubmit: () => void; onDelete: () => void }) {
+    const { t } = useTranslation('exams');
+    const canDelete = submission.submission_status === 'pending' || submission.submission_status === 'rejected';
+    return (
+        <div className="flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900/80">
+            <div className="flex items-start justify-between gap-2">
+                <div className="flex-1">
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mb-0.5">{t('submissions.exam_file_for')}</p>
+                    <h3 className="text-sm font-semibold leading-snug text-gray-900 dark:text-white line-clamp-2">
+                        {submission.exam?.name ?? t('submissions.unknown_exam')}
+                    </h3>
+                </div>
+                <StatusBadge status={submission.submission_status} />
+            </div>
+            {submission.exam?.academic_year && (
+                <span className="self-start rounded-full w-auto block bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                    {submission.exam.academic_year}
+                </span>
+            )}
+            {submission.exam?.course && (
+                <span className="self-start rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                    {courseName(submission.exam.course)} ({courseCode(submission.exam.course)})
+                </span>
+            )}
+            {submission.submission_status === 'rejected' && submission.admin_note && (
+                <div className="flex items-start gap-2 rounded-xl bg-red-50 p-3 text-xs text-red-700 dark:bg-red-900/20 dark:text-red-400">
+                    <AlertCircle size={13} className="mt-0.5 shrink-0" />
+                    <span>{submission.admin_note}</span>
+                </div>
+            )}
+            {canDelete && (
+                <div className="mt-auto flex gap-2">
+                    {submission.submission_status === 'rejected' && (
+                        <button
+                            onClick={onResubmit}
+                            className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-300"
+                        >
+                            <RefreshCw size={12} />
+                            {t('submissions.resubmit')}
+                        </button>
+                    )}
+                    <button
+                        onClick={onDelete}
+                        className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-600 transition-colors hover:bg-red-100 dark:border-red-900/40 dark:bg-red-900/10 dark:text-red-400"
+                    >
+                        <Trash2 size={12} />
+                        {t('submissions.delete_btn')}
+                    </button>
+                </div>
+            )}
+        </div>
+    );
+}
+
+function MissingExamFileCard({ exam, onSubmit }: { exam: ExamItem; onSubmit: () => void }) {
+    const { t } = useTranslation('exams');
+    return (
+        <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-gray-300 bg-white p-5 lg:shadow-sm dark:border-gray-700 dark:bg-gray-900/40">
+            <div>
+                <h3 className="text-sm font-semibold leading-snug text-gray-900 dark:text-white line-clamp-2">{exam.name}</h3>
+            </div>
+            {exam.academic_year && (
+                <span className="self-start rounded-full w-auto block bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                    {exam.academic_year}
+                </span>
+            )}
+            {exam.course && (
+                <span className="self-start rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                    {courseName(exam.course)} ({courseCode(exam.course)})
+                </span>
+            )}
+            <button
+                onClick={onSubmit}
+                className="mt-auto inline-flex items-center justify-center gap-1.5 rounded-xl bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
+            >
+                <FilePlus2 size={12} />
+                {t('submissions.submit_exam_file')}
+            </button>
+        </div>
+    );
+}
+
 function MissingSolutionCard({ exam, onSubmit }: { exam: ExamItem; onSubmit: () => void }) {
     const { t } = useTranslation('exams');
     return (
@@ -459,7 +693,7 @@ function MissingSolutionCard({ exam, onSubmit }: { exam: ExamItem; onSubmit: () 
             )}
             {exam.course && (
                 <span className="self-start rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                    {exam.course.name} ({exam.course.code})
+                    {courseName(exam.course)} ({courseCode(exam.course)})
                 </span>
             )}
             <button

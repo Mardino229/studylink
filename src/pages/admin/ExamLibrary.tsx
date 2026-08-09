@@ -12,15 +12,21 @@ import {
     useCreateCourse, useDeleteCourse,
     useGetPendingExams, useGetPendingSolutions,
     useValidateSolution, useRejectSolution,
+    useGetPendingExamFiles, useValidateExamFile, useRejectExamFile,
+    useGetSimilarExams,
 } from '../../utils/exam';
-import type { ExamItem, SolutionSubmission, ExamSession, ExamType, SubmissionStatus } from '../../types/exams';
+import type { ExamFileSubmissionRead, ExamItem, SolutionSubmission, ExamSession, ExamType, SubmissionStatus } from '../../types/exams';
+import { courseCode, courseName } from '../../types/exams';
 import { Modal } from '../../components/ui/modal/index.tsx';
 import ConfirmModal from '../../components/ui/ConfirmModal';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb.tsx';
 import PageMeta from '../../components/common/PageMeta.tsx';
 
 const SESSION_LABELS: Record<ExamSession, string> = { fall: 'Automne', winter: 'Hiver', summer: 'Printemps/Été' };
-const TYPE_LABELS: Record<ExamType, string> = { midterm: 'Intra', final: 'Final', quiz: 'Quiz', other: 'Autre' };
+const TYPE_LABELS: Record<ExamType, string> = {
+    'Mi-session': 'Mi-session', 'Final': 'Final', 'Quiz': 'Quiz',
+    'Devoir': 'Devoir', 'Pratique': 'Pratique', 'DGD': 'DGD', 'Autre': 'Autre',
+};
 
 const STATUS_CONFIG: Record<SubmissionStatus, { label: string; className: string; icon: typeof CheckCircle }> = {
     validated: { label: 'Publié', className: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', icon: CheckCircle },
@@ -28,7 +34,7 @@ const STATUS_CONFIG: Record<SubmissionStatus, { label: string; className: string
     rejected: { label: 'Refusé', className: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400', icon: XCircle },
 };
 
-type Tab = 'exams' | 'pending_exams' | 'pending_solutions' | 'courses';
+type Tab = 'exams' | 'pending_exams' | 'pending_solutions' | 'pending_exam_files' | 'courses';
 
 export default function AdminExamLibrary() {
     const navigate = useNavigate();
@@ -43,6 +49,8 @@ export default function AdminExamLibrary() {
     const deleteCourse = useDeleteCourse();
     const validateSolution = useValidateSolution();
     const rejectSolution = useRejectSolution();
+    const validateExamFile = useValidateExamFile();
+    const rejectExamFile = useRejectExamFile();
 
     const [examFilters, setExamFilters] = useState<{
         course_id: string; session: string; exam_type: string;
@@ -59,18 +67,25 @@ export default function AdminExamLibrary() {
     };
     const hasActiveFilter = Object.keys(activeFilters).length > 1;
 
+    const [courseSearch, setCourseSearch] = useState('');
+
     const { data: exams = [], isLoading: isLoadingExams } = useGetExams(activeFilters);
-    const { data: courses = [], isLoading: isLoadingCourses } = useGetCourses();
+    const { data: courses = [], isLoading: isLoadingCourses } = useGetCourses(
+        { search: courseSearch, limit: 50 },
+        { enabled: tab === 'courses' },
+    );
     const { data: pendingExams = [], isLoading: isLoadingPendingExams } = useGetPendingExams();
     const { data: pendingSolutions = [], isLoading: isLoadingPendingSols } = useGetPendingSolutions();
+    const { data: pendingExamFiles = [], isLoading: isLoadingPendingExamFiles } = useGetPendingExamFiles();
 
     // Upload exam modal
     const [examModal, setExamModal] = useState(false);
     const [examForm, setExamForm] = useState({
-        name: '', course_id: '', academic_year: '', session: '' as ExamSession | '',
-        exam_type: '' as ExamType | '', is_solution_paid: true,
+        course_id: '', academic_year: '', session: '' as ExamSession | '',
+        exam_type: '' as ExamType | '', type_number: '', section: '', is_solution_paid: true,
     });
     const [examFile, setExamFile] = useState<File | null>(null);
+    const [examSolutionFile, setExamSolutionFile] = useState<File | null>(null);
 
     // Upload solution modal
     const [solutionExamId, setSolutionExamId] = useState<string | null>(null);
@@ -84,20 +99,33 @@ export default function AdminExamLibrary() {
     const [rejectSolId, setRejectSolId] = useState<string | null>(null);
     const [rejectSolNote, setRejectSolNote] = useState('');
 
+    // Reject modal (exam file)
+    const [rejectExamFileId, setRejectExamFileId] = useState<string | null>(null);
+    const [rejectExamFileNote, setRejectExamFileNote] = useState('');
+
     // Delete confirms
     const [deleteExamId, setDeleteExamId] = useState<string | null>(null);
     const [deleteCourseId, setDeleteCourseId] = useState<string | null>(null);
 
     // Create course modal
     const [courseModal, setCourseModal] = useState(false);
-    const [courseForm, setCourseForm] = useState({ code: '', name: '' });
+    const [courseForm, setCourseForm] = useState({ code_fr: '', name_fr: '', code_en: '', name_en: '' });
 
     const previewExam = (exam: ExamItem) => {
+        if (!exam.exam_file_url) return;
         const params = new URLSearchParams({
             title: exam.name,
             endpoint: `/exam-library/${exam.id}/download`,
         });
         navigate(`/exam-library/solution/${exam.id}?${params}`);
+    };
+
+    const previewExamFile = (sub: ExamFileSubmissionRead) => {
+        const params = new URLSearchParams({
+            title: `Épreuve — ${sub.exam?.name ?? sub.exam_id}`,
+            endpoint: `/exam-library/exam-file-submissions/${sub.id}/file`,
+        });
+        navigate(`/exam-library/solution/${sub.exam_id}?${params}`);
     };
 
     const previewSolution = (sol: SolutionSubmission) => {
@@ -109,17 +137,20 @@ export default function AdminExamLibrary() {
     };
 
     const handleUploadExam = () => {
-        if (!examForm.name.trim() || !examFile) return;
+        if (!examFile && !examSolutionFile) return;
         uploadExam.mutate(
             {
-                name: examForm.name.trim(), exam_file: examFile,
+                exam_file: examFile ?? undefined,
+                solution_file: examSolutionFile ?? undefined,
                 course_id: examForm.course_id || undefined,
                 academic_year: examForm.academic_year ? Number(examForm.academic_year) : undefined,
                 session: (examForm.session || undefined) as ExamSession | undefined,
                 exam_type: (examForm.exam_type || undefined) as ExamType | undefined,
+                type_number: examForm.type_number ? Number(examForm.type_number) : undefined,
+                section: examForm.section.trim() || undefined,
                 is_solution_paid: examForm.is_solution_paid,
             },
-            { onSuccess: () => { setExamModal(false); setExamForm({ name: '', course_id: '', academic_year: '', session: '', exam_type: '', is_solution_paid: true }); setExamFile(null); } }
+            { onSuccess: () => { setExamModal(false); setExamForm({ course_id: '', academic_year: '', session: '', exam_type: '', type_number: '', section: '', is_solution_paid: true }); setExamFile(null); setExamSolutionFile(null); } }
         );
     };
 
@@ -132,10 +163,17 @@ export default function AdminExamLibrary() {
     };
 
     const handleCreateCourse = () => {
-        if (!courseForm.code.trim() || !courseForm.name.trim()) return;
+        const hasFr = courseForm.code_fr.trim() && courseForm.name_fr.trim();
+        const hasEn = courseForm.code_en.trim() && courseForm.name_en.trim();
+        if (!hasFr && !hasEn) return;
         createCourse.mutate(
-            { code: courseForm.code.trim(), name: courseForm.name.trim() },
-            { onSuccess: () => { setCourseModal(false); setCourseForm({ code: '', name: '' }); } }
+            {
+                code_fr: courseForm.code_fr.trim() || undefined,
+                name_fr: courseForm.name_fr.trim() || undefined,
+                code_en: courseForm.code_en.trim() || undefined,
+                name_en: courseForm.name_en.trim() || undefined,
+            },
+            { onSuccess: () => { setCourseModal(false); setCourseForm({ code_fr: '', name_fr: '', code_en: '', name_en: '' }); } }
         );
     };
 
@@ -143,6 +181,7 @@ export default function AdminExamLibrary() {
         { key: 'exams', label: 'Épreuves' },
         { key: 'pending_exams', label: 'File épreuves', badge: pendingExams.length },
         { key: 'pending_solutions', label: 'File corrigés', badge: pendingSolutions.length },
+        { key: 'pending_exam_files', label: 'File fichiers épreuve', badge: pendingExamFiles.length },
         { key: 'courses', label: 'Cours' },
     ];
 
@@ -198,7 +237,6 @@ export default function AdminExamLibrary() {
                         compact
                         value={examFilters.course_id}
                         onChange={(id) => setExamFilters(p => ({ ...p, course_id: id }))}
-                        courses={courses}
                     />
                     <select
                         value={examFilters.session}
@@ -216,10 +254,13 @@ export default function AdminExamLibrary() {
                         className={filterSelectCls}
                     >
                         <option value="">Tous types</option>
-                        <option value="midterm">Intra</option>
-                        <option value="final">Final</option>
-                        <option value="quiz">Quiz</option>
-                        <option value="other">Autre</option>
+                        <option value="Mi-session">Mi-session</option>
+                        <option value="Final">Final</option>
+                        <option value="Quiz">Quiz</option>
+                        <option value="Devoir">Devoir</option>
+                        <option value="Pratique">Pratique</option>
+                        <option value="DGD">DGD</option>
+                        <option value="Autre">Autre</option>
                     </select>
                     <select
                         value={examFilters.submission_status}
@@ -261,7 +302,7 @@ export default function AdminExamLibrary() {
                                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400">Cours</th>
                                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400">Détails</th>
                                         <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 dark:text-gray-400">Statut</th>
-                                        <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 dark:text-gray-400">Corrigé</th>
+                                        <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 dark:text-gray-400">Fichiers</th>
                                         <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400">Actions</th>
                                     </tr>
                                 </thead>
@@ -359,34 +400,34 @@ export default function AdminExamLibrary() {
                 </div>
             )}
 
-            {/* ── Courses tab ── */}
-            {tab === 'courses' && (
+            {/* ── Pending exam files tab ── */}
+            {tab === 'pending_exam_files' && (
                 <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
-                    {isLoadingCourses ? (
+                    {isLoadingPendingExamFiles ? (
                         <div className="py-16 text-center text-sm text-gray-400">Chargement…</div>
-                    ) : courses.length === 0 ? (
-                        <EmptyTable icon={BookOpen} text="Aucun cours pour l'instant." />
+                    ) : pendingExamFiles.length === 0 ? (
+                        <EmptyTable icon={CheckCircle2} text="Aucun fichier épreuve en attente de validation." />
                     ) : (
                         <div className="overflow-x-auto">
-                            <table className="w-full min-w-[400px] text-sm">
+                            <table className="w-full min-w-[560px] text-sm">
                                 <thead className="border-b border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-gray-800/60">
                                     <tr>
-                                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400">Code</th>
-                                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400">Nom</th>
-                                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400">Action</th>
+                                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400">Fichier épreuve pour</th>
+                                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400">Soumis le</th>
+                                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                                    {courses.map(course => (
-                                        <tr key={course.id} className="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
-                                            <td className="px-4 py-3 font-mono text-xs font-semibold text-blue-600 dark:text-blue-400">{course.code}</td>
-                                            <td className="px-4 py-3 text-gray-900 dark:text-white">{course.name}</td>
-                                            <td className="px-4 py-3 text-right">
-                                                <button onClick={() => setDeleteCourseId(course.id)} className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-950/20">
-                                                    <Trash2 size={13} />Supprimer
-                                                </button>
-                                            </td>
-                                        </tr>
+                                    {pendingExamFiles.map(sub => (
+                                        <PendingExamFileRow
+                                            key={sub.id}
+                                            submission={sub}
+                                            onValidate={() => validateExamFile.mutate(sub.id)}
+                                            onReject={() => { setRejectExamFileId(sub.id); setRejectExamFileNote(''); }}
+                                            onPreview={() => previewExamFile(sub)}
+                                            isValidating={validateExamFile.isPending}
+                                            isRejecting={rejectExamFile.isPending}
+                                        />
                                     ))}
                                 </tbody>
                             </table>
@@ -395,39 +436,104 @@ export default function AdminExamLibrary() {
                 </div>
             )}
 
+            {/* ── Courses tab ── */}
+            {tab === 'courses' && (
+                <div className="space-y-3">
+                    <input
+                        value={courseSearch}
+                        onChange={(e) => setCourseSearch(e.target.value)}
+                        placeholder="Rechercher un cours…"
+                        className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-blue-500 dark:border-gray-800 dark:bg-gray-900 dark:text-white"
+                    />
+                    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+                        {isLoadingCourses ? (
+                            <div className="py-16 text-center text-sm text-gray-400">Chargement…</div>
+                        ) : courses.length === 0 ? (
+                            <EmptyTable icon={BookOpen} text="Aucun cours trouvé." />
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <table className="w-full min-w-[400px] text-sm">
+                                    <thead className="border-b border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-gray-800/60">
+                                        <tr>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400">Code</th>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400">Nom</th>
+                                            <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                                        {courses.map(course => (
+                                            <tr key={course.id} className="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
+                                                <td className="px-4 py-3 font-mono text-xs font-semibold text-blue-600 dark:text-blue-400">{courseCode(course)}</td>
+                                                <td className="px-4 py-3 text-gray-900 dark:text-white">{courseName(course)}</td>
+                                                <td className="px-4 py-3 text-right">
+                                                    <button onClick={() => setDeleteCourseId(course.id)} className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-950/20">
+                                                        <Trash2 size={13} />Supprimer
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
             {/* ── Modal : Upload exam ── */}
             <Modal isOpen={examModal} onClose={() => setExamModal(false)} className="max-w-lg p-6">
                 <h3 className="mb-5 text-base font-semibold text-gray-900 dark:text-white">Uploader une épreuve</h3>
                 <div className="space-y-4">
-                    <input value={examForm.name} onChange={(e) => setExamForm(p => ({ ...p, name: e.target.value }))} placeholder="Nom de l'épreuve *" className={inputCls} />
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        <select value={examForm.course_id} onChange={(e) => setExamForm(p => ({ ...p, course_id: e.target.value }))} className={selectCls}>
-                            <option value="">  Cours  </option>
-                            {courses.map(c => <option key={c.id} value={c.id}>{c.code}   {c.name}</option>)}
-                        </select>
+                        <div className="sm:col-span-2">
+                            <CourseCombobox
+                                value={examForm.course_id}
+                                onChange={(id) => setExamForm(p => ({ ...p, course_id: id }))}
+                                placeholder="Cours"
+                            />
+                        </div>
                         <input type="number" value={examForm.academic_year} onChange={(e) => setExamForm(p => ({ ...p, academic_year: e.target.value }))} placeholder="Année" className={inputCls} />
                         <select value={examForm.session} onChange={(e) => setExamForm(p => ({ ...p, session: e.target.value as ExamSession | '' }))} className={selectCls}>
                             <option value="">  Session  </option>
                             <option value="fall">Automne</option><option value="winter">Hiver</option><option value="summer">Printemps/Été</option>
                         </select>
-                        <select value={examForm.exam_type} onChange={(e) => setExamForm(p => ({ ...p, exam_type: e.target.value as ExamType | '' }))} className={selectCls}>
+                        <select value={examForm.exam_type} onChange={(e) => setExamForm(p => ({ ...p, exam_type: e.target.value as ExamType | '', type_number: '' }))} className={selectCls}>
                             <option value="">  Type  </option>
-                            <option value="midterm">Intra</option><option value="final">Final</option><option value="quiz">Quiz</option><option value="other">Autre</option>
+                            <option value="Mi-session">Mi-session</option>
+                            <option value="Final">Final</option>
+                            <option value="Quiz">Quiz</option>
+                            <option value="Devoir">Devoir</option>
+                            <option value="Pratique">Pratique</option>
+                            <option value="DGD">DGD</option>
+                            <option value="Autre">Autre</option>
                         </select>
+                        {examForm.exam_type && examForm.exam_type !== 'Final' && (
+                            <input type="number" value={examForm.type_number} onChange={(e) => setExamForm(p => ({ ...p, type_number: e.target.value }))} placeholder={`N° de ${examForm.exam_type} *`} min={1} max={20} className={inputCls} />
+                        )}
+                        <input value={examForm.section} onChange={(e) => setExamForm(p => ({ ...p, section: e.target.value }))} placeholder="Section (ex: A) — optionnel" className={inputCls} />
                     </div>
                     <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
                         <input type="checkbox" checked={examForm.is_solution_paid} onChange={(e) => setExamForm(p => ({ ...p, is_solution_paid: e.target.checked }))} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
                         Corrigé payant (2 jetons)
                     </label>
-                    <input type="file" accept=".pdf,.docx,.pptx,.ppt" onChange={(e) => setExamFile(e.target.files?.[0] ?? null)} className={fileCls} />
-                    <ModalButtons onCancel={() => setExamModal(false)} onConfirm={handleUploadExam} loading={uploadExam.isPending} disabled={!examForm.name.trim() || !examFile} label="Uploader" />
+                    <div className="space-y-2">
+                        <div>
+                            <label className="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Fichier épreuve</label>
+                            <input type="file" accept=".pdf,image/*" onChange={(e) => setExamFile(e.target.files?.[0] ?? null)} className={fileCls} />
+                        </div>
+                        <div>
+                            <label className="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Corrigé (optionnel)</label>
+                            <input type="file" accept=".pdf,image/*" onChange={(e) => setExamSolutionFile(e.target.files?.[0] ?? null)} className={fileCls} />
+                        </div>
+                    </div>
+                    <ModalButtons onCancel={() => setExamModal(false)} onConfirm={handleUploadExam} loading={uploadExam.isPending} disabled={(!examFile && !examSolutionFile) || (!!examForm.exam_type && examForm.exam_type !== 'Final' && !examForm.type_number)} label="Uploader" />
                 </div>
             </Modal>
 
             {/* ── Modal : Upload solution ── */}
             <Modal isOpen={!!solutionExamId} onClose={() => { setSolutionExamId(null); setSolutionFile(null); }} className="max-w-md p-6">
                 <h3 className="mb-4 text-base font-semibold text-gray-900 dark:text-white">Uploader le corrigé</h3>
-                <input type="file" accept=".pdf,.docx,.pptx,.ppt" onChange={(e) => setSolutionFile(e.target.files?.[0] ?? null)} className={fileCls} />
+                <input type="file" accept=".pdf,image/*" onChange={(e) => setSolutionFile(e.target.files?.[0] ?? null)} className={fileCls} />
                 <div className="mt-4">
                     <ModalButtons onCancel={() => { setSolutionExamId(null); setSolutionFile(null); }} onConfirm={handleUploadSolution} loading={uploadSolution.isPending} disabled={!solutionFile} label="Uploader" />
                 </div>
@@ -484,13 +590,49 @@ export default function AdminExamLibrary() {
                 </div>
             </Modal>
 
+            {/* ── Modal : Reject exam file ── */}
+            <Modal isOpen={!!rejectExamFileId} onClose={() => setRejectExamFileId(null)} className="max-w-md p-6">
+                <h3 className="mb-3 text-base font-semibold text-gray-900 dark:text-white">Refuser le fichier épreuve</h3>
+                <textarea
+                    value={rejectExamFileNote}
+                    onChange={(e) => setRejectExamFileNote(e.target.value)}
+                    placeholder="Raison du refus…"
+                    rows={3}
+                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-red-400 dark:border-gray-800 dark:bg-gray-900 dark:text-white"
+                />
+                <div className="mt-4">
+                    <ModalButtons
+                        onCancel={() => setRejectExamFileId(null)}
+                        onConfirm={() => {
+                            if (!rejectExamFileId) return;
+                            rejectExamFile.mutate({ submissionId: rejectExamFileId, admin_note: rejectExamFileNote }, { onSuccess: () => setRejectExamFileId(null) });
+                        }}
+                        loading={rejectExamFile.isPending}
+                        disabled={!rejectExamFileNote.trim()}
+                        label="Refuser"
+                        danger
+                    />
+                </div>
+            </Modal>
+
             {/* ── Modal : Create course ── */}
-            <Modal isOpen={courseModal} onClose={() => setCourseModal(false)} className="max-w-sm p-6">
+            <Modal isOpen={courseModal} onClose={() => setCourseModal(false)} className="max-w-md p-6">
                 <h3 className="mb-4 text-base font-semibold text-gray-900 dark:text-white">Nouveau cours</h3>
                 <div className="space-y-3">
-                    <input value={courseForm.code} onChange={(e) => setCourseForm(p => ({ ...p, code: e.target.value }))} placeholder="Code   ex: CSI2120" className={inputCls} />
-                    <input value={courseForm.name} onChange={(e) => setCourseForm(p => ({ ...p, name: e.target.value }))} placeholder="Nom du cours" className={inputCls} />
-                    <ModalButtons onCancel={() => setCourseModal(false)} onConfirm={handleCreateCourse} loading={createCourse.isPending} disabled={!courseForm.code.trim() || !courseForm.name.trim()} label="Créer" />
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Au moins une paire complète (FR ou EN) est requise.</p>
+                    <div className="grid grid-cols-2 gap-3">
+                        <input value={courseForm.code_fr} onChange={(e) => setCourseForm(p => ({ ...p, code_fr: e.target.value }))} placeholder="Code FR  ex: CSI2120" className={inputCls} />
+                        <input value={courseForm.name_fr} onChange={(e) => setCourseForm(p => ({ ...p, name_fr: e.target.value }))} placeholder="Nom FR" className={inputCls} />
+                        <input value={courseForm.code_en} onChange={(e) => setCourseForm(p => ({ ...p, code_en: e.target.value }))} placeholder="Code EN" className={inputCls} />
+                        <input value={courseForm.name_en} onChange={(e) => setCourseForm(p => ({ ...p, name_en: e.target.value }))} placeholder="Name EN" className={inputCls} />
+                    </div>
+                    <ModalButtons
+                        onCancel={() => setCourseModal(false)}
+                        onConfirm={handleCreateCourse}
+                        loading={createCourse.isPending}
+                        disabled={!(courseForm.code_fr.trim() && courseForm.name_fr.trim()) && !(courseForm.code_en.trim() && courseForm.name_en.trim())}
+                        label="Créer"
+                    />
                 </div>
             </Modal>
 
@@ -562,7 +704,7 @@ function ExamRow({ exam, onValidate, onReject, onUploadSolution, onDelete, onPre
                 <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500">{exam.id.slice(0, 8)}…</p>
             </td>
             <td className="px-4 py-3">
-                {exam.course ? <span className="font-mono text-xs text-blue-600 dark:text-blue-400">{exam.course.code}</span> : <span className="text-gray-400"> </span>}
+                {exam.course ? <span className="font-mono text-xs text-blue-600 dark:text-blue-400">{courseCode(exam.course)}</span> : <span className="text-gray-400"> </span>}
             </td>
             <td className="px-4 py-3">
                 <div className="flex flex-wrap gap-1">
@@ -573,15 +715,26 @@ function ExamRow({ exam, onValidate, onReject, onUploadSolution, onDelete, onPre
             </td>
             <td className="px-4 py-3 text-center"><StatusBadge status={exam.submission_status} /></td>
             <td className="px-4 py-3 text-center">
-                {exam.solution_file_url ? (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2.5 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                        <CheckCircle size={11} />{exam.is_solution_paid ? 'Payant' : 'Gratuit'}
-                    </span>
-                ) : (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-                        <XCircle size={11} />Absent
-                    </span>
-                )}
+                <div className="flex flex-col items-center gap-1">
+                    {exam.exam_file_url ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-violet-100 px-2.5 py-0.5 text-xs font-medium text-violet-700 dark:bg-violet-900/30 dark:text-violet-400">
+                            <CheckCircle size={11} />Épreuve
+                        </span>
+                    ) : (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-400 dark:bg-gray-800 dark:text-gray-500">
+                            <XCircle size={11} />Sans épreuve
+                        </span>
+                    )}
+                    {exam.solution_file_url ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                            <CheckCircle size={11} />{exam.is_solution_paid ? 'Corrigé payant' : 'Corrigé gratuit'}
+                        </span>
+                    ) : (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-400 dark:bg-gray-800 dark:text-gray-500">
+                            <XCircle size={11} />Sans corrigé
+                        </span>
+                    )}
+                </div>
             </td>
             <td className="px-4 py-3">
                 <div className="flex items-center justify-end gap-1">
@@ -591,7 +744,7 @@ function ExamRow({ exam, onValidate, onReject, onUploadSolution, onDelete, onPre
                             <button onClick={onReject} className="rounded-lg px-2.5 py-1.5 text-xs font-medium text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-950/20">Refuser</button>
                         </>
                     )}
-                    <button onClick={onPreview} title="Aperçu du fichier" className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-blue-600 dark:hover:bg-gray-800 dark:hover:text-blue-400">
+                    <button onClick={onPreview} title={exam.exam_file_url ? "Aperçu du fichier épreuve" : "Pas de fichier épreuve"} disabled={!exam.exam_file_url} className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-blue-600 dark:hover:bg-gray-800 dark:hover:text-blue-400 disabled:opacity-30 disabled:cursor-not-allowed">
                         <Eye size={14} />
                     </button>
                     <button onClick={onUploadSolution} title={exam.solution_file_url ? 'Remplacer le corrigé' : 'Uploader le corrigé'} className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200">
@@ -610,7 +763,11 @@ function PendingExamRow({ exam, onValidate, onReject, onPreview, isValidating, i
     exam: ExamItem; onValidate: () => void; onReject: () => void; onPreview: () => void;
     isValidating: boolean; isRejecting: boolean;
 }) {
+    const [showSimilar, setShowSimilar] = useState(false);
+    const { data: similarExams = [], isLoading: isLoadingSimilar } = useGetSimilarExams(showSimilar ? exam.id : null);
+
     return (
+        <>
         <tr className="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
             <td className="px-4 py-3">
                 <p className="font-medium text-gray-900 dark:text-white">{exam.name}</p>
@@ -622,14 +779,75 @@ function PendingExamRow({ exam, onValidate, onReject, onPreview, isValidating, i
                 )}
             </td>
             <td className="px-4 py-3">
-                {exam.course ? <span className="font-mono text-xs text-blue-600 dark:text-blue-400">{exam.course.code}</span> : <span className="text-gray-400"> </span>}
+                {exam.course ? <span className="font-mono text-xs text-blue-600 dark:text-blue-400">{courseCode(exam.course)}</span> : <span className="text-gray-400"> </span>}
             </td>
             <td className="px-4 py-3">
                 <div className="flex flex-wrap gap-1">
                     {exam.academic_year && <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-400">{exam.academic_year}</span>}
                     {exam.session && <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-400">{SESSION_LABELS[exam.session]}</span>}
-                    {exam.exam_type && <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-400">{TYPE_LABELS[exam.exam_type]}</span>}
+                    {exam.exam_type && <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-400">{TYPE_LABELS[exam.exam_type]}{exam.type_number ? ` ${exam.type_number}` : ''}</span>}
+                    {exam.section && <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-400">§{exam.section}</span>}
                 </div>
+            </td>
+            <td className="px-4 py-3 text-right">
+                <div className="flex items-center justify-end gap-2">
+                    <button onClick={() => setShowSimilar(s => !s)} className={`flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors ${showSimilar ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800'}`}>
+                        <FileText size={13} />Similaires
+                    </button>
+                    <button onClick={onPreview} title="Aperçu" className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium text-blue-600 transition-colors hover:bg-blue-50 dark:hover:bg-blue-950/20">
+                        <Eye size={13} />Aperçu
+                    </button>
+                    <button onClick={onValidate} disabled={isValidating} className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white bg-green-500 hover:bg-green-600 transition-colors disabled:opacity-50">
+                        ✓ Valider
+                    </button>
+                    <button onClick={onReject} disabled={isRejecting} className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white bg-red-500 hover:bg-red-600 transition-colors disabled:opacity-50">
+                        ✕ Refuser
+                    </button>
+                </div>
+            </td>
+        </tr>
+        {showSimilar && (
+            <tr className="bg-amber-50 dark:bg-amber-950/10">
+                <td colSpan={4} className="px-4 py-3">
+                    {isLoadingSimilar ? (
+                        <p className="text-xs text-gray-400">Chargement des entrées similaires…</p>
+                    ) : similarExams.length === 0 ? (
+                        <p className="text-xs text-gray-400">Aucune entrée similaire validée trouvée.</p>
+                    ) : (
+                        <div className="space-y-1">
+                            <p className="mb-2 text-xs font-semibold text-amber-700 dark:text-amber-400">{similarExams.length} entrée(s) similaire(s) déjà validée(s) :</p>
+                            {similarExams.map(s => (
+                                <div key={s.id} className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
+                                    <span className="font-medium">{s.name}</span>
+                                    {s.exam_type && <span className="rounded-full bg-gray-200 px-1.5 py-0.5 dark:bg-gray-700">{TYPE_LABELS[s.exam_type]}{s.type_number ? ` ${s.type_number}` : ''}</span>}
+                                    {s.section && <span className="rounded-full bg-gray-200 px-1.5 py-0.5 dark:bg-gray-700">§{s.section}</span>}
+                                    {s.exam_file_url && <span className="text-violet-600 dark:text-violet-400">✓ épreuve</span>}
+                                    {s.solution_file_url && <span className="text-blue-600 dark:text-blue-400">✓ corrigé</span>}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </td>
+            </tr>
+        )}
+        </>
+    );
+}
+
+function PendingExamFileRow({ submission, onValidate, onReject, onPreview, isValidating, isRejecting }: {
+    submission: ExamFileSubmissionRead; onValidate: () => void; onReject: () => void; onPreview: () => void;
+    isValidating: boolean; isRejecting: boolean;
+}) {
+    return (
+        <tr className="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
+            <td className="px-4 py-3">
+                <p className="font-medium text-gray-900 dark:text-white">{submission.exam?.name ?? submission.exam_id}</p>
+                {submission.exam?.course && (
+                    <span className="mt-0.5 font-mono text-xs text-blue-600 dark:text-blue-400">{courseCode(submission.exam.course)}</span>
+                )}
+            </td>
+            <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                {new Date(submission.submitted_at).toLocaleDateString('fr-CA', { day: 'numeric', month: 'short', year: 'numeric' })}
             </td>
             <td className="px-4 py-3 text-right">
                 <div className="flex items-center justify-end gap-2">
@@ -657,7 +875,7 @@ function PendingSolutionRow({ submission, onValidate, onReject, onPreview, isVal
             <td className="px-4 py-3">
                 <p className="font-medium text-gray-900 dark:text-white">{submission.exam?.name ?? 'Épreuve inconnue'}</p>
                 {submission.exam?.course && (
-                    <span className="mt-0.5 font-mono text-xs text-blue-600 dark:text-blue-400">{submission.exam.course.code}</span>
+                    <span className="mt-0.5 font-mono text-xs text-blue-600 dark:text-blue-400">{courseCode(submission.exam.course)}</span>
                 )}
             </td>
             <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">

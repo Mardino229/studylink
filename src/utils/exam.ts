@@ -2,23 +2,30 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
 import { useAxiosPrivate } from "../hoooks/useAxiosPrivate";
-import type { Course, ExamFilters, ExamItem, SolutionSubmission } from "../types/exams";
+import type { Course, ExamFilters, ExamFileSubmissionRead, ExamItem, SolutionSubmission } from "../types/exams";
 
 const err = (error: unknown) =>
     (error as AxiosError<{ detail: string }>).response?.data?.detail || "Une erreur est survenue";
 
 // ─── Courses ──────────────────────────────────────────────
 
-export const useGetCourses = (filters?: { faculty_id?: string }) => {
+export const useGetCourses = (
+    filters?: { faculty_id?: string; search?: string; skip?: number; limit?: number },
+    options?: { enabled?: boolean },
+) => {
     const axiosPrivate = useAxiosPrivate();
     return useQuery({
         queryKey: ["exam-courses", filters],
         queryFn: async () => {
             const params = new URLSearchParams();
             if (filters?.faculty_id) params.set("faculty_id", filters.faculty_id);
+            if (filters?.search) params.set("search", filters.search);
+            if (filters?.skip !== undefined) params.set("skip", String(filters.skip));
+            if (filters?.limit !== undefined) params.set("limit", String(filters.limit));
             const response = await axiosPrivate.get<{ data: Course[] }>(`/exam-library/courses?${params}`);
             return response.data.data;
         },
+        enabled: options?.enabled !== false,
     });
 };
 
@@ -26,7 +33,7 @@ export const useCreateCourse = () => {
     const queryClient = useQueryClient();
     const axiosPrivate = useAxiosPrivate();
     return useMutation({
-        mutationFn: async (data: { code: string; name: string; faculty_id?: string }) => {
+        mutationFn: async (data: { code_fr?: string; name_fr?: string; code_en?: string; name_en?: string; faculty_id?: string }) => {
             const response = await axiosPrivate.post<{ data: Course }>("/exam-library/courses", data);
             return response.data.data;
         },
@@ -44,7 +51,7 @@ export const useUpdateCourse = () => {
     const queryClient = useQueryClient();
     const axiosPrivate = useAxiosPrivate();
     return useMutation({
-        mutationFn: async ({ courseId, ...data }: { courseId: string; code?: string; name?: string; faculty_id?: string }) => {
+        mutationFn: async ({ courseId, ...data }: { courseId: string; code_fr?: string; name_fr?: string; code_en?: string; name_en?: string; faculty_id?: string }) => {
             const response = await axiosPrivate.patch<{ data: Course }>(`/exam-library/courses/${courseId}`, data);
             return response.data.data;
         },
@@ -90,6 +97,8 @@ export const useGetExams = (filters?: ExamFilters) => {
             if (filters?.academic_year) params.set("academic_year", String(filters.academic_year));
             if (filters?.session) params.set("session", filters.session);
             if (filters?.exam_type) params.set("exam_type", filters.exam_type);
+            if (filters?.type_number) params.set("type_number", String(filters.type_number));
+            if (filters?.section) params.set("section", filters.section);
             if (filters?.submission_status) params.set("submission_status", filters.submission_status);
             if (filters?.skip !== undefined) params.set("skip", String(filters.skip));
             if (filters?.limit !== undefined) params.set("limit", String(filters.limit));
@@ -104,8 +113,8 @@ export const useUploadExam = () => {
     const axiosPrivate = useAxiosPrivate();
     return useMutation({
         mutationFn: async (data: {
-            name: string;
-            exam_file: File;
+            name?: string;
+            exam_file?: File;
             solution_file?: File;
             course_id?: string;
             program_id?: string;
@@ -113,11 +122,13 @@ export const useUploadExam = () => {
             academic_year?: number;
             session?: string;
             exam_type?: string;
+            type_number?: number;
+            section?: string;
             is_solution_paid?: boolean;
         }) => {
             const formData = new FormData();
-            formData.append("name", data.name);
-            formData.append("exam_file", data.exam_file);
+            if (data.name) formData.append("name", data.name);
+            if (data.exam_file) formData.append("exam_file", data.exam_file);
             if (data.solution_file) formData.append("solution_file", data.solution_file);
             if (data.course_id) formData.append("course_id", data.course_id);
             if (data.program_id) formData.append("program_id", data.program_id);
@@ -125,6 +136,8 @@ export const useUploadExam = () => {
             if (data.academic_year) formData.append("academic_year", String(data.academic_year));
             if (data.session) formData.append("session", data.session);
             if (data.exam_type) formData.append("exam_type", data.exam_type);
+            if (data.type_number) formData.append("type_number", String(data.type_number));
+            if (data.section) formData.append("section", data.section);
             const response = await axiosPrivate.post<{ data: ExamItem }>("/exam-library", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
@@ -132,6 +145,7 @@ export const useUploadExam = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["exam-library"] });
+            queryClient.invalidateQueries({ queryKey: ["my-exam-submissions"] });
             toast.success("Épreuve soumise ! Elle sera visible après validation.");
         },
         onError: (error) => {
@@ -267,6 +281,8 @@ export const useResubmitExam = () => {
             academic_year?: number;
             session?: string;
             exam_type?: string;
+            type_number?: number;
+            section?: string;
         }) => {
             const formData = new FormData();
             if (exam_file) formData.append("exam_file", exam_file);
@@ -275,6 +291,8 @@ export const useResubmitExam = () => {
             if (data.academic_year) formData.append("academic_year", String(data.academic_year));
             if (data.session) formData.append("session", data.session);
             if (data.exam_type) formData.append("exam_type", data.exam_type);
+            if (data.type_number) formData.append("type_number", String(data.type_number));
+            if (data.section) formData.append("section", data.section);
             const res = await axiosPrivate.put<{ data: ExamItem }>(`/exam-library/${examId}/resubmit`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
@@ -391,7 +409,157 @@ export const useDeleteMySolutionSubmission = () => {
     });
 };
 
+// ─── Exam file submissions (missing-exam flow) ────────────
+
+export const useGetMissingExams = () => {
+    const axiosPrivate = useAxiosPrivate();
+    return useQuery({
+        queryKey: ["exams-missing-exam"],
+        queryFn: async () => {
+            const res = await axiosPrivate.get<{ data: ExamItem[] }>("/exam-library/missing-exam");
+            return res.data.data;
+        },
+    });
+};
+
+export const useGetMyExamFileSubmissions = () => {
+    const axiosPrivate = useAxiosPrivate();
+    return useQuery({
+        queryKey: ["my-exam-file-submissions"],
+        queryFn: async () => {
+            const res = await axiosPrivate.get<{ data: ExamFileSubmissionRead[] }>("/exam-library/my-exam-file-submissions");
+            return res.data.data;
+        },
+    });
+};
+
+export const useSubmitExamFile = () => {
+    const queryClient = useQueryClient();
+    const axiosPrivate = useAxiosPrivate();
+    return useMutation({
+        mutationFn: async ({ examId, exam_file }: { examId: string; exam_file: File }) => {
+            const formData = new FormData();
+            formData.append("exam_file", exam_file);
+            const res = await axiosPrivate.post<{ data: ExamFileSubmissionRead }>(
+                `/exam-library/${examId}/exam-file/submit`,
+                formData,
+                { headers: { "Content-Type": "multipart/form-data" } },
+            );
+            return res.data.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["my-exam-file-submissions"] });
+            queryClient.invalidateQueries({ queryKey: ["exams-missing-exam"] });
+            toast.success("Fichier épreuve soumis ! Il sera visible après validation.");
+        },
+        onError: (error) => {
+            toast.error("Erreur lors de la soumission", { description: err(error) });
+        },
+    });
+};
+
+export const useResubmitExamFile = () => {
+    const queryClient = useQueryClient();
+    const axiosPrivate = useAxiosPrivate();
+    return useMutation({
+        mutationFn: async ({ submissionId, exam_file }: { submissionId: string; exam_file: File }) => {
+            const formData = new FormData();
+            formData.append("exam_file", exam_file);
+            const res = await axiosPrivate.put<{ data: ExamFileSubmissionRead }>(
+                `/exam-library/exam-file-submissions/${submissionId}/resubmit`,
+                formData,
+                { headers: { "Content-Type": "multipart/form-data" } },
+            );
+            return res.data.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["my-exam-file-submissions"] });
+            toast.success("Fichier épreuve re-soumis avec succès !");
+        },
+        onError: (error) => {
+            toast.error("Erreur lors de la re-soumission", { description: err(error) });
+        },
+    });
+};
+
+export const useDeleteExamFileSubmission = () => {
+    const queryClient = useQueryClient();
+    const axiosPrivate = useAxiosPrivate();
+    return useMutation({
+        mutationFn: async (submissionId: string) => {
+            await axiosPrivate.delete(`/exam-library/exam-file-submissions/my-submissions/${submissionId}`);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["my-exam-file-submissions"] });
+            toast.success("Soumission supprimée.");
+        },
+        onError: (error) => {
+            toast.error("Impossible de supprimer", { description: err(error) });
+        },
+    });
+};
+
 // ─── Admin moderation ─────────────────────────────────────
+
+export const useGetPendingExamFiles = () => {
+    const axiosPrivate = useAxiosPrivate();
+    return useQuery({
+        queryKey: ["pending-exam-files"],
+        queryFn: async () => {
+            const res = await axiosPrivate.get<{ data: ExamFileSubmissionRead[] }>("/exam-library/admin/exam-file-submissions/pending");
+            return res.data.data;
+        },
+    });
+};
+
+export const useValidateExamFile = () => {
+    const queryClient = useQueryClient();
+    const axiosPrivate = useAxiosPrivate();
+    return useMutation({
+        mutationFn: async (submissionId: string) => {
+            const res = await axiosPrivate.post<{ data: ExamFileSubmissionRead }>(`/exam-library/exam-file-submissions/${submissionId}/validate`);
+            return res.data.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["pending-exam-files"] });
+            queryClient.invalidateQueries({ queryKey: ["exam-library"] });
+            toast.success("Fichier épreuve validé et publié");
+        },
+        onError: (error) => {
+            toast.error("Erreur lors de la validation", { description: err(error) });
+        },
+    });
+};
+
+export const useRejectExamFile = () => {
+    const queryClient = useQueryClient();
+    const axiosPrivate = useAxiosPrivate();
+    return useMutation({
+        mutationFn: async ({ submissionId, admin_note }: { submissionId: string; admin_note: string }) => {
+            const res = await axiosPrivate.post<{ data: ExamFileSubmissionRead }>(`/exam-library/exam-file-submissions/${submissionId}/reject`, { admin_note });
+            return res.data.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["pending-exam-files"] });
+            toast.success("Fichier épreuve refusé");
+        },
+        onError: (error) => {
+            toast.error("Erreur lors du refus", { description: err(error) });
+        },
+    });
+};
+
+export const useGetSimilarExams = (examId: string | null) => {
+    const axiosPrivate = useAxiosPrivate();
+    return useQuery({
+        queryKey: ["similar-exams", examId],
+        queryFn: async () => {
+            const res = await axiosPrivate.get<{ data: ExamItem[] }>(`/exam-library/${examId}/similar`);
+            return res.data.data;
+        },
+        enabled: !!examId,
+    });
+};
 
 export const useGetPendingExams = () => {
     const axiosPrivate = useAxiosPrivate();

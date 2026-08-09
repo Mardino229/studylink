@@ -1,7 +1,7 @@
 {
   "library": {
     "page_title": "Bibliothèque d'épreuves",
-    "submit_btn": "Soumettre une épreuve",
+    "submit_btn": "Soumettre",
     "submit_short": "Soumettre",
     "contribute_desc": "Contribuez en soumettant vos épreuves et gagnez des coins !",
     "empty": "Aucune épreuve trouvée",
@@ -28,16 +28,33 @@
       "winter": "Hiver",
       "spring_summer": "Printemps/Été",
       "all_types": "Tous les types",
-      "intra": "Intra",
+      "mi_session": "Mi-session",
       "final": "Final",
       "quiz": "Quiz",
-      "other": "Autre",
+      "devoir": "Devoir",
+      "pratique": "Pratique",
+      "dgd": "DGD",
+      "autre": "Autre",
+      "type_number_placeholder": "N° (ex: 1)",
+      "section_placeholder": "Section (ex: A)",
       "search": "Rechercher"
     }
   },
   "card": {
     "pro_badge": "Pro",
-    "already_bought": "Déjà acheté"
+    "already_bought": "Déjà acheté",
+    "exam_label": "Épreuve",
+    "solution_label": "Corrigé",
+    "exam_missing_label": "Manquante",
+    "exam_missing_tooltip": "Fichier épreuve pas encore disponible",
+    "no_solution": "Aucun corrigé disponible",
+    "exam_free": "Voir l'épreuve",
+    "exam_paid": "Voir l'épreuve (🪙 1 jeton)",
+    "solution_free": "Voir le corrigé (gratuit)",
+    "solution_pro": "Voir le corrigé (inclus Pro)",
+    "solution_bought": "Voir le corrigé (déjà acheté)",
+    "solution_paid": "Voir le corrigé (🪙 2 jetons)",
+    "solution_insufficient": "Solde insuffisant — 2 jetons requis"
   },
   "solution": {
     "page_title": "Consulter le corrigé",
@@ -52,6 +69,8 @@
     "back_to_library": "Retour à la bibliothèque",
     "unavailable_title": "Corrigé indisponible",
     "unavailable_desc": "Aucun corrigé n'a encore été uploadé pour cette épreuve.",
+    "exam_unavailable_title": "Épreuve indisponible",
+    "exam_unavailable_desc": "Le fichier épreuve n'a pas encore été mis en ligne. Vous pouvez le proposer depuis vos soumissions.",
     "error_title": "Une erreur est survenue",
     "error_desc": "Impossible de charger le corrigé. Réessayez plus tard."
   },
@@ -107,6 +126,14 @@
     "delete_exam_msg": "Cette épreuve sera retirée définitivement. Cette action est irréversible.",
     "delete_sol_msg": "Ce corrigé sera retiré définitivement. Cette action est irréversible.",
     "delete_btn": "Supprimer",
-    "cancel_btn": "Annuler"
+    "cancel_btn": "Annuler",
+    "tab_exam_files": "Fichiers épreuve",
+    "empty_exam_files": "Vous n'avez pas encore soumis de fichier épreuve.",
+    "exam_file_for": "Fichier épreuve pour",
+    "submit_exam_file": "Proposer l'épreuve",
+    "resubmit_exam_file": "Re-soumettre le fichier épreuve",
+    "no_exam_banner": "Ces corrigés n'ont pas encore de fichier épreuve associé. Soumettez-le pour gagner <str>0,5 coin</str> si validé.",
+    "delete_exam_file_msg": "Ce fichier épreuve sera retiré définitivement. Cette action est irréversible.",
+    "contribute_missing_exam_empty": "Tous les corrigés ont déjà un fichier épreuve — revenez plus tard !"
   }
 }

@@ -1,8 +1,8 @@
 {
   "library": {
     "page_title": "Exam library",
-    "submit_btn": "Submit an exam",
-    "submit_short": "Submit",
+    "submit_btn": "Submit",
+    "submit_short": "Submit", 
     "contribute_desc": "Contribute by submitting your exams and earn coins!",
     "empty": "No exams found",
     "empty_desc": "Adjust your filters or check back later.",
@@ -28,16 +28,33 @@
       "winter": "Winter",
       "spring_summer": "Spring/Summer",
       "all_types": "All types",
-      "intra": "Midterm",
+      "mi_session": "Midterm",
       "final": "Final",
       "quiz": "Quiz",
-      "other": "Other",
+      "devoir": "Assignment",
+      "pratique": "Practice",
+      "dgd": "DGD",
+      "autre": "Other",
+      "type_number_placeholder": "No. (e.g. 1)",
+      "section_placeholder": "Section (e.g. A)",
       "search": "Search"
     }
   },
   "card": {
     "pro_badge": "Pro",
-    "already_bought": "Already purchased"
+    "already_bought": "Already purchased",
+    "exam_label": "Exam",
+    "solution_label": "Solution",
+    "exam_missing_label": "Missing",
+    "exam_missing_tooltip": "Exam file not yet available",
+    "no_solution": "No solution available",
+    "exam_free": "View exam",
+    "exam_paid": "View exam (🪙 1 token)",
+    "solution_free": "View solution (free)",
+    "solution_pro": "View solution (Pro included)",
+    "solution_bought": "View solution (already purchased)",
+    "solution_paid": "View solution (🪙 2 tokens)",
+    "solution_insufficient": "Insufficient balance — 2 tokens required"
   },
   "solution": {
     "page_title": "View solution",
@@ -52,6 +69,8 @@
     "back_to_library": "Back to library",
     "unavailable_title": "Solution unavailable",
     "unavailable_desc": "No solution has been uploaded for this exam yet.",
+    "exam_unavailable_title": "Exam unavailable",
+    "exam_unavailable_desc": "The exam file hasn't been uploaded yet. You can propose it from your submissions.",
     "error_title": "An error occurred",
     "error_desc": "Unable to load the solution. Try again later."
   },
@@ -107,6 +126,14 @@
     "delete_exam_msg": "This exam will be permanently removed. This action is irreversible.",
     "delete_sol_msg": "This solution will be permanently removed. This action is irreversible.",
     "delete_btn": "Delete",
-    "cancel_btn": "Cancel"
+    "cancel_btn": "Cancel",
+    "tab_exam_files": "Exam files",
+    "empty_exam_files": "You haven't submitted any exam file yet.",
+    "exam_file_for": "Exam file for",
+    "submit_exam_file": "Submit exam file",
+    "resubmit_exam_file": "Resubmit exam file",
+    "no_exam_banner": "These solutions don't have an exam file yet. Submit it to earn <str>0.5 coin</str> if validated.",
+    "delete_exam_file_msg": "This exam file submission will be permanently removed. This action is irreversible.",
+    "contribute_missing_exam_empty": "All solutions already have an exam file — check back later!"
   }
 }

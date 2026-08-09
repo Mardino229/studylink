@@ -1,16 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Plus, Zap } from 'lucide-react';
+import { FileText, Zap } from 'lucide-react';
 import { useTranslation, Trans } from 'react-i18next';
 import PageMeta from '../../components/common/PageMeta';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
-import { useGetCourses, useGetExams } from '../../utils/exam';
+import { useGetExams } from '../../utils/exam';
 import { useBilling } from '../../context/BillingContext';
 import type { ExamItem, ExamSession, ExamType } from '../../types/exams';
 import { Modal } from '../../components/ui/modal/index.tsx';
 import ExamCard from './exam-library/ExamCard';
 import ExamFiltersPanel from './exam-library/ExamFiltersPanel';
-import SubmitExamModal from './exam-library/SubmitExamModal';
 
 export default function ExamLibrary() {
     const { t } = useTranslation('exams');
@@ -21,33 +20,37 @@ export default function ExamLibrary() {
     const [academicYear, setAcademicYear] = useState('');
     const [session, setSession] = useState<ExamSession | ''>('');
     const [examType, setExamType] = useState<ExamType | ''>('');
+    const [typeNumber, setTypeNumber] = useState('');
+    const [section, setSection] = useState('');
     const [appliedFilters, setAppliedFilters] = useState<{
         courseId: string; academicYear: string;
         session: ExamSession | ''; examType: ExamType | '';
-    }>({ courseId: '', academicYear: '', session: '', examType: '' });
+        typeNumber: string; section: string;
+    }>({ courseId: '', academicYear: '', session: '', examType: '', typeNumber: '', section: '' });
 
     const [confirmViewExam, setConfirmViewExam] = useState<ExamItem | null>(null);
     const [confirmExam, setConfirmExam] = useState<ExamItem | null>(null);
-    const [submitOpen, setSubmitOpen] = useState(false);
 
-    const { data: courses = [] } = useGetCourses();
     const { data: exams = [], isLoading } = useGetExams({
         submission_status: 'validated',
         course_id: appliedFilters.courseId || undefined,
         academic_year: appliedFilters.academicYear ? Number(appliedFilters.academicYear) : undefined,
         session: (appliedFilters.session || undefined) as ExamSession | undefined,
         exam_type: (appliedFilters.examType || undefined) as ExamType | undefined,
+        type_number: appliedFilters.typeNumber ? Number(appliedFilters.typeNumber) : undefined,
+        section: appliedFilters.section || undefined,
         limit: 100,
     });
 
-    const handleSearch = () => setAppliedFilters({ courseId, academicYear, session, examType });
+    const handleSearch = () => setAppliedFilters({ courseId, academicYear, session, examType, typeNumber, section });
     const handleReset = () => {
-        setCourseId(''); setAcademicYear(''); setSession(''); setExamType('');
-        setAppliedFilters({ courseId: '', academicYear: '', session: '', examType: '' });
+        setCourseId(''); setAcademicYear(''); setSession(''); setExamType(''); setTypeNumber(''); setSection('');
+        setAppliedFilters({ courseId: '', academicYear: '', session: '', examType: '', typeNumber: '', section: '' });
     };
-    const hasActiveFilters = !!(appliedFilters.courseId || appliedFilters.academicYear || appliedFilters.session || appliedFilters.examType);
+    const hasActiveFilters = !!(appliedFilters.courseId || appliedFilters.academicYear || appliedFilters.session || appliedFilters.examType || appliedFilters.typeNumber || appliedFilters.section);
 
     const viewExam = (exam: ExamItem) => {
+        if (!exam.exam_file_url) return;
         const params = new URLSearchParams({ title: exam.name, endpoint: `/exam-library/${exam.id}/download`, cost: '1' });
         if (exam.has_exam_access) navigate(`/exam-library/solution/${exam.id}?${params}`);
         else setConfirmViewExam(exam);
@@ -67,29 +70,16 @@ export default function ExamLibrary() {
             <PageBreadcrumb pageTitle={t('library.page_title')} />
 
             <div className="space-y-5 pt-4">
-                <div className="flex items-center justify-between">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {t('library.contribute_desc')}
-                    </p>
-                    <button
-                        onClick={() => setSubmitOpen(true)}
-                        className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
-                    >
-                        <Plus size={15} />
-                        <span className="sm:hidden">{t('library.submit_short')}</span>
-                        <span className="hidden sm:inline">{t('library.submit_btn')}</span>
-                    </button>
-                </div>
-
                 <ExamFiltersPanel
                     courseId={courseId} setCourseId={setCourseId}
                     academicYear={academicYear} setAcademicYear={setAcademicYear}
                     session={session} setSession={setSession}
                     examType={examType} setExamType={setExamType}
+                    typeNumber={typeNumber} setTypeNumber={setTypeNumber}
+                    section={section} setSection={setSection}
                     hasActiveFilters={hasActiveFilters}
                     onSearch={handleSearch}
                     onReset={handleReset}
-                    courses={courses}
                 />
 
                 {!isLoading && (
@@ -221,7 +211,6 @@ export default function ExamLibrary() {
                 )}
             </Modal>
 
-            <SubmitExamModal isOpen={submitOpen} onClose={() => setSubmitOpen(false)} courses={courses} />
         </>
     );
 }

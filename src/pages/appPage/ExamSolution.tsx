@@ -30,7 +30,8 @@ export default function ExamSolution() {
     const queryClient = useQueryClient();
 
     const [status, setStatus] = useState<Status>('loading');
-    const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+    const [fileUrl, setFileUrl] = useState<string | null>(null);
+    const [isImage, setIsImage] = useState(false);
     const [upgradeOpen, setUpgradeOpen] = useState(false);
 
     const toolbarPluginInstance = toolbarPlugin();
@@ -52,17 +53,20 @@ export default function ExamSolution() {
         if (!examId && !endpoint) return;
         let revoked = false;
         setStatus('loading');
-        setPdfUrl(null);
+        setFileUrl(null);
+        setIsImage(false);
 
         const fetchUrl = endpoint || `/exam-library/${examId}/solution`;
 
-        const fetchPdf = async () => {
+        const fetchFile = async () => {
             try {
                 const response = await axiosPrivate.get(fetchUrl, { responseType: 'blob' });
-                const blob = new Blob([response.data], { type: 'application/pdf' });
+                const contentType: string = response.headers['content-type'] || 'application/pdf';
+                const blob = new Blob([response.data], { type: contentType });
                 const url = URL.createObjectURL(blob);
                 if (!revoked) {
-                    setPdfUrl(url);
+                    setFileUrl(url);
+                    setIsImage(contentType.startsWith('image/'));
                     setStatus('success');
                     if (!endpoint && examId) {
                         queryClient.invalidateQueries({ queryKey: ['token-balance'] });
@@ -79,11 +83,11 @@ export default function ExamSolution() {
             }
         };
 
-        fetchPdf();
+        fetchFile();
 
         return () => {
             revoked = true;
-            if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+            if (fileUrl) URL.revokeObjectURL(fileUrl);
         };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [examId, endpoint]);
@@ -115,22 +119,32 @@ export default function ExamSolution() {
                     </div>
                 )}
 
-                {/* PDF viewer */}
-                {status === 'success' && pdfUrl && (
-                    <Worker workerUrl={WORKER_URL}>
-                        <div className="flex h-full flex-col">
-                            <div className="border-b border-gray-200 bg-white px-2 py-1 dark:border-white/10 dark:bg-gray-800">
-                                <Toolbar>{renderDefaultToolbar(transform)}</Toolbar>
-                            </div>
-                            <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-700">
-                                <Viewer
-                                    fileUrl={pdfUrl}
-                                    plugins={[toolbarPluginInstance]}
-                                    defaultScale={SpecialZoomLevel.PageWidth}
-                                />
-                            </div>
+                {/* File viewer */}
+                {status === 'success' && fileUrl && (
+                    isImage ? (
+                        <div className="flex flex-1 items-center justify-center overflow-auto bg-gray-50 p-4 dark:bg-gray-800">
+                            <img
+                                src={fileUrl}
+                                alt={title}
+                                className="max-h-full max-w-full rounded-lg object-contain shadow-md"
+                            />
                         </div>
-                    </Worker>
+                    ) : (
+                        <Worker workerUrl={WORKER_URL}>
+                            <div className="flex h-full flex-col">
+                                <div className="border-b border-gray-200 bg-white px-2 py-1 dark:border-white/10 dark:bg-gray-800">
+                                    <Toolbar>{renderDefaultToolbar(transform)}</Toolbar>
+                                </div>
+                                <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-700">
+                                    <Viewer
+                                        fileUrl={fileUrl}
+                                        plugins={[toolbarPluginInstance]}
+                                        defaultScale={SpecialZoomLevel.PageWidth}
+                                    />
+                                </div>
+                            </div>
+                        </Worker>
+                    )
                 )}
 
                 {/* 402   Insufficient tokens */}
@@ -172,16 +186,18 @@ export default function ExamSolution() {
                 )}
                 
 
-                {/* 404   No solution uploaded */}
+                {/* 404 — file not found (exam download vs solution) */}
                 {status === 'error404' && (
                     <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
                         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800">
                             <Lock size={28} className="text-gray-400 dark:text-gray-500" />
                         </div>
                         <div>
-                            <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('solution.unavailable_title')}</h2>
+                            <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+                                {endpoint ? t('solution.exam_unavailable_title') : t('solution.unavailable_title')}
+                            </h2>
                             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                {t('solution.unavailable_desc')}
+                                {endpoint ? t('solution.exam_unavailable_desc') : t('solution.unavailable_desc')}
                             </p>
                         </div>
                         <button

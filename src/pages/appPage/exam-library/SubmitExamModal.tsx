@@ -3,21 +3,24 @@ import { Upload } from 'lucide-react';
 import { Modal } from '../../../components/ui/modal/index.tsx';
 import CourseCombobox from '../../../components/ui/CourseCombobox';
 import { useUploadExam } from '../../../utils/exam';
-import type { Course, ExamSession, ExamType } from '../../../types/exams';
+import type { ExamSession, ExamType } from '../../../types/exams';
 
 const inputCls = "h-10 w-full rounded-xl border border-gray-200 bg-white px-3 text-sm text-gray-800 outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white";
 const selectCls = "h-10 w-full rounded-xl border border-gray-200 bg-white px-3 text-sm text-gray-800 outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white";
 const fileCls = "w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-gray-100 file:px-3 file:py-1 file:text-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white";
 
 const EMPTY_FORM = {
-    name: '', course_id: '', academic_year: '',
-    session: '' as ExamSession | '', exam_type: '' as ExamType | '', is_solution_paid: true,
+    course_id: '', academic_year: '',
+    session: '' as ExamSession | '', exam_type: '' as ExamType | '',
+    type_number: '', section: '', is_solution_paid: true,
 };
 
-export default function SubmitExamModal({ isOpen, onClose, courses }: {
+const needsTypeNumber = (exam_type: ExamType | '') =>
+    !!exam_type && exam_type !== 'Final';
+
+export default function SubmitExamModal({ isOpen, onClose }: {
     isOpen: boolean;
     onClose: () => void;
-    courses: Course[];
 }) {
     const uploadExam = useUploadExam();
     const [form, setForm] = useState(EMPTY_FORM);
@@ -26,17 +29,23 @@ export default function SubmitExamModal({ isOpen, onClose, courses }: {
 
     const reset = () => { setForm(EMPTY_FORM); setExamFile(null); setSolutionFile(null); };
 
+    const isDisabled =
+        (!examFile && !solutionFile) ||
+        (needsTypeNumber(form.exam_type) && !form.type_number) ||
+        uploadExam.isPending;
+
     const handleSubmit = () => {
-        if (!form.name.trim() || !examFile) return;
+        if (isDisabled) return;
         uploadExam.mutate(
             {
-                name: form.name.trim(),
-                exam_file: examFile,
+                exam_file: examFile ?? undefined,
                 solution_file: solutionFile ?? undefined,
                 course_id: form.course_id || undefined,
                 academic_year: form.academic_year ? Number(form.academic_year) : undefined,
                 session: (form.session || undefined) as ExamSession | undefined,
                 exam_type: (form.exam_type || undefined) as ExamType | undefined,
+                type_number: form.type_number ? Number(form.type_number) : undefined,
+                section: form.section.trim() || undefined,
                 is_solution_paid: form.is_solution_paid,
             },
             { onSuccess: () => { onClose(); reset(); } }
@@ -50,23 +59,16 @@ export default function SubmitExamModal({ isOpen, onClose, courses }: {
                     <Upload size={18} className="text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                    <h3 className="text-base font-semibold text-gray-900 dark:text-white">Soumettre une épreuve</h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Elle sera vérifiée avant publication   vous gagnerez 0,5 coin.</p>
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-white">Soumettre une épreuve ou un corrigé</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Chaque fichier validé vous rapporte 0,5 coin.</p>
                 </div>
             </div>
 
             <div className="space-y-3">
-                <input
-                    value={form.name}
-                    onChange={(e) => setForm(p => ({ ...p, name: e.target.value }))}
-                    placeholder="Nom de l'épreuve *"
-                    className={inputCls}
-                />
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <CourseCombobox
                         value={form.course_id}
                         onChange={(id) => setForm(p => ({ ...p, course_id: id }))}
-                        courses={courses}
                         placeholder="  Cours  "
                     />
                     <input
@@ -82,22 +84,41 @@ export default function SubmitExamModal({ isOpen, onClose, courses }: {
                         <option value="winter">Hiver</option>
                         <option value="summer">Printemps/Été</option>
                     </select>
-                    <select value={form.exam_type} onChange={(e) => setForm(p => ({ ...p, exam_type: e.target.value as ExamType | '' }))} className={selectCls}>
+                    <select value={form.exam_type} onChange={(e) => setForm(p => ({ ...p, exam_type: e.target.value as ExamType | '', type_number: '' }))} className={selectCls}>
                         <option value="">  Type  </option>
-                        <option value="midterm">Intra</option>
-                        <option value="final">Final</option>
-                        <option value="quiz">Quiz</option>
-                        <option value="other">Autre</option>
+                        <option value="Mi-session">Mi-session</option>
+                        <option value="Final">Final</option>
+                        <option value="Quiz">Quiz</option>
+                        <option value="Devoir">Devoir</option>
+                        <option value="Pratique">Pratique</option>
+                        <option value="DGD">DGD</option>
+                        <option value="Autre">Autre</option>
                     </select>
+                    {needsTypeNumber(form.exam_type) && (
+                        <input
+                            type="number"
+                            value={form.type_number}
+                            onChange={(e) => setForm(p => ({ ...p, type_number: e.target.value }))}
+                            placeholder={`N° de ${form.exam_type} *`}
+                            min={1} max={20}
+                            className={inputCls}
+                        />
+                    )}
+                    <input
+                        value={form.section}
+                        onChange={(e) => setForm(p => ({ ...p, section: e.target.value }))}
+                        placeholder="Section (ex: A) — optionnel"
+                        className={inputCls}
+                    />
                 </div>
 
                 <div>
-                    <label className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400">Fichier épreuve *</label>
-                    <input type="file" accept=".pdf,.docx,.pptx,.ppt" onChange={(e) => setExamFile(e.target.files?.[0] ?? null)} className={fileCls} />
+                    <label className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400">Fichier épreuve (optionnel si corrigé fourni)</label>
+                    <input type="file" accept=".pdf,image/*" onChange={(e) => setExamFile(e.target.files?.[0] ?? null)} className={fileCls} />
                 </div>
                 <div>
                     <label className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400">Corrigé (optionnel   +0,5 coin supplémentaire si validé)</label>
-                    <input type="file" accept=".pdf,.docx,.pptx,.ppt" onChange={(e) => setSolutionFile(e.target.files?.[0] ?? null)} className={fileCls} />
+                    <input type="file" accept=".pdf,image/*" onChange={(e) => setSolutionFile(e.target.files?.[0] ?? null)} className={fileCls} />
                 </div>
 
                 <div className="flex flex-col-reverse gap-2 pt-1 sm:flex-row sm:justify-end">
@@ -106,7 +127,7 @@ export default function SubmitExamModal({ isOpen, onClose, courses }: {
                     </button>
                     <button
                         onClick={handleSubmit}
-                        disabled={!form.name.trim() || !examFile || uploadExam.isPending}
+                        disabled={isDisabled}
                         className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
                     >
                         {uploadExam.isPending ? 'Envoi…' : 'Soumettre'}
