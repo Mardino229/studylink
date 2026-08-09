@@ -61,9 +61,11 @@ export default function PaymentSuccess() {
             } else {
                 // token_pack   look for a "purchase" transaction created after checkout
                 await refetchToken();
+                const toUTCMs = (s: string) =>
+                    new Date(/Z$|[+-]\d{2}:\d{2}$/.test(s) ? s : s + 'Z').getTime();
                 const tx = (tokenTransactions as TokenTransaction[] | undefined)?.find(
                     tx => tx.type === "purchase" && tx.amount > 0 &&
-                         new Date(tx.created_at).getTime() > checkoutTime - 5000
+                         toUTCMs(tx.created_at) > checkoutTime - 5000
                 );
                 if (tx) {
                     setConfirmedTx({ amount: tx.amount });
