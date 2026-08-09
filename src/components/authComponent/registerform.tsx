@@ -22,8 +22,7 @@ export default function RegisterForm() {
     const register = useRegister();
 
     const registerSchema = z.object({
-        email: z.email({ message: tErr('email.invalid') })
-            .refine((v) => v.endsWith("@uottawa.ca"), { message: tErr('email.uottawa') }),
+        email: z.email({ message: tErr('email.invalid') }),
         password: z.string()
             .min(8, { message: tErr('password.min') })
             .regex(/[A-Z]/, { message: tErr('password.uppercase') })
