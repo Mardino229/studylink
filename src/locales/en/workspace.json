@@ -88,7 +88,12 @@
     "no_theme": "No themes available.",
     "modal_generate": "Launch generation",
     "no_tokens": "No tokens",
-    "confirm_delete_btn": "Delete"
+    "confirm_delete_btn": "Delete",
+    "gen_custom_label": "Custom instructions",
+    "gen_custom_placeholder": "Any specifics about what you want? (optional)",
+    "gen_custom_hint": "For language or question count, use the settings above — this field is for content, tone, and focus.",
+    "modal_gen_failed": "Generation failed.",
+    "modal_gen_failed_tokens": "Try again — no tokens were charged."
   },
   "artefact": {
     "title": "Create study tools",

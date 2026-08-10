@@ -105,9 +105,9 @@ export default function PaymentSuccess() {
                         <p className="text-gray-500 dark:text-gray-400">
                             {isSubscription ? t('payment_success.sub_loading') : t('payment_success.credits_loading')}
                         </p>
-                        <p className="text-xs text-gray-400">
+                        {/*<p className="text-xs text-gray-400">
                             {t('payment_success.attempt', { current: attempts + 1, total: MAX_ATTEMPTS })}
-                        </p>
+                        </p>*/}
                     </div>
                 )}
 

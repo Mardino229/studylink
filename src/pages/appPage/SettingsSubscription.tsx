@@ -99,7 +99,7 @@ export default function SettingsSubscription() {
       <section className="space-y-6 pt-6">
 
         {/* ── Current subscription status ── */}
-        <div className="border border-gray-200 bg-white p-6 dark:border-white/[0.05] dark:bg-white/[0.03] lg:shadow-sm">
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-white/[0.05] dark:bg-white/[0.03]">
           <h2 className="text-xl font-bold text-gray-800 dark:text-white/90">{t('settings_subscription.status')}</h2>
 
           {isLoadingSub ? (
@@ -146,6 +146,13 @@ export default function SettingsSubscription() {
                   {isCancelScheduled ? t('settings_subscription.scheduled_cancel') : t('settings_subscription.active')}
                 </span>
               </div>
+
+              {/* Auto-renew notice */}
+              {!isCancelScheduled && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  {t('settings_subscription.auto_renew_notice')}
+                </p>
+              )}
 
               {/* Pending downgrade banner */}
               {pendingPlan && !isCancelScheduled && (

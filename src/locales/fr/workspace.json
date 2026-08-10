@@ -88,7 +88,12 @@
     "no_theme": "Aucun thème disponible.",
     "modal_generate": "Lancer la génération",
     "no_tokens": "Aucun jeton",
-    "confirm_delete_btn": "Supprimer"
+    "confirm_delete_btn": "Supprimer",
+    "gen_custom_label": "Instructions personnalisées",
+    "gen_custom_placeholder": "Des précisions sur ce que tu veux ? (optionnel)",
+    "gen_custom_hint": "Pour la langue ou le nombre de questions, utilise les réglages ci-dessus — ce champ sert au contenu, au ton et au focus.",
+    "modal_gen_failed": "La génération a échoué.",
+    "modal_gen_failed_tokens": "Réessaie — aucun jeton n'a été débité."
   },
   "artefact": {
     "title": "Créer des Outils de révision",

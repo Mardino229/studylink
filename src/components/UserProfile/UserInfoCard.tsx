@@ -20,7 +20,7 @@ import type { UpdateProfileRequest } from "../../utils/type.ts";
 import Button from "../ui/button/Button.tsx";
 import { useTranslation } from "react-i18next";
 
-type UpdateProfileFormData = UpdateProfileRequest & {
+type UpdateProfileFormData = Omit<UpdateProfileRequest, 'email'> & {
   program_name?: string;
 };
 
@@ -38,8 +38,6 @@ export default function UserInfoCard() {
   const updateProfileSchema = z.object({
     first_name: z.string().min(2, t('user_profile.first_name_min')),
     last_name: z.string().min(2, t('user_profile.last_name_min')),
-    email: z.email(tErr('email.invalid')).nonempty(tErr('email.required'))
-        .refine((v) => v.endsWith("@uottawa.ca"), { message: tErr('email.uottawa') }),
     study_level_id: z.string().min(1, t('user_profile.study_level_min')),
     faculty_id: z.string().optional(),
     program_id: z.string().optional(),
@@ -70,7 +68,6 @@ export default function UserInfoCard() {
     defaultValues: {
       first_name: "",
       last_name: "",
-      email: "",
       study_level_id: "",
       faculty_id: "",
       program_id: "",
@@ -84,7 +81,6 @@ export default function UserInfoCard() {
       form.reset({
         first_name: user.first_name || "",
         last_name: user.last_name || "",
-        email: user.email || "",
         study_level_id: user.study_level_id ? String(user.study_level_id) : "",
         faculty_id: user.faculty_id ? String(user.faculty_id) : "",
         program_id: user.program_id ? String(user.program_id) : "",
@@ -141,7 +137,7 @@ export default function UserInfoCard() {
     const payload: UpdateProfileRequest = {
       first_name: data.first_name,
       last_name: data.last_name,
-      email: data.email,
+      email: user?.email ?? "",
       study_level_id: data.study_level_id,
       faculty_id: isGraduate || useOtherProgram || data.program_id === OTHER_VALUE ? undefined : data.faculty_id,
       program_id: isGraduate || useOtherProgram || data.program_id === OTHER_VALUE ? undefined : data.program_id,
@@ -234,17 +230,6 @@ export default function UserInfoCard() {
                         <FormControl>
                           <input {...field} className="block w-full border-0 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:ring-2 focus:ring-inset focus:ring-[var(--primary-color)] sm:text-sm sm:leading-6 appearance-none rounded-md px-2.5 py-2.5 placeholder-gray-400 focus:border-[var(--primary-color)] focus:outline-none dark:bg-gray-800"
                             placeholder={t('user_profile.last_name_placeholder')} />
-                        </FormControl>
-                        <FormMessage/>
-                      </FormItem>
-                    )}/>
-
-                    <FormField name="email" control={form.control} render={({field}) => (
-                      <FormItem className="col-span-2 lg:col-span-1">
-                        <FormLabel>{t('user_profile.email')}</FormLabel>
-                        <FormControl>
-                          <input {...field} type="email" className="block w-full border-0 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:ring-2 focus:ring-inset focus:ring-[var(--primary-color)] sm:text-sm sm:leading-6 appearance-none rounded-md px-2.5 py-2.5 placeholder-gray-400 focus:border-[var(--primary-color)] focus:outline-none dark:bg-gray-800"
-                            placeholder={t('user_profile.email_placeholder')} />
                         </FormControl>
                         <FormMessage/>
                       </FormItem>

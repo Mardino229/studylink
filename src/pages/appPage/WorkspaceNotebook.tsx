@@ -54,6 +54,8 @@ const WorkspaceNotebook: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'overview' | 'sources' | 'summaries' | 'flashcards' | 'quizzes' | 'podcasts' | 'chat'>('overview');
     const [generationModal, setGenerationModal] = useState<'summary' | 'flashcards' | 'quiz' | 'podcast' | null>(null);
     const [generationTitle, setGenerationTitle] = useState('');
+    const [customInstructions, setCustomInstructions] = useState('');
+    const [generationFailed, setGenerationFailed] = useState(false);
     const [flashcardCount, setFlashcardCount] = useState(10);
     const [quizCount, setQuizCount] = useState(5);
     const [summaryTarget, setSummaryTarget] = useState<{ sourceIds: string[]; themeIds: string[] }>({ sourceIds: [], themeIds: [] });
@@ -115,9 +117,13 @@ const WorkspaceNotebook: React.FC = () => {
 
     console.log(isPro, isUltra, tokenBalance, canGenerate, generationModal);
 
-    const handle402 = (error: unknown) => {
+    const handleGenerationError = (error: unknown) => {
         const status = (error as { response?: { status?: number } })?.response?.status;
-        if (status === 402) setUpgradeModalOpen(true);
+        if (status === 402) {
+            setUpgradeModalOpen(true);
+        } else {
+            setGenerationFailed(true);
+        }
     };
 
     if (!notebookId) return <div>{t('notebook.not_found')}</div>;
@@ -401,7 +407,7 @@ const WorkspaceNotebook: React.FC = () => {
 
             <Modal
                 isOpen={generationModal !== null}
-                onClose={() => { if (!isCurrentlyGenerating) { setGenerationModal(null); setGenerationTitle(''); } }}
+                onClose={() => { if (!isCurrentlyGenerating) { setGenerationModal(null); setGenerationTitle(''); setCustomInstructions(''); setGenerationFailed(false); } }}
                 className="max-w-3xl p-4 sm:p-6 max-h-[92dvh] overflow-y-auto"
             >
                 <div className="mb-5">
@@ -492,6 +498,27 @@ const WorkspaceNotebook: React.FC = () => {
                             )}
                         </div>
 
+                        <div className="mb-5">
+                            <div className="flex items-center justify-between mb-2">
+                                <label className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                    {t('notebook.gen_custom_label')}
+                                </label>
+                                <span className={`text-xs ${customInstructions.length > 950 ? 'text-red-500' : 'text-gray-400 dark:text-gray-500'}`}>
+                                    {customInstructions.length}/1000
+                                </span>
+                            </div>
+                            <textarea
+                                value={customInstructions}
+                                onChange={(e) => { setCustomInstructions(e.target.value.slice(0, 1000)); setGenerationFailed(false); }}
+                                placeholder={t('notebook.gen_custom_placeholder')}
+                                rows={3}
+                                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition resize-none focus:border-blue-500 dark:border-gray-800 dark:bg-gray-900 dark:text-white"
+                            />
+                            <p className="mt-1.5 text-xs text-gray-400 dark:text-gray-500">
+                                {t('notebook.gen_custom_hint')}
+                            </p>
+                        </div>
+
                         <div className="grid gap-4 lg:grid-cols-2">
                             <div>
                                 <p className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-200">{t('notebook.gen_sources_label')}</p>
@@ -538,12 +565,23 @@ const WorkspaceNotebook: React.FC = () => {
                             </div>
                         </div>
 
+                        {generationFailed && (
+                            <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 dark:border-red-900/40 dark:bg-red-950/20">
+                                <p className="text-sm font-semibold text-red-700 dark:text-red-300">{t('notebook.modal_gen_failed')}</p>
+                                {(generationModal === 'flashcards' || generationModal === 'quiz') && (
+                                    <p className="mt-0.5 text-xs text-red-500 dark:text-red-400">{t('notebook.modal_gen_failed_tokens')}</p>
+                                )}
+                            </div>
+                        )}
+
                         <div className="mt-6 flex justify-end gap-2">
                             <button
                                 type="button"
                                 onClick={() => {
                                     setGenerationModal(null);
                                     setGenerationTitle('');
+                                    setCustomInstructions('');
+                                    setGenerationFailed(false);
                                 }}
                                 className="rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-white/5"
                             >
@@ -557,21 +595,25 @@ const WorkspaceNotebook: React.FC = () => {
                                         return;
                                     }
                                     if (!generationTitle.trim()) return;
+                                    setGenerationFailed(false);
+                                    const ci = customInstructions.trim() || undefined;
                                     const closeOnSuccess = () => {
                                         setGenerationModal(null);
                                         setGenerationTitle('');
+                                        setCustomInstructions('');
+                                        setGenerationFailed(false);
                                     };
                                     if (generationModal === 'summary') {
-                                        createSummary.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, sourceIds: summaryTarget.sourceIds, themeIds: summaryTarget.themeIds }, { onSuccess: closeOnSuccess, onError: handle402 });
+                                        createSummary.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, sourceIds: summaryTarget.sourceIds, themeIds: summaryTarget.themeIds, customInstructions: ci }, { onSuccess: closeOnSuccess, onError: handleGenerationError });
                                     }
                                     if (generationModal === 'flashcards') {
-                                        createFlashcards.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, count: flashcardCount, sourceIds: flashcardTarget.sourceIds, themeIds: flashcardTarget.themeIds }, { onSuccess: closeOnSuccess, onError: handle402 });
+                                        createFlashcards.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, count: flashcardCount, sourceIds: flashcardTarget.sourceIds, themeIds: flashcardTarget.themeIds, customInstructions: ci }, { onSuccess: closeOnSuccess, onError: handleGenerationError });
                                     }
                                     if (generationModal === 'quiz') {
-                                        createQuiz.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, count: quizCount, sourceIds: quizTarget.sourceIds, themeIds: quizTarget.themeIds }, { onSuccess: closeOnSuccess, onError: handle402 });
+                                        createQuiz.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, count: quizCount, sourceIds: quizTarget.sourceIds, themeIds: quizTarget.themeIds, customInstructions: ci }, { onSuccess: closeOnSuccess, onError: handleGenerationError });
                                     }
                                     if (generationModal === 'podcast') {
-                                        createPodcast.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, sourceIds: podcastTarget.sourceIds, themeIds: podcastTarget.themeIds }, { onSuccess: closeOnSuccess, onError: handle402 });
+                                        createPodcast.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, sourceIds: podcastTarget.sourceIds, themeIds: podcastTarget.themeIds, customInstructions: ci }, { onSuccess: closeOnSuccess, onError: handleGenerationError });
                                     }
                                 }}
                                 disabled={!generationTitle.trim() && canGenerate}

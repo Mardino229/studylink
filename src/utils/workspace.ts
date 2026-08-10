@@ -423,12 +423,13 @@ export const useGenerateSummary = () => {
     const axiosPrivate = useAxiosPrivate();
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ notebookId, title, language, sourceIds, themeIds }: { notebookId: string; title: string; language?: string; sourceIds?: string[]; themeIds?: string[] }) => {
+        mutationFn: async ({ notebookId, title, language, sourceIds, themeIds, customInstructions }: { notebookId: string; title: string; language?: string; sourceIds?: string[]; themeIds?: string[]; customInstructions?: string }) => {
             const response = await axiosPrivate.post<{ data: ArtefactSummary }>(`/notebooks/${notebookId}/artefacts/summaries`, {
                 title,
                 language,
                 source_ids: sourceIds,
                 theme_ids: themeIds,
+                custom_instructions: customInstructions || undefined,
             });
             return response.data.data;
         },
@@ -462,13 +463,14 @@ export const useGenerateFlashcards = () => {
     const axiosPrivate = useAxiosPrivate();
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ notebookId, title, language, count = 10, sourceIds, themeIds }: { notebookId: string; title: string; language?: string; count?: number; sourceIds?: string[]; themeIds?: string[] }) => {
+        mutationFn: async ({ notebookId, title, language, count = 10, sourceIds, themeIds, customInstructions }: { notebookId: string; title: string; language?: string; count?: number; sourceIds?: string[]; themeIds?: string[]; customInstructions?: string }) => {
             const params = new URLSearchParams({ count: count.toString() });
             const response = await axiosPrivate.post<{ data: ArtefactFlashcard }>(`/notebooks/${notebookId}/artefacts/flashcards?${params}`, {
                 title,
                 language,
                 source_ids: sourceIds,
                 theme_ids: themeIds,
+                custom_instructions: customInstructions || undefined,
             });
             return response.data.data;
         },
@@ -502,13 +504,14 @@ export const useGenerateQuiz = () => {
     const axiosPrivate = useAxiosPrivate();
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ notebookId, title, language, count = 5, sourceIds, themeIds }: { notebookId: string; title: string; language?: string; count?: number; sourceIds?: string[]; themeIds?: string[] }) => {
+        mutationFn: async ({ notebookId, title, language, count = 5, sourceIds, themeIds, customInstructions }: { notebookId: string; title: string; language?: string; count?: number; sourceIds?: string[]; themeIds?: string[]; customInstructions?: string }) => {
             const params = new URLSearchParams({ count: count.toString() });
             const response = await axiosPrivate.post<{ data: ArtefactQuiz }>(`/notebooks/${notebookId}/artefacts/quizzes?${params}`, {
                 title,
                 language,
                 source_ids: sourceIds,
                 theme_ids: themeIds,
+                custom_instructions: customInstructions || undefined,
             });
             return response.data.data;
         },
@@ -554,12 +557,13 @@ export const useGeneratePodcast = () => {
     const axiosPrivate = useAxiosPrivate();
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ notebookId, title, language, sourceIds, themeIds }: { notebookId: string; title: string; language?: string; sourceIds?: string[]; themeIds?: string[] }) => {
+        mutationFn: async ({ notebookId, title, language, sourceIds, themeIds, customInstructions }: { notebookId: string; title: string; language?: string; sourceIds?: string[]; themeIds?: string[]; customInstructions?: string }) => {
             const response = await axiosPrivate.post<{ data: ArtefactPodcast }>(`/notebooks/${notebookId}/artefacts/podcasts`, {
                 title,
                 language,
                 source_ids: sourceIds,
                 theme_ids: themeIds,
+                custom_instructions: customInstructions || undefined,
             });
             return response.data.data;
         },

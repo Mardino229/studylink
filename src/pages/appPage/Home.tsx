@@ -73,14 +73,6 @@ export default function Home() {
             color: "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400",
             href: "/workspaces",
         },
-        {
-            value: String(chatCount),
-            label: t('home.stat_chats'),
-            sub: t('home.stat_chats_desc'),
-            icon: MessageSquare,
-            color: "bg-cyan-50 text-cyan-600 dark:bg-cyan-500/10 dark:text-cyan-400",
-            href: "/chat",
-        },
     ];
 
     const QUICK_ACTIONS = [
@@ -186,7 +178,7 @@ export default function Home() {
                     variants={container}
                     initial="hidden"
                     animate="show"
-                    className="grid grid-cols-2 gap-4 lg:grid-cols-4"
+                    className="grid grid-cols-2 gap-4 lg:grid-cols-3"
                 >
                     {KPI_CARDS.map(({ value, label, sub, icon: Icon, color, href }) => (
                         <motion.div key={label}>

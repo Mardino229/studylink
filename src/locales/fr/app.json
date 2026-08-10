@@ -109,7 +109,8 @@
     "per_month": "CAD/mois",
     "per_year": "CAD/an",
     "downgrade_desc": "Votre plan passera à {{name}} le {{date}}. Vous conservez tous vos avantages actuels jusqu'à cette date.",
-    "cancel_desc": "Votre abonnement se termine le {{date}}. Vous gardez l'accès jusqu'à cette date."
+    "cancel_desc": "Votre abonnement se termine le {{date}}. Vous gardez l'accès jusqu'à cette date.",
+    "auto_renew_notice": "Cet abonnement se renouvelle automatiquement si vous ne l'annulez pas avant la fin de la période."
   },
   "settings_feedback": {
     "page_title": "Paramètres • Feedback",

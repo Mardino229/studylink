@@ -113,13 +113,17 @@ export default function SubmitExamModal({ isOpen, onClose }: {
                 </div>
 
                 <div>
-                    <label className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400">Fichier épreuve (optionnel si corrigé fourni)</label>
+                    <label className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400">Fichier épreuve </label>
                     <input type="file" accept=".pdf,image/*" onChange={(e) => setExamFile(e.target.files?.[0] ?? null)} className={fileCls} />
                 </div>
                 <div>
-                    <label className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400">Corrigé (optionnel   +0,5 coin supplémentaire si validé)</label>
+                    <label className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400">Corrigé (+0,5 coin supplémentaire si validé)</label>
                     <input type="file" accept=".pdf,image/*" onChange={(e) => setSolutionFile(e.target.files?.[0] ?? null)} className={fileCls} />
                 </div>
+
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Vous devez soumettre une épreuve ou un corrigé, ou les deux à la fois.
+                </p>
 
                 <div className="flex flex-col-reverse gap-2 pt-1 sm:flex-row sm:justify-end">
                     <button onClick={onClose} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5">

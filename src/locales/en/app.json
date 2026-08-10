@@ -109,7 +109,8 @@
     "per_month": "CAD/month",
     "per_year": "CAD/year",
     "downgrade_desc": "Your plan will switch to {{name}} on {{date}}. You keep all your current benefits until then.",
-    "cancel_desc": "Your subscription ends on {{date}}. You keep access until that date."
+    "cancel_desc": "Your subscription ends on {{date}}. You keep access until that date.",
+    "auto_renew_notice": "This subscription renews automatically unless cancelled before the end of the period."
   },
   "settings_feedback": {
     "page_title": "Settings • Feedback",

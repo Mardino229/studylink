@@ -38,6 +38,94 @@ const sortMessages = (messages: Message[]) =>
         return leftTime.localeCompare(rightTime);
     });
 
+// Treat a server timestamp that has no TZ suffix as UTC so Date display is correct.
+const toUTCDate = (s: string) =>
+    new Date(/Z$|[+-]\d{2}:\d{2}$/.test(s) ? s : s + 'Z');
+
+interface SidebarContentProps {
+    sessions?: ChatSession[];
+    sessionId: string | null;
+    emptySidebar: boolean;
+    handleOpenSession: (id: string) => void;
+    setCreateModalOpen: (open: boolean) => void;
+}
+
+const SidebarContent: React.FC<SidebarContentProps> = ({
+    sessions = [], sessionId, emptySidebar, handleOpenSession, setCreateModalOpen,
+}) => {
+    const { t } = useTranslation('workspace');
+    return (
+    <>
+        <div className="p-4">
+            <div className="flex items-center justify-between gap-3">
+                <div>
+                    <p className="text-xs font-semibold text-foreground/50">{t('chat.history')}</p>
+                </div>
+                <button
+                    type="button"
+                    onClick={() => setCreateModalOpen(true)}
+                    className="inline-flex items-center gap-1 rounded-full bg-brand-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-brand-600 dark:hover:bg-brand-600"
+                >
+                    <PlusIcon size={12} />
+                    {t('chat.new_short')}
+                </button>
+            </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-3">
+            {emptySidebar && (
+                <div className="flex h-full flex-col items-center justify-center rounded-xl border border-dashed border-border bg-background p-6 text-center">
+                    <MessageSquare className="text-foreground/40" size={28} />
+                    <p className="mt-3 text-sm font-medium text-foreground/80">{t('chat.no_session_title')}</p>
+                    <p className="mt-1 text-xs text-foreground/50">{t('chat.no_session_hint')}</p>
+                    <button
+                        type="button"
+                        onClick={() => setCreateModalOpen(true)}
+                        className="mt-4 inline-flex items-center gap-2 rounded-full bg-brand-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-600 dark:hover:bg-brand-600"
+                    >
+                        <PlusIcon size={16} />
+                        {t('chat.create_session_btn')}
+                    </button>
+                </div>
+            )}
+
+            <div className="space-y-2">
+                {sessions
+                    .slice()
+                    .sort((left, right) => right.created_at.localeCompare(left.created_at))
+                    .map((session) => {
+                        const isActive = session.id === sessionId;
+                        return (
+                            <button
+                                key={session.id}
+                                type="button"
+                                onClick={() => handleOpenSession(session.id)}
+                                className={`w-full rounded-xl border px-4 py-3 text-left transition-all ${isActive
+                                    ? 'border-brand-500/30 bg-brand-50/50 dark:bg-brand-500/10 dark:border-brand-500/30 shadow-sm'
+                                    : 'border-border bg-background hover:bg-gray-50 dark:hover:bg-white/[0.02]'
+                                    }`}
+                            >
+                                <div className="flex items-start gap-3">
+                                    <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${isActive ? 'bg-brand-500 text-white' : 'bg-brand-50 text-brand-500 dark:bg-brand-500/15 dark:text-brand-400'}`}>
+                                        <MessageSquare size={16} />
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <p className="truncate text-sm font-semibold text-foreground">{session.title}</p>
+                                        <div className="mt-1 flex items-center gap-1 text-xs text-foreground/50">
+                                            <Clock3 size={12} />
+                                            <span>{toUTCDate(session.created_at).toLocaleString()}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </button>
+                        );
+                    })}
+            </div>
+        </div>
+    </>
+    );
+};
+
 const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
     const { t } = useTranslation('workspace');
     const suggestedQuestions = [
@@ -49,7 +137,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
     // Pending optimistic messages for the current in-flight exchange.
-    // Kept separate from real DB messages   never merged by content.
+    // Kept separate from real DB messages — never merged by content.
     const [pendingUserMsg, setPendingUserMsg] = useState<Message | null>(null);
     const [streamingAssistantMsg, setStreamingAssistantMsg] = useState<Message | null>(null);
     const [input, setInput] = useState('');
@@ -64,11 +152,10 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
     const preserveScrollRef = useRef(false);
     const previousScrollHeightRef = useRef(0);
     const lastSessionIdRef = useRef<string | null>(null);
-    // Timestamp (ms) of when the current exchange was initiated on the client.
-    // Kept as state (not a ref) so that clearPending() nulls it in the same React batch
-    // as the pending message states — prevents a render where sentAt is null but pending
-    // messages are still set, which would cause displayMessages to append duplicates.
-    const [exchangeStartedAt, setExchangeStartedAt] = useState<number | null>(null);
+    // Server-side created_at of the last known message before the current exchange.
+    // Comparing server timestamps against each other avoids any client/server TZ skew.
+    const exchangeSnapshotTimeRef = useRef<string>('');
+    const pollCancelRef = useRef(false);
 
     const createSessionMutation = useCreateChatSession();
     const {
@@ -98,29 +185,29 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
     }, [chatMessages]);
 
     // What's actually rendered: real DB messages + pending temp messages (if not yet confirmed).
-    // Confirmation is timestamp-based: once a real assistant message appears with created_at
-    // after when we sent, the exchange is confirmed and we drop the temp messages.
-    // A 5 s buffer handles client/server clock skew.
+    // Both sides of the comparison are server timestamps in the same format/timezone,
+    // so string ordering is correct and no client/server TZ skew can affect the result.
     const displayMessages = useMemo<Message[]>(() => {
         if (!pendingUserMsg && !streamingAssistantMsg) return fetchedMessages;
 
-        if (exchangeStartedAt !== null) {
-            const confirmed = fetchedMessages.some(
-                (m) => m.role === 'assistant' && new Date(m.created_at ?? 0).getTime() > exchangeStartedAt - 5000
-            );
-            if (confirmed) return fetchedMessages;
-        }
+        const snapshot = exchangeSnapshotTimeRef.current;
+        const confirmed = fetchedMessages.some(
+            (m) => m.role === 'assistant' && (m.created_at ?? '') > snapshot
+        );
+        if (confirmed) return fetchedMessages;
 
         const pending: Message[] = [];
         if (pendingUserMsg) pending.push(pendingUserMsg);
-        if (streamingAssistantMsg) pending.push(streamingAssistantMsg);
+        // Only show the streaming bubble once it has content; before the first token
+        // the typing indicator dots handle the "thinking" state instead.
+        if (streamingAssistantMsg?.content) pending.push(streamingAssistantMsg);
         return [...fetchedMessages, ...pending];
-    }, [fetchedMessages, pendingUserMsg, streamingAssistantMsg, exchangeStartedAt]);
+    }, [fetchedMessages, pendingUserMsg, streamingAssistantMsg]);
 
     const clearPending = () => {
+        pollCancelRef.current = true;
         setPendingUserMsg(null);
         setStreamingAssistantMsg(null);
-        setExchangeStartedAt(null);
     };
 
     // Reset all state when the notebook changes
@@ -170,13 +257,14 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
 
     // Drop temp messages once the real exchange arrives in fetchedMessages
     useEffect(() => {
-        if (exchangeStartedAt === null) return;
+        if (!pendingUserMsg && !streamingAssistantMsg) return;
+        const snapshot = exchangeSnapshotTimeRef.current;
         const confirmed = fetchedMessages.some(
-            (m) => m.role === 'assistant' && new Date(m.created_at ?? 0).getTime() > exchangeStartedAt - 5000
+            (m) => m.role === 'assistant' && (m.created_at ?? '') > snapshot
         );
         if (confirmed) clearPending();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [fetchedMessages, exchangeStartedAt]);
+    }, [fetchedMessages]);
 
     useEffect(() => {
         if (messagesContainerRef.current) {
@@ -235,7 +323,8 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
         if (!content || !sessionId) return;
 
         const now = Date.now();
-        setExchangeStartedAt(now);
+        exchangeSnapshotTimeRef.current = fetchedMessages[fetchedMessages.length - 1]?.created_at ?? '';
+        pollCancelRef.current = false;
 
         setPendingUserMsg({
             id: `user-${now}`,
@@ -276,6 +365,9 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                             );
                         } else if (data.type === 'done') {
                             setIsStreaming(false);
+                            // Early refetch: server has finished generating, DB write
+                            // likely committed, so grab the real messages now while the
+                            // SSE connection is still technically open.
                             void refetchChatMessages();
                         }
                     } catch {
@@ -288,7 +380,34 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                 },
                 onclose() {
                     setIsStreaming(false);
-                    void refetchChatMessages();
+                    // Fallback poll: handles the race where the server closes the SSE
+                    // connection slightly before the DB write is committed.
+                    // The `done` refetch above already fired; this retries if it missed.
+                    const snapshot = exchangeSnapshotTimeRef.current;
+                    const poll = async (attempt = 0) => {
+                        if (pollCancelRef.current) return;
+                        try {
+                            const result = await refetchChatMessages();
+                            if (pollCancelRef.current) return;
+                            const found = result.data?.pages?.some((page) =>
+                                page.items?.some(
+                                    (m) => m.role === 'assistant' && (m.created_at ?? '') > snapshot
+                                )
+                            ) ?? false;
+                            if (found || attempt >= 5) {
+                                if (!pollCancelRef.current) clearPending();
+                            } else {
+                                setTimeout(() => void poll(attempt + 1), 600);
+                            }
+                        } catch {
+                            if (attempt < 5) {
+                                setTimeout(() => void poll(attempt + 1), 600);
+                            } else if (!pollCancelRef.current) {
+                                clearPending();
+                            }
+                        }
+                    };
+                    void poll();
                 },
             });
         } catch (error) {
@@ -311,76 +430,9 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
     const sessionTitle = activeSession?.title ?? t('chat.session_default');
     const emptySidebar = !isLoadingChatSessions && sessions.length === 0;
 
-    const SidebarContent = () => (
-        <>
-            <div className="p-4">
-                <div className="flex items-center justify-between gap-3">
-                    <div>
-                        <p className="text-xs font-semibold text-foreground/50">{t('chat.history')}</p>
-                    </div>
-                    <button
-                        type="button"
-                        onClick={() => setCreateModalOpen(true)}
-                        className="inline-flex items-center gap-1 rounded-full bg-brand-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-brand-600 dark:hover:bg-brand-600"
-                    >
-                        <PlusIcon size={12} />
-                        {t('chat.new_short')}
-                    </button>
-                </div>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-3">
-                {emptySidebar && (
-                    <div className="flex h-full flex-col items-center justify-center rounded-xl border border-dashed border-border bg-background p-6 text-center">
-                        <MessageSquare className="text-foreground/40" size={28} />
-                        <p className="mt-3 text-sm font-medium text-foreground/80">{t('chat.no_session_title')}</p>
-                        <p className="mt-1 text-xs text-foreground/50">{t('chat.no_session_hint')}</p>
-                        <button
-                            type="button"
-                            onClick={() => setCreateModalOpen(true)}
-                            className="mt-4 inline-flex items-center gap-2 rounded-full bg-brand-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-600 dark:hover:bg-brand-600"
-                        >
-                            <PlusIcon size={16} />
-                            {t('chat.create_session_btn')}
-                        </button>
-                    </div>
-                )}
-
-                <div className="space-y-2">
-                    {sessions
-                        .slice()
-                        .sort((left, right) => right.created_at.localeCompare(left.created_at))
-                        .map((session) => {
-                            const isActive = session.id === sessionId;
-                            return (
-                                <button
-                                    key={session.id}
-                                    type="button"
-                                    onClick={() => handleOpenSession(session.id)}
-                                    className={`w-full rounded-xl border px-4 py-3 text-left transition-all ${isActive
-                                        ? 'border-brand-500/30 bg-brand-50/50 dark:bg-brand-500/10 dark:border-brand-500/30 shadow-sm'
-                                        : 'border-border bg-background hover:bg-gray-50 dark:hover:bg-white/[0.02]'
-                                        }`}
-                                >
-                                    <div className="flex items-start gap-3">
-                                        <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${isActive ? 'bg-brand-500 text-white' : 'bg-brand-50 text-brand-500 dark:bg-brand-500/15 dark:text-brand-400'}`}>
-                                            <MessageSquare size={16} />
-                                        </div>
-                                        <div className="min-w-0 flex-1">
-                                            <p className="truncate text-sm font-semibold text-foreground">{session.title}</p>
-                                            <div className="mt-1 flex items-center gap-1 text-xs text-foreground/50">
-                                                <Clock3 size={12} />
-                                                <span>{new Date(session.created_at).toLocaleString()}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </button>
-                            );
-                        })}
-                </div>
-            </div>
-        </>
-    );
+    const sidebarProps: SidebarContentProps = {
+        sessions, sessionId, emptySidebar, handleOpenSession, setCreateModalOpen,
+    };
 
     return (
         <div className="flex h-full w-full gap-4 overflow-hidden relative">
@@ -405,7 +457,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                             className="absolute left-0 top-0 bottom-0 w-[300px] p-4 flex flex-col z-10"
                         >
                             <div className="flex h-full flex-col overflow-hidden rounded-2xl bg-card">
-                                <SidebarContent />
+                                <SidebarContent {...sidebarProps} />
                             </div>
                         </motion.div>
                     </div>
@@ -422,7 +474,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
                         className="hidden xl:flex flex-col shrink-0 overflow-hidden rounded-2xl border-t border-r border-border bg-card "
                     >
-                        <SidebarContent />
+                        <SidebarContent {...sidebarProps} />
                     </motion.aside>
                 )}
             </AnimatePresence>
@@ -575,7 +627,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                         /* Normal input */
                         <div className="lg:px-4 py-4">
                             <div className="max-w-3xl mx-auto">
-                                {displayMessages.length < 2 && (
+                                {fetchedMessages.length < 2 && (
                                     <div className="grid grid-cols-2 gap-2 mb-4">
                                         {suggestedQuestions.map((q, i) => (
                                             <button

@@ -12,15 +12,13 @@ export default function SettingsProfile() {
   const { user, setUser } = useUser();
   const [firstName, setFirstName] = useState(user?.first_name || "");
   const [lastName, setLastName] = useState(user?.last_name || "");
-  const [email, setEmail] = useState(user?.email || "");
   const [saving, setSaving] = useState(false);
 
   async function onSave(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
     try {
-      // Mock local update only; backend handled elsewhere
-      setUser?.({ ...(user || {}), first_name: firstName, last_name: lastName, email });
+      setUser?.({ ...(user || {}), first_name: firstName, last_name: lastName });
     } finally {
       setSaving(false);
     }
@@ -51,11 +49,6 @@ export default function SettingsProfile() {
           <div>
             <label className="block text-sm text-foreground/70 mb-1">{t('user_profile.last_name')}</label>
             <input value={lastName} onChange={(e)=> setLastName(e.target.value)}
-                   className="w-full rounded-md border border-border bg-background text-foreground px-3 py-2" required />
-          </div>
-          <div>
-            <label className="block text-sm text-foreground/70 mb-1">{t('user_profile.email')}</label>
-            <input type="email" value={email} onChange={(e)=> setEmail(e.target.value)}
                    className="w-full rounded-md border border-border bg-background text-foreground px-3 py-2" required />
           </div>
           <div className="flex items-center gap-2">

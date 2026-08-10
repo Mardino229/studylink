@@ -17,6 +17,7 @@ import AppLayout from "./layout/AppLayout.tsx";
 import { ScrollToTop } from "./components/common/ScrollToTop.tsx";
 import { DomainRedirect } from "./components/common/DomainRedirect.tsx";
 import RequireAuth from "./context/RequireAuth.tsx";
+import GuestRoute from "./context/GuestRoute.tsx";
 import AdminGuard from "./context/AdminGuard.tsx";
 import MyCourse from "./pages/appPage/Course.tsx";
 import SummaryList from "./pages/appPage/SummaryList.tsx";
@@ -64,10 +65,12 @@ function App() {
             <DomainRedirect />
             <Routes>
                 <Route path="/" element={<Landing />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/login" element={<Login />} />
+                <Route element={<GuestRoute />}>
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
+                </Route>
                 <Route path="/confirm" element={<ConfirmAccount />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/terms" element={<Terms />} />
