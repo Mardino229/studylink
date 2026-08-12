@@ -26,12 +26,14 @@ type CompleteProfileFormData = CompleteProfileRequest & {
 
 export default function CompleteProfileForm() {
     const { t } = useTranslation('auth');
-    const OTHER_VALUE = "other";
-
     const completeProfile = useCompleteProfile();
     const studyLevels = StudyLevels();
     const faculties = Faculties();
     const programs = Programs();
+
+    const isOtherProgram = (programId: string) =>
+        programs.data?.find(p => String(p.id) === String(programId))
+            ?.name?.trim().toLowerCase() === 'autres';
 
     const baseSchema = z.object({
         first_name: z.string().min(2, t('complete_profile.error_first_name')),
@@ -43,7 +45,7 @@ export default function CompleteProfileForm() {
     }).superRefine((val, ctx) => {
         const currentIsGrad = studyLevels.data?.find((s: StudyLevel) => String(s.id) === String(val.study_level_id))
             ?.name?.toLowerCase().includes("études supérieures") ?? false;
-        const otherSelected = val.program_id === OTHER_VALUE;
+        const otherSelected = isOtherProgram(val.program_id ?? '');
 
         if (currentIsGrad) {
             if (!val.program_name || val.program_name.trim().length < 2) {
@@ -85,16 +87,16 @@ export default function CompleteProfileForm() {
     const selectedLevel = studyLevels.data?.find((s: StudyLevel) => String(s.id) === String(studyLevelId));
     const isGraduate = selectedLevel?.name?.toLowerCase().includes("études supérieures") ?? false;
     const programsByFaculty = facultyId ? programs.data?.filter((prog: Program) => prog.faculty_id === facultyId) : [];
-    const useOtherProgram = isGraduate || programId === OTHER_VALUE;
+    const useOtherProgram = isGraduate || isOtherProgram(programId ?? '');
 
     const onSubmit = (data: CompleteProfileFormData) => {
         const payload: CompleteProfileRequest = {
             first_name: data.first_name,
             last_name: data.last_name,
             study_level_id: data.study_level_id,
-            other_program: (isGraduate || useOtherProgram || data.program_id === OTHER_VALUE) && data.program_name ? data.program_name : undefined,
             faculty_id: isGraduate ? undefined : data.faculty_id,
-            program_id: (isGraduate || useOtherProgram || data.program_id === OTHER_VALUE) ? undefined : data.program_id,
+            program_id: isGraduate ? undefined : data.program_id,
+            other_program: (isGraduate || isOtherProgram(data.program_id ?? '')) && data.program_name ? data.program_name : undefined,
         };
         completeProfile.mutate(payload);
     };
@@ -191,7 +193,7 @@ export default function CompleteProfileForm() {
                                             <FormControl>
                                                 <Select {...field} onValueChange={(val) => {
                                                     field.onChange(val);
-                                                    if (val !== OTHER_VALUE) form.setValue("program_name", "");
+                                                    if (!isOtherProgram(val)) form.setValue("program_name", "");
                                                 }} value={field.value} disabled={programs.isPending || !programsByFaculty?.length}>
                                                     <SelectTrigger className="w-full overflow-hidden text-ellipsis whitespace-nowrap py-5 shadow-sm">
                                                         <SelectValue placeholder={t('complete_profile.select_placeholder')} />
@@ -200,7 +202,6 @@ export default function CompleteProfileForm() {
                                                         {programsByFaculty?.map((prog: Program) => (
                                                             <SelectItem className="w-full overflow-hidden text-ellipsis whitespace-nowrap" key={prog.id} value={String(prog.id)}>{prog.name}</SelectItem>
                                                         ))}
-                                                        <SelectItem className="w-full overflow-hidden text-ellipsis whitespace-nowrap" value={OTHER_VALUE}>{t('complete_profile.others')}</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                             </FormControl>

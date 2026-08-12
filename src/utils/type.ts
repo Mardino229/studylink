@@ -13,7 +13,7 @@ export type CompleteProfileRequest = {
 export type UpdateProfileRequest = {
     first_name: string;
     last_name: string;
-    email: string;
+    email?: string;
     study_level_id?: string;
     faculty_id?: string;
     program_id?: string;

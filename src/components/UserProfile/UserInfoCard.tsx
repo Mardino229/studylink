@@ -1,5 +1,4 @@
 import { Modal } from "../ui/modal";
-import {useModal} from "../../hoooks/useModal.ts";
 import {useUser} from "../layout/userContext.tsx";
 import { useEffect, useState } from "react";
 import { Faculties, type Faculty, type Program, Programs, StudyLevels, type StudyLevel } from "../../utils/school.ts";
@@ -12,7 +11,7 @@ import {
 } from "../ui/select.tsx";
 import { useUpdateProfile } from "../../utils/user.ts";
 import { RotatingLines } from "react-loader-spinner";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "../ui/form.tsx";
@@ -24,14 +23,21 @@ type UpdateProfileFormData = Omit<UpdateProfileRequest, 'email'> & {
   program_name?: string;
 };
 
-export default function UserInfoCard() {
-  const { isOpen, openModal, closeModal } = useModal();
+interface UserInfoCardProps {
+  isOpen: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+}
+
+export default function UserInfoCard({ isOpen, onOpen, onClose }: UserInfoCardProps) {
   const { user } = useUser();
   const [programsByFaculty, setProgramsByFaculty] = useState<Program[]|undefined>([]);
   const [useOtherProgram, setUseOtherProgram] = useState(false);
   const [isGraduate, setIsGraduate] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
-  const OTHER_VALUE = "other";
+  const isOtherProgram = (programId: string) =>
+    programs.data?.find(p => String(p.id) === String(programId))
+      ?.name?.toLowerCase() === 'autres';
   const { t } = useTranslation('app');
   const { t: tErr } = useTranslation('errors');
 
@@ -75,6 +81,10 @@ export default function UserInfoCard() {
     },
   });
 
+  const watchedProgramId = useWatch({ control: form.control, name: 'program_id' });
+  const watchedFacultyId = useWatch({ control: form.control, name: 'faculty_id' });
+  const watchedStudyLevelId = useWatch({ control: form.control, name: 'study_level_id' });
+
   useEffect(() => {
     if (user && isOpen) {
       setIsInitializing(true);
@@ -103,9 +113,8 @@ export default function UserInfoCard() {
 
   useEffect(() => {
     if (isInitializing) return;
-    const levelId = form.watch("study_level_id");
-    if (!levelId || !studyLevels.data) return;
-    const selected = studyLevels.data.find((s: StudyLevel) => String(s.id) === String(levelId));
+    if (!watchedStudyLevelId || !studyLevels.data) return;
+    const selected = studyLevels.data.find((s: StudyLevel) => String(s.id) === String(watchedStudyLevelId));
     const grad = selected?.name?.toLowerCase().includes("études supérieures") ?? false;
     setIsGraduate(!!grad);
     if (grad) {
@@ -114,36 +123,32 @@ export default function UserInfoCard() {
       form.setValue("program_name", "");
       setUseOtherProgram(true);
     }
-  }, [studyLevels.data, isInitializing, form]);
+  }, [watchedStudyLevelId, studyLevels.data, isInitializing, form]);
 
   useEffect(() => {
-    const faculty = form.watch("faculty_id");
-    if (faculty) {
-      setProgramsByFaculty(programs.data?.filter(prog => prog.faculty_id === parseInt(faculty)));
-    }
-  }, [form, programs.data]);
+    if (!watchedFacultyId) return;
+    setProgramsByFaculty(programs.data?.filter(prog => String(prog.faculty_id) === String(watchedFacultyId)));
+  }, [watchedFacultyId, programs.data]);
 
   useEffect(() => {
     if (isInitializing) return;
-    const pid = form.watch("program_id");
-    if (pid === OTHER_VALUE) {
+    if (isOtherProgram(watchedProgramId ?? '')) {
       setUseOtherProgram(true);
-    } else if (pid && !isGraduate) {
+    } else if (watchedProgramId && !isGraduate) {
       setUseOtherProgram(false);
     }
-  }, [isInitializing, isGraduate, form]);
+  }, [watchedProgramId, isInitializing, isGraduate]);
 
   const onSubmit = (data: UpdateProfileFormData) => {
     const payload: UpdateProfileRequest = {
       first_name: data.first_name,
       last_name: data.last_name,
-      email: user?.email ?? "",
       study_level_id: data.study_level_id,
-      faculty_id: isGraduate || useOtherProgram || data.program_id === OTHER_VALUE ? undefined : data.faculty_id,
-      program_id: isGraduate || useOtherProgram || data.program_id === OTHER_VALUE ? undefined : data.program_id,
-      other_program: (isGraduate || useOtherProgram || data.program_id === OTHER_VALUE) && data.program_name ? data.program_name : undefined,
+      faculty_id: isGraduate ? undefined : data.faculty_id,
+      program_id: isGraduate ? undefined : data.program_id,
+      other_program: (isGraduate || isOtherProgram(data.program_id ?? '')) && data.program_name ? data.program_name : undefined,
     };
-    updateProfile.mutate(payload, { onSuccess: () => { closeModal(); } });
+    updateProfile.mutate(payload, { onSuccess: () => { onClose(); } });
   };
 
   return (
@@ -185,7 +190,7 @@ export default function UserInfoCard() {
         </div>
 
         <button
-          onClick={openModal}
+          onClick={onOpen}
           className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200 lg:inline-flex lg:w-auto"
         >
           <svg className="fill-current" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -195,7 +200,7 @@ export default function UserInfoCard() {
         </button>
       </div>
 
-      <Modal isOpen={isOpen} onClose={closeModal} className="max-w-[700px] m-4">
+      <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px]">
         <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
           <div className="px-2 pr-14">
             <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
@@ -288,7 +293,6 @@ export default function UserInfoCard() {
                               {programsByFaculty?.map((prog: Program) => (
                                 <SelectItem className="w-full overflow-hidden text-ellipsis whitespace-nowrap" key={prog.id} value={String(prog.id)}>{prog.name}</SelectItem>
                               ))}
-                              <SelectItem className="w-full overflow-hidden text-ellipsis whitespace-nowrap" value={OTHER_VALUE}>{t('user_profile.others')}</SelectItem>
                             </SelectContent>
                           </Select>
                         </FormControl>
@@ -313,7 +317,7 @@ export default function UserInfoCard() {
                 </div>
               </div>
               <div className="flex items-center gap-3 px-2 mt-6 justify-end">
-                <Button size="sm" variant="outline" onClick={closeModal}>
+                <Button size="sm" variant="outline" onClick={onClose}>
                   {t('user_profile.cancel')}
                 </Button>
                 <Button size="sm"

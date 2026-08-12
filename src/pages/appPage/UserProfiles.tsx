@@ -6,10 +6,12 @@ import PasswordChangeCard from "../../components/common/PasswordChangeCard.tsx";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useModal } from "../../hoooks/useModal.ts";
 
 export default function UserProfiles() {
   const navigate = useNavigate();
   const { t } = useTranslation('app');
+  const { isOpen, openModal, closeModal } = useModal();
 
   return (
     <div className="space-y-6">
@@ -28,8 +30,8 @@ export default function UserProfiles() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="space-y-6">
-            <UserMetaCard />
-            <UserInfoCard />
+            <UserMetaCard onEdit={openModal} />
+            <UserInfoCard isOpen={isOpen} onOpen={openModal} onClose={closeModal} />
         </div>
         <div>
             <PasswordChangeCard />
