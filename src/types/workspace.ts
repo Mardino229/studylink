@@ -51,6 +51,7 @@ export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   citations?: Citation[];
+  image_urls?: string[];
   created_at: string;
 }
 

@@ -121,6 +121,7 @@
     "new_session": "New session",
     "start_prompt": "Start a conversation",
     "message_placeholder": "Send a message...",
+    "attach_image": "Attach an image (jpg, png, webp, gif — max 10 MB)",
     "create_session": "Create a session",
     "session_title_label": "Title",
     "session_title_placeholder": "Ex: Revision of...",

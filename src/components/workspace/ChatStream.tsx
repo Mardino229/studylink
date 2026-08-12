@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCreateChatSession, useGetChatMessages, useGetChatSessions } from '../../utils/workspace';
-import { SendIcon, BotIcon, PlusIcon, MessageSquare, Clock3, Menu, MessageCirclePlus } from 'lucide-react';
+import { SendIcon, BotIcon, PlusIcon, MessageSquare, Clock3, Menu, MessageCirclePlus, ImageIcon, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { autoScrollListRef } from '../summary/ai/use-auto-scroll';
 import { cn } from '../../lib/utils';
 import ReactMarkdown from 'react-markdown';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
-import { baseUrl } from '../../utils/api.ts';
+import { axiosPrivate, baseUrl } from '../../utils/api.ts';
 import { Modal } from '../ui/modal/index.tsx';
 import type { ChatSession, ChatMessage as WorkspaceChatMessage } from '../../types/workspace.ts';
 
@@ -20,16 +20,59 @@ interface Message {
     role: 'user' | 'assistant';
     content: string;
     citations?: WorkspaceChatMessage['citations'];
+    image_urls?: string[];
+    imageBlobUrls?: string[];
     created_at?: string;
-}
+} 
 
 const toUiMessage = (message: WorkspaceChatMessage): Message => ({
     id: message.id,
     role: message.role,
     content: message.content,
     citations: message.citations,
+    image_urls: message.image_urls,
     created_at: message.created_at,
 });
+
+interface ChatImageProps {
+    notebookId: string;
+    sessionId: string;
+    messageId: string;
+    index: number;
+}
+
+// Survives component remounts within a page session.
+// Keys are `${messageId}/${index}`; blob URLs are never explicitly revoked here
+// (they live until page unload, acceptable for a few images per session).
+const chatImageCache = new Map<string, string>();
+
+const ChatImage: React.FC<ChatImageProps> = ({ notebookId, sessionId, messageId, index }) => {
+    const cacheKey = `${messageId}/${index}`;
+    const [src, setSrc] = useState<string | null>(() => chatImageCache.get(cacheKey) ?? null);
+    const [failed, setFailed] = useState(false);
+
+    useEffect(() => {
+        if (src) return;
+        let cancelled = false;
+        axiosPrivate
+            .get(`/notebooks/${notebookId}/chats/${sessionId}/messages/${messageId}/images/${index}`, { responseType: 'blob' })
+            .then((res) => {
+                const url = URL.createObjectURL(res.data as Blob);
+                chatImageCache.set(cacheKey, url);
+                if (!cancelled) setSrc(url);
+            })
+            .catch(() => { if (!cancelled) setFailed(true); });
+        return () => { cancelled = true; };
+    }, [cacheKey, notebookId, sessionId, messageId, index]);
+
+    if (failed) return (
+        <div className="flex h-20 w-32 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 text-xs">
+            ⚠ image
+        </div>
+    );
+    if (!src) return null;
+    return <img src={src} alt="" className="max-h-48 rounded-2xl object-cover" />;
+};
 
 const sortMessages = (messages: Message[]) =>
     [...messages].sort((left, right) => {
@@ -141,6 +184,8 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
     const [pendingUserMsg, setPendingUserMsg] = useState<Message | null>(null);
     const [streamingAssistantMsg, setStreamingAssistantMsg] = useState<Message | null>(null);
     const [input, setInput] = useState('');
+    const [imageFiles, setImageFiles] = useState<File[]>([]);
+    const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
     const [sessionId, setSessionId] = useState<string | null>(null);
     const [isStreaming, setIsStreaming] = useState(false);
     const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -148,6 +193,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
 
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const imageInputRef = useRef<HTMLInputElement>(null);
     const shouldScrollToBottomRef = useRef(false);
     const preserveScrollRef = useRef(false);
     const previousScrollHeightRef = useRef(0);
@@ -210,11 +256,35 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
         setStreamingAssistantMsg(null);
     };
 
+    const clearAllImages = () => {
+        imagePreviewUrls.forEach(url => URL.revokeObjectURL(url));
+        setImageFiles([]);
+        setImagePreviewUrls([]);
+    };
+
+    const removeImage = (index: number) => {
+        URL.revokeObjectURL(imagePreviewUrls[index]);
+        setImageFiles(prev => prev.filter((_, i) => i !== index));
+        setImagePreviewUrls(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newFiles = Array.from(e.target.files ?? []);
+        if (!newFiles.length) return;
+        const combined = [...imageFiles, ...newFiles].slice(0, 5);
+        const addedFiles = combined.slice(imageFiles.length);
+        const newUrls = addedFiles.map(f => URL.createObjectURL(f));
+        setImageFiles(combined);
+        setImagePreviewUrls(prev => [...prev, ...newUrls]);
+        e.target.value = '';
+    };
+
     // Reset all state when the notebook changes
     useEffect(() => {
         setSessionId(null);
         clearPending();
         setInput('');
+        clearAllImages();
         setIsStreaming(false);
         setCreateModalOpen(false);
         setNewSessionTitle('');
@@ -323,6 +393,9 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
         if (!content || !sessionId) return;
 
         const now = Date.now();
+        const currentImageFiles = imageFiles;
+        const currentBlobUrls = imagePreviewUrls;
+
         exchangeSnapshotTimeRef.current = fetchedMessages[fetchedMessages.length - 1]?.created_at ?? '';
         pollCancelRef.current = false;
 
@@ -330,6 +403,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
             id: `user-${now}`,
             role: 'user',
             content,
+            imageBlobUrls: currentBlobUrls.length ? currentBlobUrls : undefined,
             created_at: new Date(now).toISOString(),
         });
         setStreamingAssistantMsg({
@@ -339,18 +413,23 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
             created_at: new Date(now).toISOString(),
         });
         setInput('');
+        setImageFiles([]);
+        setImagePreviewUrls([]);
         setIsStreaming(true);
         shouldScrollToBottomRef.current = true;
+
+        const form = new FormData();
+        form.append('content', content);
+        for (const file of currentImageFiles) form.append('images', file);
 
         try {
             await fetchEventSource(`${baseUrl}/notebooks/${notebookId}/chats/${sessionId}/messages/stream`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
-                    'Content-Type': 'application/json',
                     Accept: 'text/event-stream',
                 },
-                body: JSON.stringify({ content }),
+                body: form,
                 onmessage(event) {
                     if (!event.data) return;
                     try {
@@ -363,6 +442,11 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                             setStreamingAssistantMsg((prev) =>
                                 prev ? { ...prev, citations: data.citations } : null
                             );
+                        } else if (data.type === 'error') {
+                            setStreamingAssistantMsg((prev) =>
+                                prev ? { ...prev, content: data.text ?? 'Une erreur est survenue.' } : null
+                            );
+                            setIsStreaming(false);
                         } else if (data.type === 'done') {
                             setIsStreaming(false);
                             // Early refetch: server has finished generating, DB write
@@ -574,7 +658,23 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                                                 : 'px-1 py-1'
                                         )}>
                                             {sender === 'user' ? (
-                                                msg.content
+                                                <div>
+                                                    {(msg.imageBlobUrls ?? []).length > 0 && (
+                                                        <div className="flex flex-wrap gap-2 mb-2">
+                                                            {(msg.imageBlobUrls ?? []).map((url, i) => (
+                                                                <img key={i} src={url} alt="" className="max-h-48 rounded-2xl object-cover" />
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                    {!msg.imageBlobUrls?.length && (msg.image_urls ?? []).length > 0 && sessionId && (
+                                                        <div className="flex flex-wrap gap-2 mb-2">
+                                                            {(msg.image_urls ?? []).map((_, i) => (
+                                                                <ChatImage key={i} notebookId={notebookId} sessionId={sessionId} messageId={msg.id} index={i} />
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                    {msg.content}
+                                                </div>
                                             ) : (
                                                 <div className="prose text-slate-700 dark:text-slate-200 prose-sm max-w-none">
                                                     <ReactMarkdown>{msg.content}</ReactMarkdown>
@@ -644,7 +744,40 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                                     </div>
                                 )}
 
+                                {imagePreviewUrls.length > 0 && (
+                                    <div className="mb-2 flex flex-wrap gap-2">
+                                        {imagePreviewUrls.map((url, i) => (
+                                            <div key={i} className="relative inline-block">
+                                                <img src={url} alt="" className="h-20 rounded-xl object-cover border border-slate-200 dark:border-slate-700" />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeImage(i)}
+                                                    className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-gray-700 text-white rounded-full flex items-center justify-center hover:bg-gray-900 transition-colors"
+                                                >
+                                                    <X className="w-3 h-3" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                                 <div className="relative flex items-center">
+                                    <button
+                                        type="button"
+                                        onClick={() => imageInputRef.current?.click()}
+                                        disabled={isStreaming || imageFiles.length >= 5}
+                                        className="absolute left-2 p-2 text-slate-400 hover:text-brand-500 disabled:opacity-30 transition-colors rounded-full"
+                                        title={t('chat.attach_image')}
+                                    >
+                                        <ImageIcon className="w-4 h-4" />
+                                    </button>
+                                    <input
+                                        ref={imageInputRef}
+                                        type="file"
+                                        accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+                                        multiple
+                                        className="hidden"
+                                        onChange={handleImageSelect}
+                                    />
                                     <input
                                         ref={inputRef}
                                         type="text"
@@ -657,7 +790,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                                             }
                                         }}
                                         placeholder={t('chat.message_placeholder')}
-                                        className="w-full py-3.5 pl-5 pr-12 bg-transparent border border-slate-200 dark:border-slate-800 rounded-full focus:outline-none focus:border-brand-500 dark:focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all placeholder:text-slate-400 text-slate-700 dark:text-slate-200"
+                                        className="w-full py-3.5 pl-10 pr-12 bg-transparent border border-slate-200 dark:border-slate-800 rounded-full focus:outline-none focus:border-brand-500 dark:focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all placeholder:text-slate-400 text-slate-700 dark:text-slate-200"
                                         disabled={isStreaming}
                                         autoFocus
                                     />
