@@ -42,12 +42,12 @@ export default function Home() {
         {
             value: isUltra ? "Ultra" : isPro ? "Pro" : String(tokenBalance),
             label: isUltra ? t('home.plan_ultra') : isPro ? t('home.plan_pro') : t('home.tokens_label'),
-            sub: isPro
+            sub: isPro || isUltra
                 ? subscription?.end_date
                     ? t('home.access_until', { date: new Date(subscription.end_date).toLocaleDateString(locale) })
                     : t('home.unlimited')
                 : tokenBalance === 0 ? t('home.balance_empty') : t('home.of_purchased', { total: tokenPurchased }),
-            icon: isPro ? Sparkles : Zap,
+            icon: isPro ? Sparkles : Zap, 
             color: isUltra
                 ? "bg-purple-50 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400"
                 : isPro

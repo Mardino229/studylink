@@ -1,7 +1,10 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function About() {
+  const { t } = useTranslation('landing');
+
   return (
     <section className="py-20 sm:py-24 bg-background border-t border-border/60">
       <div className="container mx-auto px-2 sm:px-6 lg:px-8">
@@ -13,7 +16,7 @@ export default function About() {
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground"
           >
-            À propos de BlueCurve
+            {t('about_page.title')}
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 8 }}
@@ -22,8 +25,7 @@ export default function About() {
             transition={{ duration: 0.45, ease: "easeOut", delay: 0.05 }}
             className="mt-4 text-foreground/70 text-lg"
           >
-            Nous aidons les étudiants à apprendre plus efficacement grâce à des outils intelligents: résumés automatiques,
-            flashcards, génération d’épreuves et assistant IA. Votre progression est au cœur de notre mission.
+            {t('about_page.subtitle')}
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -36,7 +38,7 @@ export default function About() {
               to="/#key-features"
               className="inline-flex items-center justify-center rounded-full h-12 px-6 bg-foreground text-background text-sm font-semibold shadow-md hover:shadow-lg transition-shadow"
             >
-              En savoir plus
+              {t('about_page.cta')}
             </Link>
           </motion.div>
         </div>
@@ -49,10 +51,8 @@ export default function About() {
             transition={{ duration: 0.4, ease: "easeOut" }}
             className="p-6 rounded-xl border border-border bg-card shadow-sm"
           >
-            <h3 className="text-xl font-semibold text-foreground mb-2">Notre mission</h3>
-            <p className="text-sm text-foreground/70">
-              Rendre l’apprentissage accessible, personnalisé et mesurable pour chaque étudiant.
-            </p>
+            <h3 className="text-xl font-semibold text-foreground mb-2">{t('about_page.mission_title')}</h3>
+            <p className="text-sm text-foreground/70">{t('about_page.mission_text')}</p>
           </motion.div>
 
           <motion.div
@@ -62,10 +62,8 @@ export default function About() {
             transition={{ duration: 0.45, ease: "easeOut", delay: 0.05 }}
             className="p-6 rounded-xl border border-border bg-card shadow-sm"
           >
-            <h3 className="text-xl font-semibold text-foreground mb-2">Notre approche</h3>
-            <p className="text-sm text-foreground/70">
-              Combiner IA et bonnes pratiques pédagogiques: synthèse, révision active, évaluation et feedback.
-            </p>
+            <h3 className="text-xl font-semibold text-foreground mb-2">{t('about_page.approach_title')}</h3>
+            <p className="text-sm text-foreground/70">{t('about_page.approach_text')}</p>
           </motion.div>
 
           <motion.div
@@ -75,10 +73,8 @@ export default function About() {
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
             className="p-6 rounded-xl border border-border bg-card shadow-sm"
           >
-            <h3 className="text-xl font-semibold text-foreground mb-2">Nos valeurs</h3>
-            <p className="text-sm text-foreground/70">
-              Simplicité, éthique, respect des données, et impact positif sur vos résultats.
-            </p>
+            <h3 className="text-xl font-semibold text-foreground mb-2">{t('about_page.values_title')}</h3>
+            <p className="text-sm text-foreground/70">{t('about_page.values_text')}</p>
           </motion.div>
         </div>
       </div>

@@ -634,7 +634,7 @@ const WorkspaceNotebook: React.FC = () => {
                                                 </span>
                                             )
                                         ) : (
-                                            !isPro && (
+                                            (!isPro && !isUltra) && (
                                                 <span className="inline-flex items-center gap-0.5 rounded-full bg-blue-500/30 px-1.5 py-0.5 text-[10px] font-bold">
                                                     <Zap size={9} />
                                                     {ARTEFACT_COST}

@@ -1,141 +1,91 @@
 import Header from "../../components/landingComponent/header.tsx";
 import Footer from "../../components/landingComponent/footer.tsx";
 import PageMeta from "../../components/common/PageMeta.tsx";
-
-const LAST_UPDATED = "20 juillet 2026";
+import { useTranslation } from "react-i18next";
 
 export default function Privacy() {
+    const { t } = useTranslation('legal');
+
     return (
         <>
             <PageMeta
-                title="Politique de confidentialité • BlueCurve"
-                description="Comment BlueCurve collecte, utilise et protège vos données personnelles."
+                title={t('privacy.meta_title')}
+                description={t('privacy.meta_desc')}
             />
             <div className="relative flex min-h-screen flex-col bg-muted dark:bg-background">
                 <div className="layout-container flex h-full grow flex-col">
                     <Header />
                     <main className="flex-1">
                         <div className="container mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-                            {/* Header */}
                             <div className="mb-12">
                                 <p className="mb-2 text-xs text-center font-semibold uppercase tracking-widest text-blue-600 dark:text-blue-400">
-                                    Légal
+                                    {t('privacy.badge')}
                                 </p>
                                 <h1 className="sm:text-4xl text-3xl font-bold tracking-tight text-foreground">
-                                    Politique de confidentialité
+                                    {t('privacy.title')}
                                 </h1>
                                 <p className="mt-3 text-foreground/60">
-                                    Dernière mise à jour : {LAST_UPDATED}
+                                    {t('privacy.last_updated')}
                                 </p>
                             </div>
 
                             <div className="space-y-10 text-foreground/80 [&_h2]:mb-3 [&_h2]:mt-10 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-foreground [&_p]:leading-relaxed [&_ul]:mt-3 [&_ul]:space-y-2 [&_ul]:pl-5 [&_ul]:text-foreground/75 [&_li]:list-disc [&_li]:leading-relaxed">
 
-                                <p>
-                                    BlueCurve (<strong>"nous"</strong>, <strong>"notre"</strong>) prend la confidentialité de
-                                    vos données au sérieux. Cette politique explique quelles informations nous collectons,
-                                    comment nous les utilisons et quels sont vos droits, conformément à la{" "}
-                                    <em>Loi sur la protection des renseignements personnels et les documents électroniques</em>{" "}
-                                    (LPRPDE / PIPEDA).
-                                </p>
+                                <p>{t('privacy.intro')}</p>
 
                                 <section>
-                                    <h2>1. Données collectées</h2>
-                                    <p>
-                                        Lorsque vous utilisez BlueCurve, nous collectons les catégories de données suivantes :
-                                    </p>
+                                    <h2>{t('privacy.s1_title')}</h2>
+                                    <p>{t('privacy.s1_intro')}</p>
                                     <ul>
-                                        <li>
-                                            <strong>Informations de compte : </strong>   votre adresse courriel et votre nom
-                                            d'affichage, fournis lors de l'inscription.
-                                        </li>
-                                        <li>
-                                            <strong>Fichiers importés : </strong>   les documents que vous déposez sur la
-                                            plateforme (PDF, DOCX, PPTX) pour créer des résumés, flashcards ou quiz.
-                                        </li>
-                                        <li>
-                                            <strong>Contenu généré : </strong>   les artefacts produits par la plateforme
-                                            (résumés, flashcards, quiz, historique de chat) associés à votre compte.
-                                        </li>
-                                        <li>
-                                            <strong>Données de paiement : </strong>   le traitement est entièrement délégué à
-                                            Stripe. Nous ne stockons jamais de numéros de carte ou d'informations bancaires
-                                            directement.
-                                        </li>
-                                        <li>
-                                            <strong>Données d'utilisation : </strong>   solde de jetons, historique de
-                                            transactions, statistiques agrégées de révision (nombre de sessions, modules
-                                            consultés).
-                                        </li>
-                                        <li>
-                                            <strong>Données techniques : </strong>   adresse IP, type de navigateur et logs
-                                            d'accès à des fins de sécurité et de débogage.
-                                        </li>
+                                        <li><strong>{t('privacy.s1_item1_label')}</strong>{' '}{t('privacy.s1_item1')}</li>
+                                        <li><strong>{t('privacy.s1_item2_label')}</strong>{' '}{t('privacy.s1_item2')}</li>
+                                        <li><strong>{t('privacy.s1_item3_label')}</strong>{' '}{t('privacy.s1_item3')}</li>
+                                        <li><strong>{t('privacy.s1_item4_label')}</strong>{' '}{t('privacy.s1_item4')}</li>
+                                        <li><strong>{t('privacy.s1_item5_label')}</strong>{' '}{t('privacy.s1_item5')}</li>
+                                        <li><strong>{t('privacy.s1_item6_label')}</strong>{' '}{t('privacy.s1_item6')}</li>
                                     </ul>
                                 </section>
 
                                 <section>
-                                    <h2>2. Utilisation de vos données</h2>
-                                    <p>Vos données sont utilisées pour :</p>
+                                    <h2>{t('privacy.s2_title')}</h2>
+                                    <p>{t('privacy.s2_intro')}</p>
                                     <ul>
-                                        <li>Fournir et maintenir le service BlueCurve.</li>
-                                        <li>
-                                            Créer les outils de révision que vous demandez (résumés, flashcards, quiz, réponses du
-                                            chat).
-                                        </li>
-                                        <li>Gérer votre abonnement, vos packs de jetons et vos paiements.</li>
-                                        <li>
-                                            Vous envoyer des communications transactionnelles (confirmation de paiement,
-                                            mises à jour importantes du service).
-                                        </li>
-                                        <li>Détecter et prévenir les abus ou violations de nos conditions d'utilisation.</li>
+                                        <li>{t('privacy.s2_item1')}</li>
+                                        <li>{t('privacy.s2_item2')}</li>
+                                        <li>{t('privacy.s2_item3')}</li>
+                                        <li>{t('privacy.s2_item4')}</li>
+                                        <li>{t('privacy.s2_item5')}</li>
                                     </ul>
                                     <p className="mt-3">
-                                        <strong>Nous ne vendons pas vos données personnelles à des tiers.</strong>
+                                        <strong>{t('privacy.s2_no_sell')}</strong>
                                     </p>
                                 </section>
 
                                 <section>
-                                    <h2>3. Services tiers</h2>
-                                    <p>BlueCurve fait appel aux services tiers suivants :</p>
+                                    <h2>{t('privacy.s3_title')}</h2>
+                                    <p>{t('privacy.s3_intro')}</p>
                                     <ul>
-                                        <li>
-                                            <strong>Google : </strong>   vos fichiers et
-                                            messages de chat sont transmis à une API d'intelligence artificielle pour
-                                            produire les résumés, podcasts, flashcards, quiz et réponses. Ces données sont traitées
-                                            conformément à la politique de confidentialité du fournisseur d'IA. Nous vous
-                                            déconseillons d'importer des documents contenant des informations sensibles ou
-                                            confidentielles.
-                                        </li>
-                                        <li>
-                                            <strong>Stripe : </strong>   traitement sécurisé des paiements par carte de crédit
-                                            et des abonnements. Stripe est certifié PCI DSS.
-                                        </li>
+                                        <li><strong>{t('privacy.s3_item1_label')}</strong>{' '}{t('privacy.s3_item1')}</li>
+                                        <li><strong>{t('privacy.s3_item2_label')}</strong>{' '}{t('privacy.s3_item2')}</li>
                                     </ul>
                                 </section>
 
                                 <section>
-                                    <h2>4. Conservation des données</h2>
-                                    <p>
-                                        Vos données sont conservées aussi longtemps que votre compte est actif. Si vous
-                                        demandez la suppression de votre compte, nous effacerons vos données personnelles
-                                        et vos fichiers importés dans un délai raisonnable, sauf obligation légale contraire.
-                                        Les données de transaction peuvent être conservées pour des raisons comptables
-                                        conformément à la loi applicable.
-                                    </p>
+                                    <h2>{t('privacy.s4_title')}</h2>
+                                    <p>{t('privacy.s4_text')}</p>
                                 </section>
 
                                 <section>
-                                    <h2>5. Vos droits (PIPEDA)</h2>
-                                    <p>Conformément à la LPRPDE, vous avez le droit de :</p>
+                                    <h2>{t('privacy.s5_title')}</h2>
+                                    <p>{t('privacy.s5_intro')}</p>
                                     <ul>
-                                        <li>Accéder aux renseignements personnels que nous détenons sur vous.</li>
-                                        <li>Demander la correction de données inexactes.</li>
-                                        <li>Retirer votre consentement au traitement de vos données.</li>
-                                        <li>Demander la suppression de votre compte et de vos données.</li>
+                                        <li>{t('privacy.s5_item1')}</li>
+                                        <li>{t('privacy.s5_item2')}</li>
+                                        <li>{t('privacy.s5_item3')}</li>
+                                        <li>{t('privacy.s5_item4')}</li>
                                     </ul>
                                     <p className="mt-3">
-                                        Pour exercer ces droits, contactez-nous à{" "}
+                                        {t('privacy.s5_contact')}{' '}
                                         <a
                                             href="mailto:studylink.uni@gmail.com"
                                             className="text-blue-600 underline hover:text-blue-700 dark:text-blue-400"
@@ -147,38 +97,23 @@ export default function Privacy() {
                                 </section>
 
                                 <section>
-                                    <h2>6. Cookies et stockage local</h2>
-                                    <p>
-                                        BlueCurve utilise des cookies de session et du stockage local du navigateur
-                                        uniquement à des fins d'authentification et de préférences d'interface (thème clair /
-                                        sombre). Nous n'utilisons pas de cookies publicitaires ou de traceurs tiers.
-                                    </p>
+                                    <h2>{t('privacy.s6_title')}</h2>
+                                    <p>{t('privacy.s6_text')}</p>
                                 </section>
 
                                 <section>
-                                    <h2>7. Sécurité</h2>
-                                    <p>
-                                        Nous appliquons des mesures de sécurité standard (chiffrement en transit via HTTPS,
-                                        authentification sécurisée) pour protéger vos données. Aucun système n'est
-                                        infaillible ; en cas de compromission, nous vous notifierons dans les délais prévus
-                                        par la loi.
-                                    </p>
+                                    <h2>{t('privacy.s7_title')}</h2>
+                                    <p>{t('privacy.s7_text')}</p>
                                 </section>
 
                                 <section>
-                                    <h2>8. Modifications</h2>
-                                    <p>
-                                        Nous pouvons mettre à jour cette politique à tout moment. En cas de changement
-                                        significatif, nous vous en informerons par courriel ou via une notification dans
-                                        l'application. La date de dernière mise à jour est indiquée en haut de cette page.
-                                    </p>
+                                    <h2>{t('privacy.s8_title')}</h2>
+                                    <p>{t('privacy.s8_text')}</p>
                                 </section>
 
                                 <section>
-                                    <h2>9. Contact</h2>
-                                    <p>
-                                        Pour toute question relative à cette politique ou à vos données personnelles :
-                                    </p>
+                                    <h2>{t('privacy.s9_title')}</h2>
+                                    <p>{t('privacy.s9_text')}</p>
                                     <p className="mt-2">
                                         <strong>BlueCurve</strong>
                                         <br />

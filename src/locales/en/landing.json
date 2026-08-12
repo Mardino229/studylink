@@ -175,6 +175,17 @@
     },
     "footer_note": "Secure payments via Stripe. Cancel subscription anytime."
   },
+  "about_page": {
+    "title": "About BlueCurve",
+    "subtitle": "We help students learn more effectively with intelligent tools: automatic summaries, flashcards, exam generation, and an AI assistant. Your progress is at the heart of our mission.",
+    "cta": "Learn more",
+    "mission_title": "Our mission",
+    "mission_text": "Make learning accessible, personalized, and measurable for every student.",
+    "approach_title": "Our approach",
+    "approach_text": "Combining AI and sound pedagogical practices: synthesis, active recall, assessment, and feedback.",
+    "values_title": "Our values",
+    "values_text": "Simplicity, ethics, data respect, and a positive impact on your results."
+  },
   "footer": {
     "tagline": "A platform to summarize, study and organize your learning more easily.",
     "platform": "Platform",
@@ -185,7 +196,7 @@
     "login": "Login",
     "about": "About",
     "faq": "FAQ",
-    "contact": "Contact",
+    "contact": "Contact us",
     "privacy": "Privacy",
     "terms": "Terms",
     "copyright": "© 2026 BlueCurve. All rights reserved."

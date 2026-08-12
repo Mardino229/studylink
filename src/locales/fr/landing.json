@@ -175,6 +175,17 @@
     },
     "footer_note": "Paiements sécurisés via Stripe. Annulation d'abonnement à tout moment."
   },
+  "about_page": {
+    "title": "À propos de BlueCurve",
+    "subtitle": "Nous aidons les étudiants à apprendre plus efficacement grâce à des outils intelligents : résumés automatiques, flashcards, génération d'épreuves et assistant IA. Votre progression est au cœur de notre mission.",
+    "cta": "En savoir plus",
+    "mission_title": "Notre mission",
+    "mission_text": "Rendre l'apprentissage accessible, personnalisé et mesurable pour chaque étudiant.",
+    "approach_title": "Notre approche",
+    "approach_text": "Combiner IA et bonnes pratiques pédagogiques : synthèse, révision active, évaluation et feedback.",
+    "values_title": "Nos valeurs",
+    "values_text": "Simplicité, éthique, respect des données, et impact positif sur vos résultats."
+  },
   "footer": {
     "tagline": "Une plateforme pour résumer, réviser et organiser vos études plus simplement.",
     "platform": "Plateforme",
@@ -185,7 +196,7 @@
     "login": "Connexion",
     "about": "À propos",
     "faq": "FAQ",
-    "contact": "Contact",
+    "contact": "Contactez-nous",
     "privacy": "Confidentialité",
     "terms": "Conditions",
     "copyright": "© 2026 BlueCurve. Tous droits réservés."

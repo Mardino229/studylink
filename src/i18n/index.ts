@@ -8,6 +8,7 @@ import enErrors    from '../locales/en/errors.json';
 import enApp       from '../locales/en/app.json';
 import enWorkspace from '../locales/en/workspace.json';
 import enExams     from '../locales/en/exams.json';
+import enLegal     from '../locales/en/legal.json';
 
 import frCommon    from '../locales/fr/common.json';
 import frAuth      from '../locales/fr/auth.json';
@@ -16,14 +17,15 @@ import frErrors    from '../locales/fr/errors.json';
 import frApp       from '../locales/fr/app.json';
 import frWorkspace from '../locales/fr/workspace.json';
 import frExams     from '../locales/fr/exams.json';
+import frLegal     from '../locales/fr/legal.json';
 
 const savedLang = localStorage.getItem('lang');
 const browserLang = navigator.language.startsWith('fr') ? 'fr' : 'en';
 
 i18n.use(initReactI18next).init({
     resources: {
-        en: { common: enCommon, auth: enAuth, landing: enLanding, errors: enErrors, app: enApp, workspace: enWorkspace, exams: enExams },
-        fr: { common: frCommon, auth: frAuth, landing: frLanding, errors: frErrors, app: frApp, workspace: frWorkspace, exams: frExams },
+        en: { common: enCommon, auth: enAuth, landing: enLanding, errors: enErrors, app: enApp, workspace: enWorkspace, exams: enExams, legal: enLegal },
+        fr: { common: frCommon, auth: frAuth, landing: frLanding, errors: frErrors, app: frApp, workspace: frWorkspace, exams: frExams, legal: frLegal },
     },
     lng: savedLang ?? browserLang,
     fallbackLng: 'en',
