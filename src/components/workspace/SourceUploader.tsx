@@ -13,6 +13,7 @@ const YoutubeIcon = ({ size = 24, className = '' }: { size?: number; className?:
 import ConfirmModal from '../../components/ui/ConfirmModal';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { baseUrl } from '../../utils/api.ts';
+import i18n from '../../i18n/index.ts';
 import { useQueryClient } from '@tanstack/react-query';
 
 const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
@@ -67,7 +68,7 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
         void fetchEventSource(`${baseUrl}/notebooks/${notebookId}/sources/${sourceId}/stream`, {
             method: 'GET',
             credentials: 'include',
-            headers: { Accept: 'text/event-stream' },
+            headers: { Accept: 'text/event-stream', 'Accept-Language': i18n.language.startsWith('fr') ? 'fr' : 'en' },
             onmessage(event) {
                 if (!event.data) return;
                 try {

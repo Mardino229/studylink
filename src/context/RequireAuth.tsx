@@ -55,6 +55,10 @@ const RequireAuth = () => {
         );
     }
 
+    if (!user?.study_level_id === null) {
+        return <Navigate to="/complete-profile" state={{ from: location }} replace />;
+    }
+
     if (!user?.email && !isLoading) {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
