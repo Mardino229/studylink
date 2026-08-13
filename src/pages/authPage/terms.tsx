@@ -116,10 +116,10 @@ export default function Terms() {
                                         <strong>BlueCurve</strong>
                                         <br />
                                         <a
-                                            href="mailto:studylink.uni@gmail.com"
+                                            href="mailto:contact@bluecurvespace.com"
                                             className="text-blue-600 underline hover:text-blue-700 dark:text-blue-400"
                                         >
-                                            studylink.uni@gmail.com
+                                            contact@bluecurvespace.com 
                                         </a>
                                     </p>
                                 </section>

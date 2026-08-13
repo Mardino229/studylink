@@ -107,7 +107,7 @@
     "status_validated": "Validée",
     "status_pending": "En attente",
     "status_rejected": "Refusée",
-    "coins_banner": "<bold>Gagnez des coins 🪙</bold> — chaque épreuve ou corrigé validé par l'équipe vous rapporte <str>0,5 coin</str>. Convertissez <str>5 coins → 1 jeton</str> depuis votre <a>wallet</a>.",
+    "coins_banner": "<bold>Gagnez des coins. Chaque épreuve ou corrigé validé par l'équipe vous rapporte <str>0,5 coin</str>. Convertissez <str>5 coins → 1 jeton</str> depuis votre <a>portefeuille de coin</a>.",
     "no_solution_banner": "Ces épreuves n'ont pas encore de corrigé. Soumettez le vôtre pour gagner <str>0,5 coin</str> si il est validé.",
     "empty_exams": "Vous n'avez pas encore soumis d'épreuve.",
     "empty_solutions": "Vous n'avez pas encore soumis de corrigé.",

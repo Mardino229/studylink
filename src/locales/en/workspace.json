@@ -83,7 +83,7 @@
     "modal_gen_flashcards": "Generating flashcards…",
     "modal_gen_quiz": "Generating quiz…",
     "modal_gen_podcast": "Generating podcast…",
-    "modal_gen_wait": "This may take a moment. Do not close this window.",
+    "modal_gen_wait": "This may take a few seconds. Do not close this window.",
     "no_source": "No sources available.",
     "no_theme": "No themes available.",
     "modal_generate": "Launch generation",
@@ -163,7 +163,7 @@
     "add": "Add",
     "no_sources": "No sources uploaded for this notebook.",
     "delete_confirm_title": "Delete source",
-    "delete_confirm_msg": "Delete this source and its vectors?",
+    "delete_confirm_msg": "Delete this source and its themes?",
     "delete_confirm_btn": "Delete",
     "cancel": "Cancel",
     "url_invalid": "Invalid URL. Use a youtube.com or youtu.be link."

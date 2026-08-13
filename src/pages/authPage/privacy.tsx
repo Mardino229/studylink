@@ -87,10 +87,10 @@ export default function Privacy() {
                                     <p className="mt-3">
                                         {t('privacy.s5_contact')}{' '}
                                         <a
-                                            href="mailto:studylink.uni@gmail.com"
+                                            href="mailto: contact@bluecurvespace.com "
                                             className="text-blue-600 underline hover:text-blue-700 dark:text-blue-400"
                                         >
-                                            studylink.uni@gmail.com
+                                            contact@bluecurvespace.com
                                         </a>
                                         .
                                     </p>
@@ -118,10 +118,10 @@ export default function Privacy() {
                                         <strong>BlueCurve</strong>
                                         <br />
                                         <a
-                                            href="mailto:studylink.uni@gmail.com"
+                                            href="mailto:contact@bluecurvespace.com"
                                             className="text-blue-600 underline hover:text-blue-700 dark:text-blue-400"
                                         >
-                                            studylink.uni@gmail.com
+                                            contact@bluecurvespace.com
                                         </a>
                                     </p>
                                 </section>
