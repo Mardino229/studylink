@@ -31,6 +31,7 @@ export interface Source {
 export interface Theme {
   id: string;
   notebook_id: string;
+  source_ids?: string[];
   name: string;
   normalized_name: string;
   description: string;

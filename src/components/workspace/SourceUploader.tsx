@@ -337,9 +337,9 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
                                     />
                                 </div>
                             )}
-                            <p className={`truncate text-xs ${isError ? 'text-red-600 dark:text-red-400' : 'text-sky-700 dark:text-sky-200'}`}>
+                            {/*<p className={`truncate text-xs ${isError ? 'text-red-600 dark:text-red-400' : 'text-sky-700 dark:text-sky-200'}`}>
                                 {isError ? getUnsupportedMessage(info.message) : info.message}
-                            </p>
+                            </p>*/}
                         </div>
                     );
                 })}

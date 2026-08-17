@@ -6,6 +6,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { autoScrollListRef } from '../summary/ai/use-auto-scroll';
 import { cn } from '../../lib/utils';
 import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
+import rehypeRaw from 'rehype-raw';
+import 'katex/dist/katex.min.css';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { axiosPrivate, baseUrl } from '../../utils/api.ts';
 import { Modal } from '../ui/modal/index.tsx';
@@ -677,7 +683,10 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                                                 </div>
                                             ) : (
                                                 <div className="prose text-slate-700 dark:text-slate-200 prose-sm max-w-none">
-                                                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                                                    <ReactMarkdown
+                                                        remarkPlugins={[remarkMath, remarkGfm, remarkBreaks]}
+                                                        rehypePlugins={[rehypeKatex, rehypeRaw]}
+                                                    >{msg.content}</ReactMarkdown>
                                                 </div>
                                             )}
                                         </div>

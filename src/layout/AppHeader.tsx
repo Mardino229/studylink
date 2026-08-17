@@ -14,6 +14,7 @@ import {
 import { useLogout } from "../utils/auth";
 import ConfirmModal from "../components/ui/ConfirmModal";
 import ThemeToggle from "../components/common/ThemeToggle.tsx";
+import LanguageSwitcher from "../components/common/LanguageSwitcher.tsx";
 import { useTranslation } from "react-i18next";
 
 function TokenStatusBadge() {
@@ -186,6 +187,7 @@ const AppHeader: React.FC = () => {
                     </Link>
 
                     <div className="flex items-center gap-1 lg:hidden">
+                        <LanguageSwitcher className="h-10 border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300" />
                         <button
                             onClick={() => setShowLogoutModal(true)}
                             className="flex items-center justify-center w-10 h-10 text-gray-500 rounded-lg hover:bg-red-50 hover:text-red-500 dark:text-gray-400 dark:hover:bg-red-500/10 dark:hover:text-red-400 transition-colors"
@@ -288,6 +290,7 @@ const AppHeader: React.FC = () => {
                         <TokenStatusBadge />
                     </div>
                     <ThemeToggle />
+                    <LanguageSwitcher />
                     <UserDropdown />
                 </div>
             </div>

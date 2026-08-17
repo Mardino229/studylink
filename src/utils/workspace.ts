@@ -271,6 +271,7 @@ export const useDeleteSource = () => {
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["sources", variables.notebookId] });
+            queryClient.invalidateQueries({ queryKey: ["themes", variables.notebookId] });
             toast.success("Source supprimée");
         },
         onError: (error) => {

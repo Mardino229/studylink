@@ -519,51 +519,55 @@ const WorkspaceNotebook: React.FC = () => {
                             </p>
                         </div>
 
-                        <div className="grid gap-4 lg:grid-cols-2">
-                            <div>
-                                <p className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-200">{t('notebook.gen_sources_label')}</p>
-                                <div className="max-h-36 sm:max-h-52 lg:max-h-64 space-y-2 overflow-y-auto overflow-x-hidden pr-1">
-                                    {sources?.items?.map(source => {
-                                        const currentTarget = generationModal === 'summary' ? summaryTarget : generationModal === 'flashcards' ? flashcardTarget : generationModal === 'quiz' ? quizTarget : podcastTarget;
-                                        const currentSetTarget = generationModal === 'summary' ? setSummaryTarget : generationModal === 'flashcards' ? setFlashcardTarget : generationModal === 'quiz' ? setQuizTarget : setPodcastTarget;
-                                        return (
-                                            <label key={source.id} className="flex w-full min-w-0 overflow-hidden cursor-pointer items-center gap-3 rounded-xl border border-gray-100 bg-white px-3 py-2 text-sm text-gray-700 transition-colors hover:border-blue-200 dark:border-gray-800 dark:bg-gray-900/40 dark:text-gray-200">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={currentTarget.sourceIds.includes(source.id)}
-                                                    onChange={() => currentSetTarget(prev => ({ ...prev, sourceIds: prev.sourceIds.includes(source.id) ? prev.sourceIds.filter(id => id !== source.id) : [...prev.sourceIds, source.id] }))}
-                                                    className="h-4 w-4 shrink-0 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                                />
-                                                <span className="min-w-0 truncate">{source.filename}</span>
-                                            </label>
-                                        );
-                                    })}
-                                    {sources?.items?.length === 0 && <p className="text-xs text-gray-400">{t('notebook.no_source')}</p>}
-                                </div>
-                            </div>
+                        {(() => {
+                            const currentTarget = generationModal === 'summary' ? summaryTarget : generationModal === 'flashcards' ? flashcardTarget : generationModal === 'quiz' ? quizTarget : podcastTarget;
+                            const currentSetTarget = generationModal === 'summary' ? setSummaryTarget : generationModal === 'flashcards' ? setFlashcardTarget : generationModal === 'quiz' ? setQuizTarget : setPodcastTarget;
+                            const selectedSourceIds = currentTarget.sourceIds;
+                            const visibleThemes = (themes?.items ?? []).filter(theme =>
+                                selectedSourceIds.length === 0 ||
+                                !theme.source_ids?.length ||
+                                theme.source_ids.some(sid => selectedSourceIds.includes(sid))
+                            );
+                            return (
+                                <div className="grid gap-4 lg:grid-cols-2">
+                                    <div>
+                                        <p className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-200">{t('notebook.gen_sources_label')}</p>
+                                        <div className="max-h-36 sm:max-h-52 lg:max-h-64 space-y-2 overflow-y-auto overflow-x-hidden pr-1">
+                                            {sources?.items?.map(source => (
+                                                <label key={source.id} className="flex w-full min-w-0 overflow-hidden cursor-pointer items-center gap-3 rounded-xl border border-gray-100 bg-white px-3 py-2 text-sm text-gray-700 transition-colors hover:border-blue-200 dark:border-gray-800 dark:bg-gray-900/40 dark:text-gray-200">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={currentTarget.sourceIds.includes(source.id)}
+                                                        onChange={() => currentSetTarget(prev => ({ ...prev, sourceIds: prev.sourceIds.includes(source.id) ? prev.sourceIds.filter(id => id !== source.id) : [...prev.sourceIds, source.id] }))}
+                                                        className="h-4 w-4 shrink-0 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                    />
+                                                    <span className="min-w-0 truncate">{source.filename}</span>
+                                                </label>
+                                            ))}
+                                            {sources?.items?.length === 0 && <p className="text-xs text-gray-400">{t('notebook.no_source')}</p>}
+                                        </div>
+                                    </div>
 
-                            <div>
-                                <p className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-200">{t('notebook.gen_themes_label')}</p>
-                                <div className="max-h-36 sm:max-h-52 lg:max-h-64 space-y-2 overflow-y-auto overflow-x-hidden pr-1">
-                                    {themes?.items?.map(theme => {
-                                        const currentTarget = generationModal === 'summary' ? summaryTarget : generationModal === 'flashcards' ? flashcardTarget : generationModal === 'quiz' ? quizTarget : podcastTarget;
-                                        const currentSetTarget = generationModal === 'summary' ? setSummaryTarget : generationModal === 'flashcards' ? setFlashcardTarget : generationModal === 'quiz' ? setQuizTarget : setPodcastTarget;
-                                        return (
-                                            <label key={theme.id} className="flex w-full min-w-0 overflow-hidden cursor-pointer items-center gap-3 rounded-xl border border-gray-100 bg-white px-3 py-2 text-sm text-gray-700 transition-colors hover:border-blue-200 dark:border-gray-800 dark:bg-gray-900/40 dark:text-gray-200">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={currentTarget.themeIds.includes(theme.id)}
-                                                    onChange={() => currentSetTarget(prev => ({ ...prev, themeIds: prev.themeIds.includes(theme.id) ? prev.themeIds.filter(id => id !== theme.id) : [...prev.themeIds, theme.id] }))}
-                                                    className="h-4 w-4 shrink-0 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                                />
-                                                <span className="min-w-0 truncate">{theme.name}</span>
-                                            </label>
-                                        );
-                                    })}
-                                    {themes?.items?.length === 0 && <p className="text-xs text-gray-400">{t('notebook.no_theme')}</p>}
+                                    <div>
+                                        <p className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-200">{t('notebook.gen_themes_label')}</p>
+                                        <div className="max-h-36 sm:max-h-52 lg:max-h-64 space-y-2 overflow-y-auto overflow-x-hidden pr-1">
+                                            {visibleThemes.map(theme => (
+                                                <label key={theme.id} className="flex w-full min-w-0 overflow-hidden cursor-pointer items-center gap-3 rounded-xl border border-gray-100 bg-white px-3 py-2 text-sm text-gray-700 transition-colors hover:border-blue-200 dark:border-gray-800 dark:bg-gray-900/40 dark:text-gray-200">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={currentTarget.themeIds.includes(theme.id)}
+                                                        onChange={() => currentSetTarget(prev => ({ ...prev, themeIds: prev.themeIds.includes(theme.id) ? prev.themeIds.filter(id => id !== theme.id) : [...prev.themeIds, theme.id] }))}
+                                                        className="h-4 w-4 shrink-0 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                    />
+                                                    <span className="min-w-0 truncate">{theme.name}</span>
+                                                </label>
+                                            ))}
+                                            {visibleThemes.length === 0 && <p className="text-xs text-gray-400">{t('notebook.no_theme')}</p>}
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
+                            );
+                        })()}
 
                         {generationFailed && (
                             <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 dark:border-red-900/40 dark:bg-red-950/20">
