@@ -18,7 +18,7 @@ export default function NotFound() {
                 <Link to="/" className="mb-8 flex items-center gap-3 opacity-80 hover:opacity-100 transition-opacity">
                     <img src={logo} alt="BlueCurve" className="h-10 w-auto" />
                     <span className="text-xl font-bold text-gray-700 dark:text-gray-200">BlueCurve</span>
-                </Link>
+                </Link> 
 
                 <motion.p
                     initial={{ scale: 0.8, opacity: 0 }}

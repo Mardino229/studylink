@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Upload } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Modal } from '../../../components/ui/modal/index.tsx';
 import CourseCombobox from '../../../components/ui/CourseCombobox';
 import { useUploadExam } from '../../../utils/exam';
@@ -22,6 +23,7 @@ export default function SubmitExamModal({ isOpen, onClose }: {
     isOpen: boolean;
     onClose: () => void;
 }) {
+    const { t } = useTranslation('exams');
     const uploadExam = useUploadExam();
     const [form, setForm] = useState(EMPTY_FORM);
     const [examFile, setExamFile] = useState<File | null>(null);
@@ -59,8 +61,8 @@ export default function SubmitExamModal({ isOpen, onClose }: {
                     <Upload size={18} className="text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                    <h3 className="text-base font-semibold text-gray-900 dark:text-white">Soumettre une épreuve ou un corrigé</h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Chaque fichier validé vous rapporte 0,5 coin.</p>
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-white">{t('submit_modal.title')}</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('submit_modal.subtitle')}</p>
                 </div>
             </div>
 
@@ -69,37 +71,37 @@ export default function SubmitExamModal({ isOpen, onClose }: {
                     <CourseCombobox
                         value={form.course_id}
                         onChange={(id) => setForm(p => ({ ...p, course_id: id }))}
-                        placeholder="  Cours  "
+                        placeholder={t('submit_modal.course_placeholder')}
                     />
                     <input
                         type="number"
                         value={form.academic_year}
                         onChange={(e) => setForm(p => ({ ...p, academic_year: e.target.value }))}
-                        placeholder="Année"
+                        placeholder={t('submit_modal.year_placeholder')}
                         className={inputCls}
                     />
                     <select value={form.session} onChange={(e) => setForm(p => ({ ...p, session: e.target.value as ExamSession | '' }))} className={selectCls}>
-                        <option value="">  Session  </option>
-                        <option value="fall">Automne</option>
-                        <option value="winter">Hiver</option>
-                        <option value="summer">Printemps/Été</option>
+                        <option value="">{t('submit_modal.session_placeholder')}</option>
+                        <option value="fall">{t('submit_modal.session_fall')}</option>
+                        <option value="winter">{t('submit_modal.session_winter')}</option>
+                        <option value="summer">{t('submit_modal.session_spring')}</option>
                     </select>
                     <select value={form.exam_type} onChange={(e) => setForm(p => ({ ...p, exam_type: e.target.value as ExamType | '', type_number: '' }))} className={selectCls}>
-                        <option value="">  Type  </option>
-                        <option value="Mi-session">Mi-session</option>
-                        <option value="Final">Final</option>
-                        <option value="Quiz">Quiz</option>
-                        <option value="Devoir">Devoir</option>
-                        <option value="Pratique">Pratique</option>
-                        <option value="DGD">DGD</option>
-                        <option value="Autre">Autre</option>
+                        <option value="">{t('submit_modal.type_placeholder')}</option>
+                        <option value="Mi-session">{t('submit_modal.type_mi_session')}</option>
+                        <option value="Final">{t('submit_modal.type_final')}</option>
+                        <option value="Quiz">{t('submit_modal.type_quiz')}</option>
+                        <option value="Devoir">{t('submit_modal.type_devoir')}</option>
+                        <option value="Pratique">{t('submit_modal.type_pratique')}</option>
+                        <option value="DGD">{t('submit_modal.type_dgd')}</option>
+                        <option value="Autre">{t('submit_modal.type_other')}</option>
                     </select>
                     {needsTypeNumber(form.exam_type) && (
                         <input
                             type="number"
                             value={form.type_number}
                             onChange={(e) => setForm(p => ({ ...p, type_number: e.target.value }))}
-                            placeholder={`N° de ${form.exam_type} *`}
+                            placeholder={t('submit_modal.type_number_placeholder', { type: form.exam_type })}
                             min={1} max={20}
                             className={inputCls}
                         />
@@ -107,34 +109,34 @@ export default function SubmitExamModal({ isOpen, onClose }: {
                     <input
                         value={form.section}
                         onChange={(e) => setForm(p => ({ ...p, section: e.target.value }))}
-                        placeholder="Section (ex: A) — optionnel"
+                        placeholder={t('submit_modal.section_placeholder')}
                         className={inputCls}
                     />
                 </div>
 
                 <div>
-                    <label className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400">Fichier épreuve </label>
+                    <label className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400">{t('submit_modal.exam_file_label')}</label>
                     <input type="file" accept=".pdf,image/*" onChange={(e) => setExamFile(e.target.files?.[0] ?? null)} className={fileCls} />
                 </div>
                 <div>
-                    <label className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400">Corrigé (+0,5 coin supplémentaire si validé)</label>
+                    <label className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400">{t('submit_modal.solution_file_label')}</label>
                     <input type="file" accept=".pdf,image/*" onChange={(e) => setSolutionFile(e.target.files?.[0] ?? null)} className={fileCls} />
                 </div>
 
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Vous devez soumettre une épreuve ou un corrigé, ou les deux à la fois.
+                    {t('submit_modal.hint')}
                 </p>
 
                 <div className="flex flex-col-reverse gap-2 pt-1 sm:flex-row sm:justify-end">
                     <button onClick={onClose} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5">
-                        Annuler
+                        {t('submit_modal.cancel')}
                     </button>
                     <button
                         onClick={handleSubmit}
                         disabled={isDisabled}
                         className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
                     >
-                        {uploadExam.isPending ? 'Envoi…' : 'Soumettre'}
+                        {uploadExam.isPending ? t('submit_modal.submitting') : t('submit_modal.submit_btn')}
                     </button>
                 </div>
             </div>

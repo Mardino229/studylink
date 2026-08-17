@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FileText, Sparkles, Trash2, Clock, Menu, Loader2, Volume2, Play } from 'lucide-react';
+import { FileText, Sparkles, Trash2, Clock, Menu, Loader2, Volume2, Play, ZoomIn, ZoomOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import Mermaid from '../../ui/Mermaid';
@@ -41,6 +41,7 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
     const [audioRequestSummaryId, setAudioRequestSummaryId] = useState<string | null>(null);
+    const [fontSize, setFontSize] = useState(100);
     const [audioOverrides, setAudioOverrides] = useState<Record<string, Pick<ArtefactSummary, 'audio_status' | 'audio_url'>>>({});
 
     const axiosPrivate = useAxiosPrivate();
@@ -393,6 +394,27 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                         </div>
 
                         <div className="flex items-center gap-2">
+                            <div className="flex items-center rounded-xl border border-border bg-background">
+                                <button
+                                    type="button"
+                                    onClick={() => setFontSize(s => Math.max(70, s - 10))}
+                                    disabled={fontSize <= 70}
+                                    className="flex h-8 w-8 items-center justify-center rounded-l-xl text-foreground/60 transition-all hover:bg-foreground/5 hover:text-foreground disabled:opacity-30"
+                                    title="Zoom out"
+                                >
+                                    <ZoomOut size={15} />
+                                </button>
+                                <span className="min-w-[3rem] text-center text-xs font-medium text-foreground/60 tabular-nums">{fontSize}%</span>
+                                <button
+                                    type="button"
+                                    onClick={() => setFontSize(s => Math.min(150, s + 10))}
+                                    disabled={fontSize >= 150}
+                                    className="flex h-8 w-8 items-center justify-center rounded-r-xl text-foreground/60 transition-all hover:bg-foreground/5 hover:text-foreground disabled:opacity-30"
+                                    title="Zoom in"
+                                >
+                                    <ZoomIn size={15} />
+                                </button>
+                            </div>
                             {selectedSummary && (
                                 <button
                                     onClick={() => handleGenerateAudio(selectedSummary.id)}
@@ -446,7 +468,7 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                                     </div>
                                 )}
 
-                                <div className="">
+                                <div style={{ fontSize: `${fontSize}%` }}>
                                     {renderMarkdown(selectedSummary.content)}
                                 </div>
                             </div>
