@@ -6,6 +6,7 @@ import {
     ArrowLeftIcon,
     BookOpen,
     FileText,
+    GitBranch,
     HelpCircle,
     Layers,
     MessageSquare,
@@ -19,14 +20,17 @@ import { useBilling } from '../../context/BillingContext';
 import UpgradeModal from '../../components/ui/UpgradeModal';
 import {
     useDeleteArtefactFlashcard,
+    useDeleteArtefactMindmap,
     useDeleteArtefactPodcast,
     useDeleteArtefactQuiz,
     useDeleteArtefactSummary,
     useGenerateFlashcards,
+    useGenerateMindmap,
     useGeneratePodcast,
     useGenerateQuiz,
     useGenerateSummary,
     useGetArtefactFlashcards,
+    useGetArtefactMindmaps,
     useGetArtefactPodcasts,
     useGetArtefactQuizzes,
     useGetArtefactSummaries,
@@ -47,12 +51,13 @@ import QuizzesTab from '../../components/workspace/tabs/QuizzesTab';
 import PodcastsTab from '../../components/workspace/tabs/PodcastsTab';
 import ChatTab from '../../components/workspace/tabs/ChatTab';
 import SummariesTab from '../../components/workspace/tabs/SummariesTab.tsx';
+import MindmapTab from '../../components/workspace/tabs/MindmapTab.tsx';
 
 const WorkspaceNotebook: React.FC = () => {
     const { notebookId } = useParams<{ notebookId: string }>();
     const { t } = useTranslation('workspace');
-    const [activeTab, setActiveTab] = useState<'overview' | 'sources' | 'summaries' | 'flashcards' | 'quizzes' | 'podcasts' | 'chat'>('overview');
-    const [generationModal, setGenerationModal] = useState<'summary' | 'flashcards' | 'quiz' | 'podcast' | null>(null);
+    const [activeTab, setActiveTab] = useState<'overview' | 'sources' | 'summaries' | 'flashcards' | 'quizzes' | 'podcasts' | 'mindmaps' | 'chat'>('overview');
+    const [generationModal, setGenerationModal] = useState<'summary' | 'flashcards' | 'quiz' | 'podcast' | 'mindmap' | null>(null);
     const [generationTitle, setGenerationTitle] = useState('');
     const [customInstructions, setCustomInstructions] = useState('');
     const [generationFailed, setGenerationFailed] = useState(false);
@@ -62,6 +67,8 @@ const WorkspaceNotebook: React.FC = () => {
     const [flashcardTarget, setFlashcardTarget] = useState<{ sourceIds: string[]; themeIds: string[] }>({ sourceIds: [], themeIds: [] });
     const [quizTarget, setQuizTarget] = useState<{ sourceIds: string[]; themeIds: string[] }>({ sourceIds: [], themeIds: [] });
     const [podcastTarget, setPodcastTarget] = useState<{ sourceIds: string[]; themeIds: string[] }>({ sourceIds: [], themeIds: [] });
+    const [mindmapTarget, setMindmapTarget] = useState<{ sourceIds: string[]; themeIds: string[] }>({ sourceIds: [], themeIds: [] });
+    const [mindmapDepth, setMindmapDepth] = useState(3);
     const [generationLanguage, setGenerationLanguage] = useState('fr');
 
     const { data: notebook, isLoading: isLoadingNotebook } = useGetNotebook(notebookId);
@@ -71,6 +78,7 @@ const WorkspaceNotebook: React.FC = () => {
     const { data: flashcards, isLoading: isLoadingFlashcards } = useGetArtefactFlashcards(notebookId ?? "", { perPage: 100 });
     const { data: quizzes, isLoading: isLoadingQuizzes } = useGetArtefactQuizzes(notebookId ?? "", { perPage: 100 });
     const { data: podcasts, isLoading: isLoadingPodcasts } = useGetArtefactPodcasts(notebookId ?? "", { perPage: 100 });
+    const { data: mindmaps, isLoading: isLoadingMindmaps } = useGetArtefactMindmaps(notebookId ?? "", { perPage: 100 });
 
     const createSummary = useGenerateSummary();
     const createFlashcards = useGenerateFlashcards();
@@ -80,6 +88,8 @@ const WorkspaceNotebook: React.FC = () => {
     const deleteFlashcard = useDeleteArtefactFlashcard();
     const deleteQuiz = useDeleteArtefactQuiz();
     const deletePodcast = useDeleteArtefactPodcast();
+    const createMindmap = useGenerateMindmap();
+    const deleteMindmap = useDeleteArtefactMindmap();
     
     const { isPro, isUltra, tokenBalance } = useBilling();
     const queryClient = useQueryClient();
@@ -135,16 +145,18 @@ const WorkspaceNotebook: React.FC = () => {
         { id: 'flashcards', label: 'Flashcards', icon: Layers },
         { id: 'quizzes', label: t('notebook.tab_quizzes'), icon: HelpCircle },
         { id: 'podcasts', label: 'Podcasts', icon: Mic },
+        { id: 'mindmaps', label: 'Cartes', icon: GitBranch },
         { id: 'chat', label: 'Chat', icon: MessageSquare },
     ] as const;
 
-    const isGenerating = createSummary.isPending || createFlashcards.isPending || createQuiz.isPending || createPodcast.isPending;
+    const isGenerating = createSummary.isPending || createFlashcards.isPending || createQuiz.isPending || createPodcast.isPending || createMindmap.isPending;
 
     const isCurrentlyGenerating =
         (generationModal === 'summary' && createSummary.isPending) ||
         (generationModal === 'flashcards' && createFlashcards.isPending) ||
         (generationModal === 'quiz' && createQuiz.isPending) ||
-        (generationModal === 'podcast' && createPodcast.isPending);
+        (generationModal === 'podcast' && createPodcast.isPending) ||
+        (generationModal === 'mindmap' && createMindmap.isPending);
 
     const stats = [
         { label: t('notebook.stat_sources_label'), value: sources?.items?.length ?? 0, hint: isLoadingSources ? t('notebook.loading') : t('notebook.stat_sources_hint'), icon: FileText },
@@ -190,18 +202,15 @@ const WorkspaceNotebook: React.FC = () => {
         chat:       'Chat',
     };
 
-    const openGenerationModal = (type: 'summary' | 'flashcards' | 'quiz' | 'podcast') => {
+    const openGenerationModal = (type: 'summary' | 'flashcards' | 'quiz' | 'podcast' | 'mindmap') => {
         setGenerationModal(type);
         const notebookName = notebook?.name?.trim() || 'Notebook';
-        if (type === 'summary') {
-            setGenerationTitle(`${notebookName} - ${t('notebook.gen_suffix_summary')}`);
-        } else if (type === 'flashcards') {
-            setGenerationTitle(`${notebookName} - ${t('notebook.gen_suffix_flashcards')}`);
-        } else if (type === 'quiz') {
-            setGenerationTitle(`${notebookName} - ${t('notebook.gen_suffix_quiz')}`);
-        } else {
-            setGenerationTitle(`${notebookName} - ${t('notebook.gen_suffix_podcast')}`);
-        }
+        const suffixKey = type === 'summary' ? 'gen_suffix_summary'
+            : type === 'flashcards' ? 'gen_suffix_flashcards'
+            : type === 'quiz' ? 'gen_suffix_quiz'
+            : type === 'podcast' ? 'gen_suffix_podcast'
+            : 'gen_suffix_mindmap';
+        setGenerationTitle(`${notebookName} - ${t(`notebook.${suffixKey}`)}`);
     };
 
     return (
@@ -299,7 +308,7 @@ const WorkspaceNotebook: React.FC = () => {
 
                             <div ref={contentRef} className="lg:mt-6 mt-2 flex-1 overflow-hidden">
                                 <div className={`rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/80 ${
-                                    ['chat', 'summaries', 'flashcards', 'podcasts'].includes(activeTab)
+                                    ['chat', 'summaries', 'flashcards', 'podcasts', 'mindmaps'].includes(activeTab)
                                         ? 'h-[calc(100dvh-56px)] sm:h-[600px] md:h-[calc(100vh-340px)] lg:h-[calc(100vh-300px)] overflow-hidden'
                                         : ''
                                 }`}>
@@ -363,6 +372,19 @@ const WorkspaceNotebook: React.FC = () => {
                                         />
                                     )}
 
+                                    {activeTab === 'mindmaps' && (
+                                        <MindmapTab
+                                            mindmaps={mindmaps}
+                                            isLoadingMindmaps={isLoadingMindmaps}
+                                            isGenerating={isGenerating}
+                                            openGenerationModal={openGenerationModal}
+                                            handleDelete={handleDelete}
+                                            deleteMindmap={deleteMindmap}
+                                            notebookId={notebookId}
+                                            formatDate={formatDate}
+                                        />
+                                    )}
+
                                     {activeTab === 'chat' && (
                                         <ChatTab notebookId={notebookId} />
                                     )}
@@ -416,6 +438,7 @@ const WorkspaceNotebook: React.FC = () => {
                         {generationModal === 'flashcards' && t('notebook.modal_prepare_flashcards')}
                         {generationModal === 'quiz' && t('notebook.modal_prepare_quiz')}
                         {generationModal === 'podcast' && t('notebook.modal_prepare_podcast')}
+                        {generationModal === 'mindmap' && t('notebook.modal_prepare_mindmap')}
                     </h3>
                     {!isCurrentlyGenerating && (
                         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -436,6 +459,7 @@ const WorkspaceNotebook: React.FC = () => {
                                 {generationModal === 'flashcards' && t('notebook.modal_gen_flashcards')}
                                 {generationModal === 'quiz' && t('notebook.modal_gen_quiz')}
                                 {generationModal === 'podcast' && t('notebook.modal_gen_podcast')}
+                                {generationModal === 'mindmap' && t('notebook.modal_gen_mindmap')}
                             </p>
                             <p className="text-xs text-gray-400 dark:text-gray-500">
                                 {t('notebook.modal_gen_wait')}
@@ -496,6 +520,24 @@ const WorkspaceNotebook: React.FC = () => {
                                     />
                                 </div>
                             )}
+                            {generationModal === 'mindmap' && (
+                                <div>
+                                    <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                        {t('notebook.gen_depth_label')} — {mindmapDepth}
+                                    </label>
+                                    <input
+                                        type="range"
+                                        min={1}
+                                        max={5}
+                                        value={mindmapDepth}
+                                        onChange={(e) => setMindmapDepth(Number(e.target.value))}
+                                        className="w-full accent-blue-600"
+                                    />
+                                    <div className="mt-1 flex justify-between text-xs text-gray-400">
+                                        <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <div className="mb-5">
@@ -520,8 +562,8 @@ const WorkspaceNotebook: React.FC = () => {
                         </div>
 
                         {(() => {
-                            const currentTarget = generationModal === 'summary' ? summaryTarget : generationModal === 'flashcards' ? flashcardTarget : generationModal === 'quiz' ? quizTarget : podcastTarget;
-                            const currentSetTarget = generationModal === 'summary' ? setSummaryTarget : generationModal === 'flashcards' ? setFlashcardTarget : generationModal === 'quiz' ? setQuizTarget : setPodcastTarget;
+                            const currentTarget = generationModal === 'summary' ? summaryTarget : generationModal === 'flashcards' ? flashcardTarget : generationModal === 'quiz' ? quizTarget : generationModal === 'mindmap' ? mindmapTarget : podcastTarget;
+                            const currentSetTarget = generationModal === 'summary' ? setSummaryTarget : generationModal === 'flashcards' ? setFlashcardTarget : generationModal === 'quiz' ? setQuizTarget : generationModal === 'mindmap' ? setMindmapTarget : setPodcastTarget;
                             const selectedSourceIds = currentTarget.sourceIds;
                             const visibleThemes = (themes?.items ?? []).filter(theme =>
                                 selectedSourceIds.length === 0 ||
@@ -618,6 +660,9 @@ const WorkspaceNotebook: React.FC = () => {
                                     }
                                     if (generationModal === 'podcast') {
                                         createPodcast.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, sourceIds: podcastTarget.sourceIds, themeIds: podcastTarget.themeIds, customInstructions: ci }, { onSuccess: closeOnSuccess, onError: handleGenerationError });
+                                    }
+                                    if (generationModal === 'mindmap') {
+                                        createMindmap.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, maxDepth: mindmapDepth, sourceIds: mindmapTarget.sourceIds, themeIds: mindmapTarget.themeIds, customInstructions: ci }, { onSuccess: closeOnSuccess, onError: handleGenerationError });
                                     }
                                 }}
                                 disabled={!generationTitle.trim() && canGenerate}

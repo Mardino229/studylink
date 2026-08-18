@@ -4,7 +4,7 @@ import type { AxiosError } from "axios";
 import { useAxiosPrivate } from "../hoooks/useAxiosPrivate.ts";
 import type {
     Folder, Notebook, Source, Theme, ChatSession, ChatMessage,
-    ArtefactQuiz, ArtefactFlashcard, ArtefactSummary, ArtefactPodcast,
+    ArtefactQuiz, ArtefactFlashcard, ArtefactSummary, ArtefactPodcast, ArtefactMindmap,
     PaginatedResponse
 } from "../types/workspace.ts";
 
@@ -626,6 +626,69 @@ export const useSetFlashcardItemStatus = () => {
         onError: (error) => {
             const axiosError = error as AxiosError<{ detail: string }>;
             toast.error("Erreur", { description: axiosError.response?.data?.detail || "Impossible de mettre à jour le statut" });
+        },
+    });
+};
+
+// ─── Mindmaps ─────────────────────────────────────────────
+
+export const useGenerateMindmap = () => {
+    const axiosPrivate = useAxiosPrivate();
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ notebookId, title, language, maxDepth, sourceIds, themeIds, customInstructions }: {
+            notebookId: string; title: string; language?: string; maxDepth?: number;
+            sourceIds?: string[]; themeIds?: string[]; customInstructions?: string;
+        }) => {
+            const response = await axiosPrivate.post<{ data: ArtefactMindmap }>(`/notebooks/${notebookId}/artefacts/mindmaps`, {
+                title,
+                language,
+                max_depth: maxDepth,
+                source_ids: sourceIds,
+                theme_ids: themeIds,
+                custom_instructions: customInstructions || undefined,
+            });
+            return response.data.data;
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ["artefact-mindmaps", variables.notebookId] });
+            queryClient.invalidateQueries({ queryKey: ["token-balance"] });
+            toast.success("Carte mentale générée");
+        },
+        onError: (error) => {
+            const axiosError = error as AxiosError<{ message: string }>;
+            toast.error("Erreur", { description: axiosError.response?.data?.message || "Erreur lors de la génération" });
+        },
+    });
+};
+
+export const useGetArtefactMindmaps = (notebookId: string, options: PaginationOptions = {}) => {
+    const axiosPrivate = useAxiosPrivate();
+    return useQuery({
+        queryKey: ["artefact-mindmaps", notebookId, options.page ?? 1, options.perPage ?? 20],
+        queryFn: async () => {
+            const params = buildPaginationParams(options);
+            const response = await axiosPrivate.get<{ data: PaginatedResponse<ArtefactMindmap> }>(`/notebooks/${notebookId}/artefacts/mindmaps?${params}`);
+            return response.data.data;
+        },
+        enabled: !!notebookId,
+    });
+};
+
+export const useDeleteArtefactMindmap = () => {
+    const queryClient = useQueryClient();
+    const axiosPrivate = useAxiosPrivate();
+    return useMutation({
+        mutationFn: async ({ notebookId, mindmapId }: { notebookId: string; mindmapId: string }) => {
+            await axiosPrivate.delete(`/notebooks/${notebookId}/artefacts/mindmaps/${mindmapId}`);
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ["artefact-mindmaps", variables.notebookId] });
+            toast.success("Carte mentale supprimée");
+        },
+        onError: (error) => {
+            const axiosError = error as AxiosError<{ message: string }>;
+            toast.error("Erreur", { description: axiosError.response?.data?.message || "Erreur de suppression" });
         },
     });
 };

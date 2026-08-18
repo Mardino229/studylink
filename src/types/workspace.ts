@@ -113,6 +113,23 @@ export interface ArtefactPodcast {
   updated_at?: string;
 }
 
+export interface MindMapNode {
+  id: string;
+  label: string;
+  description: string | null;
+  source_ids: string[];
+  children: MindMapNode[];
+}
+
+export interface ArtefactMindmap {
+  id: string;
+  notebook_id: string;
+  title: string;
+  root: MindMapNode;
+  created_at?: string;
+  updated_at?: string;
+}
+
 // Pagination types
 export interface Pagination {
   total: number;

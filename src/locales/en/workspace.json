@@ -92,6 +92,10 @@
     "gen_custom_label": "Custom instructions",
     "gen_custom_placeholder": "Any specifics about what you want? (optional)",
     "gen_custom_hint": "For language or question count, use the settings above — this field is for content, tone, and focus.",
+    "modal_prepare_mindmap": "Prepare the mind map",
+    "modal_gen_mindmap": "Generating mind map…",
+    "gen_depth_label": "Maximum depth",
+    "gen_suffix_mindmap": "Mind Map",
     "modal_gen_failed": "Generation failed.",
     "modal_gen_failed_tokens": "Try again — no tokens were charged."
   },
@@ -236,6 +240,22 @@
       "history_title": "Quiz",
       "create_short": "Create",
       "no_quizzes": "No quizzes generated."
+    },
+    "mindmaps": {
+      "history_title": "History",
+      "create_short": "Create",
+      "no_mindmaps": "No mind maps generated.",
+      "default_title": "Mind Map",
+      "detail_default": "Mind Map",
+      "empty": "No map selected",
+      "empty_hint": "Select a mind map or create a new one.",
+      "create_btn": "Create a mind map",
+      "confirm_delete": "Delete this mind map?",
+      "delete_btn": "Delete",
+      "delete_title": "Delete",
+      "close_history": "Close history",
+      "open_history": "Open history",
+      "gen_depth_label": "Maximum depth"
     },
     "podcasts": {
       "generating": "Generating...",

@@ -92,6 +92,10 @@
     "gen_custom_label": "Instructions personnalisées",
     "gen_custom_placeholder": "Des précisions sur ce que tu veux ? (optionnel)",
     "gen_custom_hint": "Pour la langue ou le nombre de questions, utilise les réglages ci-dessus — ce champ sert au contenu, au ton et au focus.",
+    "modal_prepare_mindmap": "Préparer la carte mentale",
+    "modal_gen_mindmap": "Génération de la carte mentale en cours…",
+    "gen_depth_label": "Profondeur maximale",
+    "gen_suffix_mindmap": "Carte mentale",
     "modal_gen_failed": "La génération a échoué.",
     "modal_gen_failed_tokens": "Réessaie — aucun jeton n'a été débité."
   },
@@ -236,6 +240,22 @@
       "history_title": "Quiz",
       "create_short": "Créer",
       "no_quizzes": "Aucun quiz généré."
+    },
+    "mindmaps": {
+      "history_title": "Historique",
+      "create_short": "Créer",
+      "no_mindmaps": "Aucune carte générée.",
+      "default_title": "Carte mentale",
+      "detail_default": "Carte mentale",
+      "empty": "Aucune carte sélectionnée",
+      "empty_hint": "Sélectionnez une carte mentale ou créez-en une nouvelle.",
+      "create_btn": "Créer une carte mentale",
+      "confirm_delete": "Supprimer cette carte mentale ?",
+      "delete_btn": "Supprimer",
+      "delete_title": "Supprimer",
+      "close_history": "Fermer l'historique",
+      "open_history": "Ouvrir l'historique",
+      "gen_depth_label": "Profondeur maximale"
     },
     "podcasts": {
       "generating": "En cours de génération…",
