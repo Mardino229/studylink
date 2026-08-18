@@ -1,14 +1,19 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronRight, ChevronDown, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import type { MindMapNode } from '../../types/workspace';
 
 // ── Layout constants ──────────────────────────────────────
 const NODE_W = 168;
-const LEAF_H = 68;   // vertical slot per leaf
-const LEVEL_W = 240; // horizontal gap between depth levels
+const LEAF_H = 68;
+const LEVEL_W = 240;
 const PAD_X = 32;
 const PAD_Y = 40;
 const MIN_H = 400;
+const NODE_VH = 44;
+
+// ── Minimap constants ─────────────────────────────────────
+const MM_W = 180;
+const MM_H = 110;
 
 // ── Branch colour palette ─────────────────────────────────
 const PALETTE = [
@@ -59,12 +64,17 @@ function placeTree(
     });
 }
 
+function layoutDimensions(nodes: Placed[]) {
+    return {
+        w: Math.max(...nodes.map(p => p.x)) + NODE_W + PAD_X * 2,
+        h: Math.max(...nodes.map(p => p.y)) + NODE_VH / 2 + PAD_Y,
+    };
+}
+
 // ── Component ─────────────────────────────────────────────
 export interface MindmapRendererProps {
     root: MindMapNode;
 }
-
-const NODE_VH = 44; // visual height of a node box
 
 export default function MindmapRenderer({ root }: MindmapRendererProps) {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -74,6 +84,7 @@ export default function MindmapRenderer({ root }: MindmapRendererProps) {
     const dragging = useRef(false);
     const dragOrigin = useRef({ x: 0, y: 0 });
     const [hoveredId, setHoveredId] = useState<string | null>(null);
+    const prevRootIdRef = useRef<string | undefined>(undefined);
 
     // Build layout
     const placed = useMemo(() => {
@@ -84,14 +95,48 @@ export default function MindmapRenderer({ root }: MindmapRendererProps) {
         return nodes;
     }, [root, collapsed]);
 
-    const canvasW = useMemo(() => Math.max(...placed.map(p => p.x)) + NODE_W + PAD_X * 2, [placed]);
-    const canvasH = useMemo(() => Math.max(...placed.map(p => p.y)) + NODE_VH / 2 + PAD_Y, [placed]);
+    const canvasW = useMemo(() => layoutDimensions(placed).w, [placed]);
+    const canvasH = useMemo(() => layoutDimensions(placed).h, [placed]);
 
     const byId = useMemo(() => {
         const m = new Map<string, Placed>();
         placed.forEach(p => m.set(p.node.id, p));
         return m;
     }, [placed]);
+
+    // Fit tree to visible container area
+    const fitToContainer = useCallback(() => {
+        const container = containerRef.current;
+        if (!container || canvasW <= 0 || canvasH <= 0) return;
+        const cw = container.clientWidth;
+        const ch = container.clientHeight;
+        const z = Math.max(0.25, Math.min(2.5, Math.min(cw / canvasW, ch / canvasH) * 0.88));
+        setPan({ x: (cw - canvasW * z) / 2, y: (ch - canvasH * z) / 2 });
+        setZoom(z);
+    }, [canvasW, canvasH]);
+
+    // Auto-fit and reset collapse when root changes (new mindmap selected)
+    useEffect(() => {
+        if (prevRootIdRef.current === root.id) return;
+        prevRootIdRef.current = root.id;
+        setCollapsed(new Set());
+        // Compute full-expanded layout to get true canvas size before fitToContainer runs
+        const frameId = requestAnimationFrame(() => {
+            const container = containerRef.current;
+            if (!container) return;
+            const emptySet = new Set<string>();
+            const nodes: Placed[] = [];
+            const leaves = countLeaves(root, emptySet);
+            placeTree(root, PAD_X, 0, Math.max(leaves * LEAF_H, MIN_H), -1, null, emptySet, nodes);
+            const { w: cW, h: cH } = layoutDimensions(nodes);
+            const cw = container.clientWidth;
+            const ch = container.clientHeight;
+            const z = Math.max(0.25, Math.min(2.5, Math.min(cw / cW, ch / cH) * 0.88));
+            setPan({ x: (cw - cW * z) / 2, y: (ch - cH * z) / 2 });
+            setZoom(z);
+        });
+        return () => cancelAnimationFrame(frameId);
+    }, [root]);
 
     // Pan handlers
     const onPointerDown = useCallback((e: React.PointerEvent) => {
@@ -132,7 +177,6 @@ export default function MindmapRenderer({ root }: MindmapRendererProps) {
         });
     };
 
-    const resetView = () => { setZoom(1); setPan({ x: PAD_X, y: PAD_Y }); };
     const collapseAll = () => {
         const ids = new Set<string>();
         function walk(n: MindMapNode) { if (n.children.length) { ids.add(n.id); n.children.forEach(walk); } }
@@ -140,6 +184,32 @@ export default function MindmapRenderer({ root }: MindmapRendererProps) {
         setCollapsed(ids);
     };
     const expandAll = () => setCollapsed(new Set());
+
+    // ── Minimap ───────────────────────────────────────────
+    const mmScale = Math.min(MM_W / canvasW, MM_H / canvasH) * 0.9;
+    const mmOffX = (MM_W - canvasW * mmScale) / 2;
+    const mmOffY = (MM_H - canvasH * mmScale) / 2;
+    const contW = containerRef.current?.clientWidth ?? 0;
+    const contH = containerRef.current?.clientHeight ?? 0;
+    const mmVpX = mmOffX + (-pan.x / zoom) * mmScale;
+    const mmVpY = mmOffY + (-pan.y / zoom) * mmScale;
+    const mmVpW = (contW / zoom) * mmScale;
+    const mmVpH = (contH / zoom) * mmScale;
+
+    const onMinimapPointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
+        e.stopPropagation();
+        const rect = e.currentTarget.getBoundingClientRect();
+        const mx = e.clientX - rect.left - mmOffX;
+        const my = e.clientY - rect.top - mmOffY;
+        const cx = mx / mmScale;
+        const cy = my / mmScale;
+        const container = containerRef.current;
+        if (!container) return;
+        setPan({
+            x: -(cx * zoom) + container.clientWidth / 2,
+            y: -(cy * zoom) + container.clientHeight / 2,
+        });
+    };
 
     return (
         <div className="flex flex-col h-full gap-2">
@@ -150,7 +220,7 @@ export default function MindmapRenderer({ root }: MindmapRendererProps) {
                     <span className="min-w-[3.5rem] text-center text-xs font-medium text-foreground/60 tabular-nums">{Math.round(zoom * 100)}%</span>
                     <button onClick={() => setZoom(z => Math.min(2.5, z + 0.15))} className="flex h-8 w-8 items-center justify-center rounded-r-xl text-foreground/60 hover:bg-foreground/5 hover:text-foreground transition-all disabled:opacity-30" disabled={zoom >= 2.5}><ZoomIn size={15} /></button>
                 </div>
-                <button onClick={resetView} className="flex h-8 w-8 items-center justify-center rounded-xl border border-border bg-background text-foreground/60 hover:bg-foreground/5 hover:text-foreground transition-all" title="Réinitialiser la vue"><Maximize2 size={14} /></button>
+                <button onClick={fitToContainer} className="flex h-8 w-8 items-center justify-center rounded-xl border border-border bg-background text-foreground/60 hover:bg-foreground/5 hover:text-foreground transition-all" title="Ajuster à l'écran"><Maximize2 size={14} /></button>
                 <div className="h-4 w-px bg-border" />
                 <button onClick={expandAll} className="rounded-xl border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground/70 hover:bg-foreground/5 transition-all">Tout développer</button>
                 <button onClick={collapseAll} className="rounded-xl border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground/70 hover:bg-foreground/5 transition-all">Tout réduire</button>
@@ -266,8 +336,45 @@ export default function MindmapRenderer({ root }: MindmapRendererProps) {
                     })}
                 </div>
 
+                {/* Minimap */}
+                <svg
+                    width={MM_W}
+                    height={MM_H}
+                    onPointerDown={onMinimapPointerDown}
+                    className="absolute bottom-8 right-4 rounded-xl border border-border bg-white/85 dark:bg-gray-950/85 backdrop-blur-sm shadow-lg cursor-pointer"
+                    style={{ pointerEvents: 'all' }}
+                >
+                    {placed.map(({ node, x, y, colorIdx }) => {
+                        const color = colorIdx < 0 ? '#3b82f6' : PALETTE[colorIdx].line;
+                        return (
+                            <rect
+                                key={node.id}
+                                x={mmOffX + x * mmScale}
+                                y={mmOffY + (y - NODE_VH / 2) * mmScale}
+                                width={Math.max(1, NODE_W * mmScale)}
+                                height={Math.max(1, NODE_VH * mmScale)}
+                                rx={2}
+                                fill={color}
+                                opacity={0.65}
+                            />
+                        );
+                    })}
+                    {/* Viewport indicator */}
+                    <rect
+                        x={mmVpX}
+                        y={mmVpY}
+                        width={Math.max(4, mmVpW)}
+                        height={Math.max(4, mmVpH)}
+                        fill="#6366f1"
+                        fillOpacity={0.08}
+                        stroke="#6366f1"
+                        strokeWidth={1.5}
+                        rx={3}
+                    />
+                </svg>
+
                 {/* Hint */}
-                <p className="pointer-events-none absolute bottom-3 right-4 text-[10px] text-foreground/30 select-none">
+                <p className="pointer-events-none absolute bottom-3 left-4 text-[10px] text-foreground/30 select-none">
                     Scroll pour zoomer · Glisser pour déplacer · Clic pour développer
                 </p>
             </div>
