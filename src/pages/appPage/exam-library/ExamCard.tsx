@@ -35,8 +35,8 @@ const TYPE_KEYS: Record<ExamType, 'library.filters.mi_session' | 'library.filter
     'Autre':      'library.filters.autre',
 };
 
-export default function ExamCard({ exam, isPro, tokenBalance, isSolutionUnlocked, isExamUnlocked, onViewExam, onViewSolution }: {
-    exam: ExamItem; isPro: boolean; tokenBalance: number; isSolutionUnlocked: boolean; isExamUnlocked: boolean;
+export default function ExamCard({ exam, isPro, isUltra, tokenBalance, isSolutionUnlocked, isExamUnlocked, onViewExam, onViewSolution }: {
+    exam: ExamItem; isPro: boolean; isUltra: boolean; tokenBalance: number; isSolutionUnlocked: boolean; isExamUnlocked: boolean;
     onViewExam: () => void; onViewSolution: () => void;
 }) {
     const { t, i18n } = useTranslation('exams');
@@ -78,6 +78,10 @@ export default function ExamCard({ exam, isPro, tokenBalance, isSolutionUnlocked
                 {isPro ? (
                     <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
                         <Sparkles size={10} />{t('card.pro_badge')}
+                    </span>
+                ): isUltra ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-purple-50 px-2 py-0.5 text-[10px] font-semibold text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
+                        <Sparkles size={10} />{t('card.ultra_badge')}
                     </span>
                 ) : isSolutionUnlocked && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">

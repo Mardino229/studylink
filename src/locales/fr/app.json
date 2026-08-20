@@ -112,6 +112,15 @@
     "cancel_desc": "Votre abonnement se termine le {{date}}. Vous gardez l'accès jusqu'à cette date.",
     "auto_renew_notice": "Cet abonnement se renouvelle automatiquement si vous ne l'annulez pas avant la fin de la période."
   },
+  "settings_tokens": {
+    "page_title": "Paramètres • Mes jetons",
+    "page_desc": "Gérer votre solde de jetons",
+    "title": "Mes Jetons",
+    "back": "Retour",
+    "balance_title": "Solde de jetons",
+    "balance_label": "Solde actuel",
+    "tokens_unit": "jetons"
+  },
   "settings_feedback": {
     "page_title": "Paramètres • Feedback",
     "back": "Retour aux paramètres",
@@ -285,6 +294,7 @@
     "nav_submissions": "Mes soumissions",
     "nav_coins": "Portefeuille de coins",
     "nav_subscription": "Mon abonnement",
+    "nav_tokens": "Mes jetons",
     "nav_profile": "Mon profil",
     "nav_settings": "Paramètres"
   },

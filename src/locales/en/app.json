@@ -112,6 +112,15 @@
     "cancel_desc": "Your subscription ends on {{date}}. You keep access until that date.",
     "auto_renew_notice": "This subscription renews automatically unless cancelled before the end of the period."
   },
+  "settings_tokens": {
+    "page_title": "Settings • My Tokens",
+    "page_desc": "Manage your token balance",
+    "title": "My Tokens",
+    "back": "Back",
+    "balance_title": "Token Balance",
+    "balance_label": "Current balance",
+    "tokens_unit": "tokens"
+  },
   "settings_feedback": {
     "page_title": "Settings • Feedback",
     "back": "Back to settings",
@@ -285,6 +294,7 @@
     "nav_submissions": "My submissions",
     "nav_coins": "Coins wallet",
     "nav_subscription": "My subscription",
+    "nav_tokens": "My tokens",
     "nav_profile": "User profile",
     "nav_settings": "Settings"
   },

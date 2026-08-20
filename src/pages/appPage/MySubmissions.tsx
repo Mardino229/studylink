@@ -171,7 +171,7 @@ export default function MySubmissions() {
             )}
 
             {/* ── Mes fichiers épreuve ── */}
-            {tab === 'exam_files' && (
+            {/*{tab === 'exam_files' && (
                 <SubmissionList
                     isLoading={loadingExamFiles}
                     empty={{ icon: FilePlus2, text: t('submissions.empty_exam_files') }}
@@ -185,7 +185,7 @@ export default function MySubmissions() {
                         />
                     ))}
                 </SubmissionList>
-            )}
+            )}*/} 
 
             {/* ── Mes corrigés ── */}
             {tab === 'solutions' && (

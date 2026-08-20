@@ -55,6 +55,7 @@ import Workspaces from './pages/appPage/Workspaces.tsx';
 import WorkspaceNotebook from './pages/appPage/WorkspaceNotebook.tsx';
 import MySubmissions from './pages/appPage/MySubmissions.tsx';
 import CoinsWallet from './pages/appPage/CoinsWallet.tsx';
+import SettingsTokens from './pages/appPage/SettingsTokens.tsx';
 import NotFound from './pages/NotFound.tsx';
 
 function App() {
@@ -99,6 +100,7 @@ function App() {
                         <Route path="/settings" element={<Settings />} />
                         <Route path="/settings/profile" element={<SettingsProfile />} />
                         <Route path="/subscription" element={<SettingsSubscription />} />
+                        <Route path="/tokens" element={<SettingsTokens />} />
                         <Route path="/settings/payments" element={<PaymentListPage />} />
                         <Route path="/settings/announcements" element={<SettingsAnnouncements />} />
                         <Route path="/settings/feedback" element={<SettingsFeedback />} />

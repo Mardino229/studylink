@@ -108,7 +108,8 @@ export default function ExamLibrary() {
                             <ExamCard
                                 key={exam.id}
                                 exam={exam}
-                                isPro={isPro || isUltra}
+                                isPro={isPro}
+                                isUltra={isUltra}
                                 tokenBalance={tokenBalance}
                                 isSolutionUnlocked={exam.has_solution_access}
                                 isExamUnlocked={exam.has_exam_access}

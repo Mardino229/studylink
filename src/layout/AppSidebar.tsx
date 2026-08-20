@@ -8,7 +8,7 @@ import {
     ListIcon,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
-import { Coins, CreditCard, DockIcon, SendHorizonal, SettingsIcon } from "lucide-react";
+import { Coins, CreditCard, DockIcon, SendHorizonal, SettingsIcon, Wallet } from "lucide-react";
 import { UserCircleIcon } from "../icons";
 import { useTranslation } from "react-i18next";
 
@@ -34,6 +34,7 @@ const AppSidebar: React.FC = () => {
         { icon: <SendHorizonal size={20}/>,name: t('sidebar.nav_submissions'),  path: "/my-submissions" },
         { icon: <Coins size={20}/>,        name: t('sidebar.nav_coins'),        path: "/coins" },
         { icon: <CreditCard size={20}/>,   name: t('sidebar.nav_subscription'), path: "/subscription" },
+        { icon: <Wallet size={20}/>,       name: t('sidebar.nav_tokens'),       path: "/tokens" },
         { icon: <UserCircleIcon />,        name: t('sidebar.nav_profile'),      path: "/profile" },
         { icon: <SettingsIcon />,          name: t('sidebar.nav_settings'),     path: "/settings" },
     ];

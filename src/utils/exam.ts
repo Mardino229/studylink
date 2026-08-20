@@ -146,6 +146,7 @@ export const useUploadExam = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["exam-library"] });
             queryClient.invalidateQueries({ queryKey: ["my-exam-submissions"] });
+            queryClient.invalidateQueries({ queryKey: ["my-solution-submissions"] });
             toast.success("Épreuve soumise ! Elle sera visible après validation.");
         },
         onError: (error) => {

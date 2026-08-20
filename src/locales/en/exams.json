@@ -42,6 +42,7 @@
   },
   "card": {
     "pro_badge": "Pro",
+    "ultra_badge": "Ultra",
     "already_bought": "Already purchased",
     "exam_label": "Exam",
     "solution_label": "Solution",
@@ -98,7 +99,7 @@
     "type_number_placeholder": "{{type}} # *",
     "section_placeholder": "Section (e.g. A) — optional",
     "exam_file_label": "Exam file",
-    "solution_file_label": "Solution (+1 extra coin if validated)",
+    "solution_file_label": "Solution",
     "hint": "You must submit an exam, a solution, or both.",
     "submit_btn": "Submit",
     "submitting": "Sending…",
