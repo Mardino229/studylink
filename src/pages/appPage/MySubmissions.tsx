@@ -60,7 +60,7 @@ export default function MySubmissions() {
 
     const { data: myExams = [], isLoading: loadingExams } = useGetMySubmissions();
     const { data: mySolutions = [], isLoading: loadingSolutions } = useGetMySolutionSubmissions();
-    const { data: myExamFiles = [], isLoading: loadingExamFiles } = useGetMyExamFileSubmissions();
+    {/*const { data: myExamFiles = [], isLoading: loadingExamFiles } = useGetMyExamFileSubmissions();*/}
     const { data: missingSolutions = [], isLoading: loadingMissing } = useGetMissingSolutions();
     const { data: missingExams = [], isLoading: loadingMissingExams } = useGetMissingExams();
 
@@ -97,7 +97,6 @@ export default function MySubmissions() {
     const TABS: { key: Tab; label: string; count?: number }[] = [
         { key: 'exams', label: t('submissions.tab_exams'), count: myExams.length },
         { key: 'solutions', label: t('submissions.tab_solutions'), count: mySolutions.length },
-        { key: 'exam_files', label: t('submissions.tab_exam_files'), count: myExamFiles.length },
         { key: 'contribute', label: t('submissions.tab_contribute') },
     ];
 
