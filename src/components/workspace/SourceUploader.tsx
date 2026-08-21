@@ -125,13 +125,35 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
     const handleFiles = async (files: FileList | File[]) => {
         const fileArray = Array.from(files);
         if (fileArray.length === 0) return;
+
+        // Show immediate placeholders for each file while the POST is in flight
+        const tempKeys = fileArray.map((f, i) => `__uploading__${i}__${f.name}`);
+        setStreamingSources(prev => {
+            const next = { ...prev };
+            fileArray.forEach((f, i) => {
+                next[tempKeys[i]] = { progress: 0, message: t('sources.uploading'), status: 'pending', filename: f.name };
+            });
+            return next;
+        });
+
         try {
             const newSources = await uploadMutation.mutateAsync({ notebookId, files: fileArray });
+            // Remove temp placeholders and start SSE tracking
+            setStreamingSources(prev => {
+                const next = { ...prev };
+                tempKeys.forEach(k => delete next[k]);
+                return next;
+            });
             for (const source of newSources) {
                 listenToSourceProgress(source.id, source.filename);
             }
-        } catch (err) {
-            console.error('Upload failed', err);
+        } catch {
+            // Remove temp placeholders on failure (toast already shown by mutation onError)
+            setStreamingSources(prev => {
+                const next = { ...prev };
+                tempKeys.forEach(k => delete next[k]);
+                return next;
+            });
         }
     };
 
@@ -153,16 +175,25 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
     const handleYoutubeSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setUrlError('');
-        if (!isValidYoutubeUrl(youtubeUrl)) {
+        const trimmedUrl = youtubeUrl.trim();
+        if (!isValidYoutubeUrl(trimmedUrl)) {
             setUrlError(t('sources.url_invalid'));
             return;
         }
+
+        const tempKey = `__uploading__yt__${trimmedUrl}`;
+        setStreamingSources(prev => ({
+            ...prev,
+            [tempKey]: { progress: 0, message: t('sources.uploading'), status: 'pending', filename: trimmedUrl },
+        }));
+
         try {
-            const newSource = await youtubeM.mutateAsync({ notebookId, url: youtubeUrl.trim() });
+            const newSource = await youtubeM.mutateAsync({ notebookId, url: trimmedUrl });
             setYoutubeUrl('');
+            setStreamingSources(prev => { const next = { ...prev }; delete next[tempKey]; return next; });
             listenToSourceProgress(newSource.id, newSource.filename);
         } catch {
-            // error handled in hook
+            setStreamingSources(prev => { const next = { ...prev }; delete next[tempKey]; return next; });
         }
     };
 

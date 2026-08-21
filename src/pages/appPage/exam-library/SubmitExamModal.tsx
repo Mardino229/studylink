@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Upload } from 'lucide-react';
+import { Upload, FileWarning } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Modal } from '../../../components/ui/modal/index.tsx';
 import CourseCombobox from '../../../components/ui/CourseCombobox';
@@ -116,11 +116,27 @@ export default function SubmitExamModal({ isOpen, onClose }: {
 
                 <div>
                     <label className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400">{t('submit_modal.exam_file_label')}</label>
-                    <input type="file" accept=".pdf,image/*" onChange={(e) => setExamFile(e.target.files?.[0] ?? null)} className={fileCls} />
+                    <input type="file" accept=".pdf" onChange={(e) => setExamFile(e.target.files?.[0] ?? null)} className={fileCls} />
                 </div>
                 <div>
                     <label className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400">{t('submit_modal.solution_file_label')}</label>
-                    <input type="file" accept=".pdf,image/*" onChange={(e) => setSolutionFile(e.target.files?.[0] ?? null)} className={fileCls} />
+                    <input type="file" accept=".pdf" onChange={(e) => setSolutionFile(e.target.files?.[0] ?? null)} className={fileCls} />
+                </div>
+
+                <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 dark:border-amber-800/40 dark:bg-amber-900/10">
+                    <FileWarning size={14} className="mt-0.5 shrink-0 text-amber-500 dark:text-amber-400" />
+                    <p className="text-xs text-amber-800 dark:text-amber-300">
+                        {t('submit_modal.pdf_only_hint')}{' '}
+                        <a
+                            href="https://www.ilovepdf.com/jpg_to_pdf"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-semibold underline underline-offset-2 hover:text-amber-900 dark:hover:text-amber-200"
+                        >
+                            {t('submit_modal.pdf_only_link')}
+                        </a>
+                        .
+                    </p>
                 </div>
 
                 <p className="text-xs text-gray-500 dark:text-gray-400">
