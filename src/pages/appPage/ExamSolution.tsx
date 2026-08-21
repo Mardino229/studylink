@@ -68,9 +68,7 @@ export default function ExamSolution() {
                     setFileUrl(url);
                     setIsImage(contentType.startsWith('image/'));
                     setStatus('success');
-                    if (!endpoint && examId) {
-                        queryClient.invalidateQueries({ queryKey: ['token-balance'] });
-                    }
+                    queryClient.invalidateQueries({ queryKey: ['token-balance'] });
                 }
             } catch (error) {
                 if (axios.isAxiosError(error)) {
