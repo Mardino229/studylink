@@ -65,10 +65,32 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
             [sourceId]: { progress: 0, message: t('sources.uploading'), status: 'pending', filename },
         }));
 
+        let completed = false;
+
+        const cleanup = (refetch = true) => {
+            setStreamingSources(prev => {
+                const next = { ...prev };
+                delete next[sourceId];
+                return next;
+            });
+            if (refetch) {
+                void refetchSources();
+                queryClient.invalidateQueries({ queryKey: ['themes', notebookId] });
+            }
+        };
+
         void fetchEventSource(`${baseUrl}/notebooks/${notebookId}/sources/${sourceId}/stream`, {
             method: 'GET',
             credentials: 'include',
             headers: { Accept: 'text/event-stream', 'Accept-Language': i18n.language.startsWith('fr') ? 'fr' : 'en' },
+            onopen: async (response) => {
+                // If the server redirected to a non-SSE page, bail out and refetch
+                if (!response.ok || !response.headers.get('content-type')?.includes('text/event-stream')) {
+                    completed = true;
+                    cleanup(true);
+                    throw new Error(`SSE: unexpected response ${response.status}`);
+                }
+            },
             onmessage(event) {
                 if (!event.data) return;
                 try {
@@ -83,41 +105,37 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
                         },
                     }));
                     if (data.progress === 100 || data.status === 'completed') {
-                        void refetchSources();
-                        queryClient.invalidateQueries({ queryKey: ['themes', notebookId] });
-                        setTimeout(() => {
-                            setStreamingSources(prev => {
-                                const next = { ...prev };
-                                delete next[sourceId];
-                                return next;
-                            });
-                        }, 800);
+                        completed = true;
+                        setTimeout(() => cleanup(true), 800);
                     }
                     if (data.status === 'error') {
-                        setTimeout(() => {
-                            setStreamingSources(prev => {
-                                const next = { ...prev };
-                                delete next[sourceId];
-                                return next;
-                            });
-                        }, 6000);
+                        setTimeout(() => cleanup(false), 6000);
                     }
                 } catch {
                     // ignore malformed payloads
                 }
             },
+            onclose() {
+                // Stream closed by server without a completed event (redirect, early close, etc.)
+                // Refetch the source list so the source appears even if the stream was unreliable
+                if (!completed) {
+                    completed = true;
+                    cleanup(true);
+                }
+            },
             onerror(error) {
-                console.error('SSE Error', error);
-                setStreamingSources(prev => ({
-                    ...prev,
-                    [sourceId]: {
-                        ...prev[sourceId],
-                        status: 'error',
-                        message: t('sources.stream_error'),
-                        filename: prev[sourceId]?.filename ?? filename,
-                    },
-                }));
-                throw error;
+                if (!completed) {
+                    setStreamingSources(prev => ({
+                        ...prev,
+                        [sourceId]: {
+                            ...prev[sourceId],
+                            status: 'error',
+                            message: t('sources.stream_error'),
+                            filename: prev[sourceId]?.filename ?? filename,
+                        },
+                    }));
+                }
+                throw error; // prevent fetchEventSource from retrying
             },
         });
     };
