@@ -47,7 +47,7 @@
     "gen_cards_label": "Nombre de cartes",
     "gen_questions_label": "Nombre de questions",
     "gen_sources_label": "Sources (Veuillez choisir au moins une source) ",
-    "gen_themes_label": "Thèmes (Choix optionnel mais recommandé) ",
+    "gen_themes_label": "Thèmes (Le choix des thème est optionnel mais recommandé) ",
     "confirm_delete_title": "Confirmer la suppression",
     "loading": "Chargement...",
     "add_sources_title": "Ajoutez vos premiers documents",
@@ -97,7 +97,8 @@
     "gen_depth_label": "Profondeur maximale",
     "gen_suffix_mindmap": "Carte mentale",
     "modal_gen_failed": "La génération a échoué.",
-    "modal_gen_failed_tokens": "Réessaie — aucun jeton n'a été débité."
+    "modal_gen_failed_tokens": "Réessaie — aucun jeton n'a été débité.",
+    "source_required": "Veuillez sélectionner au moins une source."
   },
   "artefact": {
     "title": "Créer des Outils de révision",

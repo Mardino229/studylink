@@ -47,7 +47,7 @@
     "gen_cards_label": "Number of cards",
     "gen_questions_label": "Number of questions",
     "gen_sources_label": "Sources (Please select at least one source)",
-    "gen_themes_label": "Themes (Optional but recommended)",
+    "gen_themes_label": "Themes (Theme selection is optional but recommended)",
     "confirm_delete_title": "Confirm deletion",
     "loading": "Loading...",
     "add_sources_title": "Add your first documents",
@@ -97,7 +97,8 @@
     "gen_depth_label": "Maximum depth",
     "gen_suffix_mindmap": "Mind Map",
     "modal_gen_failed": "Generation failed.",
-    "modal_gen_failed_tokens": "Try again — no tokens were charged."
+    "modal_gen_failed_tokens": "Try again — no tokens were charged.",
+    "source_required": "Please select at least one source."
   },
   "artefact": {
     "title": "Create study tools",

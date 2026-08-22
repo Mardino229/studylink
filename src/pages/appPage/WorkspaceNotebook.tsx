@@ -158,6 +158,9 @@ const WorkspaceNotebook: React.FC = () => {
         (generationModal === 'podcast' && createPodcast.isPending) ||
         (generationModal === 'mindmap' && createMindmap.isPending);
 
+    const currentModalTarget = generationModal === 'summary' ? summaryTarget : generationModal === 'flashcards' ? flashcardTarget : generationModal === 'quiz' ? quizTarget : generationModal === 'mindmap' ? mindmapTarget : podcastTarget;
+    const noSourceSelected = currentModalTarget.sourceIds.length === 0;
+
     const stats = [
         { label: t('notebook.stat_sources_label'), value: sources?.items?.length ?? 0, hint: isLoadingSources ? t('notebook.loading') : t('notebook.stat_sources_hint'), icon: FileText },
         { label: t('notebook.stat_themes_label'), value: themes?.items?.length ?? 0, hint: isLoadingThemes ? t('notebook.loading') : t('notebook.stat_themes_hint'), icon: Target },
@@ -565,6 +568,7 @@ const WorkspaceNotebook: React.FC = () => {
                             const currentTarget = generationModal === 'summary' ? summaryTarget : generationModal === 'flashcards' ? flashcardTarget : generationModal === 'quiz' ? quizTarget : generationModal === 'mindmap' ? mindmapTarget : podcastTarget;
                             const currentSetTarget = generationModal === 'summary' ? setSummaryTarget : generationModal === 'flashcards' ? setFlashcardTarget : generationModal === 'quiz' ? setQuizTarget : generationModal === 'mindmap' ? setMindmapTarget : setPodcastTarget;
                             const selectedSourceIds = currentTarget.sourceIds;
+                            const noSourceSelected = selectedSourceIds.length === 0;
                             const visibleThemes = (themes?.items ?? []).filter(theme =>
                                 selectedSourceIds.length === 0 ||
                                 !theme.source_ids?.length ||
@@ -588,6 +592,11 @@ const WorkspaceNotebook: React.FC = () => {
                                             ))}
                                             {sources?.items?.length === 0 && <p className="text-xs text-gray-400">{t('notebook.no_source')}</p>}
                                         </div>
+                                        {noSourceSelected && (sources?.items?.length ?? 0) > 0 && (
+                                            <p className="mt-2 text-xs font-medium text-amber-600 dark:text-amber-400">
+                                                {t('notebook.source_required')}
+                                            </p>
+                                        )}
                                     </div>
 
                                     <div>
@@ -605,7 +614,7 @@ const WorkspaceNotebook: React.FC = () => {
                                                 </label>
                                             ))}
                                             {visibleThemes.length === 0 && <p className="text-xs text-gray-400">{t('notebook.no_theme')}</p>}
-                                        </div>
+                                        </div> 
                                     </div>
                                 </div>
                             );
@@ -641,6 +650,7 @@ const WorkspaceNotebook: React.FC = () => {
                                         return;
                                     }
                                     if (!generationTitle.trim()) return;
+                                    if (noSourceSelected && (sources?.items?.length ?? 0) > 0) return;
                                     setGenerationFailed(false);
                                     const ci = customInstructions.trim() || undefined;
                                     const closeOnSuccess = () => {
@@ -665,7 +675,7 @@ const WorkspaceNotebook: React.FC = () => {
                                         createMindmap.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, maxDepth: mindmapDepth, sourceIds: mindmapTarget.sourceIds, themeIds: mindmapTarget.themeIds, customInstructions: ci }, { onSuccess: closeOnSuccess, onError: handleGenerationError });
                                     }
                                 }}
-                                disabled={!generationTitle.trim() && canGenerate}
+                                disabled={(!generationTitle.trim() || (noSourceSelected && (sources?.items?.length ?? 0) > 0)) && canGenerate}
                                 className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-white transition-colors disabled:opacity-50 ${
                                     canGenerate
                                         ? 'bg-blue-600 hover:bg-blue-700'
