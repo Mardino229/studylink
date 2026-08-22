@@ -5,7 +5,7 @@ import * as z from "zod";
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
 import { toast } from "sonner";
-import { Plus, Tag, DollarSign, AlignLeft, List, Loader2, AlertTriangle, X, Pencil, Mic } from "lucide-react";
+import { Plus, Tag, DollarSign, AlignLeft, List, Loader2, AlertTriangle, X, Pencil, Mic, PlusCircle } from "lucide-react";
 import ComponentCard from "../../components/common/ComponentCard.tsx";
 import PlansTable from "../../components/table/AdminTables/PlansTable.tsx";
 import { useGetAdminPlans, useCreateAdminPlan, useDeleteAdminPlan, useUpdateAdminPlan } from "../../utils/admin";
@@ -18,7 +18,6 @@ const planSchema = z.object({
   description: z.string().min(1, "La description est requise"),
   price: z.number().min(0, "Le prix doit être positif"),
   annual_price: z.number().min(0, "Le prix annuel doit être positif"),
-  benefits: z.string().optional(),
   includes_audio: z.boolean(),
 });
 
@@ -32,6 +31,8 @@ export default function Plans() {
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editingPlan, setEditingPlan] = useState<SubscriptionPlan | null>(null);
+  const [benefitsList, setBenefitsList] = useState<string[]>([]);
+  const [benefitInput, setBenefitInput] = useState("");
 
   const {
     register,
@@ -47,12 +48,22 @@ export default function Plans() {
       description: "",
       price: 0,
       annual_price: 0,
-      benefits: "",
       includes_audio: false,
     },
   });
 
   const includesAudio = watch("includes_audio");
+
+  const addBenefit = () => {
+    const trimmed = benefitInput.trim();
+    if (!trimmed) return;
+    setBenefitsList(prev => [...prev, trimmed]);
+    setBenefitInput("");
+  };
+
+  const removeBenefit = (index: number) => {
+    setBenefitsList(prev => prev.filter((_, i) => i !== index));
+  };
 
   const onSubmit = (values: PlanFormValues) => {
     const payload = {
@@ -60,7 +71,7 @@ export default function Plans() {
       price: values.price,
       annual_price: values.annual_price,
       description: values.description,
-      benefits_description: values.benefits ? values.benefits.split(",").map(b => b.trim()).filter(b => b.length > 0) : [],
+      benefits_description: benefitsList,
       includes_audio: values.includes_audio,
     };
 
@@ -71,12 +82,14 @@ export default function Plans() {
       }, {
         onSuccess: () => {
           setEditingPlan(null);
+          setBenefitsList([]);
           reset();
         }
       });
     } else {
       createMutation.mutate(payload, {
         onSuccess: () => {
+          setBenefitsList([]);
           reset();
         }
       });
@@ -89,13 +102,16 @@ export default function Plans() {
     setValue("description", plan.description);
     setValue("price", Number(plan.price));
     setValue("annual_price", Number(plan.annual_price));
-    setValue("benefits", plan.benefits_description?.join(", ") || "");
     setValue("includes_audio", plan.includes_audio ?? false);
+    setBenefitsList(plan.benefits_description ?? []);
+    setBenefitInput("");
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const cancelEdit = () => {
     setEditingPlan(null);
+    setBenefitsList([]);
+    setBenefitInput("");
     reset();
   };
 
@@ -181,15 +197,41 @@ export default function Plans() {
             </div>
           </div>
 
-          <div className="space-y-1">
-            <div className="relative">
-              <List className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-500 dark:text-gray-400" />
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+              <List className="size-4 text-gray-500 dark:text-gray-400" />
+              Avantages
+            </p>
+            <div className="flex gap-2">
               <input
-                {...register("benefits")}
-                placeholder="Avantages (séparés par des virgules)"
-                className="h-11 pl-10 pr-4 w-full rounded-lg border border-gray-200 dark:border-gray-800 bg-transparent focus:ring-3 focus:ring-brand-500/10 focus:border-brand-300 outline-none text-sm dark:text-white/90"
+                value={benefitInput}
+                onChange={(e) => setBenefitInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addBenefit(); } }}
+                placeholder="Ajouter un avantage..."
+                className="h-11 px-4 flex-1 rounded-lg border border-gray-200 dark:border-gray-800 bg-transparent focus:ring-3 focus:ring-brand-500/10 focus:border-brand-300 outline-none text-sm dark:text-white/90"
               />
+              <button
+                type="button"
+                onClick={addBenefit}
+                disabled={!benefitInput.trim()}
+                className="inline-flex items-center gap-1.5 h-11 px-4 rounded-lg bg-brand-500 text-white text-sm font-medium hover:bg-brand-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                <PlusCircle className="size-4" />
+                Ajouter
+              </button>
             </div>
+            {benefitsList.length > 0 && (
+              <ul className="space-y-1.5 pt-1">
+                {benefitsList.map((b, i) => (
+                  <li key={i} className="flex items-center justify-between gap-2 rounded-lg border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-white/[0.02] px-3 py-2 text-sm text-gray-700 dark:text-gray-300">
+                    <span className="flex-1 min-w-0">{b}</span>
+                    <button type="button" onClick={() => removeBenefit(i)} className="shrink-0 text-gray-400 hover:text-red-500 transition-colors">
+                      <X className="size-4" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           <label className="flex cursor-pointer items-center gap-4 rounded-lg border border-gray-200 dark:border-gray-800 px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
