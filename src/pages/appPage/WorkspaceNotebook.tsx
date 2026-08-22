@@ -70,6 +70,7 @@ const WorkspaceNotebook: React.FC = () => {
     const [mindmapTarget, setMindmapTarget] = useState<{ sourceIds: string[]; themeIds: string[] }>({ sourceIds: [], themeIds: [] });
     const [mindmapDepth, setMindmapDepth] = useState(3);
     const [generationLanguage, setGenerationLanguage] = useState('fr');
+    const [pendingSelectId, setPendingSelectId] = useState<string | null>(null);
 
     const { data: notebook, isLoading: isLoadingNotebook } = useGetNotebook(notebookId);
     const { data: sources, isLoading: isLoadingSources } = useGetSources(notebookId ?? "", { perPage: 100 });
@@ -333,6 +334,7 @@ const WorkspaceNotebook: React.FC = () => {
                                             deleteSummary={deleteSummary}
                                             notebookId={notebookId}
                                             formatDate={formatDate}
+                                            pendingSelectId={pendingSelectId}
                                         />
                                     )}
 
@@ -346,6 +348,7 @@ const WorkspaceNotebook: React.FC = () => {
                                             deleteFlashcard={deleteFlashcard}
                                             notebookId={notebookId}
                                             formatDate={formatDate}
+                                            pendingSelectId={pendingSelectId}
                                         />
                                     )}
 
@@ -359,6 +362,7 @@ const WorkspaceNotebook: React.FC = () => {
                                             deleteQuiz={deleteQuiz}
                                             notebookId={notebookId}
                                             formatDate={formatDate}
+                                            pendingSelectId={pendingSelectId}
                                         />
                                     )}
 
@@ -372,6 +376,7 @@ const WorkspaceNotebook: React.FC = () => {
                                             deletePodcast={deletePodcast}
                                             notebookId={notebookId}
                                             formatDate={formatDate}
+                                            pendingSelectId={pendingSelectId}
                                         />
                                     )}
 
@@ -385,6 +390,7 @@ const WorkspaceNotebook: React.FC = () => {
                                             deleteMindmap={deleteMindmap}
                                             notebookId={notebookId}
                                             formatDate={formatDate}
+                                            pendingSelectId={pendingSelectId}
                                         />
                                     )}
 
@@ -653,11 +659,17 @@ const WorkspaceNotebook: React.FC = () => {
                                     if (noSourceSelected && (sources?.items?.length ?? 0) > 0) return;
                                     setGenerationFailed(false);
                                     const ci = customInstructions.trim() || undefined;
-                                    const closeOnSuccess = () => {
+                                    const tabForModal = { summary: 'summaries', flashcards: 'flashcards', quiz: 'quizzes', podcast: 'podcasts', mindmap: 'mindmaps' } as const;
+                                    const closeOnSuccess = (artifact: { id: string }) => {
+                                        const modal = generationModal;
                                         setGenerationModal(null);
                                         setGenerationTitle('');
                                         setCustomInstructions('');
                                         setGenerationFailed(false);
+                                        if (modal) {
+                                            setActiveTab(tabForModal[modal]);
+                                            setPendingSelectId(artifact.id);
+                                        }
                                     };
                                     if (generationModal === 'summary') {
                                         createSummary.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, sourceIds: summaryTarget.sourceIds, themeIds: summaryTarget.themeIds, customInstructions: ci }, { onSuccess: closeOnSuccess, onError: handleGenerationError });

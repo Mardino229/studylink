@@ -16,6 +16,7 @@ interface FlashcardsTabProps {
     deleteFlashcard: { mutateAsync: (args: { notebookId: string; flashcardId: string }) => Promise<unknown> };
     notebookId: string;
     formatDate: (date?: string) => string;
+    pendingSelectId?: string | null;
 }
 
 export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
@@ -27,6 +28,7 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
     deleteFlashcard,
     notebookId,
     formatDate,
+    pendingSelectId,
 }) => {
     const { t } = useTranslation('workspace');
     const [selectedFlashcardBatchId, setSelectedFlashcardBatchId] = useState<string | null>(null);
@@ -48,6 +50,10 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
             setSelectedFlashcardBatchId(flashcardBatchesList[0].id);
         }
     }, [flashcardBatchesList, selectedFlashcardBatchId]);
+
+    useEffect(() => {
+        if (pendingSelectId) setSelectedFlashcardBatchId(pendingSelectId);
+    }, [pendingSelectId]);
 
     // Reset filter when batch changes
     useEffect(() => {

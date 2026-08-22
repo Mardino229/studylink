@@ -16,6 +16,7 @@ interface QuizzesTabProps {
     deleteQuiz: { mutateAsync: (args: { notebookId: string; quizId: string }) => Promise<unknown> };
     notebookId: string;
     formatDate: (date?: string) => string;
+    pendingSelectId?: string | null;
 }
 
 export const QuizzesTab: React.FC<QuizzesTabProps> = ({
@@ -27,6 +28,7 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
     deleteQuiz,
     notebookId,
     formatDate,
+    pendingSelectId,
 }) => {
     const { t } = useTranslation('workspace');
     const [selectedQuizId, setSelectedQuizId] = useState<string | null>(null);
@@ -44,6 +46,10 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
             setSelectedQuizId(quizzesList[0].id);
         }
     }, [quizzesList, selectedQuizId]);
+
+    useEffect(() => {
+        if (pendingSelectId) setSelectedQuizId(pendingSelectId);
+    }, [pendingSelectId]);
 
     const { data: selectedQuizDetail, isLoading: isLoadingSelectedQuiz } = useGetArtefactQuiz(notebookId, selectedQuizId ?? undefined);
 

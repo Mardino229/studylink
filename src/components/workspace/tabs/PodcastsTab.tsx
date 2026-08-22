@@ -14,6 +14,7 @@ interface PodcastsTabProps {
     deletePodcast: { mutateAsync: (args: { notebookId: string; podcastId: string }) => Promise<unknown> };
     notebookId: string;
     formatDate: (date?: string) => string;
+    pendingSelectId?: string | null;
 }
 
 export const PodcastsTab: React.FC<PodcastsTabProps> = ({
@@ -25,6 +26,7 @@ export const PodcastsTab: React.FC<PodcastsTabProps> = ({
     deletePodcast,
     notebookId,
     formatDate,
+    pendingSelectId,
 }) => {
     const { t } = useTranslation('workspace');
     const [selectedPodcastId, setSelectedPodcastId] = useState<string | null>(null);
@@ -44,6 +46,10 @@ export const PodcastsTab: React.FC<PodcastsTabProps> = ({
             setSelectedPodcastId(podcastsList[0].id);
         }
     }, [podcastsList, selectedPodcastId]);
+
+    useEffect(() => {
+        if (pendingSelectId) setSelectedPodcastId(pendingSelectId);
+    }, [pendingSelectId]);
 
     const selectedPodcast = podcastsList.find(p => p.id === selectedPodcastId) ?? podcastsList[0] ?? null;
 

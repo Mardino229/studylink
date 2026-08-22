@@ -15,6 +15,7 @@ interface MindmapTabProps {
     deleteMindmap: { mutateAsync: (args: { notebookId: string; mindmapId: string }) => Promise<unknown> };
     notebookId: string;
     formatDate: (date?: string) => string;
+    pendingSelectId?: string | null;
 }
 
 export const MindmapTab: React.FC<MindmapTabProps> = ({
@@ -26,6 +27,7 @@ export const MindmapTab: React.FC<MindmapTabProps> = ({
     deleteMindmap,
     notebookId,
     formatDate,
+    pendingSelectId,
 }) => {
     const { t } = useTranslation('workspace');
     const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -34,6 +36,10 @@ export const MindmapTab: React.FC<MindmapTabProps> = ({
 
     const list = mindmaps?.items ?? [];
     const selected = list.find(m => m.id === selectedId) ?? list[0] ?? null;
+
+    useEffect(() => {
+        if (pendingSelectId) setSelectedId(pendingSelectId);
+    }, [pendingSelectId]);
 
     const SidebarContent = () => (
         <div className="flex h-full flex-col">

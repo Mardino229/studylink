@@ -24,6 +24,7 @@ interface SummariesTabProps {
     deleteSummary: { mutateAsync: (args: { notebookId: string; summaryId: string }) => Promise<unknown> };
     notebookId: string;
     formatDate: (date?: string) => string;
+    pendingSelectId?: string | null;
 }
 
 export const SummariesTab: React.FC<SummariesTabProps> = ({
@@ -35,6 +36,7 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
     deleteSummary,
     notebookId,
     formatDate,
+    pendingSelectId,
 }) => {
     const { t } = useTranslation('workspace');
     const [selectedSummaryId, setSelectedSummaryId] = useState<string | null>(null);
@@ -76,6 +78,10 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
             setSelectedSummaryId(mergedSummariesList[0].id);
         }
     }, [mergedSummariesList, selectedSummaryId]);
+
+    useEffect(() => {
+        if (pendingSelectId) setSelectedSummaryId(pendingSelectId);
+    }, [pendingSelectId]);
 
     useEffect(() => {
         return () => {
