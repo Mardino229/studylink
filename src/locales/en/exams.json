@@ -101,7 +101,7 @@
     "exam_file_label": "Exam file",
     "solution_file_label": "Solution",
     "hint": "You must submit an exam, a solution, or both.",
-    "pdf_only_hint": "Only PDF files are accepted. If you have images, we can convert them to PDF at",
+    "pdf_only_hint": "Only PDF files are accepted. If you have images, you can convert them to PDF at",
     "pdf_only_link": "iLovePDF",
     "submit_btn": "Submit",
     "submitting": "Sending…",
