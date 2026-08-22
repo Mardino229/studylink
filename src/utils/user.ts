@@ -43,8 +43,8 @@ const useCompleteProfile = () => {
             return response.data.data.user;
         },
         onSuccess: (userData) => {
-            navigate('/onboarding');
             setUser(userData);
+            navigate('/onboarding');
         },
         onError: (error) => {
             console.error(error);
