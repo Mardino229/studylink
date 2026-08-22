@@ -96,67 +96,6 @@ export default function SettingsSubscription() {
       </div>
 
       <section className="space-y-6 pt-6">
-
-        {/* ── Token balance ── */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-white/[0.05] dark:bg-white/[0.03] lg:shadow-sm space-y-5">
-          <div className="flex items-center justify-between flex-wrap gap-3">
-            <div>
-              <h2 className="text-xl font-bold text-gray-800 dark:text-white/90">{t('settings_subscription.tokens')}</h2>
-              <p className="text-sm text-gray-500 mt-0.5 dark:text-gray-400">
-                {t('settings_subscription.token_balance')}:{" "}
-                <span className="font-semibold text-gray-800 dark:text-white">
-                  🪙 {tokenBalance} {t('settings_tokens.tokens_unit')}
-                </span>
-              </p>
-            </div>
-            <div className="flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200 px-3 py-1.5 dark:bg-amber-900/20 dark:border-amber-800">
-              <Zap size={13} className="text-amber-600 dark:text-amber-400" />
-              <span className="text-xs font-semibold text-amber-700 dark:text-amber-300">{t('settings_subscription.token_desc')}</span>
-            </div>
-          </div>
-
-          {isLoadingPacks ? (
-            <div className="flex justify-center py-6">
-              <Loader2 className="animate-spin size-6 text-gray-400" />
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              {tokenPacks.map((pack, i) => (
-                <div
-                  key={pack.id}
-                  className={`relative rounded-2xl border p-5 flex flex-col gap-3 ${
-                    i === 1
-                      ? "border-blue-400 bg-blue-50/50 dark:border-blue-700 dark:bg-blue-900/10"
-                      : "border-gray-200 bg-white dark:border-white/[0.06] dark:bg-white/[0.02]"
-                  }`}
-                >
-                  {i === 1 && (
-                    <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full bg-blue-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white whitespace-nowrap">
-                      {t('settings_subscription.recommended')}
-                    </span>
-                  )}
-                  <div>
-                    <p className="text-sm font-bold text-gray-900 dark:text-white">{pack.name}</p>
-                    <p className="text-2xl font-black text-gray-900 dark:text-white mt-1">
-                      {pack.price_cad} <span className="text-sm font-semibold text-gray-500">$</span>
-                    </p>
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    🪙 <span className="font-semibold">{pack.tokens} {t('upgrade_modal.tokens_unit')}</span>
-                  </p>
-                  <button
-                    onClick={() => buyPack.mutate(pack.id)}
-                    disabled={buyPack.isPending}
-                    className="mt-auto w-full rounded-xl bg-blue-600 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
-                  >
-                    {buyPack.isPending ? <Loader2 className="animate-spin size-4 mx-auto" /> : t('upgrade_modal.buy_btn')}
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
         {/* ── Current subscription status ── */}
         <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-white/[0.05] dark:bg-white/[0.03]">
           <h2 className="text-xl font-bold text-gray-800 dark:text-white/90">{t('settings_subscription.status')}</h2>
@@ -397,6 +336,67 @@ export default function SettingsSubscription() {
             </div>
           )}
         </div>
+
+        {/* ── Token balance ── */}
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-white/[0.05] dark:bg-white/[0.03] lg:shadow-sm space-y-5">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <h2 className="text-xl font-bold text-gray-800 dark:text-white/90">{t('settings_subscription.tokens')}</h2>
+              <p className="text-sm text-gray-500 mt-0.5 dark:text-gray-400">
+                {t('settings_subscription.token_balance')}:{" "}
+                <span className="font-semibold text-gray-800 dark:text-white">
+                  🪙 {tokenBalance} {t('settings_tokens.tokens_unit')}
+                </span>
+              </p>
+            </div>
+            <div className="flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200 px-3 py-1.5 dark:bg-amber-900/20 dark:border-amber-800">
+              <Zap size={13} className="text-amber-600 dark:text-amber-400" />
+              <span className="text-xs font-semibold text-amber-700 dark:text-amber-300">{t('settings_subscription.token_desc')}</span>
+            </div>
+          </div>
+
+          {isLoadingPacks ? (
+            <div className="flex justify-center py-6">
+              <Loader2 className="animate-spin size-6 text-gray-400" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              {tokenPacks.map((pack, i) => (
+                <div
+                  key={pack.id}
+                  className={`relative rounded-2xl border p-5 flex flex-col gap-3 ${
+                    i === 1
+                      ? "border-blue-400 bg-blue-50/50 dark:border-blue-700 dark:bg-blue-900/10"
+                      : "border-gray-200 bg-white dark:border-white/[0.06] dark:bg-white/[0.02]"
+                  }`}
+                >
+                  {i === 1 && (
+                    <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full bg-blue-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white whitespace-nowrap">
+                      {t('settings_subscription.recommended')}
+                    </span>
+                  )}
+                  <div>
+                    <p className="text-sm font-bold text-gray-900 dark:text-white">{pack.name}</p>
+                    <p className="text-2xl font-black text-gray-900 dark:text-white mt-1">
+                      {pack.price_cad} <span className="text-sm font-semibold text-gray-500">$</span>
+                    </p>
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    🪙 <span className="font-semibold">{pack.tokens} {t('upgrade_modal.tokens_unit')}</span>
+                  </p>
+                  <button
+                    onClick={() => buyPack.mutate(pack.id)}
+                    disabled={buyPack.isPending}
+                    className="mt-auto w-full rounded-xl bg-blue-600 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {buyPack.isPending ? <Loader2 className="animate-spin size-4 mx-auto" /> : t('upgrade_modal.buy_btn')}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
 
       </section>
     </>
