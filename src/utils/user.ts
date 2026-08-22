@@ -37,14 +37,14 @@ const useCompleteProfile = () => {
     return useMutation({
         mutationFn: async (data: CompleteProfileRequest) => {
             const response = await axiosPrivate.patch<{ data: { user: User }, message: string }>('/user/complete-profile', data)
-            const userData = response.data.data.user;
-            setUser(userData)
             toast.success(response.data.message, {
                 description: "Profile completed successfully",
             })
+            return response.data.data.user;
         },
-        onSuccess: () => {
+        onSuccess: (userData) => {
             navigate('/onboarding');
+            setUser(userData);
         },
         onError: (error) => {
             console.error(error);

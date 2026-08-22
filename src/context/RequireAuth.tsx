@@ -55,7 +55,7 @@ const RequireAuth = () => {
         );
     }
 
-    if (!user?.study_level_id === null) {
+    if (user?.email && !user?.study_level_id) {
         return <Navigate to="/complete-profile" state={{ from: location }} replace />;
     }
 
