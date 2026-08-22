@@ -33,6 +33,8 @@ export default function Plans() {
   const [editingPlan, setEditingPlan] = useState<SubscriptionPlan | null>(null);
   const [benefitsList, setBenefitsList] = useState<string[]>([]);
   const [benefitInput, setBenefitInput] = useState("");
+  const [editingBenefitIndex, setEditingBenefitIndex] = useState<number | null>(null);
+  const [editingBenefitValue, setEditingBenefitValue] = useState("");
 
   const {
     register,
@@ -63,6 +65,25 @@ export default function Plans() {
 
   const removeBenefit = (index: number) => {
     setBenefitsList(prev => prev.filter((_, i) => i !== index));
+    if (editingBenefitIndex === index) {
+      setEditingBenefitIndex(null);
+      setEditingBenefitValue("");
+    }
+  };
+
+  const startEditBenefit = (index: number) => {
+    setEditingBenefitIndex(index);
+    setEditingBenefitValue(benefitsList[index]);
+  };
+
+  const saveEditBenefit = () => {
+    if (editingBenefitIndex === null) return;
+    const trimmed = editingBenefitValue.trim();
+    if (trimmed) {
+      setBenefitsList(prev => prev.map((b, i) => i === editingBenefitIndex ? trimmed : b));
+    }
+    setEditingBenefitIndex(null);
+    setEditingBenefitValue("");
   };
 
   const onSubmit = (values: PlanFormValues) => {
@@ -112,6 +133,8 @@ export default function Plans() {
     setEditingPlan(null);
     setBenefitsList([]);
     setBenefitInput("");
+    setEditingBenefitIndex(null);
+    setEditingBenefitValue("");
     reset();
   };
 
@@ -223,11 +246,38 @@ export default function Plans() {
             {benefitsList.length > 0 && (
               <ul className="space-y-1.5 pt-1">
                 {benefitsList.map((b, i) => (
-                  <li key={i} className="flex items-center justify-between gap-2 rounded-lg border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-white/[0.02] px-3 py-2 text-sm text-gray-700 dark:text-gray-300">
-                    <span className="flex-1 min-w-0">{b}</span>
-                    <button type="button" onClick={() => removeBenefit(i)} className="shrink-0 text-gray-400 hover:text-red-500 transition-colors">
-                      <X className="size-4" />
-                    </button>
+                  <li key={i} className="flex items-center gap-2 rounded-lg border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-white/[0.02] px-3 py-2">
+                    {editingBenefitIndex === i ? (
+                      <>
+                        <input
+                          autoFocus
+                          value={editingBenefitValue}
+                          onChange={(e) => setEditingBenefitValue(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') { e.preventDefault(); saveEditBenefit(); }
+                            if (e.key === 'Escape') { setEditingBenefitIndex(null); setEditingBenefitValue(""); }
+                          }}
+                          onBlur={saveEditBenefit}
+                          className="flex-1 min-w-0 bg-transparent text-sm text-gray-700 dark:text-gray-300 outline-none border-b border-brand-400 focus:border-brand-500"
+                        />
+                        <button type="button" onClick={saveEditBenefit} className="shrink-0 text-brand-500 hover:text-brand-600 text-xs font-medium transition-colors">
+                          OK
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <span
+                          className="flex-1 min-w-0 text-sm text-gray-700 dark:text-gray-300 cursor-pointer hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
+                          onClick={() => startEditBenefit(i)}
+                          title="Cliquer pour modifier"
+                        >
+                          {b}
+                        </span>
+                        <button type="button" onClick={() => removeBenefit(i)} className="shrink-0 text-gray-400 hover:text-red-500 transition-colors">
+                          <X className="size-4" />
+                        </button>
+                      </>
+                    )}
                   </li>
                 ))}
               </ul>

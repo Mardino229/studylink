@@ -89,20 +89,25 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats, themes, isLoadi
                         ))}
                     </div>
                 ) : themesList.length > 0 ? (
-                    <div className="flex flex-wrap gap-2.5">
-                        {themesList.map((theme, index) => {
-                            const color = themeColors[index % themeColors.length];
-                            return (
-                                <div
-                                    key={theme.id}
-                                    className={`group inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-medium transition-all hover:shadow-sm ${color.bg} ${color.text} ${color.border}`}
-                                    title={theme.description || theme.name}
-                                >
-                                    <span className={`h-1.5 w-1.5 rounded-full ${color.dot}`} />
-                                    <span className="truncate">{theme.name}</span>
-                                </div>
-                            );
-                        })}
+                    <div className="space-y-3">
+                        <div className="flex flex-wrap gap-2.5">
+                            {themesList.map((theme, index) => {
+                                const color = themeColors[index % themeColors.length];
+                                return (
+                                    <div
+                                        key={theme.id}
+                                        className={`group inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-medium transition-all hover:shadow-sm ${color.bg} ${color.text} ${color.border}`}
+                                        title={theme.description || theme.name}
+                                    >
+                                        <span className={`h-1.5 w-1.5 rounded-full ${color.dot}`} />
+                                        <span className="truncate">{theme.name}</span>
+                                    </div>
+                                );
+            })}
+                        </div>
+                        <p className="text-xs text-foreground/40 italic">
+                            {t('tabs.overview.themes_lang_note')}
+                        </p>
                     </div>
                 ) : (
                     <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gray-50/50 p-10 text-center dark:border-gray-800 dark:bg-white/[0.02]">

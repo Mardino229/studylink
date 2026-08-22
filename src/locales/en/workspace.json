@@ -180,7 +180,8 @@
       "themes_loading": "Retrieving themes...",
       "themes_count_one": "{{count}} concept identified",
       "themes_count_other": "{{count}} concepts identified",
-      "themes_auto_extract": "Themes are automatically extracted from your document sources."
+      "themes_auto_extract": "Themes are automatically extracted from your document sources.",
+      "themes_lang_note": "Themes are extracted in the app language at the time the sources are imported."
     },
     "summaries": {
       "delete_title": "Delete",
