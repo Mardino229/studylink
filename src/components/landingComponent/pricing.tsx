@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { AppLink } from "../common/AppLink";
 import { useTranslation } from "react-i18next";
 import { CheckCircle2, Gem, Loader2, Sparkles, Zap } from "lucide-react";
 import { useGetPublicPlans } from "../../utils/plan";
@@ -155,7 +156,7 @@ export default function Pricing() {
                                     <p className="mt-2 text-sm text-foreground/60">
                                         🪙 <strong>{pack.tokens} {t('pricing.packs.tokens_label')}</strong>
                                     </p>
-                                    <Link
+                                    <AppLink
                                         to="/register"
                                         className={`mt-6 flex items-center justify-center rounded-full h-11 px-6 text-sm font-bold transition-colors ${
                                             i === 1
@@ -164,7 +165,7 @@ export default function Pricing() {
                                         }`}
                                     >
                                         {t('pricing.packs.buy_btn')}
-                                    </Link>
+                                    </AppLink>
                                 </motion.div>
                             ))}
                         </motion.div>
@@ -254,12 +255,12 @@ export default function Pricing() {
                                                 {t('pricing.subscriptions.annual_note', { price: plan.annual_price })}
                                             </p>
                                         )}
-                                        <Link
+                                        <AppLink
                                             to="/register"
                                             className={`mt-8 flex items-center justify-center rounded-full h-13 px-8 bg-gradient-to-r ${accent.btn} text-white font-bold text-base shadow-lg hover:shadow-xl hover:opacity-90 transition-all`}
                                         >
                                             {t('pricing.subscriptions.start_with')} {plan.name}
-                                        </Link>
+                                        </AppLink>
                                         {plan.benefits_description?.length > 0 && (
                                             <ul className="mt-8 space-y-3">
                                                 {plan.benefits_description.map((b: string, i: number) => (

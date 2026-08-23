@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { AppLink } from "../common/AppLink";
 import { useTranslation } from "react-i18next";
 import logo from "../../assets/mylogo.png";
 
@@ -22,7 +23,7 @@ export default function Footer() {
                             <ul className="mt-4 space-y-2">
                                 <li><Link className="hover:text-foreground transition-colors" to={{ pathname: "/", hash: "#key-features" }}>{t('footer.features')}</Link></li>
                                 <li><Link className="hover:text-foreground transition-colors" to={{ pathname: "/", hash: "#pricing" }}>{t('footer.pricing')}</Link></li>
-                                <li><Link className="hover:text-foreground transition-colors" to="/login">{t('footer.login')}</Link></li>
+                                <li><AppLink className="hover:text-foreground transition-colors" to="/login">{t('footer.login')}</AppLink></li>
                             </ul>
                         </div>
                         <div>

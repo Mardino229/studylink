@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { AppLink } from "../common/AppLink";
 import { motion } from "framer-motion";
 import { memo, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -106,12 +107,12 @@ const HeroContent = memo(function HeroContent({ dark }: { dark: boolean }) {
                 transition={{ duration: 0.55, delay: 0.42 }}
                 className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
             >
-                <Link
+                <AppLink
                     to="/register"
                     className="flex w-full sm:w-auto min-w-[160px] items-center justify-center rounded-full h-14 px-8 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-base font-bold shadow-lg hover:opacity-90 transition-opacity"
                 >
                     {t('hero.cta_primary')}
-                </Link>
+                </AppLink>
                 <a
                     href="#pricing"
                     className={`flex w-full sm:w-auto min-w-[160px] items-center justify-center rounded-full h-14 px-8 ${secondaryBtn} text-base font-bold shadow-md transition-all`}

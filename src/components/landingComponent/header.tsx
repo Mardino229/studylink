@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import { AppLink } from "../common/AppLink";
 import logo from "../../assets/mylogo.png";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState, useCallback } from "react";
@@ -142,18 +143,18 @@ export default function Header() {
                     <div className="flex items-center gap-3">
                         <LanguageSwitcher />
                         <ThemeToggle />
-                        <Link
+                        <AppLink
                             to="/login"
                             className="hidden sm:inline-block text-base font-medium text-foreground/70 hover:text-foreground transition-colors"
                         >
                             {t('nav.login')}
-                        </Link>
-                        <Link
+                        </AppLink>
+                        <AppLink
                             to="/register"
                             className="hidden md:flex items-center justify-center rounded-full h-10 px-5 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-bold shadow hover:opacity-90 transition-opacity"
                         >
                             {t('nav.get_started')}
-                        </Link>
+                        </AppLink>
                         {/* Mobile hamburger */}
                         <button
                             type="button"
@@ -194,16 +195,16 @@ export default function Header() {
                                 </Link>
                             ))}
                             <div className="pt-2 flex flex-col items-center gap-4 border-t border-border">
-                                <Link to="/login" className="text-base text-foreground/70 hover:text-foreground" onClick={() => setMobileOpen(false)}>
+                                <AppLink to="/login" className="text-base text-foreground/70 hover:text-foreground" onClick={() => setMobileOpen(false)}>
                                     {t('nav.login')}
-                                </Link>
-                                <Link
+                                </AppLink>
+                                <AppLink
                                     to="/register"
                                     className="inline-flex items-center justify-center rounded-full h-10 px-5 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-semibold shadow"
                                     onClick={() => setMobileOpen(false)}
                                 >
                                     {t('nav.get_started')}
-                                </Link>
+                                </AppLink>
                             </div>
                         </div>
                     </motion.div>

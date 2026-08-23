@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { AppLink } from "../common/AppLink";
 import { motion } from "framer-motion";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
@@ -61,13 +62,13 @@ export default function Cta() {
                     </div>
 
                     <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <Link
+                        <AppLink
                             to="/register"
                             onClick={fireConfetti}
                             className="flex w-full sm:w-auto min-w-[180px] items-center justify-center rounded-full h-14 px-8 bg-white text-blue-600 text-base font-bold shadow-lg hover:bg-white/90 hover:shadow-xl transition-all duration-300"
                         >
                             {t('cta.cta_primary')}
-                        </Link>
+                        </AppLink>
                         <a
                             href="#pricing"
                             className="flex w-full sm:w-auto min-w-[180px] items-center justify-center rounded-full h-14 px-8 border border-white/30 bg-white/10 text-white text-base font-bold hover:bg-white/15 transition-all duration-300"
