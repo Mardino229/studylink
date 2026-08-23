@@ -131,6 +131,7 @@ export default function UserDropdown() {
         message={t('user_dropdown.confirm_msg')}
         confirmLabel={t('user_dropdown.confirm_btn')}
         cancelLabel={t('user_dropdown.cancel')}
+        isLoading={logout.isPending}
         onConfirm={() => logout.mutate()}
         onCancel={() => setShowLogoutModal(false)}
       />

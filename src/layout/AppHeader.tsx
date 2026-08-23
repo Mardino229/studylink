@@ -300,6 +300,7 @@ const AppHeader: React.FC = () => {
                 message={t('header.logout_msg')}
                 confirmLabel={t('header.logout_confirm')}
                 cancelLabel={t('header.logout_cancel')}
+                isLoading={logout.isPending}
                 onConfirm={() => logout.mutate()}
                 onCancel={() => setShowLogoutModal(false)}
             />
