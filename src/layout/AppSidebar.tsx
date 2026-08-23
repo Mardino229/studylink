@@ -21,7 +21,7 @@ type NavItem = {
 
 const AppSidebar: React.FC = () => {
     const { t } = useTranslation('app');
-    const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+    const { isExpanded, isMobileOpen, isHovered, setIsHovered, toggleMobileSidebar } = useSidebar();
     const location = useLocation();
     const [openSubmenu, setOpenSubmenu] = useState<{ type: "main"; index: number } | null>(null);
     const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>({});
@@ -98,6 +98,7 @@ const AppSidebar: React.FC = () => {
                         nav.path && (
                             <Link
                                 to={nav.path}
+                                onClick={() => { if (isMobileOpen) toggleMobileSidebar(); }}
                                 className={`menu-item group ${isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"}`}
                             >
                                 <span className={`menu-item-icon-size ${isActive(nav.path) ? "menu-item-icon-active" : "menu-item-icon-inactive"}`}>
@@ -120,6 +121,7 @@ const AppSidebar: React.FC = () => {
                                     <li key={subItem.name}>
                                         <Link
                                             to={subItem.path}
+                                            onClick={() => { if (isMobileOpen) toggleMobileSidebar(); }}
                                             className={`menu-dropdown-item ${isActive(subItem.path) ? "menu-dropdown-item-active" : "menu-dropdown-item-inactive"}`}
                                         >
                                             {subItem.name}
