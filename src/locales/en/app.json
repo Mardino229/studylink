@@ -255,7 +255,7 @@
     "nav_statistics_desc": "Study statistics",
     "nav_settings": "Settings",
     "nav_settings_desc": "Account preferences",
-    "nav_subscription": "Subscription & tokens",
+    "nav_subscription": "Subscriptions & tokens",
     "nav_subscription_desc": "Pro plans and token packs",
     "nav_payments": "Payment history",
     "nav_payments_desc": "My transactions",
@@ -293,7 +293,7 @@
     "nav_exam_library": "Exam library",
     "nav_submissions": "My submissions",
     "nav_coins": "Coins wallet",
-    "nav_subscription": "Subscription & Tokens",
+    "nav_subscription": "Subscriptions & Tokens",
     "nav_profile": "User profile",
     "nav_settings": "Settings"
   },

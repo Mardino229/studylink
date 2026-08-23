@@ -61,7 +61,7 @@
     "stat_sources_label": "Sources",
     "stat_themes_label": "Thèmes",
     "stat_summaries_label": "Résumé",
-    "stat_artefacts_label": "Artefacts",
+    "stat_artefacts_label": "Outils générés",
     "stat_sources_hint": "Documents importés",
     "stat_themes_hint": "Concepts détectés",
     "stat_summaries_hint": "Résumés générés",
@@ -181,7 +181,7 @@
       "themes_count_one": "{{count}} concept identifié",
       "themes_count_other": "{{count}} concepts identifiés",
       "themes_auto_extract": "Les thèmes sont automatiquement extraits de vos sources documentaires.",
-      "themes_lang_note": "Les thèmes sont extraits dans la langue de l'application au moment de l'importation des sources."
+      "themes_lang_note": "Les thèmes sont affichés dans la langue de l'application au moment de l'importation des sources."
     },
     "summaries": {
       "delete_title": "Supprimer",

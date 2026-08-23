@@ -210,3 +210,7 @@ export const MindmapTab: React.FC<MindmapTabProps> = ({
 };
 
 export default MindmapTab;
+function useEffect(arg0: () => void, arg1: (string | null | undefined)[]) {
+    throw new Error('Function not implemented.');
+}
+

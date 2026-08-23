@@ -61,7 +61,7 @@
     "stat_sources_label": "Sources",
     "stat_themes_label": "Themes",
     "stat_summaries_label": "Summary",
-    "stat_artefacts_label": "Artefacts",
+    "stat_artefacts_label": "Generated tools",
     "stat_sources_hint": "Imported documents",
     "stat_themes_hint": "Detected concepts",
     "stat_summaries_hint": "Generated summaries",
@@ -181,7 +181,7 @@
       "themes_count_one": "{{count}} concept identified",
       "themes_count_other": "{{count}} concepts identified",
       "themes_auto_extract": "Themes are automatically extracted from your document sources.",
-      "themes_lang_note": "Themes are extracted in the app language at the time the sources are imported."
+      "themes_lang_note": "Themes are displayed in the app language at the time the sources are imported."
     },
     "summaries": {
       "delete_title": "Delete",

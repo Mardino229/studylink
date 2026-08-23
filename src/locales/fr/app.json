@@ -255,7 +255,7 @@
     "nav_statistics_desc": "Statistiques d'étude",
     "nav_settings": "Paramètres",
     "nav_settings_desc": "Préférences de compte",
-    "nav_subscription": "Abonnement & jetons",
+    "nav_subscription": "Abonnements & jetons",
     "nav_subscription_desc": "Plans Pro et packs de jetons",
     "nav_payments": "Historique des paiements",
     "nav_payments_desc": "Mes transactions",
@@ -293,7 +293,7 @@
     "nav_exam_library": "Bibliothèque d'épreuves",
     "nav_submissions": "Mes soumissions",
     "nav_coins": "Portefeuille de coins",
-    "nav_subscription": "Abonnement & Jetons",
+    "nav_subscription": "Abonnements & Jetons",
     "nav_profile": "Mon profil",
     "nav_settings": "Paramètres"
   },
