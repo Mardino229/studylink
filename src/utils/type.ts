@@ -88,13 +88,30 @@ export interface SubscriptionPlan {
     includes_audio: boolean;
 }
 
+export interface SubscriptionPlanBilingual {
+    id: string;
+    name: string;
+    price: string | number;
+    annual_price: string | number;
+    includes_audio: boolean;
+    description_fr: string;
+    description_en: string;
+    benefits_description_fr: string[];
+    benefits_description_en: string[];
+    stripe_product_id?: string;
+    stripe_monthly_price_id?: string;
+    stripe_annual_price_id?: string;
+}
+
 export interface SubscriptionPlanRequest {
     name: string;
     price: number;
     annual_price: number;
-    description: string;
-    benefits_description: string[];
     includes_audio: boolean;
+    description_fr?: string;
+    description_en?: string;
+    benefits_description_fr?: string[];
+    benefits_description_en?: string[];
 }
 
 export interface Subscription {

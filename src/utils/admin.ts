@@ -4,6 +4,7 @@ import { useAxiosPrivate } from "../hoooks/useAxiosPrivate.ts";
 import type {
     AdminUsersResponse,
     SubscriptionPlan,
+    SubscriptionPlanBilingual,
     PaginatedSubscriptions,
     SubscriptionPlanRequest,
     Announcement,
@@ -115,6 +116,20 @@ export const useUpdateAdminPlan = () => {
         onError: (error: any) => {
             toast.error(error.response?.data?.detail || "Erreur lors de la mise à jour du plan");
         }
+    });
+};
+
+export const useGetAdminPlanBilingual = (planId: string | null) => {
+    const axiosPrivate = useAxiosPrivate();
+    return useQuery({
+        queryKey: ["admin", "plans", planId, "bilingual"],
+        queryFn: async () => {
+            const response = await axiosPrivate.get<{ data: SubscriptionPlanBilingual }>(
+                `/admin/subscription-plans/${planId}/bilingual`
+            );
+            return response.data.data;
+        },
+        enabled: !!planId,
     });
 };
 
