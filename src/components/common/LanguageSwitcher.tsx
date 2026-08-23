@@ -7,8 +7,8 @@ export default function LanguageSwitcher({ className = "" }: { className?: strin
 
     const toggle = () => {
         const next = isFr ? 'en' : 'fr';
-        i18n.changeLanguage(next);
         localStorage.setItem('lang', next);
+        i18n.changeLanguage(next).then(() => window.location.reload());
     };
 
     return (
