@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useUploadSource, useGetSources, useDeleteSource, useAddYoutubeSource } from '../../utils/workspace';
-import { FileIcon, ImageIcon, UploadCloudIcon, CheckCircleIcon, LoaderIcon, Trash2, Link2, XCircleIcon } from 'lucide-react';
+import { FileIcon, ImageIcon, UploadCloudIcon, CheckCircleIcon, LoaderIcon, Trash2, Link2, XCircleIcon, Info } from 'lucide-react';
 
 const YoutubeIcon = ({ size = 24, className = '' }: { size?: number; className?: string }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -338,6 +338,14 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
                         </div>
                     </form>
                 )}
+
+                {/* Import processing note */}
+                <div className="flex items-start gap-2 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 px-3 py-2.5">
+                    <Info size={14} className="mt-0.5 shrink-0 text-amber-500" />
+                    <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
+                        {t('sources.processing_note')}
+                    </p>
+                </div>
 
                 {/* Processing banners — one per file */}
                 {Object.entries(streamingSources).map(([id, info]) => {

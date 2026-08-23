@@ -171,7 +171,8 @@
     "delete_confirm_msg": "Delete this source and its themes?",
     "delete_confirm_btn": "Delete",
     "cancel": "Cancel",
-    "url_invalid": "Invalid URL. Use a youtube.com or youtu.be link."
+    "url_invalid": "Invalid URL. Use a youtube.com or youtu.be link.",
+    "processing_note": "Importing analyses your document to extract themes. This may take a moment depending on the file length."
   },
   "tabs": {
     "overview": {

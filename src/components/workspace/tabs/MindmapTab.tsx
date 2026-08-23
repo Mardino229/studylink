@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GitBranch, Trash2, Clock, Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -210,7 +210,4 @@ export const MindmapTab: React.FC<MindmapTabProps> = ({
 };
 
 export default MindmapTab;
-function useEffect(arg0: () => void, arg1: (string | null | undefined)[]) {
-    throw new Error('Function not implemented.');
-}
 
