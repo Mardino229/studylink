@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useUser } from "../layout/userContext";
 
 interface BreadcrumbItem {
     label: string;
@@ -13,6 +14,7 @@ interface BreadcrumbProps {
 }
 
 const PageBreadcrumb: React.FC<BreadcrumbProps> = ({ pageTitle, items = [], titleAction }) => {
+    const { user } = useUser(); // Assuming you have a user context to get the current user's role
     return (
         <div className="flex flex-wrap items-center justify-between gap-3 lg:mb-6 mb-2">
             <div className="flex min-w-0 items-center gap-3">
@@ -30,7 +32,7 @@ const PageBreadcrumb: React.FC<BreadcrumbProps> = ({ pageTitle, items = [], titl
                     <li>
                         <Link
                             className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                            to="/"
+                            to= { user!.role?.name === 'admin' ? "/admin/home" : "/home" }
                         >
                             Home
                             <svg
