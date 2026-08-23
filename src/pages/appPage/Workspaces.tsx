@@ -176,7 +176,7 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
                             }
                         }}
                         disabled={isSubmitting}
-                        className="py-2.5 px-5 text-sm font-medium text-white bg-rose-500 hover:bg-rose-600 dark:bg-rose-600 dark:hover:bg-rose-700 rounded-2xl shadow-sm hover:shadow transition-colors disabled:opacity-50 flex items-center gap-2"
+                        className="py-2.5 px-5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-2xl shadow-sm hover:shadow transition-colors disabled:opacity-50 flex items-center gap-2"
                     >
                         {isSubmitting ? t('list.deleting') : t('list.delete_confirm_btn')}
                     </button>
@@ -526,8 +526,11 @@ const Workspaces: React.FC = () => {
                                                     autoFocus
                                                 />
                                                 <div className="flex justify-end gap-2">
-                                                    <button onClick={handleCreateNotebook} className="text-white bg-brand-500 hover:bg-brand-600 focus:ring-4 focus:ring-brand-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-brand-600 dark:hover:bg-brand-700 focus:outline-none transition-colors">{t('list.create')}</button>
-                                                    <button onClick={() => setIsCreatingNotebook(false)} className="py-2.5 px-5 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 transition-colors">{t('list.cancel')}</button>
+                                                    <button onClick={handleCreateNotebook} disabled={createNotebookMutation.isPending} className="inline-flex items-center gap-2 text-white bg-brand-500 hover:bg-brand-600 focus:ring-4 focus:ring-brand-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-brand-600 dark:hover:bg-brand-700 focus:outline-none transition-colors disabled:opacity-70">
+                                                        {createNotebookMutation.isPending && <Loader2 size={14} className="animate-spin" />}
+                                                        {t('list.create')}
+                                                    </button>
+                                                    <button onClick={() => setIsCreatingNotebook(false)} disabled={createNotebookMutation.isPending} className="py-2.5 px-5 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 transition-colors disabled:opacity-50">{t('list.cancel')}</button>
                                                 </div>
                                             </div>
                                         )}
@@ -618,8 +621,11 @@ const Workspaces: React.FC = () => {
                                             autoFocus
                                         />
                                         <div className="flex justify-end gap-2">
-                                            <button onClick={handleCreateNotebook} className="text-white bg-brand-500 hover:bg-brand-600 focus:ring-4 focus:ring-brand-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-brand-600 dark:hover:bg-brand-700 focus:outline-none transition-colors">{t('list.create')}</button>
-                                            <button onClick={() => setIsCreatingNotebook(false)} className="py-2.5 px-5 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 transition-colors">{t('list.cancel')}</button>
+                                            <button onClick={handleCreateNotebook} disabled={createNotebookMutation.isPending} className="inline-flex items-center gap-2 text-white bg-brand-500 hover:bg-brand-600 focus:ring-4 focus:ring-brand-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-brand-600 dark:hover:bg-brand-700 focus:outline-none transition-colors disabled:opacity-70">
+                                                {createNotebookMutation.isPending && <Loader2 size={14} className="animate-spin" />}
+                                                {t('list.create')}
+                                            </button>
+                                            <button onClick={() => setIsCreatingNotebook(false)} disabled={createNotebookMutation.isPending} className="py-2.5 px-5 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 transition-colors disabled:opacity-50">{t('list.cancel')}</button>
                                         </div>
                                     </div>
                                 )}
