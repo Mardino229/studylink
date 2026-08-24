@@ -127,7 +127,7 @@
     "status_validated": "Validated",
     "status_pending": "Pending",
     "status_rejected": "Rejected",
-    "coins_banner": "<bold>Earn coins 🪙</bold> — every validated exam or solution earns you <str>1 coin</str>. Convert them <str>5 coins → 1 token</str> from your <a>wallet</a>.",
+    "coins_banner": "<bold>Earn coins 🪙</bold> — every validated exam or solution earns you <str>1 coin</str>. Convert <str>5 coins to get 1 token</str> from your <a>coin wallet</a>.",
     "no_solution_banner": "These exams don't have a solution yet. Submit yours to earn <str>1 coin</str> if validated.",
     "empty_exams": "You haven't submitted any exam yet.",
     "empty_solutions": "You haven't submitted any solution yet.",
