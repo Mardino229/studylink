@@ -103,12 +103,12 @@ export default function ExamCard({ exam, isPro, isUltra, tokenBalance, isSolutio
                 {exam.exam_type && (
                     <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${TYPE_COLORS[exam.exam_type]}`}>{t(TYPE_KEYS[exam.exam_type])}</span>
                 )}
-                {hasExamFile && exam.is_exam_paid && !isPro && !isExamUnlocked && (
+                {/*{hasExamFile && exam.is_exam_paid && !isPro && !isExamUnlocked && (
                     <span className="rounded-full bg-violet-50 px-2 py-0.5 text-xs font-medium text-violet-700 dark:bg-violet-900/30 dark:text-violet-400">🪙 1 jeton</span>
                 )}
                 {hasSolution && exam.is_solution_paid && !isPro && !isSolutionUnlocked && (
                     <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">🪙 2 jetons</span>
-                )}
+                )}*/}
             </div>
 
             <div className="mt-auto flex gap-2">
