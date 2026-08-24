@@ -72,7 +72,7 @@
     "gen_suffix_quiz": "Quiz",
     "gen_suffix_podcast": "Podcast",
     "token_one": "{{count}} token",
-    "token_other": "{{count}} tokens",
+    "token_other": "{{count}} tokens available",
     "recharge": "Top up",
     "modal_prepare_summary": "Preparation of the summary",
     "modal_prepare_flashcards": "Preparation of the flashcards",
