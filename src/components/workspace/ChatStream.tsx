@@ -28,6 +28,8 @@ interface Message {
     image_urls?: string[];
     imageBlobUrls?: string[];
     created_at?: string;
+    /** true pour les messages optimistes (pending/streaming) — sortie sans animation */
+    isOptimistic?: boolean;
 }
 
 // Image sélectionnée dans l'input : file + blob URL associé
@@ -447,12 +449,14 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
             content,
             imageBlobUrls: currentBlobUrls.length ? currentBlobUrls : undefined,
             created_at: new Date(now).toISOString(),
+            isOptimistic: true,
         });
         setStreamingAssistantMsg({
             id: `assistant-${now}`,
             role: 'assistant',
             content: '',
             created_at: new Date(now).toISOString(),
+            isOptimistic: true,
         });
         setInput('');
         // Ne pas révoquer les URLs — elles sont utilisées par imageBlobUrls du message optimiste
@@ -696,6 +700,12 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                                         key={msg.id}
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
+                                        // Les messages optimistes sortent instantanément :
+                                        // évite le chevauchement visuel avec le vrai message serveur
+                                        exit={msg.isOptimistic
+                                            ? { opacity: 0, transition: { duration: 0 } }
+                                            : { opacity: 0, y: -10 }
+                                        }
                                         transition={{ duration: 0.2 }}
                                         className={cn(
                                             'flex gap-4',
