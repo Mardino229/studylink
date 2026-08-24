@@ -209,9 +209,9 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
     const preserveScrollRef = useRef(false);
     const previousScrollHeightRef = useRef(0);
     const lastSessionIdRef = useRef<string | null>(null);
-    // Timestamp serveur du dernier message connu avant l'échange courant.
-    // Comparaison serveur↔serveur : aucun décalage TZ client possible.
-    const exchangeSnapshotTimeRef = useRef<string>('');
+    // IDs des messages connus AVANT l'envoi de l'échange courant.
+    // Comparaison par ID : immune aux problèmes de TZ, format ou précision de timestamp.
+    const knownMsgIdsRef = useRef<Set<string>>(new Set());
     const pollCancelRef = useRef(false);
     // AbortController du stream SSE actif — annulé à chaque changement de session/notebook
     const streamAbortRef = useRef<AbortController | null>(null);
@@ -243,18 +243,25 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
     }, [chatMessages]);
 
     // Messages affichés : DB + optimistes (si pas encore confirmés).
-    // La comparaison snapshot est entièrement côté serveur — pas de décalage TZ.
+    // Confirmation par ID de message — immunisée contre les problèmes de timestamp.
     const displayMessages = useMemo<Message[]>(() => {
         if (!pendingUserMsg && !streamingAssistantMsg) return fetchedMessages;
 
-        const snapshot = exchangeSnapshotTimeRef.current;
-        const confirmed = fetchedMessages.some(
-            (m) => m.role === 'assistant' && (m.created_at ?? '') > snapshot
+        const knownIds = knownMsgIdsRef.current;
+        // L'échange est confirmé quand le serveur retourne un message assistant inconnu avant l'envoi
+        const serverHasAssistant = fetchedMessages.some(
+            (m) => m.role === 'assistant' && !knownIds.has(m.id)
         );
-        if (confirmed) return fetchedMessages;
+        if (serverHasAssistant) return fetchedMessages;
+
+        // Le serveur a déjà commis le message user (avant l'assistant) :
+        // ne pas afficher pendingUserMsg pour éviter le doublon de la question
+        const serverHasUser = fetchedMessages.some(
+            (m) => m.role === 'user' && !knownIds.has(m.id)
+        );
 
         const pending: Message[] = [];
-        if (pendingUserMsg) pending.push(pendingUserMsg);
+        if (pendingUserMsg && !serverHasUser) pending.push(pendingUserMsg);
         // N'afficher la bulle de streaming qu'une fois le premier token reçu
         if (streamingAssistantMsg?.content) pending.push(streamingAssistantMsg);
         return [...fetchedMessages, ...pending];
@@ -353,12 +360,12 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sessionId]);
 
-    // Supprimer les messages temporaires dès que la DB confirme l'échange
+    // Supprimer les messages temporaires dès que la DB confirme l'échange (vérification par ID)
     useEffect(() => {
         if (!pendingUserMsg && !streamingAssistantMsg) return;
-        const snapshot = exchangeSnapshotTimeRef.current;
+        const knownIds = knownMsgIdsRef.current;
         const confirmed = fetchedMessages.some(
-            (m) => m.role === 'assistant' && (m.created_at ?? '') > snapshot
+            (m) => m.role === 'assistant' && !knownIds.has(m.id)
         );
         if (confirmed) clearPending();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -427,7 +434,8 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
         const currentImages = selectedImages;
         const currentBlobUrls = currentImages.map(img => img.previewUrl);
 
-        exchangeSnapshotTimeRef.current = fetchedMessages[fetchedMessages.length - 1]?.created_at ?? '';
+        // Capturer les IDs de tous les messages connus avant cet échange
+        knownMsgIdsRef.current = new Set(fetchedMessages.map(m => m.id));
         pollCancelRef.current = false;
 
         // Annuler tout stream précédent avant d'en démarrer un nouveau
@@ -511,9 +519,9 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
 
                     setIsStreaming(false);
                     // Poll de confirmation : le serveur a fermé la connexion SSE juste avant
-                    // que l'écriture DB soit visible. On re-fetche jusqu'à trouver le message
-                    // ou après 5 tentatives.
-                    const snapshot = exchangeSnapshotTimeRef.current;
+                    // que l'écriture DB soit visible. On re-fetche jusqu'à trouver un message
+                    // assistant dont l'ID n'existait pas avant l'envoi, ou après 5 tentatives.
+                    const knownIds = knownMsgIdsRef.current;
                     const poll = async (attempt = 0) => {
                         if (pollCancelRef.current) return;
                         try {
@@ -521,7 +529,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                             if (pollCancelRef.current) return;
                             const found = result.data?.pages?.some((page) =>
                                 page.items?.some(
-                                    (m) => m.role === 'assistant' && (m.created_at ?? '') > snapshot
+                                    (m) => m.role === 'assistant' && !knownIds.has(m.id)
                                 )
                             ) ?? false;
                             if (found || attempt >= 5) {
