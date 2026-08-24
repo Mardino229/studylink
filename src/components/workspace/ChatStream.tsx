@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCreateChatSession, useGetChatMessages, useGetChatSessions } from '../../utils/workspace';
 import { SendIcon, BotIcon, PlusIcon, MessageSquare, Clock3, Menu, MessageCirclePlus, ImageIcon, X } from 'lucide-react';
@@ -10,7 +10,6 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
-import rehypeRaw from 'rehype-raw';
 import 'katex/dist/katex.min.css';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { axiosPrivate, baseUrl } from '../../utils/api.ts';
@@ -29,7 +28,13 @@ interface Message {
     image_urls?: string[];
     imageBlobUrls?: string[];
     created_at?: string;
-} 
+}
+
+// Image sélectionnée dans l'input : file + blob URL associé
+interface SelectedImage {
+    file: File;
+    previewUrl: string;
+}
 
 const toUiMessage = (message: WorkspaceChatMessage): Message => ({
     id: message.id,
@@ -47,9 +52,8 @@ interface ChatImageProps {
     index: number;
 }
 
-// Survives component remounts within a page session.
-// Keys are `${messageId}/${index}`; blob URLs are never explicitly revoked here
-// (they live until page unload, acceptable for a few images per session).
+// Cache module-level : survit aux remontages, nettoyé à l'unload de la page.
+// Acceptable pour quelques images par session.
 const chatImageCache = new Map<string, string>();
 
 const ChatImage: React.FC<ChatImageProps> = ({ notebookId, sessionId, messageId, index }) => {
@@ -63,9 +67,10 @@ const ChatImage: React.FC<ChatImageProps> = ({ notebookId, sessionId, messageId,
         axiosPrivate
             .get(`/notebooks/${notebookId}/chats/${sessionId}/messages/${messageId}/images/${index}`, { responseType: 'blob' })
             .then((res) => {
+                if (cancelled) return;
                 const url = URL.createObjectURL(res.data as Blob);
                 chatImageCache.set(cacheKey, url);
-                if (!cancelled) setSrc(url);
+                setSrc(url);
             })
             .catch(() => { if (!cancelled) setFailed(true); });
         return () => { cancelled = true; };
@@ -80,14 +85,15 @@ const ChatImage: React.FC<ChatImageProps> = ({ notebookId, sessionId, messageId,
     return <img src={src} alt="" className="max-h-48 rounded-2xl object-cover" />;
 };
 
+// Tri numérique par timestamp — évite les ambiguïtés de localeCompare sur les ISO dates
 const sortMessages = (messages: Message[]) =>
-    [...messages].sort((left, right) => {
-        const leftTime = left.created_at ?? '';
-        const rightTime = right.created_at ?? '';
-        return leftTime.localeCompare(rightTime);
+    [...messages].sort((a, b) => {
+        const aTime = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const bTime = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return aTime - bTime;
     });
 
-// Treat a server timestamp that has no TZ suffix as UTC so Date display is correct.
+// Traite un timestamp sans TZ comme UTC
 const toUTCDate = (s: string) =>
     new Date(/Z$|[+-]\d{2}:\d{2}$/.test(s) ? s : s + 'Z');
 
@@ -141,7 +147,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
             <div className="space-y-2">
                 {sessions
                     .slice()
-                    .sort((left, right) => right.created_at.localeCompare(left.created_at))
+                    .sort((a, b) => b.created_at.localeCompare(a.created_at))
                     .map((session) => {
                         const isActive = session.id === sessionId;
                         return (
@@ -185,13 +191,12 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
     ];
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
-    // Pending optimistic messages for the current in-flight exchange.
-    // Kept separate from real DB messages — never merged by content.
+    // Messages optimistes en attente de confirmation serveur — jamais fusionnés par contenu
     const [pendingUserMsg, setPendingUserMsg] = useState<Message | null>(null);
     const [streamingAssistantMsg, setStreamingAssistantMsg] = useState<Message | null>(null);
     const [input, setInput] = useState('');
-    const [imageFiles, setImageFiles] = useState<File[]>([]);
-    const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
+    // Images groupées : fichier + blob URL évitant la désynchronisation des tableaux parallèles
+    const [selectedImages, setSelectedImages] = useState<SelectedImage[]>([]);
     const [sessionId, setSessionId] = useState<string | null>(null);
     const [isStreaming, setIsStreaming] = useState(false);
     const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -204,10 +209,12 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
     const preserveScrollRef = useRef(false);
     const previousScrollHeightRef = useRef(0);
     const lastSessionIdRef = useRef<string | null>(null);
-    // Server-side created_at of the last known message before the current exchange.
-    // Comparing server timestamps against each other avoids any client/server TZ skew.
+    // Timestamp serveur du dernier message connu avant l'échange courant.
+    // Comparaison serveur↔serveur : aucun décalage TZ client possible.
     const exchangeSnapshotTimeRef = useRef<string>('');
     const pollCancelRef = useRef(false);
+    // AbortController du stream SSE actif — annulé à chaque changement de session/notebook
+    const streamAbortRef = useRef<AbortController | null>(null);
 
     const createSessionMutation = useCreateChatSession();
     const {
@@ -227,18 +234,16 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
 
     const activeSession = useMemo<ChatSession | null>(() => {
         if (!sessionId) return null;
-        return sessions.find((session) => session.id === sessionId) ?? null;
+        return sessions.find((s) => s.id === sessionId) ?? null;
     }, [sessionId, sessions]);
 
     const fetchedMessages = useMemo<Message[]>(() => {
         const pages = chatMessages?.pages ?? [];
-        const flattened = pages.flatMap((page) => page.items.map(toUiMessage));
-        return sortMessages(flattened);
+        return sortMessages(pages.flatMap((page) => page.items.map(toUiMessage)));
     }, [chatMessages]);
 
-    // What's actually rendered: real DB messages + pending temp messages (if not yet confirmed).
-    // Both sides of the comparison are server timestamps in the same format/timezone,
-    // so string ordering is correct and no client/server TZ skew can affect the result.
+    // Messages affichés : DB + optimistes (si pas encore confirmés).
+    // La comparaison snapshot est entièrement côté serveur — pas de décalage TZ.
     const displayMessages = useMemo<Message[]>(() => {
         if (!pendingUserMsg && !streamingAssistantMsg) return fetchedMessages;
 
@@ -250,43 +255,60 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
 
         const pending: Message[] = [];
         if (pendingUserMsg) pending.push(pendingUserMsg);
-        // Only show the streaming bubble once it has content; before the first token
-        // the typing indicator dots handle the "thinking" state instead.
+        // N'afficher la bulle de streaming qu'une fois le premier token reçu
         if (streamingAssistantMsg?.content) pending.push(streamingAssistantMsg);
         return [...fetchedMessages, ...pending];
     }, [fetchedMessages, pendingUserMsg, streamingAssistantMsg]);
 
-    const clearPending = () => {
+    const clearPending = useCallback(() => {
         pollCancelRef.current = true;
         setPendingUserMsg(null);
         setStreamingAssistantMsg(null);
-    };
+    }, []);
 
-    const clearAllImages = () => {
-        imagePreviewUrls.forEach(url => URL.revokeObjectURL(url));
-        setImageFiles([]);
-        setImagePreviewUrls([]);
-    };
+    // Annule le stream SSE en cours s'il y en a un
+    const abortCurrentStream = useCallback(() => {
+        streamAbortRef.current?.abort();
+        streamAbortRef.current = null;
+    }, []);
 
-    const removeImage = (index: number) => {
-        URL.revokeObjectURL(imagePreviewUrls[index]);
-        setImageFiles(prev => prev.filter((_, i) => i !== index));
-        setImagePreviewUrls(prev => prev.filter((_, i) => i !== index));
-    };
+    const clearAllImages = useCallback(() => {
+        setSelectedImages(prev => {
+            prev.forEach(img => URL.revokeObjectURL(img.previewUrl));
+            return [];
+        });
+    }, []);
 
-    const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const removeImage = useCallback((index: number) => {
+        setSelectedImages(prev => {
+            URL.revokeObjectURL(prev[index].previewUrl);
+            return prev.filter((_, i) => i !== index);
+        });
+    }, []);
+
+    const handleImageSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const newFiles = Array.from(e.target.files ?? []);
         if (!newFiles.length) return;
-        const combined = [...imageFiles, ...newFiles].slice(0, 5);
-        const addedFiles = combined.slice(imageFiles.length);
-        const newUrls = addedFiles.map(f => URL.createObjectURL(f));
-        setImageFiles(combined);
-        setImagePreviewUrls(prev => [...prev, ...newUrls]);
+        setSelectedImages(prev => {
+            const slotsLeft = 5 - prev.length;
+            if (slotsLeft <= 0) return prev;
+            const added = newFiles.slice(0, slotsLeft).map(f => ({
+                file: f,
+                previewUrl: URL.createObjectURL(f),
+            }));
+            return [...prev, ...added];
+        });
         e.target.value = '';
-    };
+    }, []);
 
-    // Reset all state when the notebook changes
+    // Nettoyage complet à l'unmount : annuler le stream ouvert
     useEffect(() => {
+        return () => { abortCurrentStream(); };
+    }, [abortCurrentStream]);
+
+    // Reset complet quand le notebook change
+    useEffect(() => {
+        abortCurrentStream();
         setSessionId(null);
         clearPending();
         setInput('');
@@ -300,28 +322,28 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [notebookId]);
 
-    // Auto-select the latest session when the list loads or changes
+    // Auto-sélection de la session la plus récente
     useEffect(() => {
         if (!sessions.length) {
             if (sessionId !== null) setSessionId(null);
             return;
         }
         if (!sessionId) {
-            const latestSession = [...sessions].sort((left, right) => right.created_at.localeCompare(left.created_at))[0];
-            if (latestSession) {
+            const latest = [...sessions].sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
+            if (latest) {
                 shouldScrollToBottomRef.current = true;
-                setSessionId(latestSession.id);
+                setSessionId(latest.id);
             }
             return;
         }
-        if (!sessions.some((session) => session.id === sessionId)) {
-            const latestSession = [...sessions].sort((left, right) => right.created_at.localeCompare(left.created_at))[0];
+        if (!sessions.some((s) => s.id === sessionId)) {
+            const latest = [...sessions].sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
             shouldScrollToBottomRef.current = true;
-            setSessionId(latestSession?.id ?? null);
+            setSessionId(latest?.id ?? null);
         }
     }, [sessions, sessionId]);
 
-    // Clear pending exchange whenever the active session changes
+    // Vider les messages optimistes au changement de session active
     useEffect(() => {
         if (lastSessionIdRef.current !== sessionId) {
             lastSessionIdRef.current = sessionId;
@@ -331,7 +353,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sessionId]);
 
-    // Drop temp messages once the real exchange arrives in fetchedMessages
+    // Supprimer les messages temporaires dès que la DB confirme l'échange
     useEffect(() => {
         if (!pendingUserMsg && !streamingAssistantMsg) return;
         const snapshot = exchangeSnapshotTimeRef.current;
@@ -342,21 +364,22 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fetchedMessages]);
 
+    // Auto-scroll pendant le streaming (MutationObserver, respecte le scroll de l'utilisateur)
     useEffect(() => {
         if (messagesContainerRef.current) {
-            const cleanup = autoScrollListRef(messagesContainerRef.current);
-            return cleanup;
+            return autoScrollListRef(messagesContainerRef.current);
         }
         return;
     }, []);
 
+    // Scroll programmatique : restauration de position après chargement de l'historique
+    // et scroll initial à l'ouverture d'une session
     useEffect(() => {
         if (!messagesContainerRef.current) return;
 
         if (preserveScrollRef.current) {
             const container = messagesContainerRef.current;
-            const nextScrollHeight = container.scrollHeight;
-            container.scrollTop += nextScrollHeight - previousScrollHeightRef.current;
+            container.scrollTop += container.scrollHeight - previousScrollHeightRef.current;
             preserveScrollRef.current = false;
             return;
         }
@@ -367,22 +390,23 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
         }
     }, [displayMessages]);
 
-    const handleOpenSession = (nextSessionId: string) => {
+    const handleOpenSession = useCallback((nextSessionId: string) => {
         if (nextSessionId === sessionId) return;
+        abortCurrentStream();
         setSessionId(nextSessionId);
         clearPending();
         setInput('');
         setIsStreaming(false);
         shouldScrollToBottomRef.current = true;
-    };
+    }, [sessionId, abortCurrentStream, clearPending]);
 
     const handleCreateSession = async () => {
         const title = newSessionTitle.trim();
         if (!title) return;
         try {
-            const createdSession = await createSessionMutation.mutateAsync({ notebookId, title });
+            const created = await createSessionMutation.mutateAsync({ notebookId, title });
             await refetchChatSessions();
-            setSessionId(createdSession.id);
+            setSessionId(created.id);
             clearPending();
             setInput('');
             setIsStreaming(false);
@@ -399,11 +423,15 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
         if (!content || !sessionId) return;
 
         const now = Date.now();
-        const currentImageFiles = imageFiles;
-        const currentBlobUrls = imagePreviewUrls;
+        // Capturer les images AVANT de vider l'état
+        const currentImages = selectedImages;
+        const currentBlobUrls = currentImages.map(img => img.previewUrl);
 
         exchangeSnapshotTimeRef.current = fetchedMessages[fetchedMessages.length - 1]?.created_at ?? '';
         pollCancelRef.current = false;
+
+        // Annuler tout stream précédent avant d'en démarrer un nouveau
+        abortCurrentStream();
 
         setPendingUserMsg({
             id: `user-${now}`,
@@ -419,60 +447,72 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
             created_at: new Date(now).toISOString(),
         });
         setInput('');
-        setImageFiles([]);
-        setImagePreviewUrls([]);
+        // Ne pas révoquer les URLs — elles sont utilisées par imageBlobUrls du message optimiste
+        setSelectedImages([]);
         setIsStreaming(true);
         shouldScrollToBottomRef.current = true;
 
         const form = new FormData();
         form.append('content', content);
-        for (const file of currentImageFiles) form.append('images', file);
+        for (const img of currentImages) form.append('images', img.file);
+
+        const controller = new AbortController();
+        streamAbortRef.current = controller;
 
         try {
             await fetchEventSource(`${baseUrl}/notebooks/${notebookId}/chats/${sessionId}/messages/stream`, {
                 method: 'POST',
                 credentials: 'include',
-                headers: {
-                    Accept: 'text/event-stream',
-                },
+                headers: { Accept: 'text/event-stream' },
                 body: form,
+                signal: controller.signal,
                 onmessage(event) {
                     if (!event.data) return;
                     try {
-                        const data = JSON.parse(event.data);
+                        const data = JSON.parse(event.data) as {
+                            type: string;
+                            text?: string;
+                            citations?: WorkspaceChatMessage['citations'];
+                        };
                         if (data.type === 'token') {
-                            setStreamingAssistantMsg((prev) =>
-                                prev ? { ...prev, content: prev.content + data.text } : null
+                            setStreamingAssistantMsg(prev =>
+                                prev ? { ...prev, content: prev.content + (data.text ?? '') } : null
                             );
+                            // Maintenir le scroll vers le bas à chaque token reçu
+                            shouldScrollToBottomRef.current = true;
                         } else if (data.type === 'citations') {
-                            setStreamingAssistantMsg((prev) =>
+                            setStreamingAssistantMsg(prev =>
                                 prev ? { ...prev, citations: data.citations } : null
                             );
                         } else if (data.type === 'error') {
-                            setStreamingAssistantMsg((prev) =>
+                            setStreamingAssistantMsg(prev =>
                                 prev ? { ...prev, content: data.text ?? 'Une erreur est survenue.' } : null
                             );
                             setIsStreaming(false);
                         } else if (data.type === 'done') {
+                            // L'IA a fini de générer : masquer l'indicateur de frappe.
+                            // Le poll dans onclose confirme l'écriture DB et nettoie les messages optimistes.
                             setIsStreaming(false);
-                            // Early refetch: server has finished generating, DB write
-                            // likely committed, so grab the real messages now while the
-                            // SSE connection is still technically open.
-                            void refetchChatMessages();
                         }
                     } catch {
-                        // Ignore malformed payloads.
+                        // Ignorer les payloads malformés
                     }
                 },
                 onerror(error) {
+                    // Abort intentionnel (changement de session) : stopper fetchEventSource sans log
+                    if ((error as Error).name === 'AbortError') throw error;
                     setIsStreaming(false);
+                    console.error('SSE error', error);
                     throw error;
                 },
                 onclose() {
+                    // Connexion fermée suite à un abort intentionnel — pas de poll
+                    if (controller.signal.aborted) return;
+
                     setIsStreaming(false);
-                    // Fallback poll: handles the race where the server closes the SSE
-                    // connection slightly before the DB write is committed.
-                    // The `done` refetch above already fired; this retries if it missed.
+                    // Poll de confirmation : le serveur a fermé la connexion SSE juste avant
+                    // que l'écriture DB soit visible. On re-fetche jusqu'à trouver le message
+                    // ou après 5 tentatives.
                     const snapshot = exchangeSnapshotTimeRef.current;
                     const poll = async (attempt = 0) => {
                         if (pollCancelRef.current) return;
@@ -501,8 +541,14 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                 },
             });
         } catch (error) {
-            setIsStreaming(false);
-            console.error('Stream failed', error);
+            if ((error as Error).name !== 'AbortError') {
+                setIsStreaming(false);
+                console.error('Stream failed', error);
+            }
+        } finally {
+            if (streamAbortRef.current === controller) {
+                streamAbortRef.current = null;
+            }
         }
     };
 
@@ -526,11 +572,10 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
 
     return (
         <div className="flex h-full w-full gap-4 overflow-hidden relative">
-            {/* Mobile drawer with framer-motion slide-in */}
+            {/* Drawer mobile avec slide framer-motion */}
             <AnimatePresence>
                 {sidebarOpen && (
                     <div className="fixed top-16 inset-0 z-50 xl:hidden">
-                        {/* Backdrop overlay */}
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -538,7 +583,6 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                             className="absolute inset-0 bg-black/40 backdrop-blur-xs"
                             onClick={() => setSidebarOpen(false)}
                         />
-                        {/* Slide panel */}
                         <motion.div
                             initial={{ x: '-100%' }}
                             animate={{ x: 0 }}
@@ -554,7 +598,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                 )}
             </AnimatePresence>
 
-            {/* Desktop Collapsible Sidebar */}
+            {/* Sidebar desktop escamotable */}
             <AnimatePresence initial={false}>
                 {desktopSidebarOpen && (
                     <motion.aside
@@ -569,12 +613,11 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                 )}
             </AnimatePresence>
 
-            {/* Main Chat Interface */}
+            {/* Interface principale */}
             <section className="flex flex-1 min-w-0 px-2 flex-col overflow-hidden bg-card">
-                {/* Chat Header */}
+                {/* En-tête du chat */}
                 <div className="flex items-center justify-between py-4">
                     <div className="flex items-center gap-3">
-                        {/* Desktop sidebar toggle button when closed/open */}
                         <button
                             type="button"
                             onClick={() => setDesktopSidebarOpen(prev => !prev)}
@@ -610,7 +653,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                     </div>
                 </div>
 
-                {/* Message list container */}
+                {/* Liste des messages */}
                 <div
                     ref={messagesContainerRef}
                     onScroll={handleScroll}
@@ -685,7 +728,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                                                 <div className="prose text-slate-700 dark:text-slate-200 prose-sm max-w-none">
                                                     <ReactMarkdown
                                                         remarkPlugins={[remarkMath, remarkGfm, remarkBreaks]}
-                                                        rehypePlugins={[rehypeKatex, rehypeRaw]}
+                                                        rehypePlugins={[rehypeKatex]}
                                                     >{msg.content}</ReactMarkdown>
                                                 </div>
                                             )}
@@ -710,10 +753,9 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                     </div>
                 </div>
 
-                {/* Input Area */}
+                {/* Zone de saisie */}
                 <div className="border-t border-border bg-white dark:bg-slate-900">
                     {!sessionId && !isLoadingChatSessions ? (
-                        /* No session   CTA to create one */
                         <div className="flex items-center justify-between gap-3 px-4 py-3">
                             <p className="text-sm text-slate-500 dark:text-slate-400">
                                 {t('chat.no_session_cta')}
@@ -728,12 +770,10 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                             </button>
                         </div>
                     ) : isLoadingChatSessions ? (
-                        /* Loading   neutral skeleton */
                         <div className="flex items-center justify-center py-4">
                             <div className="h-10 w-full max-w-3xl mx-4 animate-pulse rounded-full bg-slate-100 dark:bg-slate-800" />
                         </div>
                     ) : (
-                        /* Normal input */
                         <div className="lg:px-4 py-4">
                             <div className="max-w-3xl mx-auto">
                                 {fetchedMessages.length < 2 && (
@@ -741,6 +781,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                                         {suggestedQuestions.map((q, i) => (
                                             <button
                                                 key={i}
+                                                type="button"
                                                 onClick={() => {
                                                     setInput(q);
                                                     inputRef.current?.focus();
@@ -753,11 +794,11 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                                     </div>
                                 )}
 
-                                {imagePreviewUrls.length > 0 && (
+                                {selectedImages.length > 0 && (
                                     <div className="mb-2 flex flex-wrap gap-2">
-                                        {imagePreviewUrls.map((url, i) => (
+                                        {selectedImages.map((img, i) => (
                                             <div key={i} className="relative inline-block">
-                                                <img src={url} alt="" className="h-20 rounded-xl object-cover border border-slate-200 dark:border-slate-700" />
+                                                <img src={img.previewUrl} alt="" className="h-20 rounded-xl object-cover border border-slate-200 dark:border-slate-700" />
                                                 <button
                                                     type="button"
                                                     onClick={() => removeImage(i)}
@@ -773,7 +814,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                                     <button
                                         type="button"
                                         onClick={() => imageInputRef.current?.click()}
-                                        disabled={isStreaming || imageFiles.length >= 5}
+                                        disabled={isStreaming || selectedImages.length >= 5}
                                         className="absolute left-2 p-2 text-slate-400 hover:text-brand-500 disabled:opacity-30 transition-colors rounded-full"
                                         title={t('chat.attach_image')}
                                     >
@@ -804,6 +845,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                                         autoFocus
                                     />
                                     <button
+                                        type="button"
                                         onClick={() => void handleSendMessage()}
                                         disabled={!input.trim() || isStreaming}
                                         className="absolute right-2 p-2 bg-brand-500 hover:bg-brand-600 disabled:opacity-30 text-white rounded-full transition-all"
