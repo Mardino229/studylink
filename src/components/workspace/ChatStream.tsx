@@ -40,7 +40,8 @@ interface SelectedImage {
 
 const toUiMessage = (message: WorkspaceChatMessage): Message => ({
     id: message.id,
-    role: message.role,
+    // L'API utilise "model" pour les réponses, l'interface utilise "assistant".
+    role: message.role === 'user' ? 'user' : 'assistant',
     content: message.content,
     citations: message.citations,
     image_urls: message.image_urls,
@@ -261,6 +262,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                 )
             )
         );
+        
         if (serverHasAssistant) return fetchedMessages;
 
         // Le serveur a déjà commis le message user (avant l'assistant) :
