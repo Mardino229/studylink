@@ -252,7 +252,14 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
         const knownIds = knownMsgIdsRef.current;
         // L'échange est confirmé quand le serveur retourne un message assistant inconnu avant l'envoi
         const serverHasAssistant = fetchedMessages.some(
-            (m) => m.role === 'assistant' && !knownIds.has(m.id)
+            (m) => m.role === 'assistant' && (
+                !knownIds.has(m.id)
+                || (
+                    !!streamingAssistantMsg?.content
+                    && m.content === streamingAssistantMsg.content
+                    && new Date(m.created_at ?? 0).getTime() >= new Date(streamingAssistantMsg.created_at ?? 0).getTime()
+                )
+            )
         );
         if (serverHasAssistant) return fetchedMessages;
 
@@ -367,7 +374,14 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
         if (!pendingUserMsg && !streamingAssistantMsg) return;
         const knownIds = knownMsgIdsRef.current;
         const confirmed = fetchedMessages.some(
-            (m) => m.role === 'assistant' && !knownIds.has(m.id)
+            (m) => m.role === 'assistant' && (
+                !knownIds.has(m.id)
+                || (
+                    !!streamingAssistantMsg?.content
+                    && m.content === streamingAssistantMsg.content
+                    && new Date(m.created_at ?? 0).getTime() >= new Date(streamingAssistantMsg.created_at ?? 0).getTime()
+                )
+            )
         );
         if (confirmed) clearPending();
     // eslint-disable-next-line react-hooks/exhaustive-deps
