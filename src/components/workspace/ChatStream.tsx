@@ -257,7 +257,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                 || (
                     !!streamingAssistantMsg?.content
                     && m.content === streamingAssistantMsg.content
-                    && new Date(m.created_at ?? 0).getTime() >= new Date(streamingAssistantMsg.created_at ?? 0).getTime()
+                    && toUTCDate(m.created_at ?? '').getTime() >= toUTCDate(streamingAssistantMsg.created_at ?? '').getTime()
                 )
             )
         );
@@ -379,7 +379,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
                 || (
                     !!streamingAssistantMsg?.content
                     && m.content === streamingAssistantMsg.content
-                    && new Date(m.created_at ?? 0).getTime() >= new Date(streamingAssistantMsg.created_at ?? 0).getTime()
+                    && toUTCDate(m.created_at ?? '').getTime() >= toUTCDate(streamingAssistantMsg.created_at ?? '').getTime()
                 )
             )
         );
