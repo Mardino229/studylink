@@ -21,6 +21,7 @@
     "confirm_sol_btn": "Confirm (2 tokens)",
     "unlock_solution": "Unlock solution",
     "solution_note": "You don't pay again to reopen this solution.",
+    "token_exam_desc": "1 exam = 1 token. 1 solution = 2 tokens.",
     "filters": {
       "year_placeholder": "Year (e.g. 2024)",
       "all_sessions": "All sessions",
@@ -133,7 +134,7 @@
     "empty_solutions": "You haven't submitted any solution yet.",
     "contribute_empty": "All exams already have a solution — check back later!",
     "resubmit_exam": "Resubmit exam",
-    "resubmit_exam_desc": "You can upload a new corrected file (optional if only metadata changes).",
+    "resubmit_exam_desc": "You can upload a new exam file or resubmit the same file if you think it's an error.",
     "resubmit_solution": "Resubmit solution",
     "submit_solution": "Submit a solution",
     "cancel": "Cancel",

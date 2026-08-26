@@ -68,7 +68,9 @@ export default function ExamLibrary() {
         <>
             <PageMeta title={t('library.page_title')} description={t('library.page_title')} />
             <PageBreadcrumb pageTitle={t('library.page_title')} />
-
+            <div className="mb-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/30 dark:bg-amber-900/10">
+                <p className="text-sm text-amber-800 dark:text-amber-300">{t('library.token_exam_desc')}</p>
+            </div>
             <div className="space-y-5 pt-4">
                 <ExamFiltersPanel
                     courseId={courseId} setCourseId={setCourseId}
