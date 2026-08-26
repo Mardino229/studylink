@@ -99,7 +99,7 @@
     "audio_included": "Audio inclus",
     "current_plan": "Plan actuel",
     "scheduled_for": "Programmé pour le {{date}}",
-    "upgrade_to": "Upgrader vers {{name}}",
+    "upgrade_to": "Mettre à jour vers {{name}}",
     "switch_to": "Passer à {{name}}",
     "subscribe": "S'abonner ({{name}})",
     "recommended": "Recommandé",
