@@ -226,7 +226,7 @@ export default function Pricing() {
                                     viewport={{ once: true, amount: 0.3 }}
                                     className="max-w-md mx-auto w-full"
                                 >
-                                    <div className={`relative flex flex-col rounded-2xl border-2 ${accent.border} bg-gradient-to-br ${accent.from} to-white p-8 shadow-xl dark:to-card dark:shadow-none`}>
+                                    <div className={`relative flex flex-col rounded-2xl border-2 ${accent.border} bg-gradient-to-br ${accent.from} to-white p-8 dark:to-card dark:shadow-none`}>
                                         <div className={`absolute -top-3 left-1/2 -translate-x-1/2 rounded-full ${accent.badge} px-4 py-0.5 text-xs font-bold uppercase tracking-wider text-white`}>
                                             {isUltra
                                                 ? <><Gem size={11} className="inline mr-1 -mt-0.5" />{plan.name}</>

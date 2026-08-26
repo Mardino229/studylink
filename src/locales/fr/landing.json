@@ -39,7 +39,7 @@
       },
       {
         "title": "Générez vos outils de révision",
-        "desc": "Utilisez vos jetons ou votre abonnement Pro ou Ultra pour générer en un clic des résumés, des flashcards, des quiz ou des podcasts audio."
+        "desc": "Utilisez vos jetons ou votre abonnement Pro ou Ultra pour générer en un clic des résumés, des flashcards, des quiz, des cartes mentales, ou des podcasts audio."
       },
       {
         "title": "Révisez avec un assistant",
@@ -144,7 +144,7 @@
       "free_col": "Gratuit",
       "features": [
         "Conservation des outils de révision générés",
-        "Résumés, quiz, flashcards (vidéos YouTube ou fichiers de cours et images)",
+        "Résumés, quiz, flashcards, cartes mentales (vidéos YouTube ou fichiers de cours et images)",
         "Discussion avec l'assistant IA (10 messages)",
         "Bibliothèque d'épreuves",
         "Corrigés des épreuves",

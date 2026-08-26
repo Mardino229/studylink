@@ -39,7 +39,7 @@
       },
       {
         "title": "Generate your study tools",
-        "desc": "Use your tokens or your Pro or Ultra subscription to generate summaries, flashcards, quizzes or audio podcasts in one click."
+        "desc": "Use your tokens or your Pro or Ultra subscription to generate summaries, flashcards, quizzes, mindmaps, or audio podcasts in one click."
       },
       {
         "title": "Study with an assistant",
@@ -144,7 +144,7 @@
       "free_col": "Free",
       "features": [
         "Retention of generated study tools",
-        "Summaries, quizzes, flashcards (YouTube videos or course files and images)",
+        "Summaries, quizzes, flashcards, mindmaps (YouTube videos or course files and images)",
         "AI assistant chat (10 messages)",
         "Exam library",
         "Exam solutions",
