@@ -71,7 +71,7 @@ export default function ExamLibrary() {
             {
                 !isPro && !isUltra && (
                     <div className="mb-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/30 dark:bg-amber-900/10">
-                        <p className="text-sm text-amber-800 dark:text-amber-300">{t('library.token_exam_desc')}</p>
+                        <p className="text-sm bold text-amber-800 dark:text-amber-300">{t('library.token_exam_desc')}</p>
                     </div>
                 )
             } 
