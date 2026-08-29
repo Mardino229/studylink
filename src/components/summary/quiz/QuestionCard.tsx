@@ -1,6 +1,7 @@
 import { CheckCircle, XCircle } from "lucide-react";
 import { cn } from "../../../lib/utils.ts";
 import type { QuizQuestion } from "../../../utils/summary.ts";
+import { renderMarkdown } from "../../../utils/mk.tsx";
 
 interface QuestionCardProps {
     question: QuizQuestion;
@@ -23,7 +24,7 @@ export default function QuestionCard({
         <div className="rounded-xl sm:p-6 ">
             <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white leading-relaxed mb-2">
-                    {question.question}
+                    {renderMarkdown(question.question)}
                 </h2>
                 <div className="text-sm text-gray-500 dark:text-gray-400">
                     {question.type === "mcq" ? "Sélectionnez une réponse" : "Tapez votre réponse"}
@@ -73,7 +74,7 @@ export default function QuestionCard({
                                 
                                 {/* Texte de l'option */}
                                 <span className="flex-1 text-gray-900 dark:text-white font-medium">
-                                    {option}
+                                    {renderMarkdown(option)}
                                 </span>
                                 
                                 {/* Icônes de résultat */}
@@ -105,7 +106,7 @@ export default function QuestionCard({
                         <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
                             <p className="text-sm text-green-800 dark:text-green-200 mb-2 font-semibold">Réponse attendue :</p>
                             <p className="text-green-900 dark:text-green-100 leading-relaxed">
-                                {question.answer}
+                                {renderMarkdown(question.answer)}
                             </p>
                         </div>
                     )}
@@ -117,7 +118,7 @@ export default function QuestionCard({
                 <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                     <h3 className="font-medium text-blue-900 dark:text-blue-100 mb-2">💡 Explication</h3>
                     <p className="text-blue-800 dark:text-blue-200 text-sm">
-                        {question.explanation}
+                        {renderMarkdown(question.explanation)}
                     </p>
                 </div>
             )}

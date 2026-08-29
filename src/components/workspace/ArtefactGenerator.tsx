@@ -11,6 +11,7 @@ import {
     useGetArtefactPodcasts,
 } from '../../utils/workspace';
 import { BrainIcon, FileQuestionIcon, LayersIcon, LoaderIcon, FileTextIcon, MicIcon } from 'lucide-react';
+import { renderMarkdown } from '../../utils/mk';
 
 interface ArtefactGeneratorProps {
     notebookId: string;
@@ -219,12 +220,12 @@ const ArtefactGenerator: React.FC<ArtefactGeneratorProps> = ({ notebookId }) => 
                         {podcasts?.items?.map(podcast => (
                             <div key={podcast.id} className="rounded-lg border border-gray-100 bg-gray-50 p-3 text-sm dark:border-gray-800 dark:bg-white/[0.03]">
                                 <p className="font-medium text-gray-800 dark:text-white/90">{podcast.title || 'Podcast'}</p>
-                                <p className="mt-1 line-clamp-3 text-xs text-gray-500 dark:text-gray-400">{podcast.transcript}</p>
+                                <p className="mt-1 line-clamp-3 text-xs text-gray-500 dark:text-gray-400">{renderMarkdown(podcast.transcript || '')}</p>
                             </div>
-                        ))}
+                        ))} 
                         {podcasts?.items?.length === 0 && <p className="text-xs text-gray-400">{t('artefact.empty_podcast')}</p>}
                     </div>
-                </div>
+                </div> 
             </div>
         </div>
     );

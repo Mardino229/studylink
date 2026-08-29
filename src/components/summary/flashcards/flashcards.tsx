@@ -3,6 +3,7 @@ import { motion, AnimatePresence, useMotionValue, useTransform, type PanInfo } f
 import { ChevronLeft, ChevronRight, RotateCcw, Lightbulb, Bookmark } from "lucide-react";
 import { cn } from "../../../lib/utils";
 import type { Flashcard as FlashcardType } from "../../../utils/summary.ts";
+import { renderMarkdown } from "../../../utils/mk.tsx";
 
 // --- Types ---
 interface FlashcardData {
@@ -160,20 +161,20 @@ const Card = ({
 								)}
 								<span className="text-xs font-medium text-slate-400">
 									{data.displayIndex} / {total}
-								</span>
-							</div>
+								</span> 
+							</div> 
 						</div>
 
 						<div className="flex-1 flex flex-col justify-center items-center text-center my-4 overflow-hidden w-full">
 							<h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 shrink-0">
-								Question
+								Question 
 							</h3>
 							<div className="flex-1 overflow-y-auto w-full flex items-center justify-center pr-1 custom-scrollbar">
 								<p className={cn(
 									"font-medium text-slate-800 dark:text-slate-100 leading-relaxed",
 									getFontSizeClass(data.question)
 								)}>
-									{data.question}
+									{renderMarkdown(data.question)}
 								</p>
 							</div>
 						</div>
@@ -225,7 +226,7 @@ const Card = ({
 									"font-bold leading-relaxed",
 									getFontSizeClass(data.answer)
 								)}>
-									{data.answer}
+									{renderMarkdown(data.answer)}
 								</p>
 							</div>
 						</div>

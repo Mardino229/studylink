@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronRight, ChevronDown, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import type { MindMapNode } from '../../types/workspace';
+import { renderMarkdown } from '../../utils/mk';
 
 // ── Layout constants ──────────────────────────────────────
 const NODE_W = 168;
@@ -308,9 +309,9 @@ export default function MindmapRenderer({ root }: MindmapRendererProps) {
                                     style={{ minHeight: NODE_VH }}
                                 >
                                     <span className={`flex-1 text-xs font-semibold leading-tight ${isRoot ? 'text-white' : ''}`}>
-                                        {node.label}
-                                    </span>
-                                    {hasChildren && (
+                                        {renderMarkdown(node.label)}
+                                    </span> 
+                                    {hasChildren && ( 
                                         <span className={`shrink-0 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
                                             isRoot ? 'bg-white/20 text-white' : 'bg-black/10 dark:bg-white/10 text-current'
                                         }`}>
@@ -328,7 +329,7 @@ export default function MindmapRenderer({ root }: MindmapRendererProps) {
                                         className="absolute left-0 top-full mt-1.5 z-50 w-56 rounded-xl border border-border bg-white dark:bg-gray-900 px-3 py-2 shadow-xl"
                                         style={{ pointerEvents: 'none' }}
                                     >
-                                        <p className="text-xs text-foreground/70 leading-relaxed">{node.description}</p>
+                                        <p className="text-xs text-foreground/70 leading-relaxed">{renderMarkdown(node.description)}</p>
                                     </div>
                                 )}
                             </div>
