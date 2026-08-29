@@ -21,9 +21,9 @@
     "confirm_sol_btn": "Confirmer (2 jetons)",
     "unlock_solution": "Débloquer le corrigé",
     "solution_note": "Vous ne repayez pas pour rouvrir ce corrigé.",
-    "token_exam_desc": "Sans abonnement chaque examen coûte 1 token et chaque corrigé coûte 2 tokens.",
+    "token_exam_desc": "1 épreuve = 1 jeton. 1 corrigé = 2 jetons.",
     "filters": {
-      "year_placeholder": "Année (ex: 2024)",
+      "year_placeholder": "Année (ex: 2024)", 
       "all_sessions": "Toutes les sessions",
       "fall": "Automne",
       "winter": "Hiver",
