@@ -4,6 +4,17 @@ import { ChevronLeft, ChevronRight, RotateCcw, Lightbulb, Bookmark } from "lucid
 import { cn } from "../../../lib/utils";
 import type { Flashcard as FlashcardType } from "../../../utils/summary.ts";
 import { renderMarkdown } from "../../../utils/mk.tsx";
+import ReactMarkdown from "react-markdown";
+import remarkMath from "remark-math";
+import Mermaid from "../../ui/Mermaid.tsx";
+import remarkGfm from "remark-gfm";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import remarkToc from "remark-toc";
+import rehypeKatex from "rehype-katex";
+import rehypeRaw from "rehype-raw";
+import rehypeSlug from "rehype-slug";
+import remarkBreaks from "remark-breaks";
+import remarkEmoji from "remark-emoji";
 
 // --- Types ---
 interface FlashcardData {
@@ -174,7 +185,24 @@ const Card = ({
 									"font-medium text-slate-800 dark:text-slate-100 leading-relaxed",
 									getFontSizeClass(data.question)
 								)}>
-									{renderMarkdown(data.question)}
+									<ReactMarkdown
+										remarkPlugins={[remarkMath, remarkGfm, remarkBreaks, remarkEmoji, [remarkToc, { heading: "sommaire|toc|table of contents" }]]}
+										rehypePlugins={[rehypeKatex, rehypeSlug, rehypeAutolinkHeadings, rehypeRaw]}
+										components={{
+											code({ node, className, children, ...props }: any) {
+												const match = /language-(\w+)/.exec(className || "");
+												return match && match[1] === "mermaid" ? (
+													<Mermaid chart={String(children).replace(/\n$/, "")} />
+												) : (
+													<code className={className} {...props}>
+														{children}
+													</code>
+												);
+											},
+										}}
+									>
+										{data.question}
+									</ReactMarkdown>
 								</p>
 							</div>
 						</div>
@@ -226,8 +254,25 @@ const Card = ({
 									"font-bold leading-relaxed",
 									getFontSizeClass(data.answer)
 								)}>
-									{renderMarkdown(data.answer)}
-								</p>
+									<ReactMarkdown
+										remarkPlugins={[remarkMath, remarkGfm, remarkBreaks, remarkEmoji, [remarkToc, { heading: "sommaire|toc|table of contents" }]]}
+										rehypePlugins={[rehypeKatex, rehypeSlug, rehypeAutolinkHeadings, rehypeRaw]}
+										components={{
+											code({ node, className, children, ...props }: any) {
+												const match = /language-(\w+)/.exec(className || "");
+												return match && match[1] === "mermaid" ? (
+													<Mermaid chart={String(children).replace(/\n$/, "")} />
+												) : (
+													<code className={className} {...props}>
+														{children}
+													</code>
+												);
+											},
+										}} 
+									>
+										{data.answer}
+									</ReactMarkdown> 
+								</p> 
 							</div>
 						</div>
 

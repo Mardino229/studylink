@@ -2,6 +2,17 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronRight, ChevronDown, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import type { MindMapNode } from '../../types/workspace';
 import { renderMarkdown } from '../../utils/mk';
+import ReactMarkdown from 'react-markdown';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import rehypeKatex from 'rehype-katex';
+import rehypeRaw from 'rehype-raw';
+import rehypeSlug from 'rehype-slug';
+import remarkBreaks from 'remark-breaks';
+import remarkEmoji from 'remark-emoji';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import remarkToc from 'remark-toc';
+import Mermaid from '../ui/Mermaid';
 
 // ── Layout constants ──────────────────────────────────────
 const NODE_W = 168;
@@ -329,7 +340,27 @@ export default function MindmapRenderer({ root }: MindmapRendererProps) {
                                         className="absolute left-0 top-full mt-1.5 z-50 w-56 rounded-xl border border-border bg-white dark:bg-gray-900 px-3 py-2 shadow-xl"
                                         style={{ pointerEvents: 'none' }}
                                     >
-                                        <p className="text-xs text-foreground/70 leading-relaxed">{renderMarkdown(node.description)}</p>
+                                        <p className="text-xs text-foreground/70 leading-relaxed">
+                                            <ReactMarkdown
+                                                remarkPlugins={[remarkMath, remarkGfm, remarkBreaks, remarkEmoji, [remarkToc, { heading: "sommaire|toc|table of contents" }]]}
+                                                rehypePlugins={[rehypeKatex, rehypeSlug, rehypeAutolinkHeadings, rehypeRaw]}
+                                                components={{
+                                                    code({ node, className, children, ...props }: any) {
+                                                        const match = /language-(\w+)/.exec(className || "");
+                                                        return match && match[1] === "mermaid" ? (
+                                                            <Mermaid chart={String(children).replace(/\n$/, "")} />
+                                                        ) : (
+                                                            <code className={className} {...props}>
+                                                                {children}
+                                                            </code>
+                                                        );
+                                                    },
+                                                }} 
+                                            >
+                                                {node.description}
+
+                                            </ReactMarkdown>
+                                        </p>
                                     </div>
                                 )}
                             </div>
