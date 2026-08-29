@@ -1,7 +1,17 @@
 import { CheckCircle, XCircle } from "lucide-react";
 import { cn } from "../../../lib/utils.ts";
 import type { QuizQuestion } from "../../../utils/summary.ts";
-import { renderMarkdown } from "../../../utils/mk.tsx";
+import ReactMarkdown from "react-markdown";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypeKatex from "rehype-katex";
+import rehypeRaw from "rehype-raw";
+import rehypeSlug from "rehype-slug";
+import remarkBreaks from "remark-breaks";
+import remarkEmoji from "remark-emoji";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import remarkToc from "remark-toc";
+import Mermaid from "../../ui/Mermaid.tsx";
 
 interface QuestionCardProps {
     question: QuizQuestion;
@@ -24,7 +34,24 @@ export default function QuestionCard({
         <div className="rounded-xl sm:p-6 ">
             <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white leading-relaxed mb-2">
-                    {renderMarkdown(question.question)}
+                    <ReactMarkdown
+                        remarkPlugins={[remarkMath, remarkGfm, remarkBreaks, remarkEmoji, [remarkToc, { heading: "sommaire|toc|table of contents" }]]}
+                        rehypePlugins={[rehypeKatex, rehypeSlug, rehypeAutolinkHeadings, rehypeRaw]}
+                        components={{
+                            code({ node, className, children, ...props }: any) {
+                                const match = /language-(\w+)/.exec(className || "");
+                                return match && match[1] === "mermaid" ? (
+                                    <Mermaid chart={String(children).replace(/\n$/, "")} />
+                                ) : (
+                                    <code className={className} {...props}>
+                                        {children}
+                                    </code>
+                                );
+                            },
+                        }} 
+                    >
+                        {question.question}
+                    </ReactMarkdown>
                 </h2>
                 <div className="text-sm text-gray-500 dark:text-gray-400">
                     {question.type === "mcq" ? "Sélectionnez une réponse" : "Tapez votre réponse"}
@@ -74,7 +101,24 @@ export default function QuestionCard({
                                 
                                 {/* Texte de l'option */}
                                 <span className="flex-1 text-gray-900 dark:text-white font-medium">
-                                    {renderMarkdown(option)}
+                                    <ReactMarkdown
+                                        remarkPlugins={[remarkMath, remarkGfm, remarkBreaks, remarkEmoji, [remarkToc, { heading: "sommaire|toc|table of contents" }]]}
+                                        rehypePlugins={[rehypeKatex, rehypeSlug, rehypeAutolinkHeadings, rehypeRaw]}
+                                        components={{
+                                            code({ node, className, children, ...props }: any) {
+                                                const match = /language-(\w+)/.exec(className || "");
+                                                return match && match[1] === "mermaid" ? (
+                                                    <Mermaid chart={String(children).replace(/\n$/, "")} />
+                                                ) : (
+                                                    <code className={className} {...props}>
+                                                        {children}
+                                                    </code>
+                                                );
+                                            },
+                                        }} 
+                                    >
+                                        {option}
+                                    </ReactMarkdown>
                                 </span>
                                 
                                 {/* Icônes de résultat */}
@@ -106,7 +150,24 @@ export default function QuestionCard({
                         <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
                             <p className="text-sm text-green-800 dark:text-green-200 mb-2 font-semibold">Réponse attendue :</p>
                             <p className="text-green-900 dark:text-green-100 leading-relaxed">
-                                {renderMarkdown(question.answer)}
+                                <ReactMarkdown
+                                    remarkPlugins={[remarkMath, remarkGfm, remarkBreaks, remarkEmoji, [remarkToc, { heading: "sommaire|toc|table of contents" }]]}
+                                    rehypePlugins={[rehypeKatex, rehypeSlug, rehypeAutolinkHeadings, rehypeRaw]}
+                                    components={{
+                                        code({ node, className, children, ...props }: any) {
+                                            const match = /language-(\w+)/.exec(className || "");
+                                            return match && match[1] === "mermaid" ? (
+                                                <Mermaid chart={String(children).replace(/\n$/, "")} />
+                                            ) : (
+                                                <code className={className} {...props}>
+                                                    {children}
+                                                </code>
+                                            );
+                                        },
+                                    }} 
+                                >
+                                    {question.answer}
+                                </ReactMarkdown>
                             </p>
                         </div>
                     )}
@@ -118,7 +179,24 @@ export default function QuestionCard({
                 <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                     <h3 className="font-medium text-blue-900 dark:text-blue-100 mb-2">💡 Explication</h3>
                     <p className="text-blue-800 dark:text-blue-200 text-sm">
-                        {renderMarkdown(question.explanation)}
+                        <ReactMarkdown
+                            remarkPlugins={[remarkMath, remarkGfm, remarkBreaks, remarkEmoji, [remarkToc, { heading: "sommaire|toc|table of contents" }]]}
+                            rehypePlugins={[rehypeKatex, rehypeSlug, rehypeAutolinkHeadings, rehypeRaw]}
+                            components={{
+                                code({ node, className, children, ...props }: any) {
+                                    const match = /language-(\w+)/.exec(className || "");
+                                    return match && match[1] === "mermaid" ? (
+                                        <Mermaid chart={String(children).replace(/\n$/, "")} />
+                                    ) : (
+                                        <code className={className} {...props}>
+                                            {children}
+                                        </code>
+                                    );
+                                },
+                            }} 
+                    > 
+                        {question.explanation}
+                    </ReactMarkdown>
                     </p>
                 </div>
             )}

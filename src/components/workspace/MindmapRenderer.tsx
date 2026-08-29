@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronRight, ChevronDown, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import type { MindMapNode } from '../../types/workspace';
-import { renderMarkdown } from '../../utils/mk';
 import ReactMarkdown from 'react-markdown';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeKatex from 'rehype-katex';
@@ -320,7 +319,24 @@ export default function MindmapRenderer({ root }: MindmapRendererProps) {
                                     style={{ minHeight: NODE_VH }}
                                 >
                                     <span className={`flex-1 text-xs font-semibold leading-tight ${isRoot ? 'text-white' : ''}`}>
-                                        {renderMarkdown(node.label)}
+                                        <ReactMarkdown
+                                        remarkPlugins={[remarkMath, remarkGfm, remarkBreaks, remarkEmoji, [remarkToc, { heading: "sommaire|toc|table of contents" }]]}
+                                        rehypePlugins={[rehypeKatex, rehypeSlug, rehypeAutolinkHeadings, rehypeRaw]}
+                                        components={{
+                                            code({ node, className, children, ...props }: any) {
+                                                const match = /language-(\w+)/.exec(className || "");
+                                                return match && match[1] === "mermaid" ? (
+                                                    <Mermaid chart={String(children).replace(/\n$/, "")} />
+                                                ) : (
+                                                    <code className={className} {...props}>
+                                                        {children}
+                                                    </code>
+                                                );
+                                            },
+                                        }} 
+                                    >
+                                        {node.label}
+                                    </ReactMarkdown>
                                     </span> 
                                     {hasChildren && ( 
                                         <span className={`shrink-0 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
@@ -358,7 +374,6 @@ export default function MindmapRenderer({ root }: MindmapRendererProps) {
                                                 }} 
                                             >
                                                 {node.description}
-
                                             </ReactMarkdown>
                                         </p>
                                     </div>
