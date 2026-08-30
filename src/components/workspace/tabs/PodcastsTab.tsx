@@ -4,6 +4,19 @@ import { Mic, Trash2, Clock, Loader, Menu, Play, SkipForward, SkipBack, Volume2 
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ArtefactPodcast, PaginatedResponse } from '../../../types/workspace';
 import { PlusIcon } from '../../../icons';
+import ReactMarkdown from "react-markdown";
+import "katex/dist/katex.min.css";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypeKatex from "rehype-katex";
+import rehypeRaw from "rehype-raw";
+import rehypeSlug from "rehype-slug";
+import remarkBreaks from "remark-breaks";
+import remarkEmoji from "remark-emoji";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import remarkToc from "remark-toc";
+import Mermaid from "../../ui/Mermaid.tsx";
+
 
 interface PodcastsTabProps {
     podcasts?: PaginatedResponse<ArtefactPodcast>;
@@ -159,6 +172,30 @@ export const PodcastsTab: React.FC<PodcastsTabProps> = ({
         setCurrentTime(nextTime);
     };
 
+    const renderMathMarkdown = (content: string, className?: string) => (
+        <div className={className}>
+            <ReactMarkdown
+                remarkPlugins={[remarkMath, remarkGfm, remarkBreaks, remarkEmoji, [remarkToc, { heading: "sommaire|toc|table of contents" }]]}
+                rehypePlugins={[rehypeKatex, rehypeSlug, rehypeAutolinkHeadings, rehypeRaw]}
+                components={{
+                    p: ({ children }) => <>{children}</>,
+                    code({ node, className, children, ...props }: any) {
+                        const match = /language-(\w+)/.exec(className || "");
+                        return match && match[1] === "mermaid" ? (
+                            <Mermaid chart={String(children).replace(/\n$/, "")} />
+                        ) : (
+                            <code className={className} {...props}>
+                                {children}
+                            </code>
+                        );
+                    },
+                }}
+            >
+                {content}
+            </ReactMarkdown>
+        </div>
+    );
+
     const SidebarContent = () => (
         <div className="flex h-full flex-col ">
             {/* Sidebar Header */}
@@ -239,10 +276,6 @@ export const PodcastsTab: React.FC<PodcastsTabProps> = ({
             </div>
         </div>
     );
-
-    function renderMathMarkdown(transcript: string): React.ReactNode | Iterable<React.ReactNode> {
-        throw new Error('Function not implemented.');
-    }
 
     return (
         <div className='h-full'>
