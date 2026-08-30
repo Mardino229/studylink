@@ -5,6 +5,7 @@ import { cn } from "../../../lib/utils";
 import type { Flashcard as FlashcardType } from "../../../utils/summary.ts";
 import { renderMarkdown } from "../../../utils/mk.tsx";
 import ReactMarkdown from "react-markdown";
+import "katex/dist/katex.min.css";
 import remarkMath from "remark-math";
 import Mermaid from "../../ui/Mermaid.tsx";
 import remarkGfm from "remark-gfm";

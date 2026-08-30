@@ -1,9 +1,21 @@
 import { useState } from "react";
 import { CheckCircle, XCircle, ArrowLeft, RotateCcw, Eye } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkMath from "remark-math";
+import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
+import remarkEmoji from "remark-emoji";
+import remarkToc from "remark-toc";
+import rehypeKatex from "rehype-katex";
+import rehypeRaw from "rehype-raw";
+import rehypeSlug from "rehype-slug";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import "katex/dist/katex.min.css";
 
 import { getQuestionResult } from "./quiz-types.ts";
 import type { QuizQuestion } from "../../../utils/summary.ts";
 import Button from "../../ui/button/Button.tsx";
+import Mermaid from "../../ui/Mermaid.tsx";
 
 interface QuizResultsProps {
     score: number;
@@ -15,6 +27,30 @@ interface QuizResultsProps {
     showOnlySummary?: boolean; // when true, render only the recap view
     onCloseRecap?: () => void; // callback to close external recap drawer
 }
+
+const renderMathMarkdown = (content: string, className?: string) => (
+    <div className={className}>
+        <ReactMarkdown
+            remarkPlugins={[remarkMath, remarkGfm, remarkBreaks, remarkEmoji, [remarkToc, { heading: "sommaire|toc|table of contents" }]]}
+            rehypePlugins={[rehypeKatex, rehypeSlug, rehypeAutolinkHeadings, rehypeRaw]}
+            components={{
+                p: ({ children }) => <>{children}</>,
+                code({ node, className, children, ...props }: any) {
+                    const match = /language-(\w+)/.exec(className || "");
+                    return match && match[1] === "mermaid" ? (
+                        <Mermaid chart={String(children).replace(/\n$/, "")} />
+                    ) : (
+                        <code className={className} {...props}>
+                            {children}
+                        </code>
+                    );
+                },
+            }}
+        >
+            {content}
+        </ReactMarkdown>
+    </div>
+);
 
 export default function QuizResults({ score, total, answers, questions, onRestart, onOpenRecap, showOnlySummary, onCloseRecap }: QuizResultsProps) {
     const [showSummary, setShowSummary] = useState(false);
@@ -66,36 +102,37 @@ export default function QuizResults({ score, total, answers, questions, onRestar
                                             <h3 className="font-semibold text-gray-900 dark:text-white text-lg">
                                                 Question {index + 1}
                                             </h3>
-                                            <p className="text-gray-700 dark:text-gray-300 mt-1">
-                                                {question.question}
-                                            </p>
+                                            <div className="text-gray-700 dark:text-gray-300 mt-1">
+                                                {renderMathMarkdown(question.question, "text-left")}
+                                            </div>
                                         </div>
                                         
                                         <div className="space-y-2">
                                             <div>
                                                 <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Votre réponse:</span>
-                                                <p className={`mt-1 font-medium ${
+                                                <div className={`mt-1 font-medium ${
                                                     result.isCorrect ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'
                                                 }`}>
-                                                    {result.userAnswer}
-                                                </p>
+                                                    {renderMathMarkdown(result.userAnswer || "-", "text-left")}
+                                                </div>
                                             </div>
                                             
                                             {!result.isCorrect && result.correctAnswer && (
                                                 <div>
                                                     <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Bonne réponse:</span>
-                                                    <p className="mt-1 font-medium text-green-700 dark:text-green-400">
-                                                        {result.correctAnswer}
-                                                    </p>
+                                                    <div className="mt-1 font-medium text-green-700 dark:text-green-400">
+                                                        {renderMathMarkdown(result.correctAnswer, "text-left")}
+                                                    </div>
                                                 </div>
                                             )}
                                         </div>
                                         
                                         {question.explanation && (
                                             <div className="mt-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                                                <p className="text-sm text-blue-800 dark:text-blue-200">
-                                                    <strong>💡 Explication:</strong> {question.explanation}
-                                                </p>
+                                                <div className="text-sm text-blue-800 dark:text-blue-200">
+                                                    <strong>💡 Explication:</strong>
+                                                    {renderMathMarkdown(question.explanation, "mt-2 text-left")}
+                                                </div>
                                             </div>
                                         )}
                                     </div>
