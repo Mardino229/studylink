@@ -240,6 +240,10 @@ export const PodcastsTab: React.FC<PodcastsTabProps> = ({
         </div>
     );
 
+    function renderMathMarkdown(transcript: string): React.ReactNode | Iterable<React.ReactNode> {
+        throw new Error('Function not implemented.');
+    }
+
     return (
         <div className='h-full'>
                     <div className="flex h-full sm:p-4 p-1 w-full gap-4 overflow-hidden relative">
@@ -423,7 +427,8 @@ export const PodcastsTab: React.FC<PodcastsTabProps> = ({
                                 <div className="space-y-4">
                                     <h3 className="text-sm font-bold text-foreground tracking-wider border-b border-border pb-2">{t('tabs.podcasts.transcript')}</h3>
                                     <p className="text-sm md:text-base text-foreground/80 leading-relaxed whitespace-pre-wrap bg-background p-5 rounded-2xl border border-border">
-                                        {selectedPodcast.transcript}
+                                        
+                                        {renderMathMarkdown(selectedPodcast.transcript)}
                                     </p>
                                 </div>
                             )}
