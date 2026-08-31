@@ -102,6 +102,7 @@ export const useGetExams = (filters?: ExamFilters) => {
             if (filters?.submission_status) params.set("submission_status", filters.submission_status);
             if (filters?.skip !== undefined) params.set("skip", String(filters.skip));
             if (filters?.limit !== undefined) params.set("limit", String(filters.limit));
+            if (filters?.language) params.set("language", filters.language);
             const response = await axiosPrivate.get<{ data: ExamItem[] }>(`/exam-library?${params}`);
             return response.data.data;
         },
@@ -125,6 +126,7 @@ export const useUploadExam = () => {
             type_number?: number;
             section?: string;
             is_solution_paid?: boolean;
+            language: 'fr' | 'en' | '';
         }) => {
             const formData = new FormData();
             if (data.name) formData.append("name", data.name);
@@ -138,6 +140,7 @@ export const useUploadExam = () => {
             if (data.exam_type) formData.append("exam_type", data.exam_type);
             if (data.type_number) formData.append("type_number", String(data.type_number));
             if (data.section) formData.append("section", data.section);
+            if (data.language) formData.append("language", data.language);
             const response = await axiosPrivate.post<{ data: ExamItem }>("/exam-library", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });

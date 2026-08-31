@@ -90,4 +90,5 @@ export type ExamFilters = {
     submission_status?: SubmissionStatus;
     skip?: number;
     limit?: number;
+    language?: 'fr' | 'en';
 };

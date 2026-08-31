@@ -13,7 +13,7 @@ const fileCls = "w-full rounded-xl border border-gray-200 bg-white px-3 py-2 tex
 const EMPTY_FORM = {
     course_id: '', academic_year: '',
     session: '' as ExamSession | '', exam_type: '' as ExamType | '',
-    type_number: '', section: '', is_solution_paid: true,
+    type_number: '', section: '', is_solution_paid: true, language: '' as 'fr' | 'en' | ''
 };
 
 const needsTypeNumber = (exam_type: ExamType | '') =>
@@ -47,6 +47,7 @@ export default function SubmitExamModal({ isOpen, onClose }: {
                 session: (form.session || undefined) as ExamSession | undefined,
                 exam_type: (form.exam_type || undefined) as ExamType | undefined,
                 type_number: form.type_number ? Number(form.type_number) : undefined,
+                language: form.language, 
                 section: form.section.trim() || undefined,
                 is_solution_paid: form.is_solution_paid,
             },
@@ -85,6 +86,11 @@ export default function SubmitExamModal({ isOpen, onClose }: {
                         <option value="fall">{t('submit_modal.session_fall')}</option>
                         <option value="winter">{t('submit_modal.session_winter')}</option>
                         <option value="summer">{t('submit_modal.session_spring')}</option>
+                    </select>
+                    <select value={form.language} onChange={(e) => setForm(p => ({ ...p, language: e.target.value as 'fr' | 'en' | '' }))} className={selectCls}>
+                        <option value="">{t('submit_modal.language_label')}</option>
+                        <option value="fr">{t('submit_modal.language_french')}</option>
+                        <option value="en">{t('submit_modal.language_english')}</option>
                     </select>
                     <select value={form.exam_type} onChange={(e) => setForm(p => ({ ...p, exam_type: e.target.value as ExamType | '', type_number: '' }))} className={selectCls}>
                         <option value="">{t('submit_modal.type_placeholder')}</option>

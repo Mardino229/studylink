@@ -1,6 +1,7 @@
 import { Search } from 'lucide-react';
 import CourseCombobox from '../../../components/ui/CourseCombobox';
 import type { ExamSession, ExamType } from '../../../types/exams';
+import { useTranslation } from 'react-i18next';
 
 const inputCls = "h-10 w-full rounded-xl border border-gray-200 bg-white px-3 text-sm text-gray-800 outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white";
 const selectCls = "h-10 w-full rounded-xl border border-gray-200 bg-white px-3 text-sm text-gray-800 outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white";
@@ -12,6 +13,7 @@ export default function ExamFiltersPanel({
     examType, setExamType,
     typeNumber, setTypeNumber,
     section, setSection,
+    language, setLanguage,
     hasActiveFilters, onSearch, onReset,
 }: {
     courseId: string; setCourseId: (v: string) => void;
@@ -20,8 +22,10 @@ export default function ExamFiltersPanel({
     examType: ExamType | ''; setExamType: (v: ExamType | '') => void;
     typeNumber: string; setTypeNumber: (v: string) => void;
     section: string; setSection: (v: string) => void;
+    language: 'fr' | 'en' | ''; setLanguage: (v: 'fr' | 'en' | '') => void;
     hasActiveFilters: boolean; onSearch: () => void; onReset: () => void;
 }) {
+    const { t } = useTranslation('exams'); 
     return (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900/80">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -69,6 +73,11 @@ export default function ExamFiltersPanel({
                     onKeyDown={(e) => e.key === 'Enter' && onSearch()}
                     className={inputCls}
                 />
+                <select value={language} onChange={(e) => setLanguage(e.target.value as 'fr' | 'en' | '')} className={selectCls}>
+                    <option value="">Toutes les langues</option>
+                    <option value="fr">{t('submit_modal.language_french')}</option>
+                    <option value="en">{t('submit_modal.language_english')}</option>
+                </select>
             </div>
             <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
                 {hasActiveFilters && (

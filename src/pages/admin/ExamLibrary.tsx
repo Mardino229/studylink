@@ -54,8 +54,8 @@ export default function AdminExamLibrary() {
 
     const [examFilters, setExamFilters] = useState<{
         course_id: string; session: string; exam_type: string;
-        submission_status: string; academic_year: string;
-    }>({ course_id: '', session: '', exam_type: '', submission_status: '', academic_year: '' });
+        submission_status: string; academic_year: string; language: string;
+    }>({ course_id: '', session: '', exam_type: '', submission_status: '', academic_year: '', language: '' });
 
     const activeFilters = {
         ...(examFilters.course_id ? { course_id: examFilters.course_id } : {}),
@@ -63,6 +63,7 @@ export default function AdminExamLibrary() {
         ...(examFilters.exam_type ? { exam_type: examFilters.exam_type as ExamType } : {}),
         ...(examFilters.submission_status ? { submission_status: examFilters.submission_status as SubmissionStatus } : {}),
         ...(examFilters.academic_year ? { academic_year: Number(examFilters.academic_year) } : {}),
+        ...(examFilters.language ? { language: examFilters.language as 'fr' | 'en' } : {}),
         limit: 200,
     };
     const hasActiveFilter = Object.keys(activeFilters).length > 1;
@@ -82,7 +83,7 @@ export default function AdminExamLibrary() {
     const [examModal, setExamModal] = useState(false);
     const [examForm, setExamForm] = useState({
         course_id: '', academic_year: '', session: '' as ExamSession | '',
-        exam_type: '' as ExamType | '', type_number: '', section: '', is_solution_paid: true,
+        exam_type: '' as ExamType | '', type_number: '', section: '', is_solution_paid: true, language: '' as 'fr' | 'en' | ''
     });
     const [examFile, setExamFile] = useState<File | null>(null);
     const [examSolutionFile, setExamSolutionFile] = useState<File | null>(null);
@@ -149,8 +150,9 @@ export default function AdminExamLibrary() {
                 type_number: examForm.type_number ? Number(examForm.type_number) : undefined,
                 section: examForm.section.trim() || undefined,
                 is_solution_paid: examForm.is_solution_paid,
+                language: examForm.language,
             },
-            { onSuccess: () => { setExamModal(false); setExamForm({ course_id: '', academic_year: '', session: '', exam_type: '', type_number: '', section: '', is_solution_paid: true }); setExamFile(null); setExamSolutionFile(null); } }
+            { onSuccess: () => { setExamModal(false); setExamForm({ course_id: '', academic_year: '', session: '', exam_type: '', type_number: '', section: '', is_solution_paid: true, language: '' as 'fr' | 'en' | '' }); setExamFile(null); setExamSolutionFile(null); } }
         );
     };
 
@@ -248,6 +250,7 @@ export default function AdminExamLibrary() {
                         <option value="winter">Hiver</option>
                         <option value="summer">Printemps/Été</option>
                     </select>
+                    
                     <select
                         value={examFilters.exam_type}
                         onChange={(e) => setExamFilters(p => ({ ...p, exam_type: e.target.value }))}
@@ -279,9 +282,18 @@ export default function AdminExamLibrary() {
                         placeholder="Année"
                         className={filterSelectCls + ' w-24'}
                     />
+                    <select
+                        value={examFilters.language}
+                        onChange={(e) => setExamFilters(p => ({ ...p, language: e.target.value }))}
+                        className={filterSelectCls}
+                    >
+                        <option value="">Toutes les langues</option>
+                        <option value="fr">Français</option>
+                        <option value="en">English</option>
+                    </select>
                     {hasActiveFilter && (
                         <button
-                            onClick={() => setExamFilters({ course_id: '', session: '', exam_type: '', submission_status: '', academic_year: '' })}
+                            onClick={() => setExamFilters({ course_id: '', session: '', exam_type: '', submission_status: '', academic_year: '', language: '' })}
                             className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
                         >
                             <X size={12} />Réinitialiser

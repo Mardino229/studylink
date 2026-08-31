@@ -3,7 +3,6 @@ import { motion, AnimatePresence, useMotionValue, useTransform, type PanInfo } f
 import { ChevronLeft, ChevronRight, RotateCcw, Lightbulb, Bookmark } from "lucide-react";
 import { cn } from "../../../lib/utils";
 import type { Flashcard as FlashcardType } from "../../../utils/summary.ts";
-import { renderMarkdown } from "../../../utils/mk.tsx";
 import ReactMarkdown from "react-markdown";
 import "katex/dist/katex.min.css";
 import remarkMath from "remark-math";

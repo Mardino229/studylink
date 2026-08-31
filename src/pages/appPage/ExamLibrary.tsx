@@ -22,11 +22,12 @@ export default function ExamLibrary() {
     const [examType, setExamType] = useState<ExamType | ''>('');
     const [typeNumber, setTypeNumber] = useState('');
     const [section, setSection] = useState('');
+    const [language, setLanguage] = useState<'fr' | 'en' | ''>('');
     const [appliedFilters, setAppliedFilters] = useState<{
         courseId: string; academicYear: string;
         session: ExamSession | ''; examType: ExamType | '';
-        typeNumber: string; section: string;
-    }>({ courseId: '', academicYear: '', session: '', examType: '', typeNumber: '', section: '' });
+        typeNumber: string; section: string; language: 'fr' | 'en' | '';
+    }>({ courseId: '', academicYear: '', session: '', examType: '', typeNumber: '', section: '', language: '' });
 
     const [confirmViewExam, setConfirmViewExam] = useState<ExamItem | null>(null);
     const [confirmExam, setConfirmExam] = useState<ExamItem | null>(null);
@@ -40,14 +41,15 @@ export default function ExamLibrary() {
         type_number: appliedFilters.typeNumber ? Number(appliedFilters.typeNumber) : undefined,
         section: appliedFilters.section || undefined,
         limit: 100,
+        language: appliedFilters.language || undefined,
     });
 
-    const handleSearch = () => setAppliedFilters({ courseId, academicYear, session, examType, typeNumber, section });
+    const handleSearch = () => setAppliedFilters({ courseId, academicYear, session, examType, typeNumber, section, language });
     const handleReset = () => {
-        setCourseId(''); setAcademicYear(''); setSession(''); setExamType(''); setTypeNumber(''); setSection('');
-        setAppliedFilters({ courseId: '', academicYear: '', session: '', examType: '', typeNumber: '', section: '' });
+        setCourseId(''); setAcademicYear(''); setSession(''); setExamType(''); setTypeNumber(''); setSection(''); setLanguage('');
+        setAppliedFilters({ courseId: '', academicYear: '', session: '', examType: '', typeNumber: '', section: '', language: '' });
     };
-    const hasActiveFilters = !!(appliedFilters.courseId || appliedFilters.academicYear || appliedFilters.session || appliedFilters.examType || appliedFilters.typeNumber || appliedFilters.section);
+    const hasActiveFilters = !!(appliedFilters.courseId || appliedFilters.academicYear || appliedFilters.session || appliedFilters.examType || appliedFilters.typeNumber || appliedFilters.section || appliedFilters.language);
 
     const viewExam = (exam: ExamItem) => {
         if (!exam.exam_file_url) return;
@@ -84,6 +86,7 @@ export default function ExamLibrary() {
                     examType={examType} setExamType={setExamType}
                     typeNumber={typeNumber} setTypeNumber={setTypeNumber}
                     section={section} setSection={setSection}
+                    language={language} setLanguage={setLanguage}
                     hasActiveFilters={hasActiveFilters}
                     onSearch={handleSearch}
                     onReset={handleReset}
