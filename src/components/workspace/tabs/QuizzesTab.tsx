@@ -124,7 +124,7 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
                                         await deleteQuiz.mutateAsync({ notebookId, quizId: quiz.id });
                                     });
                                 }}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg text-gray-400 opacity-0 group-hover:opacity-100 focus:opacity-100 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all"
+                                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg text-gray-400 focus:opacity-100 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all"
                                 title={t('tabs.quizzes.delete_title')}
                             >
                                 <Trash2 size={14} />

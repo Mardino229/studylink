@@ -91,13 +91,13 @@
     "confirm_delete_btn": "Delete",
     "gen_custom_label": "Custom instructions",
     "gen_custom_placeholder": "Any specifics about what you want? (optional)",
-    "gen_custom_hint": "For language or question count, use the settings above — this field is for content, tone, and focus.",
+    "gen_custom_hint": "For language or question count, use the settings above. This field is for content, tone, and focus.",
     "modal_prepare_mindmap": "Prepare the mind map",
     "modal_gen_mindmap": "Generating mind map…",
     "gen_depth_label": "Maximum depth",
     "gen_suffix_mindmap": "Mind Map",
     "modal_gen_failed": "Generation failed.",
-    "modal_gen_failed_tokens": "Try again — no tokens were charged.",
+    "modal_gen_failed_tokens": "Try again. No tokens were charged.",
     "source_required": "Please select at least one source."
   },
   "artefact": {

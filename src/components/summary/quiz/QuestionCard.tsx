@@ -88,7 +88,7 @@ export default function QuestionCard({
                                 <input
                                     type="radio"
                                     name="mcq-answer"
-                                    value={renderMathMarkdown(option, "text-left")} 
+                                    value={option} 
                                     checked={isSelected}
                                     onChange={() => onAnswerSelect(option)}
                                     className="sr-only"

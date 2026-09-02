@@ -314,7 +314,7 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                                         }
                                     });
                                 }}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 text-gray-400 opacity-0 transition-all hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 focus:opacity-100 dark:hover:bg-red-950/20"
+                                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 text-gray-400 transition-all hover:bg-red-50 hover:text-red-500 focus:opacity-100 dark:hover:bg-red-950/20"
                                 title={t('tabs.summaries.delete_title')}
                             >
                                 <Trash2 size={14} />
