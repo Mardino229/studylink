@@ -1,5 +1,6 @@
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
+import ConfirmModal from "../../components/ui/ConfirmModal.tsx";
 import { useGetPlans } from "../../utils/plan";
 import {
   useCreateCheckout,
@@ -32,6 +33,8 @@ export default function SettingsSubscription() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation('app');
   const [billingType, setBillingType] = useState<"monthly" | "annual">("monthly");
+  const [selectedPlanForSwitch, setSelectedPlanForSwitch] = useState<{ id: string; name: string } | null>(null);
+  const [showCancelModal, setShowCancelModal] = useState<boolean>(false);
 
   const locale = i18n.language.startsWith('fr') ? 'fr-CA' : 'en-CA';
 
@@ -56,8 +59,9 @@ export default function SettingsSubscription() {
 
   const handleChoosePlan = async (planId: string) => {
     if (hasSub) {
-      // Already subscribed → change-plan endpoint
-      await changePlan.mutateAsync({ new_plan_id: planId, billing_type: billingType });
+      // Already subscribed → show confirmation modal first
+      const targetPlan = plans?.find(p => p.id === planId);
+      setSelectedPlanForSwitch({ id: planId, name: targetPlan?.name || "" });
     } else {
       // No subscription → checkout flow
       try {
@@ -73,6 +77,28 @@ export default function SettingsSubscription() {
       } catch (error) {
         console.error("Checkout error:", error);
       }
+    }
+  };
+
+  const handleConfirmChangePlan = async () => {
+    if (!selectedPlanForSwitch) return;
+    try {
+      await changePlan.mutateAsync({ new_plan_id: selectedPlanForSwitch.id, billing_type: billingType });
+    } catch (error) {
+      console.error("Change plan error:", error);
+    } finally {
+      setSelectedPlanForSwitch(null);
+    }
+  };
+
+  const handleConfirmCancel = async () => {
+    if (!activeSubscription) return;
+    try {
+      await cancelSubscription.mutateAsync(activeSubscription.id);
+    } catch (error) {
+      console.error("Cancel subscription error:", error);
+    } finally {
+      setShowCancelModal(false);
     }
   };
 
@@ -182,11 +208,11 @@ export default function SettingsSubscription() {
                 </div>
               )}
 
-              {/* Cancel button   only when not already scheduled */}
+              {/* Cancel button — only when not already scheduled */}
               {!isCancelScheduled && !pendingPlanId && (
                 <div className="flex justify-end">
                   <button
-                    onClick={() => cancelSubscription.mutate(activeSubscription.id)}
+                    onClick={() => setShowCancelModal(true)}
                     disabled={cancelSubscription.isPending}
                     className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-2 text-xs font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50 dark:border-red-900/30 dark:bg-transparent dark:hover:bg-red-900/10"
                   >
@@ -396,9 +422,37 @@ export default function SettingsSubscription() {
             </div>
           )}
         </div>
-
-
       </section>
+
+      {/* ── Confirmation Modals ── */}
+      <ConfirmModal
+        isOpen={!!selectedPlanForSwitch}
+        title={t('settings_subscription.confirm_change_plan_title')}
+        message={t('settings_subscription.confirm_change_plan_msg', {
+          name: selectedPlanForSwitch?.name || '',
+          billingType: billingType === 'monthly' ? t('settings_subscription.monthly') : t('settings_subscription.annual'),
+        })}
+        confirmLabel={t('settings_subscription.confirm_change_plan_btn')}
+        cancelLabel={t('user_profile.cancel')}
+        confirmVariant="primary"
+        isLoading={changePlan.isPending}
+        onConfirm={handleConfirmChangePlan}
+        onCancel={() => setSelectedPlanForSwitch(null)}
+      />
+
+      <ConfirmModal
+        isOpen={showCancelModal}
+        title={t('settings_subscription.confirm_cancel_title')}
+        message={t('settings_subscription.confirm_cancel_msg', {
+          date: endDateFormatted || '',
+        })}
+        confirmLabel={t('settings_subscription.confirm_cancel_btn')}
+        cancelLabel={t('settings_subscription.keep_subscription_btn')}
+        confirmVariant="danger"
+        isLoading={cancelSubscription.isPending}
+        onConfirm={handleConfirmCancel}
+        onCancel={() => setShowCancelModal(false)}
+      />
     </>
   );
 }

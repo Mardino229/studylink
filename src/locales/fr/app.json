@@ -110,7 +110,14 @@
     "per_year": "CAD/an",
     "downgrade_desc": "Votre plan passera à {{name}} le {{date}}. Vous conservez tous vos avantages actuels jusqu'à cette date.",
     "cancel_desc": "Votre abonnement se termine le {{date}}. Vous gardez l'accès jusqu'à cette date.",
-    "auto_renew_notice": "Cet abonnement se renouvelle automatiquement si vous ne l'annulez pas avant la fin de la période."
+    "auto_renew_notice": "Cet abonnement se renouvelle automatiquement si vous ne l'annulez pas avant la fin de la période.",
+    "confirm_change_plan_title": "Confirmer le changement de plan",
+    "confirm_change_plan_msg": "Voulez-vous vraiment passer au plan {{name}} ({{billingType}}) ?",
+    "confirm_change_plan_btn": "Confirmer le changement",
+    "confirm_cancel_title": "Confirmer la résiliation",
+    "confirm_cancel_msg": "Voulez-vous vraiment annuler votre abonnement ? Vous conserverez l'accès jusqu'au {{date}}.",
+    "confirm_cancel_btn": "Annuler l'abonnement",
+    "keep_subscription_btn": "Conserver l'abonnement"
   },
   "settings_tokens": {
     "page_title": "Paramètres • Mes jetons",

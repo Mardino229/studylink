@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Loader2 } from 'lucide-react';
 import { Modal } from './modal/index.tsx';
 
@@ -11,9 +11,27 @@ interface ConfirmModalProps {
   isLoading?: boolean;
   onConfirm: () => Promise<unknown> | void;
   onCancel: () => void;
+  confirmVariant?: 'danger' | 'primary' | 'warning';
 }
 
-export default function ConfirmModal({ isOpen, title, message, confirmLabel = 'Confirmer', cancelLabel = 'Annuler', isLoading = false, onConfirm, onCancel }: ConfirmModalProps) {
+export default function ConfirmModal({
+  isOpen,
+  title,
+  message,
+  confirmLabel = 'Confirmer',
+  cancelLabel = 'Annuler',
+  isLoading = false,
+  onConfirm,
+  onCancel,
+  confirmVariant = 'danger',
+}: ConfirmModalProps) {
+  const confirmBtnBg =
+    confirmVariant === 'primary'
+      ? 'bg-blue-600 hover:bg-blue-700'
+      : confirmVariant === 'warning'
+      ? 'bg-amber-600 hover:bg-amber-700'
+      : 'bg-red-600 hover:bg-red-700';
+
   return (
     <Modal isOpen={isOpen} onClose={onCancel} className="max-w-lg p-6">
       <div className="flex flex-col gap-4">
@@ -33,7 +51,7 @@ export default function ConfirmModal({ isOpen, title, message, confirmLabel = 'C
             type="button"
             onClick={async () => { await onConfirm(); }}
             disabled={isLoading}
-            className="inline-flex items-center gap-2 rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-70"
+            className={`inline-flex items-center gap-2 rounded-md ${confirmBtnBg} px-4 py-2 text-sm font-medium text-white disabled:opacity-70`}
           >
             {isLoading && <Loader2 size={14} className="animate-spin" />}
             {confirmLabel}

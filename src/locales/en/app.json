@@ -110,7 +110,14 @@
     "per_year": "CAD/year",
     "downgrade_desc": "Your plan will switch to {{name}} on {{date}}. You keep all your current benefits until then.",
     "cancel_desc": "Your subscription ends on {{date}}. You keep access until that date.",
-    "auto_renew_notice": "This subscription renews automatically unless cancelled before the end of the period."
+    "auto_renew_notice": "This subscription renews automatically unless cancelled before the end of the period.",
+    "confirm_change_plan_title": "Confirm Plan Change",
+    "confirm_change_plan_msg": "Are you sure you want to switch to {{name}} ({{billingType}})?",
+    "confirm_change_plan_btn": "Confirm Change",
+    "confirm_cancel_title": "Confirm Cancellation",
+    "confirm_cancel_msg": "Are you sure you want to cancel your subscription? You will keep access until {{date}}.",
+    "confirm_cancel_btn": "Cancel Subscription",
+    "keep_subscription_btn": "Keep Subscription"
   },
   "settings_tokens": {
     "page_title": "Settings • My Tokens",
