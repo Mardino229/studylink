@@ -12,7 +12,7 @@ const TIER_LOGIC = [
     { free: true,  tokens: true,    pro: true,  ultra: true  },
     { free: false, tokens: "1 🪙",  pro: true,  ultra: true  },
     { free: false, tokens: "1 🪙",  pro: true,  ultra: true  },
-    { free: false, tokens: "1 🪙",  pro: true,  ultra: true  },
+    { free: false, tokens: "1 🪙",  pro: true,  ultra: true  }, 
     { free: false, tokens: "2 🪙",  pro: true,  ultra: true  },
     { free: false, tokens: "5 🪙",  pro: false, ultra: true  },
 ];

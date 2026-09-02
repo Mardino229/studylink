@@ -119,7 +119,7 @@ const WorkspaceNotebook: React.FC = () => {
     }, [activeTab]);
 
     const ARTEFACT_COST = 1;
-    const AUDIO_COST = 2;
+    const AUDIO_COST = 5;
 
     // Audio (podcast) is free only on Ultra; text artefacts are free on Pro or Ultra
     const canGenerate = generationModal === 'podcast'

@@ -38,7 +38,9 @@
       "autre": "Autre",
       "type_number_placeholder": "N° (ex: 1)",
       "section_placeholder": "Section (ex: A)",
-      "search": "Rechercher"
+      "search": "Rechercher",
+      "all_languages": "Toutes les langues",
+      "reset": "Réinitialiser"
     }
   },
   "card": {

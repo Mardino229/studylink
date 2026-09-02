@@ -38,7 +38,9 @@
       "autre": "Other",
       "type_number_placeholder": "No. (e.g. 1)",
       "section_placeholder": "Section (e.g. A)",
-      "search": "Search"
+      "search": "Search",
+      "all_languages": "All languages",
+      "reset": "Reset"
     }
   },
   "card": {

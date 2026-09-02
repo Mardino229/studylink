@@ -183,7 +183,7 @@ const AppHeader: React.FC = () => {
                     </button>
 
                     <Link to="/home" className="lg:hidden">
-                        <img src={logo} alt="BlueCurve" className="h-12 w-auto" />
+                        <img src={logo} alt="BlueCurve" className="lg:h-12 w-auto h-8" />
                     </Link>
 
                     <div className="flex items-center gap-1 lg:hidden">
