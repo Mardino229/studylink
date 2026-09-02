@@ -206,11 +206,7 @@ export default function Home() {
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
                     {/* Quick actions */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 16 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.45, ease: "easeOut" }}
-                        viewport={{ once: true, amount: 0.2 }}
+                    <div
                         className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900/80"
                     >
                         <h2 className="mb-4 text-sm font-semibold text-gray-400 dark:text-gray-500">
@@ -236,7 +232,7 @@ export default function Home() {
                                 </Link>
                             ))}
                         </div>
-                    </motion.div>
+                    </div>
 
                     {/* Token consumption */}
                     <motion.div
