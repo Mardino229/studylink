@@ -59,22 +59,22 @@ export default function Settings() {
                     placeholder={t('settings.language_placeholder')}
                   />
                 </div>
-                <label className="flex items-center gap-2 text-sm">
+                {/*<label className="flex items-center gap-2 text-sm">
                   <input type="checkbox" checked={notifications} onChange={(e) => setNotifications(e.target.checked)} />
                   {t('settings.enable_notifications')}
                 </label>
                 <label className="flex items-center gap-2 text-sm">
                   <input type="checkbox" checked={newsletter} onChange={(e) => setNewsletter(e.target.checked)} />
                   {t('settings.newsletter')}
-                </label>
+                </label>*/}
               </div>
             </section>
 
-            <section className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5">
+            {/*<section className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5">
               <h2 className="text-base font-semibold mb-3">{t('settings.announcements_section')}</h2>
               <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings.announcements_desc')}</p>
               <Button className="w-full mt-3" variant="outline" onClick={() => navigate("/settings/announcements")}>{t('settings.view_announcements')}</Button>
-            </section>
+            </section>*/}
 
             <section className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5">
               <h2 className="text-base font-semibold mb-3">{t('settings.support')}</h2>
