@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Zap } from 'lucide-react';
+import { FileText, Zap, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslation, Trans } from 'react-i18next';
 import PageMeta from '../../components/common/PageMeta';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
@@ -11,11 +11,14 @@ import { Modal } from '../../components/ui/modal/index.tsx';
 import ExamCard from './exam-library/ExamCard';
 import ExamFiltersPanel from './exam-library/ExamFiltersPanel';
 
+const LIMIT = 12;
+
 export default function ExamLibrary() {
     const { t } = useTranslation('exams');
     const navigate = useNavigate();
     const { isPro, isUltra, tokenBalance } = useBilling();
 
+    const [page, setPage] = useState(1);
     const [courseId, setCourseId] = useState('');
     const [academicYear, setAcademicYear] = useState('');
     const [session, setSession] = useState<ExamSession | ''>('');
@@ -40,12 +43,17 @@ export default function ExamLibrary() {
         exam_type: (appliedFilters.examType || undefined) as ExamType | undefined,
         type_number: appliedFilters.typeNumber ? Number(appliedFilters.typeNumber) : undefined,
         section: appliedFilters.section || undefined,
-        limit: 100,
+        skip: (page - 1) * LIMIT,
+        limit: LIMIT,
         language: appliedFilters.language || undefined,
     });
 
-    const handleSearch = () => setAppliedFilters({ courseId, academicYear, session, examType, typeNumber, section, language });
+    const handleSearch = () => {
+        setPage(1);
+        setAppliedFilters({ courseId, academicYear, session, examType, typeNumber, section, language });
+    };
     const handleReset = () => {
+        setPage(1);
         setCourseId(''); setAcademicYear(''); setSession(''); setExamType(''); setTypeNumber(''); setSection(''); setLanguage('');
         setAppliedFilters({ courseId: '', academicYear: '', session: '', examType: '', typeNumber: '', section: '', language: '' });
     };
@@ -127,6 +135,30 @@ export default function ExamLibrary() {
                                 onViewSolution={() => viewSolution(exam)}
                             />
                         ))}
+                    </div>
+                )}
+
+                {(exams.length > 0 || page > 1) && (
+                    <div className="mt-6 flex items-center justify-center gap-3">
+                        <button
+                            onClick={() => setPage(p => Math.max(1, p - 1))}
+                            disabled={page <= 1 || isLoading}
+                            className="inline-flex items-center gap-1 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
+                        >
+                            <ChevronLeft size={16} />
+                            <span>{t('pagination.prev')}</span>
+                        </button>
+                        <span className="rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2 text-xs font-semibold text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300">
+                            {t('pagination.page', { current: page })}
+                        </span>
+                        <button
+                            onClick={() => setPage(p => p + 1)}
+                            disabled={exams.length < LIMIT || isLoading}
+                            className="inline-flex items-center gap-1 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
+                        >
+                            <span>{t('pagination.next')}</span>
+                            <ChevronRight size={16} />
+                        </button>
                     </div>
                 )}
             </div>

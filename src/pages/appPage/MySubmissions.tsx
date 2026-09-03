@@ -3,6 +3,7 @@ import { useTranslation, Trans } from 'react-i18next';
 import {
     AlertCircle, CheckCircle2, Clock,
     FileText, FilePlus2, Plus, RefreshCw, Trash2, Upload, XCircle,
+    ChevronLeft, ChevronRight,
 } from 'lucide-react';
 import PageMeta from '../../components/common/PageMeta';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
@@ -50,6 +51,8 @@ function StatusBadge({ status }: { status: SubmissionStatus }) {
     );
 }
 
+const SUBMISSIONS_PER_PAGE = 12;
+
 type Tab = 'exams' | 'solutions' | 'exam_files' | 'contribute';
 
 export default function MySubmissions() {
@@ -58,11 +61,27 @@ export default function MySubmissions() {
 
     const [submitOpen, setSubmitOpen] = useState(false);
 
-    const { data: myExams = [], isLoading: loadingExams } = useGetMySubmissions();
-    const { data: mySolutions = [], isLoading: loadingSolutions } = useGetMySolutionSubmissions();
-    {/*const { data: myExamFiles = [], isLoading: loadingExamFiles } = useGetMyExamFileSubmissions();*/}
-    const { data: missingSolutions = [], isLoading: loadingMissing } = useGetMissingSolutions();
-    const { data: missingExams = [], isLoading: loadingMissingExams } = useGetMissingExams();
+    const [pageExams, setPageExams] = useState(1);
+    const [pageSolutions, setPageSolutions] = useState(1);
+    const [pageMissingSolutions, setPageMissingSolutions] = useState(1);
+    const [pageMissingExams, setPageMissingExams] = useState(1);
+
+    const { data: myExams = [], isLoading: loadingExams } = useGetMySubmissions({
+        skip: (pageExams - 1) * SUBMISSIONS_PER_PAGE,
+        limit: SUBMISSIONS_PER_PAGE,
+    });
+    const { data: mySolutions = [], isLoading: loadingSolutions } = useGetMySolutionSubmissions({
+        skip: (pageSolutions - 1) * SUBMISSIONS_PER_PAGE,
+        limit: SUBMISSIONS_PER_PAGE,
+    });
+    const { data: missingSolutions = [], isLoading: loadingMissing } = useGetMissingSolutions({
+        skip: (pageMissingSolutions - 1) * SUBMISSIONS_PER_PAGE,
+        limit: SUBMISSIONS_PER_PAGE,
+    });
+    const { data: missingExams = [], isLoading: loadingMissingExams } = useGetMissingExams({
+        skip: (pageMissingExams - 1) * SUBMISSIONS_PER_PAGE,
+        limit: SUBMISSIONS_PER_PAGE,
+    });
 
     const resubmitExam = useResubmitExam();
     const resubmitSolution = useResubmitSolution();
@@ -154,53 +173,58 @@ export default function MySubmissions() {
 
             {/* ── Mes épreuves ── */}
             {tab === 'exams' && (
-                <SubmissionList
-                    isLoading={loadingExams}
-                    empty={{ icon: FileText, text: t('submissions.empty_exams') }}
-                >
-                    {myExams.map(exam => (
-                        <ExamSubmissionCard
-                            key={exam.id}
-                            exam={exam}
-                            onResubmit={() => setResubmitExamId(exam.id)}
-                            onDelete={() => setDeleteExamId(exam.id)}
-                        />
-                    ))}
-                </SubmissionList>
-            )}
+                <div>
+                    <SubmissionList
+                        isLoading={loadingExams}
+                        empty={{ icon: FileText, text: t('submissions.empty_exams') }}
+                    >
+                        {myExams.map(exam => (
+                            <ExamSubmissionCard
+                                key={exam.id}
+                                exam={exam}
+                                onResubmit={() => setResubmitExamId(exam.id)}
+                                onDelete={() => setDeleteExamId(exam.id)}
+                            />
+                        ))}
+                    </SubmissionList>
 
-            {/* ── Mes fichiers épreuve ── */}
-            {/*{tab === 'exam_files' && (
-                <SubmissionList
-                    isLoading={loadingExamFiles}
-                    empty={{ icon: FilePlus2, text: t('submissions.empty_exam_files') }}
-                >
-                    {myExamFiles.map(sub => (
-                        <ExamFileSubmissionCard
-                            key={sub.id}
-                            submission={sub}
-                            onResubmit={() => setResubmitExamFileId(sub.id)}
-                            onDelete={() => setDeleteExamFileId(sub.id)}
+                    {(myExams.length > 0 || pageExams > 1) && (
+                        <PaginationControls
+                            page={pageExams}
+                            onPageChange={setPageExams}
+                            hasMore={myExams.length === SUBMISSIONS_PER_PAGE}
+                            isLoading={loadingExams}
                         />
-                    ))}
-                </SubmissionList>
-            )}*/} 
+                    )}
+                </div>
+            )}
 
             {/* ── Mes corrigés ── */}
             {tab === 'solutions' && (
-                <SubmissionList
-                    isLoading={loadingSolutions}
-                    empty={{ icon: Upload, text: t('submissions.empty_solutions') }}
-                >
-                    {mySolutions.map(sol => (
-                        <SolutionSubmissionCard
-                            key={sol.id}
-                            submission={sol}
-                            onResubmit={() => setResubmitSolId(sol.id)}
-                            onDelete={() => setDeleteSolId(sol.id)}
+                <div>
+                    <SubmissionList
+                        isLoading={loadingSolutions}
+                        empty={{ icon: Upload, text: t('submissions.empty_solutions') }}
+                    >
+                        {mySolutions.map(sol => (
+                            <SolutionSubmissionCard
+                                key={sol.id}
+                                submission={sol}
+                                onResubmit={() => setResubmitSolId(sol.id)}
+                                onDelete={() => setDeleteSolId(sol.id)}
+                            />
+                        ))}
+                    </SubmissionList>
+
+                    {(mySolutions.length > 0 || pageSolutions > 1) && (
+                        <PaginationControls
+                            page={pageSolutions}
+                            onPageChange={setPageSolutions}
+                            hasMore={mySolutions.length === SUBMISSIONS_PER_PAGE}
+                            isLoading={loadingSolutions}
                         />
-                    ))}
-                </SubmissionList>
+                    )}
+                </div>
             )}
 
             {/* ── Contribuer ── */}
@@ -230,6 +254,15 @@ export default function MySubmissions() {
                                 />
                             ))}
                         </SubmissionList>
+
+                        {(missingSolutions.length > 0 || pageMissingSolutions > 1) && (
+                            <PaginationControls
+                                page={pageMissingSolutions}
+                                onPageChange={setPageMissingSolutions}
+                                hasMore={missingSolutions.length === SUBMISSIONS_PER_PAGE}
+                                isLoading={loadingMissing}
+                            />
+                        )}
                     </div>
 
                     {/* Corrigés sans épreuve */}
@@ -256,6 +289,15 @@ export default function MySubmissions() {
                                 />
                             ))}
                         </SubmissionList>
+
+                        {(missingExams.length > 0 || pageMissingExams > 1) && (
+                            <PaginationControls
+                                page={pageMissingExams}
+                                onPageChange={setPageMissingExams}
+                                hasMore={missingExams.length === SUBMISSIONS_PER_PAGE}
+                                isLoading={loadingMissingExams}
+                            />
+                        )}
                     </div>
                 </div>
             )}
@@ -701,6 +743,45 @@ function MissingSolutionCard({ exam, onSubmit }: { exam: ExamItem; onSubmit: () 
             >
                 <Upload size={12} />
                 {t('submissions.submit_solution')}
+            </button>
+        </div>
+    );
+}
+
+function PaginationControls({
+    page,
+    onPageChange,
+    hasMore,
+    isLoading,
+}: {
+    page: number;
+    onPageChange: (newPage: number) => void;
+    hasMore: boolean;
+    isLoading?: boolean;
+}) {
+    const { t } = useTranslation('exams');
+    if (page === 1 && !hasMore) return null;
+
+    return (
+        <div className="mt-6 flex items-center justify-center gap-3">
+            <button
+                onClick={() => onPageChange(Math.max(1, page - 1))}
+                disabled={page <= 1 || isLoading}
+                className="inline-flex items-center gap-1 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
+            >
+                <ChevronLeft size={16} />
+                <span>{t('pagination.prev')}</span>
+            </button>
+            <span className="rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2 text-xs font-semibold text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300">
+                {t('pagination.page', { current: page })}
+            </span>
+            <button
+                onClick={() => onPageChange(page + 1)}
+                disabled={!hasMore || isLoading}
+                className="inline-flex items-center gap-1 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
+            >
+                <span>{t('pagination.next')}</span>
+                <ChevronRight size={16} />
             </button>
         </div>
     );

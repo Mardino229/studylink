@@ -262,12 +262,15 @@ export const useDeleteExam = () => {
 
 // ─── User submissions ─────────────────────────────────────
 
-export const useGetMySubmissions = () => {
+export const useGetMySubmissions = (filters?: { skip?: number; limit?: number }) => {
     const axiosPrivate = useAxiosPrivate();
     return useQuery({
-        queryKey: ["my-exam-submissions"],
+        queryKey: ["my-exam-submissions", filters],
         queryFn: async () => {
-            const res = await axiosPrivate.get<{ data: ExamItem[] }>("/exam-library/my-submissions");
+            const params = new URLSearchParams();
+            if (filters?.skip !== undefined) params.set("skip", String(filters.skip));
+            if (filters?.limit !== undefined) params.set("limit", String(filters.limit));
+            const res = await axiosPrivate.get<{ data: ExamItem[] }>(`/exam-library/my-submissions?${params}`);
             return res.data.data;
         },
     });
@@ -312,12 +315,15 @@ export const useResubmitExam = () => {
     });
 };
 
-export const useGetMissingSolutions = () => {
+export const useGetMissingSolutions = (filters?: { skip?: number; limit?: number }) => {
     const axiosPrivate = useAxiosPrivate();
     return useQuery({
-        queryKey: ["exams-missing-solution"],
+        queryKey: ["exams-missing-solution", filters],
         queryFn: async () => {
-            const res = await axiosPrivate.get<{ data: ExamItem[] }>("/exam-library/missing-solution");
+            const params = new URLSearchParams();
+            if (filters?.skip !== undefined) params.set("skip", String(filters.skip));
+            if (filters?.limit !== undefined) params.set("limit", String(filters.limit));
+            const res = await axiosPrivate.get<{ data: ExamItem[] }>(`/exam-library/missing-solution?${params}`);
             return res.data.data;
         },
     });
@@ -346,12 +352,15 @@ export const useSubmitSolution = () => {
     });
 };
 
-export const useGetMySolutionSubmissions = () => {
+export const useGetMySolutionSubmissions = (filters?: { skip?: number; limit?: number }) => {
     const axiosPrivate = useAxiosPrivate();
     return useQuery({
-        queryKey: ["my-solution-submissions"],
+        queryKey: ["my-solution-submissions", filters],
         queryFn: async () => {
-            const res = await axiosPrivate.get<{ data: SolutionSubmission[] }>("/exam-library/my-solution-submissions");
+            const params = new URLSearchParams();
+            if (filters?.skip !== undefined) params.set("skip", String(filters.skip));
+            if (filters?.limit !== undefined) params.set("limit", String(filters.limit));
+            const res = await axiosPrivate.get<{ data: SolutionSubmission[] }>(`/exam-library/my-solution-submissions?${params}`);
             return res.data.data;
         },
     });
@@ -415,23 +424,29 @@ export const useDeleteMySolutionSubmission = () => {
 
 // ─── Exam file submissions (missing-exam flow) ────────────
 
-export const useGetMissingExams = () => {
+export const useGetMissingExams = (filters?: { skip?: number; limit?: number }) => {
     const axiosPrivate = useAxiosPrivate();
     return useQuery({
-        queryKey: ["exams-missing-exam"],
+        queryKey: ["exams-missing-exam", filters],
         queryFn: async () => {
-            const res = await axiosPrivate.get<{ data: ExamItem[] }>("/exam-library/missing-exam");
+            const params = new URLSearchParams();
+            if (filters?.skip !== undefined) params.set("skip", String(filters.skip));
+            if (filters?.limit !== undefined) params.set("limit", String(filters.limit));
+            const res = await axiosPrivate.get<{ data: ExamItem[] }>(`/exam-library/missing-exam?${params}`);
             return res.data.data;
         },
     });
 };
 
-export const useGetMyExamFileSubmissions = () => {
+export const useGetMyExamFileSubmissions = (filters?: { skip?: number; limit?: number }) => {
     const axiosPrivate = useAxiosPrivate();
     return useQuery({
-        queryKey: ["my-exam-file-submissions"],
+        queryKey: ["my-exam-file-submissions", filters],
         queryFn: async () => {
-            const res = await axiosPrivate.get<{ data: ExamFileSubmissionRead[] }>("/exam-library/my-exam-file-submissions");
+            const params = new URLSearchParams();
+            if (filters?.skip !== undefined) params.set("skip", String(filters.skip));
+            if (filters?.limit !== undefined) params.set("limit", String(filters.limit));
+            const res = await axiosPrivate.get<{ data: ExamFileSubmissionRead[] }>(`/exam-library/my-exam-file-submissions?${params}`);
             return res.data.data;
         },
     });

@@ -159,7 +159,12 @@
     "submit_exam_file": "Submit exam file",
     "resubmit_exam_file": "Resubmit exam file",
     "no_exam_banner": "These solutions don't have an exam file yet. Submit it to earn <str>1 coin</str> if validated.",
-    "delete_exam_file_msg": "This exam file submission will be permanently removed. This action is irreversible.",
+    "delete_exam_file_msg": "This exam file will be permanently removed. This action is irreversible.",
     "contribute_missing_exam_empty": "All solutions already have an exam file — check back later!"
+  },
+  "pagination": {
+    "prev": "Previous",
+    "next": "Next",
+    "page": "Page {{current}}"
   }
 }

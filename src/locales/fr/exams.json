@@ -161,5 +161,10 @@
     "no_exam_banner": "Ces corrigés n'ont pas encore de fichier épreuve associé. Soumettez-le pour gagner <str>1 coin</str> si validé.",
     "delete_exam_file_msg": "Ce fichier épreuve sera retiré définitivement. Cette action est irréversible.",
     "contribute_missing_exam_empty": "Tous les corrigés ont déjà un fichier épreuve — revenez plus tard !"
+  },
+  "pagination": {
+    "prev": "Précédent",
+    "next": "Suivant",
+    "page": "Page {{current}}"
   }
 }
