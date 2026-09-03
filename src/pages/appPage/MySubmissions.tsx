@@ -13,7 +13,7 @@ import {
     useGetMySubmissions, useResubmitExam, useDeleteMyExamSubmission,
     useGetMySolutionSubmissions, useResubmitSolution, useDeleteMySolutionSubmission,
     useGetMissingSolutions, useSubmitSolution,
-    useGetMissingExams, useGetMyExamFileSubmissions, useSubmitExamFile,
+    useGetMissingExams, useSubmitExamFile,
     useResubmitExamFile, useDeleteExamFileSubmission,
 } from '../../utils/exam';
 import type { ExamFileSubmissionRead, ExamItem, SolutionSubmission, SubmissionStatus } from '../../types/exams';
