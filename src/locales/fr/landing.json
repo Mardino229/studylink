@@ -11,7 +11,7 @@
   "hero": {
     "tag": "Outil de révision",
     "title": "Révisez mieux avec BlueCurve.",
-    "subtitle": "Génère des résumés, des flashcards, des podcasts éducatifs et des quiz à partir de tes cours et de vidéos YouTube, et dispose d'un assistant IA pour te guider dans tes révisions, le tout dans une seule interface.",
+    "subtitle": "Génère des résumés, des flashcards, des podcasts éducatifs, des cartes mentales et des quiz à partir de tes cours et de vidéos YouTube, et dispose d'un assistant IA pour te guider dans tes révisions, le tout dans une seule interface.",
     "cta_primary": "Commence gratuitement",
     "cta_secondary": "Voir les offres",
     "pricing_note": "Gratuit pour essayer · Packs de jetons dès 2,99 $ CAD · Abonnements dès 6,99 $ CAD/mois",
@@ -23,9 +23,10 @@
       "Organise ton espace de révision",
       "Génère des résumés en quelques secondes",
       "Consulte des épreuves et des corrigés",
-      "Crée des podcasts audio à partir de tes cours"
+      "Crée des podcasts audio à partir de tes cours",
+      "Visualise ton apprentissage avec des cartes mentales"
     ],
-    "chips": ["Résumés", "Flashcards", "Podcasts", "Quiz", "Examens", "Assistant IA"]
+    "chips": ["Résumés", "Flashcards", "Podcasts", "Mindmaps", "Quiz", "Cartes Mentales", "Examens", "Assistant IA"]
   },
   "smart": {
     "section_label": "Comment ça marche ?",

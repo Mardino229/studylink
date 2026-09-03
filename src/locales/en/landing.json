@@ -11,7 +11,7 @@
   "hero": {
     "tag": "Study Tool",
     "title": "Study smarter with BlueCurve.",
-    "subtitle": "Generate summaries, flashcards, educational podcasts and quizzes from your course files and YouTube videos, with an AI assistant to guide your revision — all in one interface.",
+    "subtitle": "Generate summaries, flashcards, educational podcasts, mindmaps and quizzes from your course files and YouTube videos, with an AI assistant to guide your revision — all in one interface.",
     "cta_primary": "Start for free",
     "cta_secondary": "See plans",
     "pricing_note": "Free to try · Token packs from $2.99 CAD · Subscriptions from $6.99 CAD/month",
@@ -23,9 +23,10 @@
       "Organize your study workspace",
       "Generate summaries in seconds",
       "Browse past exams and solutions",
-      "Create audio podcasts from your courses"
+      "Create audio podcasts from your courses",
+      "Visualize your learning with mindmaps"
     ],
-    "chips": ["Summaries", "Flashcards", "Podcasts", "Quiz", "Exams", "AI Assistant"]
+    "chips": ["Summaries", "Flashcards", "Podcasts", "Mindmaps", "Quiz", "Exams", "AI Assistant"]
   },
   "smart": {
     "section_label": "How does it work?",
