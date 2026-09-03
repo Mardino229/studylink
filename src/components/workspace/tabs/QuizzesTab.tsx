@@ -186,9 +186,9 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
                 </AnimatePresence>
 
                 {/* Main Content Area */}
-                <section className="flex flex-1 min-w-0 px-2 flex-col overflow-hidden bg-card">
+                <section className="flex flex-1 min-w-0 lg:px-2 flex-col overflow-hidden bg-card">
                     {/* Main Header */}
-                    <div className="flex items-center justify-between px-2 py-3 shrink-0">
+                    <div className="flex items-center justify-between py-3 shrink-0">
                         <div className="flex items-center gap-3">
                             <button
                                 type="button"
@@ -226,7 +226,7 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
                     </div>
 
                     {/* Main Content (QuizRunner / Empty State) */}
-                    <div className="flex-1 overflow-y-auto p-4 sm:p-6 scroll-smooth">
+                    <div className="flex-1 overflow-y-auto sm:p-6 scroll-smooth">
                         {isLoadingSelectedQuiz ? (
                             <div className="flex h-full items-center justify-center py-20 text-sm text-foreground/50">
                                 {t('tabs.quizzes.loading')}

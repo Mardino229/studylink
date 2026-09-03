@@ -106,7 +106,7 @@ export const MindmapTab: React.FC<MindmapTabProps> = ({
 
     return (
         <div className="h-full">
-            <div className="relative flex h-full w-full gap-4 overflow-hidden p-1 sm:p-4">
+            <div className="relative flex h-full w-full gap-4 overflow-hidden sm:p-4">
                 {/* Mobile sidebar overlay */}
                 <AnimatePresence>
                     {sidebarOpen && (
@@ -143,7 +143,7 @@ export const MindmapTab: React.FC<MindmapTabProps> = ({
                 </AnimatePresence>
 
                 {/* Main content */}
-                <section className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-2xl px-2">
+                <section className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-2xl lg:px-2">
                     {/* Toolbar */}
                     <div className="flex shrink-0 items-center justify-between px-2 py-3">
                         <div className="flex items-center gap-3">
@@ -164,7 +164,7 @@ export const MindmapTab: React.FC<MindmapTabProps> = ({
                             >
                                 <Menu size={18} />
                             </button>
-                            <h3 className="max-w-[200px] truncate text-sm font-bold text-foreground sm:max-w-xs">
+                            <h3 className="max-w-[130px] truncate text-sm font-bold text-foreground sm:max-w-xs">
                                 {selected?.title || t('tabs.mindmaps.detail_default')}
                             </h3>
                         </div>
@@ -174,10 +174,11 @@ export const MindmapTab: React.FC<MindmapTabProps> = ({
                                     await deleteMindmap.mutateAsync({ notebookId, mindmapId: selected.id });
                                     setSelectedId(null);
                                 })}
-                                className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-500 transition-all hover:bg-red-100 hover:text-red-600 dark:bg-red-950/20 dark:hover:bg-red-950/40"
+                                title={t('tabs.mindmaps.delete_btn')}
+                                className="inline-flex items-center gap-1 rounded-full bg-red-50 p-2 sm:px-2.5 sm:py-1.5 text-xs font-medium text-red-500 transition-all hover:bg-red-100 hover:text-red-600 dark:bg-red-950/20 dark:hover:bg-red-950/40"
                             >
-                                <Trash2 size={12} />
-                                <span className="hidden sm:block">{t('tabs.mindmaps.delete_btn')}</span>
+                                <Trash2 size={14} />
+                                <span className="hidden sm:inline">{t('tabs.mindmaps.delete_btn')}</span>
                             </button>
                         )}
                     </div>

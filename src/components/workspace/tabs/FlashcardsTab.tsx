@@ -244,9 +244,9 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
                 </AnimatePresence>
 
                 {/* Main Content Area */}
-                <section className="flex flex-1 min-w-0 px-2 flex-col overflow-hidden bg-card">
+                <section className="flex flex-1 min-w-0 lg:px-2 flex-col overflow-hidden bg-card">
                     {/* Main Header */}
-                    <div className="flex items-center justify-between px-2 py-3 shrink-0">
+                    <div className="flex items-center justify-between py-3 shrink-0">
                         <div className="flex items-center gap-3">
                             <button
                                 type="button"
@@ -284,7 +284,7 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
                     </div>
 
                     {/* Main Content */}
-                    <div className="flex-1 overflow-y-auto p-4 sm:p-6 scroll-smooth">
+                    <div className="flex-1 overflow-y-auto sm:p-6 scroll-smooth">
                         {displayedFlashcards.length > 0 ? (
                             <div className="w-full pt-10 max-w-2xl">
                                 <StackPreview

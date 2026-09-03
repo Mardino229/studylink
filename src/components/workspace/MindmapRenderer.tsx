@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronRight, ChevronDown, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
+import { ChevronRight, ChevronDown, ZoomIn, ZoomOut, Maximize2, ChevronsUpDown, ChevronsDownUp } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { MindMapNode } from '../../types/workspace';
 import ReactMarkdown from 'react-markdown';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
@@ -88,6 +89,7 @@ export interface MindmapRendererProps {
 }
 
 export default function MindmapRenderer({ root }: MindmapRendererProps) {
+    const { t } = useTranslation('workspace');
     const containerRef = useRef<HTMLDivElement>(null);
     const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
     const [zoom, setZoom] = useState(1);
@@ -225,16 +227,22 @@ export default function MindmapRenderer({ root }: MindmapRendererProps) {
     return (
         <div className="flex flex-col h-full gap-2">
             {/* Toolbar */}
-            <div className="flex shrink-0 items-center gap-2 px-1">
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 px-1">
                 <div className="flex items-center rounded-xl border border-border bg-background">
-                    <button onClick={() => setZoom(z => Math.max(0.25, z - 0.15))} className="flex h-8 w-8 items-center justify-center rounded-l-xl text-foreground/60 hover:bg-foreground/5 hover:text-foreground transition-all disabled:opacity-30" disabled={zoom <= 0.25}><ZoomOut size={15} /></button>
-                    <span className="min-w-[3.5rem] text-center text-xs font-medium text-foreground/60 tabular-nums">{Math.round(zoom * 100)}%</span>
-                    <button onClick={() => setZoom(z => Math.min(2.5, z + 0.15))} className="flex h-8 w-8 items-center justify-center rounded-r-xl text-foreground/60 hover:bg-foreground/5 hover:text-foreground transition-all disabled:opacity-30" disabled={zoom >= 2.5}><ZoomIn size={15} /></button>
+                    <button onClick={() => setZoom(z => Math.max(0.25, z - 0.15))} className="flex h-8 w-8 items-center justify-center rounded-l-xl text-foreground/60 hover:bg-foreground/5 hover:text-foreground transition-all disabled:opacity-30" disabled={zoom <= 0.25} title="Zoom out"><ZoomOut size={15} /></button>
+                    <span className="hidden sm:inline-block min-w-[2.5rem] text-center text-xs font-medium text-foreground/60 tabular-nums">{Math.round(zoom * 100)}%</span>
+                    <button onClick={() => setZoom(z => Math.min(2.5, z + 0.15))} className="flex h-8 w-8 items-center justify-center rounded-r-xl text-foreground/60 hover:bg-foreground/5 hover:text-foreground transition-all disabled:opacity-30" disabled={zoom >= 2.5} title="Zoom in"><ZoomIn size={15} /></button>
                 </div>
-                <button onClick={fitToContainer} className="flex h-8 w-8 items-center justify-center rounded-xl border border-border bg-background text-foreground/60 hover:bg-foreground/5 hover:text-foreground transition-all" title="Ajuster à l'écran"><Maximize2 size={14} /></button>
+                <button onClick={fitToContainer} className="flex h-8 w-8 items-center justify-center rounded-xl border border-border bg-background text-foreground/60 hover:bg-foreground/5 hover:text-foreground transition-all" title={t('tabs.mindmaps.fit_screen')}><Maximize2 size={14} /></button>
                 <div className="h-4 w-px bg-border" />
-                <button onClick={expandAll} className="rounded-xl border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground/70 hover:bg-foreground/5 transition-all">Tout développer</button>
-                <button onClick={collapseAll} className="rounded-xl border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground/70 hover:bg-foreground/5 transition-all">Tout réduire</button>
+                <button onClick={expandAll} className="inline-flex h-8 items-center justify-center gap-1.5 rounded-xl border border-border bg-background px-2.5 sm:px-3 text-xs font-medium text-foreground/70 hover:bg-foreground/5 transition-all" title={t('tabs.mindmaps.expand_all')}>
+                    <ChevronsUpDown size={14} />
+                    <span className="hidden sm:inline">{t('tabs.mindmaps.expand_all')}</span>
+                </button>
+                <button onClick={collapseAll} className="inline-flex h-8 items-center justify-center gap-1.5 rounded-xl border border-border bg-background px-2.5 sm:px-3 text-xs font-medium text-foreground/70 hover:bg-foreground/5 transition-all" title={t('tabs.mindmaps.collapse_all')}>
+                    <ChevronsDownUp size={14} />
+                    <span className="hidden sm:inline">{t('tabs.mindmaps.collapse_all')}</span>
+                </button>
             </div>
 
             {/* Canvas */}
@@ -383,12 +391,12 @@ export default function MindmapRenderer({ root }: MindmapRendererProps) {
                     })}
                 </div>
 
-                {/* Minimap */}
+                {/* Minimap - hidden on mobile so it doesn't obstruct touch drag */}
                 <svg
                     width={MM_W}
                     height={MM_H}
                     onPointerDown={onMinimapPointerDown}
-                    className="absolute bottom-8 right-4 rounded-xl border border-border bg-white/85 dark:bg-gray-950/85 backdrop-blur-sm shadow-lg cursor-pointer"
+                    className="hidden sm:block absolute bottom-8 right-4 rounded-xl border border-border bg-white/85 dark:bg-gray-950/85 backdrop-blur-sm shadow-lg cursor-pointer"
                     style={{ pointerEvents: 'all' }}
                 >
                     {placed.map(({ node, x, y, colorIdx }) => {

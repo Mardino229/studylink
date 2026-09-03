@@ -642,7 +642,7 @@ const ChatStream: React.FC<ChatStreamProps> = ({ notebookId }) => {
             </AnimatePresence>
 
             {/* Interface principale */}
-            <section className="flex flex-1 min-w-0 px-2 flex-col overflow-hidden bg-card">
+            <section className="flex flex-1 min-w-0 lg:px-2 flex-col overflow-hidden bg-card">
                 {/* En-tête du chat */}
                 <div className="flex items-center justify-between py-4">
                     <div className="flex items-center gap-3">

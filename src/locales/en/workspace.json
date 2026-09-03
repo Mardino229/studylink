@@ -258,7 +258,10 @@
       "delete_title": "Delete",
       "close_history": "Close history",
       "open_history": "Open history",
-      "gen_depth_label": "Maximum depth"
+      "gen_depth_label": "Maximum depth",
+      "expand_all": "Expand all",
+      "collapse_all": "Collapse all",
+      "fit_screen": "Fit to screen"
     },
     "podcasts": {
       "generating": "Generating...",

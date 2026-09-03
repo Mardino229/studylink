@@ -334,7 +334,7 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
 
     return (
         <div className="h-full">
-            <div className="relative flex h-full w-full gap-4 overflow-hidden p-1 sm:p-4">
+            <div className="relative flex h-full w-full gap-4 overflow-hidden sm:p-4">
                 <AnimatePresence>
                     {sidebarOpen && (
                         <div className="fixed top-16 inset-0 z-50 xl:hidden">
@@ -374,9 +374,9 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                     )}
                 </AnimatePresence>
 
-                <section className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-2xl px-2">
+                <section className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-2xl lg:px-2">
                     <div className="flex shrink-0 items-center justify-between px-2 py-3">
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3">
                             <button
                                 type="button"
                                 onClick={() => setDesktopSidebarOpen((prev) => !prev)}
@@ -394,12 +394,12 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                             >
                                 <Menu size={18} />
                             </button>
-                            <h3 className="max-w-[200px] truncate text-sm font-bold text-foreground sm:max-w-xs">
+                            <h3 className="max-w-[130px] truncate text-sm font-bold text-foreground sm:max-w-xs">
                                 {selectedSummary?.title || t('tabs.summaries.detail_default')}
                             </h3>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5 sm:gap-2">
                             <div className="flex items-center rounded-xl border border-border bg-background">
                                 <button
                                     type="button"
@@ -410,7 +410,7 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                                 >
                                     <ZoomOut size={15} />
                                 </button>
-                                <span className="min-w-[3rem] text-center text-xs font-medium text-foreground/60 tabular-nums">{fontSize}%</span>
+                                <span className="hidden sm:inline-block min-w-[2.5rem] text-center text-xs font-medium text-foreground/60 tabular-nums">{fontSize}%</span>
                                 <button
                                     type="button"
                                     onClick={() => setFontSize(s => Math.min(150, s + 10))}
@@ -425,10 +425,11 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                                 <button
                                     onClick={() => handleGenerateAudio(selectedSummary.id)}
                                     disabled={audioRequestSummaryId === selectedSummary.id || selectedSummary.audio_status === 'processing'}
-                                    className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1.5 text-xs font-medium text-emerald-700 transition-all hover:bg-emerald-100 disabled:opacity-50 dark:bg-emerald-950/20 dark:text-emerald-100 dark:hover:bg-emerald-950/40"
+                                    title={selectedSummary.audio_status === 'completed' ? t('tabs.summaries.regenerate_audio') : t('tabs.summaries.generate_audio')}
+                                    className="inline-flex items-center gap-1 rounded-full bg-emerald-50 p-2 sm:px-2.5 sm:py-1.5 text-xs font-medium text-emerald-700 transition-all hover:bg-emerald-100 disabled:opacity-50 dark:bg-emerald-950/20 dark:text-emerald-100 dark:hover:bg-emerald-950/40"
                                 >
-                                    {audioRequestSummaryId === selectedSummary.id ? <Loader2 size={12} className="animate-spin" /> : <Volume2 size={12} />}
-                                    <span className="">
+                                    {audioRequestSummaryId === selectedSummary.id ? <Loader2 size={14} className="animate-spin" /> : <Volume2 size={14} />}
+                                    <span className="hidden sm:inline">
                                         {selectedSummary.audio_status === 'completed' ? t('tabs.summaries.regenerate_audio') : t('tabs.summaries.generate_audio')}
                                     </span>
                                 </button>
@@ -436,20 +437,21 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
 
                             {selectedSummary && (
                                 <button
-                                    onClick={() => handleDelete('Supprimer ce résumé ?', async () => {
+                                    onClick={() => handleDelete(t('tabs.summaries.confirm_delete'), async () => {
                                         await deleteSummary.mutateAsync({ notebookId, summaryId: selectedSummary.id });
                                         setSelectedSummaryId(null);
                                     })}
-                                    className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-500 transition-all hover:bg-red-100 hover:text-red-600 dark:bg-red-950/20 dark:hover:bg-red-950/40"
+                                    title={t('tabs.summaries.delete_btn')}
+                                    className="inline-flex items-center gap-1 rounded-full bg-red-50 p-2 sm:px-2.5 sm:py-1.5 text-xs font-medium text-red-500 transition-all hover:bg-red-100 hover:text-red-600 dark:bg-red-950/20 dark:hover:bg-red-950/40"
                                 >
-                                    <Trash2 size={12} />
-                                    <span className="hidden sm:block">{t('tabs.summaries.delete_btn')}</span>
+                                    <Trash2 size={14} />
+                                    <span className="hidden sm:inline">{t('tabs.summaries.delete_btn')}</span>
                                 </button>
                             )}
                         </div>
                     </div>
 
-                    <div className="scroll-smooth flex-1 overflow-y-auto p-2 sm:p-6">
+                    <div className="scroll-smooth flex-1 overflow-y-auto sm:p-6">
                         {selectedSummary ? (
                             <div className="mx-auto max-w-4xl space-y-6">
                                 {selectedSummary.audio_status === 'processing' && (

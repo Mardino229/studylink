@@ -311,9 +311,9 @@ const WorkspaceNotebook: React.FC = () => {
                             </div>
 
                             <div ref={contentRef} className="lg:mt-6 mt-2 flex-1 overflow-hidden">
-                                <div className={`rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/80 ${
+                                <div className={`rounded-3xl lg:border lg:border-gray-200 bg-white lg:shadow-sm dark:lg:border-gray-800 dark:bg-gray-900/80 ${
                                     ['chat', 'summaries', 'flashcards', 'podcasts', 'mindmaps'].includes(activeTab)
-                                        ? 'h-[calc(100dvh-56px)] sm:h-[600px] md:h-[calc(100vh-340px)] lg:h-[calc(100vh-300px)] overflow-hidden'
+                                        ? 'h-[calc(100dvh-56px)] sm:h-[600px] md:h-[calc(100vh-340px)] lg:h-[calc(100vh-300px)] overflow-hidden' 
                                         : ''
                                 }`}>
                                     {activeTab === 'overview' && (
