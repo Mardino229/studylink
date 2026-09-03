@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import logo from "../../assets/mylogo.png";
 import { useSidebar } from "../../context/SidebarContext";
-import { LayoutDashboard, Users, BadgeCheck, Layers, CreditCard, Megaphone, MessageSquare, BarChart3, Settings as SettingsIcon, BookMarked, Zap } from "lucide-react";
+import { LayoutDashboard, Users, BadgeCheck, Layers, CreditCard, Megaphone, MessageSquare, BarChart3, Settings as SettingsIcon, BookMarked, Zap, Repeat2 } from "lucide-react";
 
 export default function AdminSidebar() {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
@@ -19,6 +19,7 @@ export default function AdminSidebar() {
     { name: "Announcements", path: "/admin/announcements", icon: Megaphone },
     { name: "Feedbacks", path: "/admin/feedbacks", icon: MessageSquare },
     { name: "Reports", path: "/admin/reports", icon: BarChart3 },
+    { name: "Rétention", path: "/admin/retention", icon: Repeat2 },
     { name: "Settings", path: "/admin/settings", icon: SettingsIcon },
   ];
 
