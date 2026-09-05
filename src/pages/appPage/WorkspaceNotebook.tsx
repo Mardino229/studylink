@@ -61,8 +61,8 @@ const WorkspaceNotebook: React.FC = () => {
     const [generationTitle, setGenerationTitle] = useState('');
     const [customInstructions, setCustomInstructions] = useState('');
     const [generationFailed, setGenerationFailed] = useState(false);
-    const [flashcardCount, setFlashcardCount] = useState(10);
-    const [quizCount, setQuizCount] = useState(5);
+    const [flashcardCount, setFlashcardCount] = useState<string | number>(10);
+    const [quizCount, setQuizCount] = useState<string | number>(5);
     const [summaryTarget, setSummaryTarget] = useState<{ sourceIds: string[]; themeIds: string[] }>({ sourceIds: [], themeIds: [] });
     const [flashcardTarget, setFlashcardTarget] = useState<{ sourceIds: string[]; themeIds: string[] }>({ sourceIds: [], themeIds: [] });
     const [quizTarget, setQuizTarget] = useState<{ sourceIds: string[]; themeIds: string[] }>({ sourceIds: [], themeIds: [] });
@@ -507,11 +507,18 @@ const WorkspaceNotebook: React.FC = () => {
                                 <div>
                                     <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-200">{t('notebook.gen_cards_label')}</label>
                                     <input
-                                        type="number"
-                                        min={1}
-                                        max={50}
+                                        type="text"
                                         value={flashcardCount}
-                                        onChange={(e) => setFlashcardCount(Math.max(1, Math.min(50, Number(e.target.value) || 10)))}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            if (val === '' || /^\d+$/.test(val)) setFlashcardCount(val);
+                                        }}
+                                        onBlur={() => {
+                                            let num = Number(flashcardCount);
+                                            if (!num || num < 1) num = 10;
+                                            if (num > 50) num = 50;
+                                            setFlashcardCount(num);
+                                        }}
                                         className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 dark:border-gray-800 dark:bg-gray-900 dark:text-white"
                                     />
                                 </div>
@@ -520,11 +527,18 @@ const WorkspaceNotebook: React.FC = () => {
                                 <div>
                                     <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-200">{t('notebook.gen_questions_label')}</label>
                                     <input
-                                        type="number"
-                                        min={1}
-                                        max={20}
+                                        type="text"
                                         value={quizCount}
-                                        onChange={(e) => setQuizCount(Math.max(1, Math.min(20, Number(e.target.value) || 5)))}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            if (val === '' || /^\d+$/.test(val)) setQuizCount(val);
+                                        }}
+                                        onBlur={() => {
+                                            let num = Number(quizCount);
+                                            if (!num || num < 1) num = 5;
+                                            if (num > 25) num = 25;
+                                            setQuizCount(num);
+                                        }}
                                         className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 dark:border-gray-800 dark:bg-gray-900 dark:text-white"
                                     />
                                 </div>
@@ -675,10 +689,10 @@ const WorkspaceNotebook: React.FC = () => {
                                         createSummary.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, sourceIds: summaryTarget.sourceIds, themeIds: summaryTarget.themeIds, customInstructions: ci }, { onSuccess: closeOnSuccess, onError: handleGenerationError });
                                     }
                                     if (generationModal === 'flashcards') {
-                                        createFlashcards.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, count: flashcardCount, sourceIds: flashcardTarget.sourceIds, themeIds: flashcardTarget.themeIds, customInstructions: ci }, { onSuccess: closeOnSuccess, onError: handleGenerationError });
+                                        createFlashcards.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, count: Number(flashcardCount) || 10, sourceIds: flashcardTarget.sourceIds, themeIds: flashcardTarget.themeIds, customInstructions: ci }, { onSuccess: closeOnSuccess, onError: handleGenerationError });
                                     }
                                     if (generationModal === 'quiz') {
-                                        createQuiz.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, count: quizCount, sourceIds: quizTarget.sourceIds, themeIds: quizTarget.themeIds, customInstructions: ci }, { onSuccess: closeOnSuccess, onError: handleGenerationError });
+                                        createQuiz.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, count: Number(quizCount) || 5, sourceIds: quizTarget.sourceIds, themeIds: quizTarget.themeIds, customInstructions: ci }, { onSuccess: closeOnSuccess, onError: handleGenerationError });
                                     }
                                     if (generationModal === 'podcast') {
                                         createPodcast.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, sourceIds: podcastTarget.sourceIds, themeIds: podcastTarget.themeIds, customInstructions: ci }, { onSuccess: closeOnSuccess, onError: handleGenerationError });

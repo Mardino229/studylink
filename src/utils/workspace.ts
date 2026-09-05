@@ -472,7 +472,8 @@ export const useGenerateFlashcards = () => {
                 source_ids: sourceIds,
                 theme_ids: themeIds,
                 custom_instructions: customInstructions || undefined,
-            });
+                count: count,
+            }); 
             return response.data.data;
         },
         onSuccess: (_, variables) => {
@@ -513,6 +514,7 @@ export const useGenerateQuiz = () => {
                 source_ids: sourceIds,
                 theme_ids: themeIds,
                 custom_instructions: customInstructions || undefined,
+                count: count || undefined,
             });
             return response.data.data;
         },
