@@ -172,7 +172,17 @@
     "delete_confirm_btn": "Supprimer",
     "cancel": "Annuler",
     "url_invalid": "URL invalide. Utilisez un lien youtube.com ou youtu.be.",
-    "processing_note": "L'importation analyse votre document pour en extraire les thèmes. Cela peut prendre quelques instants selon la taille du fichier."
+    "processing_note": "L'importation analyse votre document pour en extraire les thèmes. Cela peut prendre quelques instants selon la taille du fichier.",
+    "free_limit_reached": "Limite gratuite atteinte",
+    "free_limit_msg": "Vous avez déjà 1 source gratuite dans ce notebook. Rechargez des jetons ou passez à un abonnement pour importer davantage de sources.",
+    "cost_file": "1 jeton / fichier",
+    "cost_youtube": "2 jetons / vidéo",
+    "not_enough_tokens_file": "Solde insuffisant — il vous faut au moins 1 jeton pour importer un fichier.",
+    "not_enough_tokens_youtube": "Solde insuffisant — il vous faut au moins 2 jetons pour importer une vidéo YouTube.",
+    "youtube_ultra_only": "L'import YouTube est exclusivement réservé aux abonnés Ultra.",
+    "get_tokens": "Recharger des jetons",
+    "upgrade": "Voir les abonnements",
+    "unlimited_upload": "Upload illimité inclus"
   },
   "tabs": {
     "overview": {
@@ -190,6 +200,8 @@
       "open_history": "Ouvrir l'historique",
       "regenerate_audio": "Régénérer audio",
       "generate_audio": "Générer audio",
+      "confirm_generate_audio_title": "Générer l'audio",
+      "confirm_generate_audio": "Voulez-vous générer un fichier audio pour ce résumé ?",
       "confirm_delete": "Supprimer ce résumé ?",
       "delete_btn": "Supprimer",
       "audio_generating": "L'audio du résumé est en génération...",

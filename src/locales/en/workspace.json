@@ -172,7 +172,17 @@
     "delete_confirm_btn": "Delete",
     "cancel": "Cancel",
     "url_invalid": "Invalid URL. Use a youtube.com or youtu.be link.",
-    "processing_note": "Importing analyses your document to extract themes. This may take a moment depending on the file length."
+    "processing_note": "Importing analyses your document to extract themes. This may take a moment depending on the file length.",
+    "free_limit_reached": "Free limit reached",
+    "free_limit_msg": "You already have 1 free source in this notebook. Top up tokens or upgrade to a subscription to import more sources.",
+    "cost_file": "1 token / file",
+    "cost_youtube": "2 tokens / video",
+    "not_enough_tokens_file": "Insufficient balance — you need at least 1 token to import a file.",
+    "not_enough_tokens_youtube": "Insufficient balance — you need at least 2 tokens to import a YouTube video.",
+    "youtube_ultra_only": "YouTube import is exclusively reserved for Ultra subscribers.",
+    "get_tokens": "Top up tokens",
+    "upgrade": "View plans",
+    "unlimited_upload": "Unlimited upload included"
   },
   "tabs": {
     "overview": {
@@ -190,6 +200,8 @@
       "open_history": "Open history",
       "regenerate_audio": "Regenerate audio",
       "generate_audio": "Generate audio",
+      "confirm_generate_audio_title": "Generate audio",
+      "confirm_generate_audio": "Do you want to generate an audio file for this summary?",
       "confirm_delete": "Delete this summary?",
       "delete_btn": "Delete",
       "audio_generating": "Audio is being generated...",
