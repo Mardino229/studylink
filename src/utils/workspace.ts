@@ -433,7 +433,7 @@ export const useGenerateSummary = () => {
                 custom_instructions: customInstructions || undefined,
             });
             return response.data.data;
-        },
+        }, 
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["artefact-summaries", variables.notebookId] });
             queryClient.invalidateQueries({ queryKey: ["token-balance"] });

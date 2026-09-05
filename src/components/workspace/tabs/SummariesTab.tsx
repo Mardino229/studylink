@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FileText, Sparkles, Trash2, Clock, Menu, Loader2, Volume2, Play, ZoomIn, ZoomOut } from 'lucide-react';
+import { FileText, Trash2, Clock, Menu, Loader2, Volume2, Play, ZoomIn, ZoomOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import Mermaid from '../../ui/Mermaid';

@@ -42,11 +42,7 @@ export const FlashcardsTab: React.FC<FlashcardsTabProps> = ({
     const flashcardBatchesList = flashcards?.items ?? [];
 
     useEffect(() => {
-        if (flashcardBatchesList.length === 0) {
-            setSelectedFlashcardBatchId(null);
-            return;
-        }
-        if (!selectedFlashcardBatchId || !flashcardBatchesList.some((b) => b.id === selectedFlashcardBatchId)) {
+        if (!selectedFlashcardBatchId && flashcardBatchesList.length > 0) {
             setSelectedFlashcardBatchId(flashcardBatchesList[0].id);
         }
     }, [flashcardBatchesList, selectedFlashcardBatchId]);

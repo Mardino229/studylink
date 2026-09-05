@@ -38,11 +38,7 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
     const quizzesList = quizzes?.items ?? [];
 
     useEffect(() => {
-        if (quizzesList.length === 0) {
-            setSelectedQuizId(null);
-            return;
-        }
-        if (!selectedQuizId || !quizzesList.some((q) => q.id === selectedQuizId)) {
+        if (!selectedQuizId && quizzesList.length > 0) {
             setSelectedQuizId(quizzesList[0].id);
         }
     }, [quizzesList, selectedQuizId]);
