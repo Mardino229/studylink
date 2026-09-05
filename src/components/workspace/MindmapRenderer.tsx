@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronRight, ChevronDown, ZoomIn, ZoomOut, Maximize2, ChevronsUpDown, ChevronsDownUp } from 'lucide-react';
+import { ChevronRight, ChevronDown, ZoomIn, ZoomOut, Maximize2, ChevronsUpDown, ChevronsDownUp, Info, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { MindMapNode } from '../../types/workspace';
+import { Modal } from '../ui/modal/index.tsx';
 import ReactMarkdown from 'react-markdown';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeKatex from 'rehype-katex';
@@ -96,7 +97,7 @@ export default function MindmapRenderer({ root }: MindmapRendererProps) {
     const [pan, setPan] = useState({ x: PAD_X, y: PAD_Y });
     const dragging = useRef(false);
     const dragOrigin = useRef({ x: 0, y: 0 });
-    const [hoveredId, setHoveredId] = useState<string | null>(null);
+    const [descModalNode, setDescModalNode] = useState<MindMapNode | null>(null);
     const prevRootIdRef = useRef<string | undefined>(undefined);
 
     // Build layout
@@ -296,7 +297,6 @@ export default function MindmapRenderer({ root }: MindmapRendererProps) {
                         const isRoot = colorIdx < 0;
                         const hasChildren = node.children.length > 0;
                         const isCollapsed = collapsed.has(node.id);
-                        const isHovered = hoveredId === node.id;
                         const palette = colorIdx >= 0 ? PALETTE[colorIdx] : null;
 
                         return (
@@ -309,10 +309,8 @@ export default function MindmapRenderer({ root }: MindmapRendererProps) {
                                     top: y - NODE_VH / 2,
                                     width: NODE_W,
                                     minHeight: NODE_VH,
-                                    zIndex: isHovered ? 10 : 1,
+                                    zIndex: 1,
                                 }}
-                                onMouseEnter={() => setHoveredId(node.id)}
-                                onMouseLeave={() => setHoveredId(null)}
                             >
                                 {/* Node box */}
                                 <div
@@ -346,6 +344,23 @@ export default function MindmapRenderer({ root }: MindmapRendererProps) {
                                         {node.label}
                                     </ReactMarkdown>
                                     </span> 
+                                    
+                                    {node.description && (
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setDescModalNode(node);
+                                            }}
+                                            className={`shrink-0 flex h-6 w-6 items-center justify-center rounded-full transition-colors ${
+                                                isRoot ? 'bg-white/20 text-white hover:bg-white/30' : 'bg-black/5 dark:bg-white/10 text-foreground/70 hover:bg-black/10 dark:hover:bg-white/20 hover:text-foreground'
+                                            }`}
+                                            title={t('tabs.mindmaps.detail_default', 'Détails')}
+                                        >
+                                            <Info size={13} />
+                                        </button>
+                                    )}
+
                                     {hasChildren && ( 
                                         <span className={`shrink-0 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
                                             isRoot ? 'bg-white/20 text-white' : 'bg-black/10 dark:bg-white/10 text-current'
@@ -357,35 +372,6 @@ export default function MindmapRenderer({ root }: MindmapRendererProps) {
                                         </span>
                                     )}
                                 </div>
-
-                                {/* Description tooltip */}
-                                {isHovered && node.description && (
-                                    <div
-                                        className="absolute left-0 top-full mt-1.5 z-50 w-56 rounded-xl border border-border bg-white dark:bg-gray-900 px-3 py-2 shadow-xl"
-                                        style={{ pointerEvents: 'none' }}
-                                    >
-                                        <p className="text-xs text-foreground/70 leading-relaxed">
-                                            <ReactMarkdown
-                                                remarkPlugins={[remarkMath, remarkGfm, remarkBreaks, remarkEmoji, [remarkToc, { heading: "sommaire|toc|table of contents" }]]}
-                                                rehypePlugins={[rehypeKatex, rehypeSlug, rehypeAutolinkHeadings, rehypeRaw]}
-                                                components={{
-                                                    code({ node, className, children, ...props }: any) {
-                                                        const match = /language-(\w+)/.exec(className || "");
-                                                        return match && match[1] === "mermaid" ? (
-                                                            <Mermaid chart={String(children).replace(/\n$/, "")} />
-                                                        ) : (
-                                                            <code className={className} {...props}>
-                                                                {children}
-                                                            </code>
-                                                        );
-                                                    },
-                                                }} 
-                                            >
-                                                {node.description}
-                                            </ReactMarkdown>
-                                        </p>
-                                    </div>
-                                )}
                             </div>
                         );
                     })}
@@ -433,6 +419,49 @@ export default function MindmapRenderer({ root }: MindmapRendererProps) {
                     Scroll pour zoomer · Glisser pour déplacer · Clic pour développer
                 </p>
             </div>
+            
+            <Modal isOpen={!!descModalNode} onClose={() => setDescModalNode(null)} className="max-w-xl p-0 overflow-hidden">
+                {descModalNode && (
+                    <div className="flex flex-col max-h-[85vh]">
+                        <div className="flex items-center justify-between p-4 border-b border-border bg-gray-50/50 dark:bg-gray-900/50">
+                            <h3 className="text-base font-semibold text-foreground pr-4">
+                                <ReactMarkdown
+                                    remarkPlugins={[remarkMath, remarkGfm, remarkEmoji]}
+                                    rehypePlugins={[rehypeKatex, rehypeRaw]}
+                                    components={{ p: ({children}) => <span className="inline">{children}</span> }}
+                                >
+                                    {descModalNode.label}
+                                </ReactMarkdown>
+                            </h3>
+                            <button onClick={() => setDescModalNode(null)} className="rounded-lg p-2 text-foreground/50 hover:bg-foreground/5 hover:text-foreground transition-colors shrink-0">
+                                <X size={18} />
+                            </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-5">
+                            <div className="text-sm text-foreground/80 leading-relaxed space-y-4">
+                                <ReactMarkdown
+                                    remarkPlugins={[remarkMath, remarkGfm, remarkBreaks, remarkEmoji, [remarkToc, { heading: "sommaire|toc|table of contents" }]]}
+                                    rehypePlugins={[rehypeKatex, rehypeSlug, rehypeAutolinkHeadings, rehypeRaw]}
+                                    components={{
+                                        code({ node, className, children, ...props }: any) {
+                                            const match = /language-(\w+)/.exec(className || "");
+                                            return match && match[1] === "mermaid" ? (
+                                                <Mermaid chart={String(children).replace(/\n$/, "")} />
+                                            ) : (
+                                                <code className={className} {...props}>
+                                                    {children}
+                                                </code>
+                                            );
+                                        },
+                                    }} 
+                                >
+                                    {descModalNode.description}
+                                </ReactMarkdown>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </Modal>
         </div>
     );
 }

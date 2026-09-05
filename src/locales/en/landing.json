@@ -169,7 +169,7 @@
       "annual": "Annual",
       "per_month": "month",
       "per_year": "year",
-      "annual_note": "Or {{price}} $ CAD/year — save 40%",
+      "annual_note": "Or {{price}} $ CAD/year — save 2 months",
       "ultra_badge": "Podcasts & Audio included",
       "start_with": "Start with",
       "error": "Unable to load subscriptions at the moment."

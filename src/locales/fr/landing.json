@@ -169,7 +169,7 @@
       "annual": "Annuel",
       "per_month": "mois",
       "per_year": "an",
-      "annual_note": "Ou {{price}} $ CAD/an — économisez 40 %",
+      "annual_note": "Ou {{price}} $ CAD/an — économisez 2 mois",
       "ultra_badge": "Podcasts & Audio inclus",
       "start_with": "Commencer avec",
       "error": "Impossible de charger les abonnements pour le moment."
