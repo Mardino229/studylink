@@ -10,6 +10,19 @@ import type {
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
 
+export type ChangePlanPreview = {
+    current_plan: string;
+    current_billing_type: "monthly" | "annual";
+    new_plan: string;
+    new_billing_type: "monthly" | "annual";
+    is_upgrade: boolean;
+    charge_now: number;
+    next_renewal_amount: number;
+    currency: string;
+    current_period_end: number;
+    invoice_id: string;
+};
+
 export const useGetMySubscriptions = () => {
     const axiosPrivate = useAxiosPrivate();
     return useQuery({
@@ -67,6 +80,25 @@ export const useCreateBillingPortal = () => {
         },
         onError: (error: AxiosError<{ detail?: string }>) => {
             toast.error("Impossible d'ouvrir le portail de facturation", {
+                description: error.response?.data?.detail || "Une erreur est survenue.",
+            });
+        },
+    });
+};
+
+export const usePreviewChangePlan = () => {
+    const axiosPrivate = useAxiosPrivate();
+    return useMutation({
+        mutationFn: async (data: { new_plan_id: string; billing_type: "monthly" | "annual" }) => {
+            const response = await axiosPrivate.post<{
+                success: boolean;
+                data: ChangePlanPreview;
+                message: string;
+            }>("/subscriptions/change-plan/preview", data);
+            return response.data.data;
+        },
+        onError: (error: AxiosError<{ detail?: string }>) => {
+            toast.error("Impossible de prévisualiser le changement de plan", {
                 description: error.response?.data?.detail || "Une erreur est survenue.",
             });
         },

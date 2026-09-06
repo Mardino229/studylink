@@ -9,6 +9,8 @@ import {
   useChangePlan,
   useUndoCancel,
   useCreateBillingPortal,
+  usePreviewChangePlan,
+  type ChangePlanPreview,
 } from "../../utils/subscription";
 import { useGetTokenPacks, useBuyTokenPack } from "../../utils/billing";
 import { useBilling } from "../../context/BillingContext";
@@ -35,10 +37,20 @@ export default function SettingsSubscription() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation('app');
   const [billingType, setBillingType] = useState<"monthly" | "annual">("monthly");
-  const [selectedPlanForSwitch, setSelectedPlanForSwitch] = useState<{ id: string; name: string } | null>(null);
+  const [selectedPlanForSwitch, setSelectedPlanForSwitch] = useState<{
+    id: string;
+    name: string;
+    billingType: "monthly" | "annual";
+  } | null>(null);
+  const [changePlanPreview, setChangePlanPreview] = useState<ChangePlanPreview | null>(null);
   const [showCancelModal, setShowCancelModal] = useState<boolean>(false);
 
   const locale = i18n.language.startsWith('fr') ? 'fr-CA' : 'en-CA';
+  const formatAmount = (minorAmount: number, currency = "CAD") =>
+    (Number(minorAmount) / 100).toLocaleString(locale, {
+      style: "currency",
+      currency: currency.toUpperCase(),
+    });
 
   const { data: plans, isLoading: isLoadingPlans } = useGetPlans();
   const { data: activeSubscription, isLoading: isLoadingSub } = useGetMyActiveSubscription();
@@ -51,6 +63,7 @@ export default function SettingsSubscription() {
   const cancelSubscription = useCancelSubscription();
   const undoCancel = useUndoCancel();
   const createBillingPortal = useCreateBillingPortal();
+  const previewChangePlan = usePreviewChangePlan();
 
   const hasSub = !!activeSubscription;
   const isCancelScheduled = activeSubscription?.cancel_at_period_end === true;
@@ -60,17 +73,35 @@ export default function SettingsSubscription() {
     ? new Date(activeSubscription.end_date).toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" })
     : "";
   const renewalAmount = activeSubscription?.plan
-    ? Number(activeSubscription.billing_type === "monthly" ? activeSubscription.plan.price : activeSubscription.plan.annual_price).toLocaleString(locale, {
-        style: "currency",
-        currency: "CAD",
+    ? formatAmount(Number(activeSubscription.billing_type === "monthly" ? activeSubscription.plan.price : activeSubscription.plan.annual_price) * 100)
+    : "";
+  const previewChargeNow = changePlanPreview ? formatAmount(changePlanPreview.charge_now, changePlanPreview.currency) : "";
+  const previewNextRenewal = changePlanPreview
+    ? formatAmount(changePlanPreview.next_renewal_amount, changePlanPreview.currency)
+    : "";
+  const previewPeriodEnd = changePlanPreview
+    ? new Date(changePlanPreview.current_period_end * 1000).toLocaleDateString(locale, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
       })
     : "";
 
   const handleChoosePlan = async (planId: string) => {
     if (hasSub) {
-      // Already subscribed → show confirmation modal first
       const targetPlan = plans?.find(p => p.id === planId);
-      setSelectedPlanForSwitch({ id: planId, name: targetPlan?.name || "" });
+      if (!targetPlan) return;
+
+      try {
+        const preview = await previewChangePlan.mutateAsync({
+          new_plan_id: planId,
+          billing_type: billingType,
+        });
+        setChangePlanPreview(preview);
+        setSelectedPlanForSwitch({ id: planId, name: targetPlan.name, billingType });
+      } catch (error) {
+        console.error("Change plan preview error:", error);
+      }
     } else {
       // No subscription → checkout flow
       try {
@@ -92,11 +123,15 @@ export default function SettingsSubscription() {
   const handleConfirmChangePlan = async () => {
     if (!selectedPlanForSwitch) return;
     try {
-      await changePlan.mutateAsync({ new_plan_id: selectedPlanForSwitch.id, billing_type: billingType });
+      await changePlan.mutateAsync({
+        new_plan_id: selectedPlanForSwitch.id,
+        billing_type: selectedPlanForSwitch.billingType,
+      });
     } catch (error) {
       console.error("Change plan error:", error);
     } finally {
       setSelectedPlanForSwitch(null);
+      setChangePlanPreview(null);
     }
   };
 
@@ -122,7 +157,7 @@ export default function SettingsSubscription() {
     }
   };
 
-  const isMutating = changePlan.isPending || createCheckout.isPending;
+  const isMutating = changePlan.isPending || createCheckout.isPending || previewChangePlan.isPending;
 
   void isPro;
 
@@ -455,18 +490,28 @@ export default function SettingsSubscription() {
 
       {/* ── Confirmation Modals ── */}
       <ConfirmModal
-        isOpen={!!selectedPlanForSwitch}
+        isOpen={!!selectedPlanForSwitch && !!changePlanPreview}
         title={t('settings_subscription.confirm_change_plan_title')}
-        message={t('settings_subscription.confirm_change_plan_msg', {
+        message={t(changePlanPreview?.is_upgrade
+          ? 'settings_subscription.confirm_change_plan_upgrade_msg'
+          : 'settings_subscription.confirm_change_plan_downgrade_msg', {
           name: selectedPlanForSwitch?.name || '',
-          billingType: billingType === 'monthly' ? t('settings_subscription.monthly') : t('settings_subscription.annual'),
+          billingType: selectedPlanForSwitch?.billingType === 'monthly'
+            ? t('settings_subscription.monthly')
+            : t('settings_subscription.annual'),
+          chargeNow: previewChargeNow,
+          nextRenewalAmount: previewNextRenewal,
+          periodEnd: previewPeriodEnd,
         })}
         confirmLabel={t('settings_subscription.confirm_change_plan_btn')}
         cancelLabel={t('user_profile.cancel')}
         confirmVariant="primary"
         isLoading={changePlan.isPending}
         onConfirm={handleConfirmChangePlan}
-        onCancel={() => setSelectedPlanForSwitch(null)}
+        onCancel={() => {
+          setSelectedPlanForSwitch(null);
+          setChangePlanPreview(null);
+        }}
       />
 
       <ConfirmModal
