@@ -50,7 +50,7 @@ const RequireAuth = () => {
     if (isLoading) {
         return (
             <div className="w-screen h-screen text-gray-800 dark:text-white/90 flex justify-center items-center">
-                <Loader className="h-64" />
+                <Loader className="h-64 text-blue-500" />
             </div>
         );
     }

@@ -7,7 +7,7 @@ export default function CompleteProfile() {
     const { user } = useUser();
 
     if (user?.first_name && user?.study_level_id) {
-        return <Navigate to="/home" replace />;
+        return <Navigate to="/onboarding" replace />;
     }
 
     return (
