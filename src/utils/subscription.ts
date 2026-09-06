@@ -54,6 +54,25 @@ export const useCreateCheckout = () => {
     });
 };
 
+export const useCreateBillingPortal = () => {
+    const axiosPrivate = useAxiosPrivate();
+    return useMutation({
+        mutationFn: async (data: { return_url: string }) => {
+            const response = await axiosPrivate.post<{
+                success: boolean;
+                data: { url: string };
+                message: string;
+            }>('/subscriptions/billing-portal', data);
+            return response.data.data;
+        },
+        onError: (error: AxiosError<{ detail?: string }>) => {
+            toast.error("Impossible d'ouvrir le portail de facturation", {
+                description: error.response?.data?.detail || "Une erreur est survenue.",
+            });
+        },
+    });
+};
+
 export const useCancelSubscription = () => {
     const axiosPrivate = useAxiosPrivate();
     const queryClient = useQueryClient();

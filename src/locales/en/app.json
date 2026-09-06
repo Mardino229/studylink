@@ -90,6 +90,7 @@
     "downgrade_notice": "Your plan will switch to...",
     "cancel_downgrade": "Cancel downgrade",
     "cancel_subscription": "Cancel subscription",
+    "manage_payment_method": "Change payment method",
     "no_subscription": "No active subscription...",
     "change_plan": "Change plan",
     "choose_plan": "Choose a plan",

@@ -8,6 +8,7 @@ import {
   useCancelSubscription,
   useChangePlan,
   useUndoCancel,
+  useCreateBillingPortal,
 } from "../../utils/subscription";
 import { useGetTokenPacks, useBuyTokenPack } from "../../utils/billing";
 import { useBilling } from "../../context/BillingContext";
@@ -19,6 +20,7 @@ import {
   Banknote,
   CalendarClock,
   CheckCircle2,
+  CreditCard,
   Loader2,
   Mic,
   RotateCcw,
@@ -48,6 +50,7 @@ export default function SettingsSubscription() {
   const changePlan = useChangePlan();
   const cancelSubscription = useCancelSubscription();
   const undoCancel = useUndoCancel();
+  const createBillingPortal = useCreateBillingPortal();
 
   const hasSub = !!activeSubscription;
   const isCancelScheduled = activeSubscription?.cancel_at_period_end === true;
@@ -99,6 +102,17 @@ export default function SettingsSubscription() {
       console.error("Cancel subscription error:", error);
     } finally {
       setShowCancelModal(false);
+    }
+  };
+
+  const handleManagePaymentMethod = async () => {
+    try {
+      const response = await createBillingPortal.mutateAsync({
+        return_url: `${window.location.origin}/subscription`,
+      });
+      window.location.assign(response.url);
+    } catch (error) {
+      console.error("Billing portal error:", error);
     }
   };
 
@@ -209,8 +223,17 @@ export default function SettingsSubscription() {
               )}
 
               {/* Cancel button — only when not already scheduled */}
-              {!isCancelScheduled && !pendingPlanId && (
-                <div className="flex justify-end">
+              <div className="flex flex-wrap justify-end gap-2">
+                <button
+                  onClick={handleManagePaymentMethod}
+                  disabled={createBillingPortal.isPending}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-white px-3 py-2 text-xs font-medium text-blue-600 transition-colors hover:bg-blue-50 disabled:opacity-50 dark:border-blue-900/30 dark:bg-transparent dark:text-blue-400 dark:hover:bg-blue-900/10"
+                >
+                  {createBillingPortal.isPending ? <Loader2 size={12} className="animate-spin" /> : <CreditCard size={12} />}
+                  {t('settings_subscription.manage_payment_method')}
+                </button>
+
+                {!isCancelScheduled && !pendingPlanId && (
                   <button
                     onClick={() => setShowCancelModal(true)}
                     disabled={cancelSubscription.isPending}
@@ -219,8 +242,8 @@ export default function SettingsSubscription() {
                     {cancelSubscription.isPending ? <Loader2 size={12} className="animate-spin" /> : <XCircle size={12} />}
                     {t('settings_subscription.cancel_subscription')}
                   </button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           ) : (
             <div className="mt-4 flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 p-4 dark:border-white/[0.05] dark:bg-white/[0.02]">
