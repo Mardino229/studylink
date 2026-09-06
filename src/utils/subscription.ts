@@ -20,6 +20,7 @@ export type ChangePlanPreview = {
     next_renewal_amount: number;
     currency: string;
     current_period_end: number;
+    proration_date: number;
     invoice_id: string;
 };
 
@@ -132,10 +133,14 @@ export const useChangePlan = () => {
     const axiosPrivate = useAxiosPrivate();
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ new_plan_id, billing_type }: { new_plan_id: string; billing_type?: "monthly" | "annual" }) => {
+        mutationFn: async ({ new_plan_id, billing_type, proration_date }: {
+            new_plan_id: string;
+            billing_type?: "monthly" | "annual";
+            proration_date?: number;
+        }) => {
             const response = await axiosPrivate.post<{ success: boolean; message: string; data: Subscription }>(
                 "/subscriptions/change-plan",
-                { new_plan_id, billing_type }
+                { new_plan_id, billing_type, proration_date }
             );
             return response.data;
         },

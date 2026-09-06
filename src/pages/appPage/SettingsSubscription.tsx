@@ -121,11 +121,12 @@ export default function SettingsSubscription() {
   };
 
   const handleConfirmChangePlan = async () => {
-    if (!selectedPlanForSwitch) return;
+    if (!selectedPlanForSwitch || !changePlanPreview) return;
     try {
       await changePlan.mutateAsync({
         new_plan_id: selectedPlanForSwitch.id,
         billing_type: selectedPlanForSwitch.billingType,
+        proration_date: changePlanPreview.proration_date,
       });
     } catch (error) {
       console.error("Change plan error:", error);
