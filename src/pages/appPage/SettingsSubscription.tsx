@@ -59,6 +59,12 @@ export default function SettingsSubscription() {
   const endDateFormatted = activeSubscription?.end_date
     ? new Date(activeSubscription.end_date).toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" })
     : "";
+  const renewalAmount = activeSubscription?.plan
+    ? Number(activeSubscription.billing_type === "monthly" ? activeSubscription.plan.price : activeSubscription.plan.annual_price).toLocaleString(locale, {
+        style: "currency",
+        currency: "CAD",
+      })
+    : "";
 
   const handleChoosePlan = async (planId: string) => {
     if (hasSub) {
@@ -468,6 +474,7 @@ export default function SettingsSubscription() {
         title={t('settings_subscription.confirm_cancel_title')}
         message={t('settings_subscription.confirm_cancel_msg', {
           date: endDateFormatted || '',
+          amount: renewalAmount,
         })}
         confirmLabel={t('settings_subscription.confirm_cancel_btn')}
         cancelLabel={t('settings_subscription.keep_subscription_btn')}
