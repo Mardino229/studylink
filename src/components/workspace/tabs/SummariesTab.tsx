@@ -535,6 +535,7 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                 isOpen={upgradeModalOpen}
                 onClose={() => setUpgradeModalOpen(false)}
                 isPro={isPro} 
+                isPodcast={true} 
             />
         </div>
     );

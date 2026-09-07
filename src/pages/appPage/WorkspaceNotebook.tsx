@@ -753,7 +753,7 @@ const WorkspaceNotebook: React.FC = () => {
                 isOpen={upgradeModalOpen}
                 onClose={() => setUpgradeModalOpen(false)}
                 isPro={isPro} 
-                isPodcast = {generationModal==="podcast"}
+                isPodcast = {generationModal=="podcast"}
             />
         </>
     );
