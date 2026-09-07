@@ -752,6 +752,7 @@ const WorkspaceNotebook: React.FC = () => {
             <UpgradeModal
                 isOpen={upgradeModalOpen}
                 onClose={() => setUpgradeModalOpen(false)}
+                isPro={isPro} 
             />
         </>
     );

@@ -8,9 +8,10 @@ import { useTranslation } from 'react-i18next';
 type UpgradeModalProps = {
     isOpen: boolean;
     onClose: () => void;
+    isPro: boolean;
 };
 
-export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
+export default function UpgradeModal({ isOpen, onClose, isPro }: UpgradeModalProps) {
     const { data: packs = [], isLoading } = useGetTokenPacks();
     const buyPack = useBuyTokenPack();
     const { t } = useTranslation('app');
@@ -75,8 +76,8 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                     <Sparkles size={15} className="text-white" />
                 </div>
                 <div className="flex-1">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{t('upgrade_modal.go_pro')}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('upgrade_modal.pro_desc')}</p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{isPro ? t('upgrade_modal.go_ultra') : t('upgrade_modal.go_pro')}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{isPro ? t('upgrade_modal.ultra_desc') : t('upgrade_modal.pro_desc')}</p>
                 </div>
                 <Link
                     to="/subscription"

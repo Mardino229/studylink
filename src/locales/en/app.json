@@ -404,7 +404,8 @@
     "buy_btn": "Buy",
     "go_pro": "Go Pro",
     "go_ultra": "Go Ultra",
-    "pro_desc": "Unlimited access from $9.99/month",
+    "pro_desc": "Unlimited access from pro plan",
+    "ultra_desc": "Unlimited access from ultra plan",
     "view_plans": "View plans"
   },
   "support_widget": {

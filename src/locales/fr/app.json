@@ -404,7 +404,8 @@
     "buy_btn": "Acheter",
     "go_pro": "Passer à Pro",
     "go_ultra": "Passer à Ultra",
-    "pro_desc": "Tout illimité dès 6,99 $/mois",
+    "pro_desc": "Tout illimité à partir du plan pro",
+    "ultra_desc": "Tout illimité à partir du plan ultra",
     "view_plans": "Voir les plans"
   },
   "support_widget": {

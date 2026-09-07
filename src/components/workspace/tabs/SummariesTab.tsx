@@ -15,6 +15,8 @@ import { baseUrl } from '../../../utils/api.ts';
 import type { ArtefactSummary, PaginatedResponse } from '../../../types/workspace';
 import { PlusIcon } from '../../../icons/index.ts';
 import ConfirmModal from '../../ui/ConfirmModal';
+import UpgradeModal from '../../ui/UpgradeModal.tsx';
+import { useBilling } from '../../../context/BillingContext.tsx';
 
 interface SummariesTabProps {
     summaries?: PaginatedResponse<ArtefactSummary>;
@@ -47,6 +49,8 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
     const [fontSize, setFontSize] = useState(100);
     const [audioOverrides, setAudioOverrides] = useState<Record<string, Pick<ArtefactSummary, 'audio_status' | 'audio_url'>>>({});
     const [audioConfirmOpen, setAudioConfirmOpen] = useState(false);
+    const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+    const { isPro, isUltra, tokenBalance } = useBilling();
 
     const axiosPrivate = useAxiosPrivate();
     const queryClient = useQueryClient();
@@ -512,6 +516,12 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                 confirmLabel={selectedSummary?.audio_status === 'completed' ? t('tabs.summaries.regenerate_audio') : t('tabs.summaries.generate_audio')}
                 cancelLabel={t('list.cancel')}
                 onConfirm={() => {
+
+                    if (!isUltra && tokenBalance<5) {
+                        setUpgradeModalOpen(true);
+                        setAudioConfirmOpen(false);
+                        return; 
+                    }
                     setAudioConfirmOpen(false);
                     if (selectedSummary) {
                         handleGenerateAudio(selectedSummary.id);
@@ -519,6 +529,12 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                 }}
                 onCancel={() => setAudioConfirmOpen(false)}
                 confirmVariant="primary"
+            />
+
+            <UpgradeModal
+                isOpen={upgradeModalOpen}
+                onClose={() => setUpgradeModalOpen(false)}
+                isPro={isPro} 
             />
         </div>
     );
