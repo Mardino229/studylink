@@ -2,6 +2,7 @@ import { AlertCircle, BookOpen, CheckCircle2, Eye, Lock, Sparkles } from 'lucide
 import { useTranslation } from 'react-i18next';
 import type { ExamItem, ExamSession, ExamType } from '../../../types/exams';
 import { courseCode, courseName } from '../../../types/exams';
+import LanguageSwitcher from '../../../components/common/LanguageSwitcher';
 
 export const SESSION_LABELS: Record<ExamSession, string> = {
     fall: 'Automne', winter: 'Hiver', summer: 'Printemps/Été',
@@ -102,6 +103,12 @@ export default function ExamCard({ exam, isPro, isUltra, tokenBalance, isSolutio
                 )}
                 {exam.exam_type && (
                     <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${TYPE_COLORS[exam.exam_type]}`}>{t(TYPE_KEYS[exam.exam_type])}</span>
+                )}
+                {exam.language && (
+                    <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                        <LanguageSwitcher className="h-10 border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300" />
+                        {exam.language}
+                    </span> 
                 )}
                 {/*{hasExamFile && exam.is_exam_paid && !isPro && !isExamUnlocked && (
                     <span className="rounded-full bg-violet-50 px-2 py-0.5 text-xs font-medium text-violet-700 dark:bg-violet-900/30 dark:text-violet-400">🪙 1 jeton</span>

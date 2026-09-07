@@ -30,9 +30,10 @@ export type ExamItem = {
     study_level_id?: string | null;
     academic_year?: number | null;
     session?: ExamSession | null;
+    language?: 'fr' | 'en';
     exam_type?: ExamType | null;
     is_exam_paid: boolean;
-    is_solution_paid: boolean;
+    is_solution_paid: boolean; 
     type_number?: number | null;
     section?: string | null;
     exam_file_url?: string | null;

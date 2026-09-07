@@ -403,7 +403,8 @@
     "tokens_unit": "tokens",
     "buy_btn": "Buy",
     "go_pro": "Go Pro",
-    "pro_desc": "Unlimited access from $6.99/month",
+    "go_ultra": "Go Ultra",
+    "pro_desc": "Unlimited access from $9.99/month",
     "view_plans": "View plans"
   },
   "support_widget": {
