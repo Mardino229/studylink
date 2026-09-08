@@ -1,4 +1,4 @@
-import { AlertCircle, BookOpen, CheckCircle2, Eye, Lock, Sparkles } from 'lucide-react';
+import { AlertCircle, BookOpen, CheckCircle2, Eye, Languages, Lock, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { ExamItem, ExamSession, ExamType } from '../../../types/exams';
 import { courseCode, courseName } from '../../../types/exams';
@@ -106,7 +106,7 @@ export default function ExamCard({ exam, isPro, isUltra, tokenBalance, isSolutio
                 )}
                 {exam.language && (
                     <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-400">
-                        <LanguageSwitcher className="h-10 border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300" />
+                        <Languages size={14} />
                         {exam.language}
                     </span> 
                 )}
