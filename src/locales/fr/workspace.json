@@ -301,5 +301,25 @@
       "no_podcasts": "Aucun podcast.",
       "briefing_default": "Briefing Audio"
     }
+  },
+  "audio_choice_modal": {
+    "title_audio": "Générer la version audio",
+    "title_podcast": "Générer un podcast",
+    "subtitle": "Les fonctionnalités audio sont incluses en illimité dans le forfait Ultra.",
+    "choose_hint": "Choisissez comment vous souhaitez générer ce contenu audio :",
+    "ultra_card_badge": "Recommandé",
+    "ultra_card_title": "Passer au forfait Ultra",
+    "ultra_card_desc": "Accès illimité aux podcasts et résumés audio, sans consommer de jetons.",
+    "ultra_card_btn": "Passer à Ultra",
+    "tokens_card_title": "Utiliser mes jetons",
+    "tokens_card_desc": "Déduire 5 jetons de votre solde pour cette génération.",
+    "tokens_cost": "Coût : 5 jetons",
+    "tokens_balance": "Votre solde actuel : {{count}} jeton",
+    "tokens_balance_plural": "Votre solde actuel : {{count}} jetons",
+    "tokens_remaining": "Solde restant après génération : {{count}} jetons",
+    "tokens_insufficient": "Solde insuffisant ({{count}} jetons disponibles). Rechargez vos jetons pour continuer.",
+    "tokens_card_btn": "Utiliser 5 jetons",
+    "tokens_card_btn_recharge": "Recharger des jetons",
+    "cancel": "Annuler"
   }
 }

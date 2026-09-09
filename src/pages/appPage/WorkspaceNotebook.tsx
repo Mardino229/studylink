@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useBilling } from '../../context/BillingContext';
 import UpgradeModal from '../../components/ui/UpgradeModal';
+import AudioFeatureChoiceModal from '../../components/ui/AudioFeatureChoiceModal';
 import {
     useDeleteArtefactFlashcard,
     useDeleteArtefactMindmap,
@@ -92,9 +93,10 @@ const WorkspaceNotebook: React.FC = () => {
     const createMindmap = useGenerateMindmap();
     const deleteMindmap = useDeleteArtefactMindmap();
     
-    const { isPro, isUltra, tokenBalance } = useBilling();
+    const { isPro, isUltra, tokenBalance, refetchBilling } = useBilling();
     const queryClient = useQueryClient();
     const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+    const [audioChoiceOpen, setAudioChoiceOpen] = useState(false);
 
     const contentRef = useRef<HTMLDivElement>(null);
 
@@ -662,78 +664,119 @@ const WorkspaceNotebook: React.FC = () => {
                             >
                                 {t('list.cancel')}
                             </button>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    if (!canGenerate) {
-                                        setUpgradeModalOpen(true);
-                                        return;
-                                    }
-                                    if (!generationTitle.trim()) return;
-                                    if (noSourceSelected && (sources?.items?.length ?? 0) > 0) return;
+                            {(() => {
+                                const isPodcastModal = generationModal === 'podcast';
+                                const isFormInvalid = !generationTitle.trim() || (noSourceSelected && (sources?.items?.length ?? 0) > 0);
+
+                                const executePodcastGeneration = () => {
+                                    if (isFormInvalid) return;
                                     setGenerationFailed(false);
                                     const ci = customInstructions.trim() || undefined;
-                                    const tabForModal = { summary: 'summaries', flashcards: 'flashcards', quiz: 'quizzes', podcast: 'podcasts', mindmap: 'mindmaps' } as const;
                                     const closeOnSuccess = (artifact: { id: string }) => {
-                                        const modal = generationModal;
                                         setGenerationModal(null);
                                         setGenerationTitle('');
                                         setCustomInstructions('');
                                         setGenerationFailed(false);
-                                        if (modal) {
-                                            setActiveTab(tabForModal[modal]);
-                                            setPendingSelectId(artifact.id);
-                                        }
+                                        setActiveTab('podcasts');
+                                        setPendingSelectId(artifact.id);
+                                        refetchBilling();
                                     };
-                                    if (generationModal === 'summary') {
-                                        createSummary.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, sourceIds: summaryTarget.sourceIds, themeIds: summaryTarget.themeIds, customInstructions: ci }, { onSuccess: closeOnSuccess, onError: handleGenerationError });
-                                    }
-                                    if (generationModal === 'flashcards') {
-                                        createFlashcards.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, count: Number(flashcardCount) || 10, sourceIds: flashcardTarget.sourceIds, themeIds: flashcardTarget.themeIds, customInstructions: ci }, { onSuccess: closeOnSuccess, onError: handleGenerationError });
-                                    }
-                                    if (generationModal === 'quiz') {
-                                        createQuiz.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, count: Number(quizCount) || 5, sourceIds: quizTarget.sourceIds, themeIds: quizTarget.themeIds, customInstructions: ci }, { onSuccess: closeOnSuccess, onError: handleGenerationError });
-                                    }
-                                    if (generationModal === 'podcast') {
-                                        createPodcast.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, sourceIds: podcastTarget.sourceIds, themeIds: podcastTarget.themeIds, customInstructions: ci }, { onSuccess: closeOnSuccess, onError: handleGenerationError });
-                                    }
-                                    if (generationModal === 'mindmap') {
-                                        createMindmap.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, maxDepth: mindmapDepth, sourceIds: mindmapTarget.sourceIds, themeIds: mindmapTarget.themeIds, customInstructions: ci }, { onSuccess: closeOnSuccess, onError: handleGenerationError });
-                                    }
-                                }}
-                                disabled={(!generationTitle.trim() || (noSourceSelected && (sources?.items?.length ?? 0) > 0)) && canGenerate}
-                                className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-white transition-colors disabled:opacity-50 ${
-                                    canGenerate
-                                        ? 'bg-blue-600 hover:bg-blue-700'
-                                        : 'bg-amber-500 hover:bg-amber-600'
-                                }`}
-                            >
-                                {canGenerate ? (
-                                    <>
-                                        {t('notebook.modal_generate')}
-                                        {generationModal === 'podcast' ? (
-                                            !isUltra && (
-                                                <span className="inline-flex items-center gap-0.5 rounded-full bg-blue-500/30 px-1.5 py-0.5 text-[10px] font-bold">
-                                                    <Zap size={9} />
-                                                    {AUDIO_COST}
-                                                </span>
-                                            )
+                                    createPodcast.mutate(
+                                        {
+                                            notebookId,
+                                            title: generationTitle.trim(),
+                                            language: generationLanguage,
+                                            sourceIds: podcastTarget.sourceIds,
+                                            themeIds: podcastTarget.themeIds,
+                                            customInstructions: ci,
+                                        },
+                                        { onSuccess: closeOnSuccess, onError: handleGenerationError }
+                                    );
+                                };
+
+                                return (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            if (isPodcastModal) {
+                                                if (isFormInvalid) return;
+                                                if (isUltra) {
+                                                    executePodcastGeneration();
+                                                } else {
+                                                    setAudioChoiceOpen(true);
+                                                }
+                                                return;
+                                            }
+
+                                            if (!canGenerate) {
+                                                setUpgradeModalOpen(true);
+                                                return;
+                                            }
+                                            if (isFormInvalid) return;
+                                            setGenerationFailed(false);
+                                            const ci = customInstructions.trim() || undefined;
+                                            const tabForModal = { summary: 'summaries', flashcards: 'flashcards', quiz: 'quizzes', podcast: 'podcasts', mindmap: 'mindmaps' } as const;
+                                            const closeOnSuccess = (artifact: { id: string }) => {
+                                                const modal = generationModal;
+                                                setGenerationModal(null);
+                                                setGenerationTitle('');
+                                                setCustomInstructions('');
+                                                setGenerationFailed(false);
+                                                if (modal) {
+                                                    setActiveTab(tabForModal[modal]);
+                                                    setPendingSelectId(artifact.id);
+                                                }
+                                                refetchBilling();
+                                            };
+                                            if (generationModal === 'summary') {
+                                                createSummary.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, sourceIds: summaryTarget.sourceIds, themeIds: summaryTarget.themeIds, customInstructions: ci }, { onSuccess: closeOnSuccess, onError: handleGenerationError });
+                                            }
+                                            if (generationModal === 'flashcards') {
+                                                createFlashcards.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, count: Number(flashcardCount) || 10, sourceIds: flashcardTarget.sourceIds, themeIds: flashcardTarget.themeIds, customInstructions: ci }, { onSuccess: closeOnSuccess, onError: handleGenerationError });
+                                            }
+                                            if (generationModal === 'quiz') {
+                                                createQuiz.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, count: Number(quizCount) || 5, sourceIds: quizTarget.sourceIds, themeIds: quizTarget.themeIds, customInstructions: ci }, { onSuccess: closeOnSuccess, onError: handleGenerationError });
+                                            }
+                                            if (generationModal === 'mindmap') {
+                                                createMindmap.mutate({ notebookId, title: generationTitle.trim(), language: generationLanguage, maxDepth: mindmapDepth, sourceIds: mindmapTarget.sourceIds, themeIds: mindmapTarget.themeIds, customInstructions: ci }, { onSuccess: closeOnSuccess, onError: handleGenerationError });
+                                            }
+                                        }}
+                                        disabled={isPodcastModal ? isFormInvalid : (isFormInvalid && canGenerate)}
+                                        className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-white transition-colors disabled:opacity-50 ${
+                                            isPodcastModal || canGenerate
+                                                ? 'bg-blue-600 hover:bg-blue-700'
+                                                : 'bg-amber-500 hover:bg-amber-600'
+                                        }`}
+                                    >
+                                        {isPodcastModal ? (
+                                            <>
+                                                {t('notebook.modal_generate')}
+                                                {!isUltra && (
+                                                    <span className="inline-flex items-center gap-0.5 rounded-full bg-blue-500/30 px-1.5 py-0.5 text-[10px] font-bold">
+                                                        <Zap size={9} />
+                                                        {AUDIO_COST}
+                                                    </span>
+                                                )}
+                                            </>
+                                        ) : canGenerate ? (
+                                            <>
+                                                {t('notebook.modal_generate')}
+                                                {(!isPro && !isUltra) && (
+                                                    <span className="inline-flex items-center gap-0.5 rounded-full bg-blue-500/30 px-1.5 py-0.5 text-[10px] font-bold">
+                                                        <Zap size={9} />
+                                                        {ARTEFACT_COST}
+                                                    </span>
+                                                )}
+                                            </>
                                         ) : (
-                                            (!isPro && !isUltra) && (
-                                                <span className="inline-flex items-center gap-0.5 rounded-full bg-blue-500/30 px-1.5 py-0.5 text-[10px] font-bold">
-                                                    <Zap size={9} />
-                                                    {ARTEFACT_COST}
-                                                </span>
-                                            )
+                                            <>
+                                                <Zap size={13} />
+                                                {t('notebook.no_tokens')}
+                                            </>
                                         )}
-                                    </>
-                                ) : (
-                                    <>
-                                        <Zap size={13} />
-                                        {t('notebook.no_tokens')}
-                                    </>
-                                )}
-                            </button>
+                                    </button>
+                                );
+                            })()}
                         </div>
                     </>
                 )}
@@ -749,11 +792,43 @@ const WorkspaceNotebook: React.FC = () => {
                 onCancel={() => setConfirmOpen(false)}
             />
 
+            <AudioFeatureChoiceModal
+                isOpen={audioChoiceOpen}
+                onClose={() => setAudioChoiceOpen(false)}
+                featureType="podcast"
+                onConfirmUseTokens={() => {
+                    const ci = customInstructions.trim() || undefined;
+                    const closeOnSuccess = (artifact: { id: string }) => {
+                        setGenerationModal(null);
+                        setGenerationTitle('');
+                        setCustomInstructions('');
+                        setGenerationFailed(false);
+                        setActiveTab('podcasts');
+                        setPendingSelectId(artifact.id);
+                        refetchBilling();
+                    };
+                    createPodcast.mutate(
+                        {
+                            notebookId,
+                            title: generationTitle.trim(),
+                            language: generationLanguage,
+                            sourceIds: podcastTarget.sourceIds,
+                            themeIds: podcastTarget.themeIds,
+                            customInstructions: ci,
+                        },
+                        { onSuccess: closeOnSuccess, onError: handleGenerationError }
+                    );
+                }}
+                onOpenRecharge={() => {
+                    setUpgradeModalOpen(true);
+                }}
+            />
+
             <UpgradeModal
                 isOpen={upgradeModalOpen}
                 onClose={() => setUpgradeModalOpen(false)}
                 isPro={isPro} 
-                isPodcast = {generationModal=="podcast"}
+                isPodcast={generationModal === 'podcast' || audioChoiceOpen}
             />
         </>
     );

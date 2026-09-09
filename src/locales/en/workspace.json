@@ -301,5 +301,25 @@
       "no_podcasts": "No podcasts.",
       "briefing_default": "Audio Briefing"
     }
+  },
+  "audio_choice_modal": {
+    "title_audio": "Generate Audio Version",
+    "title_podcast": "Generate Podcast",
+    "subtitle": "Audio features are included with unlimited access in the Ultra plan.",
+    "choose_hint": "Choose how you want to generate this audio content:",
+    "ultra_card_badge": "Recommended",
+    "ultra_card_title": "Upgrade to Ultra plan",
+    "ultra_card_desc": "Unlimited access to audio summaries and podcasts without spending tokens.",
+    "ultra_card_btn": "Upgrade to Ultra",
+    "tokens_card_title": "Use my tokens",
+    "tokens_card_desc": "Deduct 5 tokens from your balance for this generation.",
+    "tokens_cost": "Cost: 5 tokens",
+    "tokens_balance": "Your current balance: {{count}} token",
+    "tokens_balance_plural": "Your current balance: {{count}} tokens",
+    "tokens_remaining": "Remaining balance after generation: {{count}} tokens",
+    "tokens_insufficient": "Insufficient balance ({{count}} tokens available). Top up your tokens to continue.",
+    "tokens_card_btn": "Use 5 tokens",
+    "tokens_card_btn_recharge": "Top up tokens",
+    "cancel": "Cancel"
   }
 }

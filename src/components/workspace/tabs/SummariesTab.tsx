@@ -14,7 +14,7 @@ import { useAxiosPrivate } from '../../../hoooks/useAxiosPrivate.ts';
 import { baseUrl } from '../../../utils/api.ts';
 import type { ArtefactSummary, PaginatedResponse } from '../../../types/workspace';
 import { PlusIcon } from '../../../icons/index.ts';
-import ConfirmModal from '../../ui/ConfirmModal';
+import AudioFeatureChoiceModal from '../../ui/AudioFeatureChoiceModal.tsx';
 import UpgradeModal from '../../ui/UpgradeModal.tsx';
 import { useBilling } from '../../../context/BillingContext.tsx';
 
@@ -48,9 +48,9 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
     const [audioRequestSummaryId, setAudioRequestSummaryId] = useState<string | null>(null);
     const [fontSize, setFontSize] = useState(100);
     const [audioOverrides, setAudioOverrides] = useState<Record<string, Pick<ArtefactSummary, 'audio_status' | 'audio_url'>>>({});
-    const [audioConfirmOpen, setAudioConfirmOpen] = useState(false);
+    const [audioChoiceOpen, setAudioChoiceOpen] = useState(false);
     const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
-    const { isPro, isUltra, tokenBalance } = useBilling();
+    const { isPro, isUltra, tokenBalance, refetchBilling } = useBilling();
 
     const axiosPrivate = useAxiosPrivate();
     const queryClient = useQueryClient();
@@ -128,6 +128,7 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
 
         try {
             await axiosPrivate.post(`/notebooks/${notebookId}/artefacts/summaries/${summaryId}/audio`);
+            refetchBilling();
 
             await fetchEventSource(`${baseUrl}/notebooks/${notebookId}/artefacts/summaries/${summaryId}/audio/stream`, {
                 method: 'GET',
@@ -181,7 +182,11 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                     }
                 },
             });
-        } catch {
+        } catch (error) {
+            const status = (error as { response?: { status?: number } })?.response?.status;
+            if (status === 402) {
+                setUpgradeModalOpen(true);
+            }
             applyAudioOverride(summaryId, {
                 audio_status: 'error',
             });
@@ -429,7 +434,13 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                             </div>
                             {selectedSummary && (
                                 <button
-                                    onClick={() => setAudioConfirmOpen(true)}
+                                    onClick={() => {
+                                        if (isUltra) {
+                                            handleGenerateAudio(selectedSummary.id);
+                                        } else {
+                                            setAudioChoiceOpen(true);
+                                        }
+                                    }}
                                     disabled={audioRequestSummaryId === selectedSummary.id || selectedSummary.audio_status === 'processing'}
                                     title={selectedSummary.audio_status === 'completed' ? t('tabs.summaries.regenerate_audio') : t('tabs.summaries.generate_audio')}
                                     className="inline-flex items-center gap-1 rounded-full bg-emerald-50 p-2 sm:px-2.5 sm:py-1.5 text-xs font-medium text-emerald-700 transition-all hover:bg-emerald-100 disabled:opacity-50 dark:bg-emerald-950/20 dark:text-emerald-100 dark:hover:bg-emerald-950/40"
@@ -509,26 +520,16 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                 </section>
             </div>
             
-            <ConfirmModal
-                isOpen={audioConfirmOpen}
-                title={t('tabs.summaries.confirm_generate_audio_title')}
-                message={t('tabs.summaries.confirm_generate_audio')}
-                confirmLabel={selectedSummary?.audio_status === 'completed' ? t('tabs.summaries.regenerate_audio') : t('tabs.summaries.generate_audio')}
-                cancelLabel={t('list.cancel')}
-                onConfirm={() => {
-
-                    if (!isUltra && tokenBalance<5) {
-                        setUpgradeModalOpen(true);
-                        setAudioConfirmOpen(false);
-                        return; 
-                    }
-                    setAudioConfirmOpen(false);
+            <AudioFeatureChoiceModal
+                isOpen={audioChoiceOpen}
+                onClose={() => setAudioChoiceOpen(false)}
+                featureType="audio"
+                onConfirmUseTokens={() => {
                     if (selectedSummary) {
                         handleGenerateAudio(selectedSummary.id);
                     }
                 }}
-                onCancel={() => setAudioConfirmOpen(false)}
-                confirmVariant="primary"
+                onOpenRecharge={() => setUpgradeModalOpen(true)}
             />
 
             <UpgradeModal
