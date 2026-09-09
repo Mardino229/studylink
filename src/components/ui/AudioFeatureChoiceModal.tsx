@@ -76,7 +76,7 @@ export const AudioFeatureChoiceModal: React.FC<AudioFeatureChoiceModalProps> = (
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' || e.key === ' ') handleUpgradeUltra();
                         }}
-                        className="group relative flex cursor-pointer flex-col justify-between gap-3 rounded-2xl border-2 border-purple-400/60 bg-gradient-to-br from-purple-50/80 via-white to-indigo-50/40 p-4 transition-all hover:border-purple-500 hover:shadow-md dark:border-purple-600/40 dark:from-purple-950/20 dark:via-gray-900 dark:to-indigo-950/20 sm:flex-row sm:items-center"
+                        className="group relative flex cursor-pointer flex-col justify-between gap-3 rounded-2xl border-2 border-purple-400/60 bg-gradient-to-br from-purple-50/80 via-white to-indigo-50/40 p-4 transition-all hover:border-purple-500 dark:border-purple-600/40 dark:from-purple-950/20 dark:via-gray-900 dark:to-indigo-950/20 sm:flex-row sm:items-center"
                     >
                         <span className="absolute -top-2.5 right-4 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-xs">
                             {t('audio_choice_modal.ultra_card_badge')}
@@ -111,7 +111,7 @@ export const AudioFeatureChoiceModal: React.FC<AudioFeatureChoiceModalProps> = (
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' || e.key === ' ') handleUseTokens();
                         }}
-                        className={`group relative flex cursor-pointer flex-col justify-between gap-3 rounded-2xl border p-4 transition-all hover:shadow-md sm:flex-row sm:items-center ${
+                        className={`group relative flex cursor-pointer flex-col justify-between gap-3 rounded-2xl border p-4 transition-all sm:flex-row sm:items-center ${
                             hasEnoughTokens
                                 ? 'border-gray-200 bg-white hover:border-amber-400 dark:border-gray-800 dark:bg-gray-900'
                                 : 'border-amber-200 bg-amber-50/40 hover:border-amber-400 dark:border-amber-900/40 dark:bg-amber-950/10'
