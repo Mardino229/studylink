@@ -251,13 +251,13 @@ export const useUploadSource = () => {
 export const useAddYoutubeSource = () => {
     const axiosPrivate = useAxiosPrivate();
     return useMutation({
-        mutationFn: async ({ notebookId, url }: { notebookId: string; url: string }) => {
-            const response = await axiosPrivate.post<{ data: Source }>(`/notebooks/${notebookId}/sources/youtube`, { url });
+        mutationFn: async ({ notebookId, url, filename }: { notebookId: string; url: string; filename: string }) => {
+            const response = await axiosPrivate.post<{ data: Source }>(`/notebooks/${notebookId}/sources/youtube`, { url, filename });
             return response.data.data;
         },
         onError: (error) => {
-            const axiosError = error as AxiosError<{ detail: string }>;
-            toast.error("Erreur", { description: axiosError.response?.data?.detail || "URL YouTube invalide" });
+            const axiosError = error as AxiosError<{ detail?: string; message?: string }>;
+            toast.error("Erreur", { description: axiosError.response?.data?.detail || axiosError.response?.data?.message || "Erreur lors de l'ajout de la vidéo YouTube" });
         },
     });
 };

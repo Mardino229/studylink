@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useUploadSource, useGetSources, useDeleteSource, useAddYoutubeSource } from '../../utils/workspace';
-import { FileIcon, ImageIcon, UploadCloudIcon, CheckCircleIcon, LoaderIcon, Trash2, Link2, XCircleIcon, Info, Coins, LockIcon, Sparkles } from 'lucide-react';
+import { FileIcon, FileText, ImageIcon, UploadCloudIcon, CheckCircleIcon, LoaderIcon, Trash2, Link2, XCircleIcon, Info, Coins, LockIcon, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useBilling } from '../../context/BillingContext';
 
@@ -67,6 +67,8 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
     const [mode, setMode] = useState<'file' | 'youtube'>('file');
     const [youtubeUrl, setYoutubeUrl] = useState('');
     const [urlError, setUrlError] = useState('');
+    const [youtubeFilename, setYoutubeFilename] = useState('');
+    const [filenameError, setFilenameError] = useState('');
     const [isDragging, setIsDragging] = useState(false);
 
     const [streamingSources, setStreamingSources] = useState<Record<string, StreamInfo>>({});
@@ -211,21 +213,33 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
         e.preventDefault();
         if (youtubeUploadDisabled) return;
         setUrlError('');
+        setFilenameError('');
         const trimmedUrl = youtubeUrl.trim();
+        const trimmedFilename = youtubeFilename.trim();
+
+        let hasError = false;
+        if (!trimmedFilename) {
+            setFilenameError(t('sources.filename_required'));
+            hasError = true;
+        }
         if (!isValidYoutubeUrl(trimmedUrl)) {
             setUrlError(t('sources.url_invalid'));
             return;
+            hasError = true;
         }
+        if (hasError) return;
 
         const tempKey = `__uploading__yt__${trimmedUrl}`;
         setStreamingSources(prev => ({
             ...prev,
             [tempKey]: { progress: 0, message: t('sources.uploading'), status: 'pending', filename: trimmedUrl },
+            [tempKey]: { progress: 0, message: t('sources.uploading'), status: 'pending', filename: trimmedFilename },
         }));
 
         try {
-            const newSource = await youtubeM.mutateAsync({ notebookId, url: trimmedUrl });
+            const newSource = await youtubeM.mutateAsync({ notebookId, url: trimmedUrl, filename: trimmedFilename });
             setYoutubeUrl('');
+            setYoutubeFilename('');
             setStreamingSources(prev => { const next = { ...prev }; delete next[tempKey]; return next; });
             listenToSourceProgress(newSource.id, newSource.filename);
         } catch {
@@ -391,52 +405,150 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
                     </>
                 ) : (
                     <form onSubmit={handleYoutubeSubmit} className="space-y-3">
-                        <div className={`rounded-2xl border-2 border-dashed p-2 transition-colors ${youtubeUploadDisabled ? 'border-gray-200 opacity-60 dark:border-gray-700' : 'border-red-200 dark:border-red-500/30'}`}>
+                        <div
+                            className={`rounded-2xl border-2 border-dashed p-4 transition-colors ${
+                                youtubeUploadDisabled
+                                    ? 'border-gray-200 opacity-60 dark:border-gray-700'
+                                    : 'border-red-200 dark:border-red-500/30'
+                            }`}
+                        >
                             <div className="mb-3 flex items-center gap-2">
-                                <YoutubeIcon size={18} className={`shrink-0 ${youtubeUploadDisabled ? 'text-gray-400' : 'text-red-500'}`} />
+                                <YoutubeIcon
+                                    size={18}
+                                    className={`shrink-0 ${
+                                        youtubeUploadDisabled
+                                            ? 'text-gray-400'
+                                            : 'text-red-500'
+                                    }`}
+                                />
+
                                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                     {t('sources.youtube_link_label')}
                                 </span>
                             </div>
-                            <div className="flex flex-wrap justify-end gap-2">
-                                <div className={`flex flex-1 items-center gap-2 rounded-xl border border-gray-200 px-3 dark:border-gray-700 ${youtubeUploadDisabled ? 'bg-gray-100 dark:bg-gray-800/50' : 'bg-gray-50 dark:bg-white/[0.03]'}`}>
-                                    <Link2 size={14} className="shrink-0 text-gray-400" />
+
+                            {/* URL */}
+                            <div>
+                                <label className="mb-1 block text-xs font-medium text-gray-600 dark:text-gray-400">
+                                    {t('sources.youtube_url_label')}
+                                </label>
+
+                                <div className="flex flex-col gap-2 sm:flex-row">
+                                    <div
+                                        className={`flex flex-1 items-center gap-2 rounded-xl border border-gray-200 px-3 dark:border-gray-700 ${
+                                            youtubeUploadDisabled
+                                                ? 'bg-gray-100 dark:bg-gray-800/50'
+                                                : 'bg-gray-50 dark:bg-white/[0.03]'
+                                        }`}
+                                    >
+                                        <Link2
+                                            size={14}
+                                            className="shrink-0 text-gray-400"
+                                        />
+
+                                        <input
+                                            type="url"
+                                            value={youtubeUrl}
+                                            disabled={youtubeUploadDisabled}
+                                            onChange={e => {
+                                                setYoutubeUrl(e.target.value);
+                                                setUrlError('');
+                                            }}
+                                            placeholder={t('sources.youtube_placeholder')}
+                                            className="flex-1 bg-transparent py-2.5 text-sm text-gray-800 outline-none placeholder-gray-400 dark:text-white disabled:cursor-not-allowed"
+                                        />
+                                    </div>
+
+                                </div>
+
+                                {urlError && (
+                                    <p className="mt-1 text-xs text-red-500">
+                                        {urlError}
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Filename */}
+                            <div className="mt-3">
+                                <label className="mb-1 block text-xs font-medium text-gray-600 dark:text-gray-400">
+                                    {t('sources.youtube_filename_label')}
+                                </label>
+
+                                <div
+                                    className={`flex items-center gap-2 rounded-xl border border-gray-200 px-3 dark:border-gray-700 ${
+                                        youtubeUploadDisabled
+                                            ? 'bg-gray-100 dark:bg-gray-800/50'
+                                            : 'bg-gray-50 dark:bg-white/[0.03]'
+                                    }`}
+                                >
+                                    <FileText
+                                        size={14}
+                                        className="shrink-0 text-gray-400"
+                                    />
+
                                     <input
-                                        type="url"
-                                        value={youtubeUrl}
+                                        type="text"
+                                        value={youtubeFilename}
                                         disabled={youtubeUploadDisabled}
                                         onChange={e => {
-                                            setYoutubeUrl(e.target.value);
-                                            setUrlError('');
+                                            setYoutubeFilename(e.target.value);
+                                            setFilenameError('');
                                         }}
-                                        placeholder="https://www.youtube.com/watch?v=..."
+                                        placeholder={t(
+                                            'sources.youtube_filename_placeholder'
+                                        )}
                                         className="flex-1 bg-transparent py-2.5 text-sm text-gray-800 outline-none placeholder-gray-400 dark:text-white disabled:cursor-not-allowed"
                                     />
                                 </div>
+
+                                {filenameError && (
+                                    <p className="mt-1 text-xs text-red-500">
+                                        {filenameError}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="mt-4 flex justify-end">  
                                 <button
-                                    type="submit"
-                                    disabled={youtubeM.isPending || !youtubeUrl || youtubeUploadDisabled}
-                                    className="flex shrink-0 items-center justify-center item-ends rounded-xl bg-red-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    {youtubeM.isPending ? <LoaderIcon size={15} className="animate-spin" /> : t('sources.add')}
+                                        type="submit"
+                                        disabled={
+                                            youtubeM.isPending ||
+                                            !youtubeUrl.trim() ||
+                                            !youtubeFilename.trim() ||
+                                            youtubeUploadDisabled
+                                        }
+                                        className="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-red-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                        {youtubeM.isPending ? (
+                                            <LoaderIcon
+                                                size={15}
+                                                className="animate-spin"
+                                            />
+                                        ) : (
+                                            t('sources.add')
+                                        )}
                                 </button>
                             </div>
-                            {urlError && <p className="mt-2 text-xs text-red-500">{urlError}</p>}
-                            {/* Ultra required for YouTube */}
+
+                            {/* Ultra required */}
                             {!isUltra && (
-                                <div className="mt-2 flex items-center justify-between rounded-lg bg-purple-50 px-3 py-2 dark:bg-purple-500/10 border border-purple-100 dark:border-purple-500/20">
+                                <div className="mt-3 flex items-center justify-between rounded-lg border border-purple-100 bg-purple-50 px-3 py-2 dark:border-purple-500/20 dark:bg-purple-500/10">
                                     <p className="text-xs text-purple-700 dark:text-purple-400">
                                         {t('sources.youtube_ultra_only')}
                                     </p>
+
                                     <Link
                                         to="/subscription"
-                                        className="text-xs font-semibold text-purple-600 dark:text-purple-400 hover:underline"
+                                        className="text-xs font-semibold text-purple-600 hover:underline dark:text-purple-400"
                                     >
                                         {t('sources.upgrade')}
                                     </Link>
                                 </div>
                             )}
-                            <p className="mt-2 text-xs text-gray-400">{t('sources.youtube_hint')}</p>
+
+                            <p className="mt-2 text-xs text-gray-400">
+                                {t('sources.youtube_hint')}
+                            </p>
                         </div>
                     </form>
                 )}
@@ -508,7 +620,7 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
                     {sources?.items?.map(source => {
                         const isYoutube = source.file_type === 'youtube';
                         const isImage = isImageType(source.file_type);
-                        const videoId = isYoutube ? extractYoutubeId(source.filename) : null;
+                        const videoId = isYoutube ? (extractYoutubeId(source.storage_url) || extractYoutubeId(source.filename)) : null;
                         return (
                             <div
                                 key={source.id}
