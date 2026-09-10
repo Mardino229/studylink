@@ -9,11 +9,13 @@ import type { SubscriptionPlan } from "../../utils/type";
 import { useGetPublicTokenPacks } from "../../utils/billing";
 
 const TIER_LOGIC = [
-    { free: true,  tokens: true,    pro: true,  ultra: true  },
-    { free: false, tokens: "1 🪙",  pro: true,  ultra: true  },
+    { free: false,  tokens: "1 🪙",    pro: true,  ultra: true  },
+    { free: false,  tokens: false,    pro: false,  ultra: true  },
+    { free: true, tokens: true,  pro: true,  ultra: true  },
     { free: false, tokens: "1 🪙",  pro: true,  ultra: true  },
     { free: false, tokens: "1 🪙",  pro: true,  ultra: true  }, 
-    { free: false, tokens: "2 🪙",  pro: true,  ultra: true  },
+    { free: false, tokens: "1 🪙",  pro: true,  ultra: true  },
+    { free: false, tokens: "2 🪙",  pro: true, ultra: true  },
     { free: false, tokens: "5 🪙",  pro: false, ultra: true  },
 ];
 
@@ -69,7 +71,7 @@ export default function Pricing() {
                         <thead>
                             <tr className="border-b border-border">
                                 <th className="px-6 py-4 text-left font-medium text-foreground/50 w-2/5">{t('pricing.table.feature_col')}</th>
-                                <th className="px-4 py-4 text-center font-semibold text-foreground/70">{t('pricing.table.free_col')}</th>
+                                <th className="px-4 py-4 text-center font-semibold text-foreground/50">{t('pricing.table.free_col')}</th>
                                 <th className="px-4 py-4 text-center font-semibold text-amber-600 dark:text-amber-400">
                                     <span className="inline-flex items-center gap-1"><Zap size={14} /> Jetons</span>
                                 </th>

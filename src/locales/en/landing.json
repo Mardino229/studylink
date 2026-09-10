@@ -96,32 +96,32 @@
     "title": "Frequently Asked Questions",
     "items": [
       {
-        "q": "What does BlueCurve do?",
-        "a": "BlueCurve generates all your study and revision tools from the content you provide: summaries, flashcards and quizzes from your files or YouTube videos. You also have access to an exam library with some solutions, a revision assistant, audio podcasts and progress-tracking tools."
+        "q": "What does BlueCurve offer?",
+        "a": "BlueCurve generates all your study and revision tools from the content you provide: summaries, flashcards, mind maps, and quizzes from your files or YouTube videos. You also have access to a library of exams, some of which include answer keys, a revision assistant, audio podcasts, and tools to track your progress."
       },
       {
         "q": "Can I use a YouTube video as a source?",
-        "a": "Yes. Paste the URL of a public YouTube video into the dedicated space in your workspace. BlueCurve extracts the content and makes it available like any other source. You can then generate summaries, flashcards and quizzes from the video. Private or unlisted videos are not supported, and the maximum length is approximately 1 hour."
+        "a": "Yes. Paste the URL of a public YouTube video into the dedicated section of your workspace. BlueCurve extracts the content and makes it available like any other source. You can then generate summaries, flashcards, quizzes, and mind maps from the video. You can also ask your revision assistant questions based on the video content. Private or unlisted videos are not supported, and the maximum duration is approximately 1 hour."
       },
       {
         "q": "How does the token system work?",
-        "a": "If you don't have a subscription, each feature consumes tokens: 1 token to generate a summary, flashcards or a quiz, 1 token per 10 chat messages, 1 token to access an exam and 2 tokens to access a paid solution. You buy a token pack (Starter, Standard or Maxi) and use them at your own pace — tokens never expire."
+        "a": "If you don't have a subscription, each feature uses tokens: 1 token to import a file and extract its information, 1 token to generate a summary, flashcards, a quiz, or a mind map, 5 tokens to generate a podcast, 1 token for every 10 messages with the revision assistant, 1 token to access an exam, and 2 tokens to access an answer key. You can purchase a token pack (Starter, Standard, or Maxi) and use your tokens at your own pace, with no expiration date."
       },
       {
-        "q": "What's the difference between the Pro subscription and token packs?",
-        "a": "With token packs, you pay per use. The Pro subscription gives unlimited access to all features without ever deducting tokens for the duration of the subscription. Pro is ideal if you generate a lot of content each month."
+        "q": "What is the difference between a subscription and token packs?",
+        "a": "With token packs, you spend tokens on each feature. A subscription provides unlimited access to some or all features, depending on the subscription, without deducting any tokens for the entire duration of the subscription (one month or one year). A subscription is ideal if you regularly generate a lot of content."
       },
       {
-        "q": "Are all exams and solutions paid?",
-        "a": "Yes. Accessing an exam costs 1 token, and accessing its solution costs 2 tokens, unless you have an active Pro or Ultra subscription which gives unlimited access to both."
+        "q": "Are all exams and answer keys paid?",
+        "a": "Yes. Accessing an exam costs 1 token, and accessing its answer key costs 2 tokens, except with an active Pro or Ultra subscription, which provides unlimited access to both."
       },
       {
-        "q": "Do my old summaries and generations disappear if I run out of tokens?",
-        "a": "No. Your already-generated content (summaries, flashcards, quizzes) remains accessible indefinitely, even if your token balance drops to zero or your subscription expires."
+        "q": "Will my previous summaries and generations disappear if I run out of tokens?",
+        "a": "No. Your previously generated content (summaries, flashcards, quizzes, and mind maps) remains accessible indefinitely, even if your token balance reaches zero or your subscription expires."
       },
       {
         "q": "Can I use BlueCurve on mobile?",
-        "a": "Yes. The site and app automatically adapt to your phone for an experience as smooth as on a computer."
+        "a": "Yes. The website and app automatically adapt to your phone, providing an experience that is just as smooth as on a computer."
       }
     ]
   },
@@ -144,6 +144,8 @@
       "feature_col": "Feature",
       "free_col": "Free",
       "features": [
+        "Importation of images and documents",
+        "Importation of YouTube videos and generation of summaries, mindmaps, flashcards and quizzes from them",
         "Retention of generated study tools",
         "Summaries, quizzes, flashcards, mindmaps (YouTube videos or course files and images)",
         "AI assistant chat (10 messages)",

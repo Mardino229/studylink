@@ -97,19 +97,19 @@
     "items": [
       {
         "q": "Que permet BlueCurve ?",
-        "a": "BlueCurve génère l'ensemble de tes outils d'étude et de révision à partir des contenus que tu lui fournis : résumés, flashcards et quiz à partir de tes fichiers ou de vidéos YouTube. Tu disposes aussi d'une bibliothèque d'épreuves dont certaines sont corrigées, d'un assistant de révision, de podcasts audio et d'outils de suivi de ta progression."
+        "a": "BlueCurve génère l'ensemble de tes outils d'étude et de révision à partir des contenus que tu lui fournis : résumés, flashcards, cartes mentales et quiz à partir de tes fichiers ou de vidéos YouTube. Tu disposes aussi d'une bibliothèque d'épreuves dont certaines sont corrigées, d'un assistant de révision, de podcasts audio et d'outils de suivi de ta progression."
       },
       {
         "q": "Puis-je utiliser une vidéo YouTube comme source ?",
-        "a": "Oui. Colle l'URL d'une vidéo YouTube publique dans l'espace dédié de ton espace de travail. BlueCurve en extrait le contenu et le rend disponible comme n'importe quelle autre source. Génère ensuite des résumés, des flashcards et des quiz à partir de la vidéo. Les vidéos privées ou non listées ne sont pas prises en charge, et la durée maximale est d'environ 1 heure."
+        "a": "Oui. Colle l'URL d'une vidéo YouTube publique dans l'espace dédié de ton espace de travail. BlueCurve en extrait le contenu et le rend disponible comme n'importe quelle autre source. Génère ensuite des résumés, des flashcards, des quiz et des cartes mentales à partir de la vidéo. Tu peux également poser des questions à ton assistant de révision sur la base de ces vidéos. Les vidéos privées ou non listées ne sont pas prises en charge, et la durée maximale est d'environ 1 heure."
       },
       {
         "q": "Comment fonctionne le système de jetons ?",
-        "a": "Si tu ne disposes pas d'un abonnement, chaque fonctionnalité consomme des jetons : 1 jeton pour générer un résumé, des flashcards ou un quiz, 1 jeton par tranche de 10 messages de chat, 1 jeton pour accéder à une épreuve et 2 jetons pour accéder à un corrigé payant. Tu achètes un pack de jetons (Starter, Standard ou Maxi) et tu les utilises à ton rythme, sans date d'expiration pour les jetons."
+        "a": "Si tu ne disposes pas d'un abonnement, chaque fonctionnalité consomme des jetons : 1 jeton pour importer un fichier et en extraire l’information, 1 jeton pour générer un résumé, des flashcards, un quiz ou une carte mentale, 5 jetons pour générer un podcast, 1 jeton pour 10 messages avec l’assistant de révision, 1 jeton pour accéder à une épreuve et 2 jetons pour accéder à un corrigé. Tu achètes un pack de jetons (Starter, Standard ou Maxi) et tu les utilises à ton rythme, sans date d'expiration pour les jetons."
       },
       {
-        "q": "Quelle est la différence entre l'abonnement Pro et les packs de jetons ?",
-        "a": "Avec les packs de jetons, vous payez à la consommation. L'abonnement Pro donne un accès illimité à toutes les fonctionnalités, sans jamais déduire de jetons pendant toute la durée de l'abonnement. Pro est idéal si vous générez beaucoup de contenu chaque mois."
+        "q": "Quelle est la différence entre l'abonnement et les packs de jetons ?",
+        "a": "Avec les packs de jetons, tu dépenses des jetons pour chaque fonctionnalité. L'abonnement donne un accès illimité à certaines, voire toutes les fonctionnalités selon l'abonnement, sans jamais déduire de jetons pendant toute sa durée (un mois ou un an). Un abonnement est idéal si tu génères beaucoup de contenu régulièrement."
       },
       {
         "q": "Les épreuves et corrigés sont-ils tous payants ?",
@@ -117,7 +117,7 @@
       },
       {
         "q": "Mes anciens résumés et générations disparaissent-ils si je n'ai plus de jetons ?",
-        "a": "Non. Tes créations déjà générées (résumés, flashcards, quiz) restent accessibles indéfiniment, même si ton solde de jetons tombe à zéro ou si ton abonnement expire."
+        "a": "Non. Tes créations déjà générées (résumés, flashcards, quiz, cartes mentales) restent accessibles indéfiniment, même si ton solde de jetons tombe à zéro ou si ton abonnement expire."
       },
       {
         "q": "Puis-je utiliser BlueCurve sur mobile ?",
@@ -144,6 +144,8 @@
       "feature_col": "Fonctionnalité",
       "free_col": "Gratuit",
       "features": [
+        "Importation d'images et de documents",
+        "Importation de vidéos YouTube et génération de résumés, cartes mentales, flashcards et quiz à partir de celles-ci",
         "Conservation des outils de révision générés",
         "Résumés, quiz, flashcards, cartes mentales (vidéos YouTube ou fichiers de cours et images)",
         "Discussion avec l'assistant IA (10 messages)",

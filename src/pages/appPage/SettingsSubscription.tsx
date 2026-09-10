@@ -502,7 +502,7 @@ export default function SettingsSubscription() {
             : t('settings_subscription.annual'),
           chargeNow: previewChargeNow,
           nextRenewalAmount: previewNextRenewal,
-          // periodEnd: previewPeriodEnd,
+          periodEnd: previewPeriodEnd,
         })}
         confirmLabel={t('settings_subscription.confirm_change_plan_btn')}
         cancelLabel={t('user_profile.cancel')}
