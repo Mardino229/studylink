@@ -106,7 +106,7 @@
     "recommended": "Recommandé",
     "tokens": "Jetons",
     "token_balance": "Solde actuel",
-    "token_desc": "1 jeton = 1 génération (résumé, flashcards, quiz, etc.). 1 épreuve = 1 jeton. 1 corrigé = 2 jetons. Les jetons n'expirent pas.",
+    "token_desc": "1 jeton = 1 contenu généré (résumé, flashcards, quiz, mind map) / 1 document importé. 1 épreuve = 1 jeton. 1 corrigé = 2 jetons. Les jetons n'expirent pas.",
     "per_month": "CAD/mois",
     "per_year": "CAD/an",
     "downgrade_desc": "Votre plan passera à {{name}} le {{date}}. Vous conservez tous vos avantages actuels jusqu'à cette date.",

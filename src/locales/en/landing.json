@@ -97,7 +97,7 @@
     "items": [
       {
         "q": "What does BlueCurve offer?",
-        "a": "BlueCurve generates all your study and revision tools from the content you provide: summaries, flashcards, mind maps, and quizzes from your files or YouTube videos. You also have access to a library of exams, some of which include answer keys, a revision assistant, audio podcasts, and tools to track your progress."
+        "a": "BlueCurve generates all your study and study tools from the content you provide: summaries, flashcards, mind maps, and quizzes from your files or YouTube videos. You also have access to a library of exams, some of which include answer keys, a revision assistant, audio podcasts, and tools to track your progress."
       },
       {
         "q": "Can I use a YouTube video as a source?",
@@ -116,12 +116,12 @@
         "a": "Yes. Accessing an exam costs 1 token, and accessing its answer key costs 2 tokens, except with an active Pro or Ultra subscription, which provides unlimited access to both."
       },
       {
-        "q": "Will my previous summaries and generations disappear if I run out of tokens?",
+        "q": "Will my previously generated content disappear if I run out of tokens?",
         "a": "No. Your previously generated content (summaries, flashcards, quizzes, and mind maps) remains accessible indefinitely, even if your token balance reaches zero or your subscription expires."
       },
       {
         "q": "Can I use BlueCurve on mobile?",
-        "a": "Yes. The website and app automatically adapt to your phone, providing an experience that is just as smooth as on a computer."
+        "a": "Yes. The website and app are optimized for mobile devices, providing an experience that is just as smooth as on a computer."
       }
     ]
   },

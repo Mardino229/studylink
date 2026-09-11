@@ -106,7 +106,7 @@
     "recommended": "Recommended",
     "tokens": "Tokens",
     "token_balance": "Current balance",
-    "token_desc": "1 token = 1 generation (summary, flashcards, quiz, etc.). 1 exam = 1 token. 1 solution = 2 tokens. Tokens never expire.",
+    "token_desc": "1 token = 1 generated content (summary, flashcards, quiz, mind map) / 1 imported document. 1 exam = 1 token. 1 solution = 2 tokens. Tokens never expire.",
     "per_month": "CAD/month",
     "per_year": "CAD/year",
     "downgrade_desc": "Your plan will switch to {{name}} on {{date}}. You keep all your current benefits until then.",
