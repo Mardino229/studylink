@@ -169,6 +169,7 @@
       "desc": "L'abonnement Pro pour un accès illimité aux fonctionnalités et corrigés. L'abonnement Ultra pour des fonctionnalités exclusives en plus, telles que les résumés audios et les podcasts.",
       "monthly": "Mensuel",
       "annual": "Annuel",
+      "annual_discount": "2 mois offerts",
       "per_month": "mois",
       "per_year": "an",
       "annual_note": "Ou {{price}} $ CAD/an — économisez 2 mois",

@@ -202,7 +202,7 @@ export default function Pricing() {
                             >
                                 {t('pricing.subscriptions.annual')}
                                 <span className="ml-1.5 rounded-full bg-green-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
-                                    -40%
+                                    {t('pricing.subscriptions.annual_discount')}
                                 </span>
                             </button>
                         </div>
