@@ -158,7 +158,7 @@ export const useChangePlan = () => {
         },
         onError: (error: AxiosError<{ detail?: string }>) => {
             toast.error("Erreur lors du changement de plan", {
-                description: error.response?.data?.detail || "Une erreur est survenue.",
+                description: error.response?.data?.detail || "Payment for the plan upgrade failed. Please update your payment method and try again.",
             });
         },
     });

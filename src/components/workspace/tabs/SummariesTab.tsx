@@ -211,7 +211,7 @@ export const SummariesTab: React.FC<SummariesTabProps> = ({
                     h2: ({ children }) => <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mt-7 mb-3 leading-tight border-b border-gray-200 dark:border-gray-700 pb-2">{children}</h2>,
                     h3: ({ children }) => <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100 mt-5 mb-2">{children}</h3>,
                     h4: ({ children }) => <h4 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-100 mt-4 mb-2">{children}</h4>,
-                    p: ({ children }) => <p className="my-3 leading-7 text-gray-700 dark:text-gray-300">{children}</p>,
+                    p: ({ children }) => <p className="my-4 leading-7 text-gray-700 dark:text-gray-300">{children}</p>,
                     ul: ({ children }) => <ul className="my-3 ml-6 list-disc space-y-1 text-gray-700 dark:text-gray-300">{children}</ul>,
                     ol: ({ children }) => <ol className="my-3 ml-6 list-decimal space-y-1 text-gray-700 dark:text-gray-300">{children}</ol>,
                     li: ({ children }) => <li className="leading-7 pl-1">{children}</li>,
