@@ -9,14 +9,14 @@ import type { SubscriptionPlan } from "../../utils/type";
 import { useGetPublicTokenPacks } from "../../utils/billing";
 
 const TIER_LOGIC = [
-    { free: false,  tokens: "1 🪙",    pro: true,  ultra: true  },
-    { free: false,  tokens: false,    pro: false,  ultra: true  },
     { free: true, tokens: true,  pro: true,  ultra: true  },
+    { free: false,  tokens: "1 🪙",    pro: true,  ultra: true  },
     { free: false, tokens: "1 🪙",  pro: true,  ultra: true  },
     { free: false, tokens: "1 🪙",  pro: true,  ultra: true  }, 
     { free: false, tokens: "1 🪙",  pro: true,  ultra: true  },
     { free: false, tokens: "2 🪙",  pro: true, ultra: true  },
     { free: false, tokens: "5 🪙",  pro: false, ultra: true  },
+    { free: false,  tokens: false,    pro: false,  ultra: true  },
 ];
 
 function Check() {

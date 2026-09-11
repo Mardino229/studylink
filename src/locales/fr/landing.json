@@ -144,14 +144,14 @@
       "feature_col": "Fonctionnalité",
       "free_col": "Gratuit",
       "features": [
-        "Importation d'images et de documents",
-        "Importation de vidéos YouTube et génération de résumés, cartes mentales, flashcards et quiz à partir de celles-ci",
         "Conservation des outils de révision générés",
+        "Importation d'images et de documents",
         "Résumés, quiz, flashcards, cartes mentales (vidéos YouTube ou fichiers de cours et images)",
         "Discussion avec l'assistant IA (10 messages)",
         "Bibliothèque d'épreuves",
         "Corrigés des épreuves",
-        "Résumés audio des documents et podcasts"
+        "Résumés audio des documents et podcasts",
+        "Création d'outils de révision à partir de vidéos YouTube"
       ]
     },
     "packs": {

@@ -144,14 +144,14 @@
       "feature_col": "Feature",
       "free_col": "Free",
       "features": [
+        "Conservation of generated study tools",
         "Importation of images and documents",
-        "Importation of YouTube videos and generation of summaries, mindmaps, flashcards and quizzes from them",
-        "Retention of generated study tools",
         "Summaries, quizzes, flashcards, mindmaps (YouTube videos or course files and images)",
         "AI assistant chat (10 messages)",
         "Exam library",
         "Exam solutions",
-        "Audio summaries of documents and podcasts"
+        "Audio summaries of documents and podcasts",
+        "Create study tools from YouTube videos links"
       ]
     },
     "packs": {
