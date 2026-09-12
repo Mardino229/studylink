@@ -36,7 +36,7 @@ export default function Smart() {
 
     return (
         <section
-            className="py-16 sm:py-28 bg-background"
+            className="py-16 sm:py-18 bg-background"
             id="how-it-works"
         >
             <div className="container mx-auto px-6 lg:px-8">
@@ -229,7 +229,7 @@ export default function Smart() {
                         </div>
 
                         <p className="mt-3 text-sm font-medium text-emerald-500">
-                            {t("smart.completed", "You're all set!")}
+                            {t("smart.completed")}
                         </p>
 
                     </motion.div>

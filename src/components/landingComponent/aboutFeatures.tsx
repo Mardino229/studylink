@@ -1,16 +1,18 @@
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { BookOpen, Bot, Layers, HelpCircle, BookMarked, FolderKanban, Mic, Video } from "lucide-react";
+import { BookOpen, Bot, Layers, HelpCircle, BookMarked, FolderKanban, Mic, Video, Map, VectorSquare } from "lucide-react";
+import { faVectorPolygon } from "@fortawesome/free-solid-svg-icons";
 
 const FEATURE_META = [
     { icon: BookOpen,      color: "bg-blue-500/10 text-blue-500 dark:bg-blue-500/15 dark:text-blue-400",     glow: "bg-blue-400",    span: "lg:col-span-4", wide: true,  n: "01", badge: false },
     { icon: Layers,        color: "bg-purple-500/10 text-purple-500 dark:bg-purple-500/15 dark:text-purple-400", glow: "bg-purple-400",  span: "lg:col-span-2", wide: false, n: "02", badge: false },
     { icon: HelpCircle,    color: "bg-amber-500/10 text-amber-500 dark:bg-amber-500/15 dark:text-amber-400",  glow: "bg-amber-400",   span: "lg:col-span-2", wide: false, n: "03", badge: false },
-    { icon: Bot,           color: "bg-cyan-500/10 text-cyan-500 dark:bg-cyan-500/15 dark:text-cyan-400",     glow: "bg-cyan-400",    span: "lg:col-span-4", wide: true,  n: "04", badge: false },
+    { icon: VectorSquare,  color: "bg-gray-500/10 text-gray-500 dark:bg-gray-500/15 dark:text-gray-400", glow: "bg-gray-400", span: "lg:col-span-4", wide: false, n: "04", badge: false },
+    { icon: Bot,           color: "bg-cyan-500/10 text-cyan-500 dark:bg-cyan-500/15 dark:text-cyan-400",     glow: "bg-cyan-400",    span: "lg:col-span-2", wide: true,  n: "04", badge: false },
     { icon: BookMarked,    color: "bg-emerald-500/10 text-emerald-500 dark:bg-emerald-500/15 dark:text-emerald-400", glow: "bg-emerald-400", span: "lg:col-span-2", wide: false, n: "05", badge: false },
     { icon: Video,         color: "bg-red-500/10 text-red-500 dark:bg-red-500/15 dark:text-red-400",         glow: "bg-red-400",     span: "lg:col-span-2", wide: false, n: "06", badge: false },
-    { icon: FolderKanban,  color: "bg-orange-500/10 text-orange-500 dark:bg-orange-500/15 dark:text-orange-400", glow: "bg-orange-400",  span: "lg:col-span-2", wide: false, n: "07", badge: false },
-    { icon: Mic,           color: "bg-violet-500/10 text-violet-500 dark:bg-violet-500/15 dark:text-violet-400", glow: "bg-violet-400",  span: "lg:col-span-6", wide: true,  n: "08", badge: true },
+    { icon: FolderKanban,  color: "bg-orange-500/10 text-orange-500 dark:bg-orange-500/15 dark:text-orange-400", glow: "bg-orange-400",  span: "lg:col-span-3", wide: false, n: "07", badge: false },
+    { icon: Mic,           color: "bg-violet-500/10 text-violet-500 dark:bg-violet-500/15 dark:text-violet-400", glow: "bg-violet-400",  span: "lg:col-span-3", wide: true,  n: "08", badge: true },
 ];
 
 export default function AboutFeatures() {
@@ -18,7 +20,7 @@ export default function AboutFeatures() {
     const items = t('features.items', { returnObjects: true }) as { title: string; desc: string }[];
 
     return (
-        <section className="py-12 sm:py-28 bg-background" id="key-features">
+        <section className="py-12 sm:py-18 bg-background" id="key-features">
             <div className="container mx-auto sm:px-6 lg:px-8">
                 <motion.div
                     initial="hidden"

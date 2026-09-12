@@ -11,10 +11,10 @@
   "hero": {
     "tag": "Study Tool",
     "title": "Study smarter with BlueCurve.",
-    "subtitle": "Generate summaries, flashcards, educational podcasts, mindmaps and quizzes from your course files and YouTube videos, with an AI assistant to guide your revision — all in one interface.",
+    "subtitle": "Generate summaries, flashcards, educational podcasts, mindmaps and quizzes from your course files and YouTube videos, with an AI assistant to guide your revision, all in one interface.",
     "cta_primary": "Start for free",
     "cta_secondary": "See plans",
-    "pricing_note": "Free to try · Token packs from $2.99 CAD · Subscriptions from $6.99 CAD/month",
+    "pricing_note": "Free to try with tokens provided at sign-up · Token packs and subscriptions available",
     "phrases": [
       "Transform a YouTube video into study tools",
       "Prepare revision quizzes",
@@ -32,11 +32,12 @@
     "section_label": "How does it work?",
     "title": "A simple path to master",
     "title_highlight": "the essentials",
+    "completed": "You're all set!",
     "subtitle": "BlueCurve organizes your courses, generates summaries, exams and statistics, and gives you an AI assistant to guide you.",
     "steps": [
       {
         "title": "Import your sources",
-        "desc": "Drop your course files, images or paste a YouTube link. BlueCurve reads the file or watches the video, then transforms the content into study material."
+        "desc": "Drop your course files, images or paste a YouTube link. BlueCurve reads the file or watches the video, then transforms the content into study materials."
       },
       {
         "title": "Generate your study tools",
@@ -68,6 +69,10 @@
       {
         "title": "Quiz",
         "desc": "BlueCurve generates multiple-choice quizzes to test you on your course material. Get your score and corrections instantly."
+      },
+      {
+        "title": "Mind Maps",
+        "desc": "Visualize the key concepts of your course with mind maps. BlueCurve organizes ideas and their connections to help you better understand and remember the content."
       },
       {
         "title": "Study Assistant",
@@ -146,7 +151,7 @@
       "features": [
         "Conservation of generated study tools",
         "Importation of images and documents",
-        "Summaries, quizzes, flashcards, mindmaps (YouTube videos or course files and images)",
+        "Summaries, quizzes, flashcards, mindmaps (Course files and images)",
         "AI assistant chat (10 messages)",
         "Exam library",
         "Exam solutions",
