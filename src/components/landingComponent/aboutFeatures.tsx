@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { BookOpen, Bot, Layers, HelpCircle, BookMarked, FolderKanban, Mic, Video, Map, VectorSquare } from "lucide-react";
-import { faVectorPolygon } from "@fortawesome/free-solid-svg-icons";
+import { BookOpen, Bot, Layers, HelpCircle, BookMarked, FolderKanban, Mic, Video, VectorSquare } from "lucide-react";
 
 const FEATURE_META = [
     { icon: BookOpen,      color: "bg-blue-500/10 text-blue-500 dark:bg-blue-500/15 dark:text-blue-400",     glow: "bg-blue-400",    span: "lg:col-span-4", wide: true,  n: "01", badge: false },

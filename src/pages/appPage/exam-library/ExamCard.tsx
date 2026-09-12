@@ -21,6 +21,12 @@ export const TYPE_COLORS: Record<ExamType, string> = {
     'Autre':      'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
 };
 
+export const SESSION_COLORS: Record<ExamSession, string> = {
+    fall: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+    winter: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+    summer: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+};
+
 const SESSION_KEYS: Record<ExamSession, 'library.filters.fall' | 'library.filters.winter' | 'library.filters.spring_summer'> = {
     fall: 'library.filters.fall',
     winter: 'library.filters.winter',
@@ -99,7 +105,7 @@ export default function ExamCard({ exam, isPro, isUltra, tokenBalance, isSolutio
                     <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-400">{exam.academic_year}</span>
                 )}
                 {exam.session && (
-                    <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-400">{t(SESSION_KEYS[exam.session])}</span>
+                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${SESSION_COLORS[exam.session]}`}>{t(SESSION_KEYS[exam.session])}</span>
                 )}
                 {exam.exam_type && (
                     <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${TYPE_COLORS[exam.exam_type]}`}>{t(TYPE_KEYS[exam.exam_type])}</span>
