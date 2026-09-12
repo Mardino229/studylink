@@ -22,7 +22,6 @@ export default function Onboarding() {
     ];
 
     const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
     const [error, setError] = useState('');
 
     const handleCreate = async (e: React.FormEvent) => {
@@ -34,7 +33,6 @@ export default function Onboarding() {
         try {
             const notebook = await createNotebook.mutateAsync({
                 name: name.trim(),
-                description: description.trim(),
                 folder_id: null,
             });
             navigate(`/workspaces/notebook/${notebook.id}`);
@@ -115,20 +113,6 @@ export default function Onboarding() {
                                 className="form-input block w-full appearance-none rounded-lg border border-gray-300 px-3 py-3 placeholder-gray-400 shadow-sm focus:border-[var(--primary-color)] focus:outline-none focus:ring-[var(--primary-color)] sm:text-sm"
                             />
                             {error && <p className="text-xs text-red-500">{error}</p>}
-                        </div>
-
-                        {/* Description */}
-                        <div className="space-y-1.5">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {t('onboarding.desc_label')} <span className="font-normal text-gray-400">{t('onboarding.desc_optional')}</span>
-                            </label>
-                            <textarea
-                                value={description}
-                                onChange={e => setDescription(e.target.value)}
-                                placeholder={t('onboarding.desc_placeholder')}
-                                rows={2}
-                                className="block w-full appearance-none resize-none rounded-lg border border-gray-300 px-3 py-3 text-sm placeholder-gray-400 shadow-sm outline-none focus:border-[var(--primary-color)] focus:ring-1 focus:ring-[var(--primary-color)] dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder-gray-500"
-                            />
                         </div>
 
                         <Button

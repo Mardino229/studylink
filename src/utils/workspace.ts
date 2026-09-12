@@ -153,7 +153,7 @@ export const useCreateNotebook = () => {
     const queryClient = useQueryClient();
     const axiosPrivate = useAxiosPrivate();
     return useMutation({
-        mutationFn: async (data: { name: string; description: string; folder_id: string | null }) => {
+        mutationFn: async (data: { name: string; folder_id: string | null }) => {
             const response = await axiosPrivate.post<{ data: Notebook }>("/notebooks", data);
             return response.data.data;
         },
