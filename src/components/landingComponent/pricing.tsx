@@ -35,7 +35,7 @@ export default function Pricing() {
     const featureLabels = t('pricing.table.features', { returnObjects: true }) as string[];
 
     return (
-        <section className="py-12 sm:py-18 bg-background" id="pricing">
+        <section className="py-12 bg-background" id="pricing">
             <div className="container mx-auto sm:px-6 lg:px-8">
 
                 <div className="text-center max-w-3xl mx-auto">

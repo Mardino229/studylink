@@ -24,7 +24,7 @@ export default function Cta() {
     }, []);
 
     return (
-        <section className="py-12 sm:py-18 bg-background">
+        <section className="py-12 bg-background">
             <div className="container mx-auto sm:px-6 lg:px-8">
                 <motion.div
                     initial={{ opacity: 0, y: 24 }}

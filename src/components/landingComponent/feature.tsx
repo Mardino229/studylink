@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 export default function Feature() {
 
     return (
-        <section className="py-12 sm:py-18 bg-background" id="key-features">
+        <section className="py-12 bg-background" id="key-features">
             <div className="container mx-auto px-2 sm:px-6 lg:px-8">
                 <div className="text-center">
                     <motion.h2

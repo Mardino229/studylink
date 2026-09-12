@@ -36,7 +36,7 @@ export default function Smart() {
 
     return (
         <section
-            className="py-16 sm:py-18 bg-background"
+            className="py-16 bg-background"
             id="how-it-works"
         >
             <div className="container mx-auto px-6 lg:px-8">

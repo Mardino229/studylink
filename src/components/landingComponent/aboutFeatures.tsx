@@ -19,7 +19,7 @@ export default function AboutFeatures() {
     const items = t('features.items', { returnObjects: true }) as { title: string; desc: string }[];
 
     return (
-        <section className="py-12 sm:py-18 bg-background" id="key-features">
+        <section className="py-12 bg-background" id="key-features">
             <div className="container mx-auto sm:px-6 lg:px-8">
                 <motion.div
                     initial="hidden"
