@@ -162,7 +162,7 @@
     "packs": {
       "label": "Packs de jetons",
       "title": "Payez uniquement ce dont vous avez besoin.",
-      "desc": "1 jeton = 1 génération (résumé, flashcards, quiz, etc.). 1 épreuve = 1 jeton. 1 corrigé = 2 jetons. Les jetons n'expirent pas.",
+      "desc": "1 jeton = 1 génération (résumé, flashcards, quiz, cartes mentales.). 1 épreuve = 1 jeton. 1 corrigé = 2 jetons. Les jetons n'expirent pas.",
       "best_value": "Meilleur rapport",
       "tokens_label": "jetons",
       "buy_btn": "Acheter",

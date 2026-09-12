@@ -162,7 +162,7 @@
     "packs": {
       "label": "Token packs",
       "title": "Pay only for what you need.",
-      "desc": "1 token = 1 generation (summary, flashcards, quiz, etc.). 1 exam = 1 token. 1 solution = 2 tokens. Tokens never expire.",
+      "desc": "1 token = 1 generation (summary, flashcards, quiz, mindmaps). 1 exam = 1 token. 1 solution = 2 tokens. Tokens never expire.",
       "best_value": "Best value",
       "tokens_label": "tokens",
       "buy_btn": "Buy",
