@@ -16,6 +16,7 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import remarkToc from "remark-toc";
 import Mermaid from "../../ui/Mermaid.tsx";
+import { renderMarkdown } from '../../../utils/mk.tsx';
 
 
 interface PodcastsTabProps {
@@ -172,29 +173,7 @@ export const PodcastsTab: React.FC<PodcastsTabProps> = ({
         setCurrentTime(nextTime);
     };
 
-    const renderMathMarkdown = (content: string, className?: string) => (
-        <div className={className}>
-            <ReactMarkdown
-                remarkPlugins={[remarkMath, remarkGfm, remarkBreaks, remarkEmoji, [remarkToc, { heading: "sommaire|toc|table of contents" }]]}
-                rehypePlugins={[rehypeKatex, rehypeSlug, rehypeAutolinkHeadings, rehypeRaw]}
-                components={{
-                    p: ({ children }) => <>{children}</>,
-                    code({ node, className, children, ...props }: any) {
-                        const match = /language-(\w+)/.exec(className || "");
-                        return match && match[1] === "mermaid" ? (
-                            <Mermaid chart={String(children).replace(/\n$/, "")} />
-                        ) : (
-                            <code className={className} {...props}>
-                                {children}
-                            </code>
-                        );
-                    },
-                }}
-            >
-                {content}
-            </ReactMarkdown>
-        </div>
-    );
+
 
     const SidebarContent = () => (
         <div className="flex h-full flex-col ">
@@ -461,7 +440,7 @@ export const PodcastsTab: React.FC<PodcastsTabProps> = ({
                                     <h3 className="text-sm font-bold text-foreground tracking-wider border-b border-border pb-2">{t('tabs.podcasts.transcript')}</h3>
                                     <p className="text-sm md:text-base text-foreground/80 leading-relaxed whitespace-pre-wrap bg-background p-5 rounded-2xl border border-border">
                                         
-                                        {renderMathMarkdown(selectedPodcast.transcript)}
+                                        {renderMarkdown(selectedPodcast.transcript)}
                                     </p>
                                 </div>
                             )}
