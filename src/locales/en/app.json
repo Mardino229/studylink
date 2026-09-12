@@ -388,7 +388,7 @@
     "welcome": "Welcome, {{name}}!",
     "subtitle": "Create your first notebook to start revising.",
     "name_label": "Notebook name",
-    "name_placeholder": "Ex: Physics S2, Constitutional Law...",
+    "name_placeholder": "Ex: ADM1100, MAT 1721, ....",
     "desc_label": "Description",
     "desc_optional": "— optional",
     "desc_placeholder": "A few words about this notebook...",
