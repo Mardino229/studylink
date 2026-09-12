@@ -35,7 +35,7 @@
     "s3_item2_label": "Stripe:",
     "s3_item2": "secure processing of credit card payments and subscriptions. Stripe is PCI DSS certified.",
     "s4_title": "4. Data retention",
-    "s4_text": "Your data is retained as long as your account is active. If you request account deletion, we will erase your personal data and uploaded files within a reasonable timeframe, unless legally required otherwise. Transaction data may be retained for accounting purposes in accordance with applicable law.",
+    "s4_text": "Your data is retained as long as your account is active. If you request account deletion, we will erase your personal data within 3 business days following the receipt of your request, unless legally required otherwise. Transaction data may be retained for accounting purposes in accordance with applicable law.",
     "s5_title": "5. Your rights (PIPEDA)",
     "s5_intro": "Under PIPEDA, you have the right to:",
     "s5_item1": "Access the personal information we hold about you.",

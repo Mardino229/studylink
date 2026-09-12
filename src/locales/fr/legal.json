@@ -35,7 +35,7 @@
     "s3_item2_label": "Stripe :",
     "s3_item2": "traitement sécurisé des paiements par carte de crédit et des abonnements. Stripe est certifié PCI DSS.",
     "s4_title": "4. Conservation des données",
-    "s4_text": "Vos données sont conservées aussi longtemps que votre compte est actif. Si vous demandez la suppression de votre compte, nous effacerons vos données personnelles et vos fichiers importés dans un délai raisonnable, sauf obligation légale contraire. Les données de transaction peuvent être conservées pour des raisons comptables conformément à la loi applicable.",
+    "s4_text": "Vos données sont conservées aussi longtemps que votre compte est actif. Si vous demandez la suppression de votre compte, nous effacerons vos données personnelles dans un délai de 3 jours ouvrables suivant la réception de votre demande, sauf obligation légale contraire. Les données de transaction peuvent être conservées pour des raisons comptables conformément à la loi applicable.",
     "s5_title": "5. Vos droits (PIPEDA)",
     "s5_intro": "Conformément à la LPRPDE, vous avez le droit de :",
     "s5_item1": "Accéder aux renseignements personnels que nous détenons sur vous.",
