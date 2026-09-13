@@ -70,6 +70,7 @@ export default function RegisterForm() {
                                        className="block w-full border-0 text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-white/20 focus:ring-2 focus:ring-inset focus:ring-[var(--primary-color)] sm:text-sm sm:leading-6 appearance-none rounded-md border-gray-300 px-2.5 py-2.5 placeholder-gray-400 focus:border-[var(--primary-color)] focus:outline-none"
                                        id="email" type="email" placeholder={t('register.email_placeholder')} />
                             </FormControl>
+                            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t('login.email_hint')}</p>
                             <FormMessage />
                         </FormItem>
                     )} />
