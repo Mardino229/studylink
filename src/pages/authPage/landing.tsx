@@ -7,7 +7,6 @@ import Smart from "../../components/landingComponent/smart.tsx";
 import Cta from "../../components/landingComponent/cta.tsx";
 import Faq from "../../components/landingComponent/faq.tsx";
 import Footer from "../../components/landingComponent/footer.tsx";
-import Testimonial from "../../components/landingComponent/testimonial.tsx";
 import Pricing from "../../components/landingComponent/pricing.tsx";
 import PageMeta from "../../components/common/PageMeta.tsx";
 

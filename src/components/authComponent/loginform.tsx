@@ -138,10 +138,10 @@ export default function LoginForm() {
                     </Form>
                     <p className="text-center text-sm text-gray-600 dark:text-gray-300">
                         {t('login.no_account')}{" "}
-                        <Link className="font-semibold text-[var(--primary-color)] hover:text-blue-700" to="/register">
+                        <Link className="font-semibold text-[var(--primary-color)] hover:text-blue-700" to={`/register${window.location.search}`}>
                             {t('login.sign_up')}
                         </Link>
-                    </p>
+                    </p> 
                 </FormLayout>
             </div>
         </div>

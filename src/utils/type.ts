@@ -36,6 +36,17 @@ export type RegisterFormRequest = {
     email: string;
     password: string;
     confirmPassword: string;
+    acquisition_source?: string;
+}
+
+export interface AcquisitionEntry {
+    key: string;
+    value: number;
+}
+
+export interface AcquisitionReport {
+    counts: AcquisitionEntry[];
+    total: number;
 }
 
 export type Role = {

@@ -1,11 +1,14 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
 import Chart from "react-apexcharts";
 import type { ApexOptions } from "apexcharts";
 import ComponentCard from "../../components/common/ComponentCard.tsx";
-import { Users, CreditCard, Activity, ArrowRight, Loader2, Zap, BadgeCheck, TrendingUp } from "lucide-react";
+import Select from "../../components/form/Select.tsx";
+import { Users, CreditCard, Activity, ArrowRight, Loader2, Zap, BadgeCheck, TrendingUp, Eye, MousePointer, UserCheck, Percent, Share2 } from "lucide-react";
 import { useGetAdminDashboard } from "../../utils/admin.ts";
+import { useVisitorReport } from "../../utils/reports.ts";
 
 export default function AdminHome() {
   const { data, isLoading, isError } = useGetAdminDashboard();
@@ -53,7 +56,45 @@ export default function AdminHome() {
     tooltip: { enabled: true },
   };
 
+  const [visitorDays, setVisitorDays] = useState<number>(28);
+  const { data: visitorData, isLoading: loadingVisitors } = useVisitorReport(visitorDays);
+
+  const visitorDaysOptions = [
+    { value: "7", label: "7 derniers jours" },
+    { value: "28", label: "28 derniers jours" },
+    { value: "90", label: "90 derniers jours" },
+  ];
+
+  const dailyDates = visitorData?.daily?.map(d => {
+    if (d.date && d.date.length === 8) {
+      return `${d.date.slice(6, 8)}/${d.date.slice(4, 6)}`;
+    }
+    return d.date;
+  }) ?? [];
+
+  const dailyActiveUsers = visitorData?.daily?.map(d => d.active_users) ?? [];
+  const dailySessions    = visitorData?.daily?.map(d => d.sessions) ?? [];
+
+  const visitorChartSeries = [
+    { name: "Utilisateurs actifs", data: dailyActiveUsers },
+    { name: "Sessions", data: dailySessions },
+  ];
+
+  const visitorChartOptions: ApexOptions = {
+    chart: { type: "area", toolbar: { show: false }, background: "transparent" },
+    xaxis: { categories: dailyDates, axisBorder: { show: false }, axisTicks: { show: false } },
+    grid: { borderColor: "#e5e7eb", strokeDashArray: 4 },
+    dataLabels: { enabled: false },
+    stroke: { curve: "smooth", width: 2 },
+    fill: { type: "gradient", gradient: { shadeIntensity: 1, opacityFrom: 0.3, opacityTo: 0.05, stops: [0, 90, 100] } },
+    colors: ["#3b82f6", "#8b5cf6"],
+    tooltip: { theme: "light" },
+  };
+
+  const sourcesTotal = visitorData?.sources?.reduce((acc, s) => acc + s.users, 0) || 1;
+
   return (
+
     <div className="space-y-6">
       <PageMeta title="Admin" description="Panneau d'administration" />
       <PageBreadcrumb pageTitle="Tableau de bord" />
@@ -144,6 +185,141 @@ export default function AdminHome() {
           </h4>
         </div>
       </div>
+
+      {/* ── Statistiques des visiteurs (GA4) ── */}
+      <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h3 className="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
+              <Eye className="size-5 text-blue-500" />
+              Statistiques des visiteurs (GA4)
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Données de trafic Google Analytics 4
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Select
+              options={visitorDaysOptions}
+              defaultValue={String(visitorDays)}
+              onChange={(val) => setVisitorDays(Number(val))}
+              className="w-48"
+            />
+          </div>
+        </div>
+
+        {loadingVisitors ? (
+          <div className="h-48 flex items-center justify-center">
+            <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+          </div>
+        ) : visitorData ? (
+          <>
+            {/* KPI Cards Grid */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/40 p-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Utilisateurs actifs</span>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+                    <Users className="size-4" />
+                  </div>
+                </div>
+                <p className="mt-2 text-xl font-bold text-gray-800 dark:text-white">
+                  {visitorData.active_users?.toLocaleString() ?? 0}
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/40 p-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Sessions</span>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400">
+                    <MousePointer className="size-4" />
+                  </div>
+                </div>
+                <p className="mt-2 text-xl font-bold text-gray-800 dark:text-white">
+                  {visitorData.sessions?.toLocaleString() ?? 0}
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/40 p-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Nouveaux utilisateurs</span>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
+                    <UserCheck className="size-4" />
+                  </div>
+                </div>
+                <p className="mt-2 text-xl font-bold text-gray-800 dark:text-white">
+                  {visitorData.new_users?.toLocaleString() ?? 0}
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/40 p-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Taux d'engagement</span>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">
+                    <Percent className="size-4" />
+                  </div>
+                </div>
+                <p className="mt-2 text-xl font-bold text-gray-800 dark:text-white">
+                  {((visitorData.engagement_rate ?? 0) * 100).toFixed(1)} %
+                </p>
+              </div>
+            </div>
+
+            {/* Charts Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
+              {/* Daily Evolution */}
+              <div className="lg:col-span-2">
+                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Évolution quotidienne</h4>
+                {dailyDates.length > 0 ? (
+                  <Chart options={visitorChartOptions} series={visitorChartSeries} type="area" height={240} />
+                ) : (
+                  <div className="h-48 flex items-center justify-center border border-dashed border-gray-200 dark:border-gray-800 rounded-xl">
+                    <p className="text-xs text-gray-400">Aucune donnée quotidienne</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Traffic Sources */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Sources de trafic</h4>
+                {visitorData.sources && visitorData.sources.length > 0 ? (
+                  <div className="space-y-3">
+                    {visitorData.sources.map((s) => {
+                      const pct = ((s.users / sourcesTotal) * 100).toFixed(1);
+                      return (
+                        <div key={s.source} className="space-y-1">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="font-medium capitalize text-gray-700 dark:text-gray-300 flex items-center gap-1.5 truncate max-w-[140px]">
+                              <Share2 className="size-3 text-gray-400 shrink-0" />
+                              {s.source}
+                            </span>
+                            <span className="text-gray-500 dark:text-gray-400">
+                              {s.users} <span className="text-[10px] text-gray-400">({pct} %)</span>
+                            </span>
+                          </div>
+                          <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+                            <div
+                              className="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500"
+                              style={{ width: `${Math.min(100, Math.max(0, Number(pct)))}%` }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="h-48 flex items-center justify-center border border-dashed border-gray-200 dark:border-gray-800 rounded-xl">
+                    <p className="text-xs text-gray-400">Aucune source disponible</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        ) : (
+          <p className="text-xs text-gray-400 text-center py-6">Impossible de charger les données GA4.</p>
+        )}
+      </div>
+
 
       {/* Token analytics */}
       {data.tokenAnalytics && (

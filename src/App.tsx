@@ -16,6 +16,7 @@ import Home from "./pages/appPage/Home.tsx";
 import AppLayout from "./layout/AppLayout.tsx";
 import { ScrollToTop } from "./components/common/ScrollToTop.tsx";
 import { DomainRedirect } from "./components/common/DomainRedirect.tsx";
+import { AnalyticsTracker } from "./components/common/AnalyticsTracker.tsx";
 import RequireAuth from "./context/RequireAuth.tsx";
 import GuestRoute from "./context/GuestRoute.tsx";
 import AdminGuard from "./context/AdminGuard.tsx";
@@ -64,6 +65,7 @@ function App() {
         <Router>
             <ScrollToTop />
             <DomainRedirect />
+            <AnalyticsTracker />
             <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route element={<GuestRoute />}>

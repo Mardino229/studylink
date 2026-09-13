@@ -159,7 +159,7 @@ export default function Pricing() {
                                         🪙 <strong>{pack.tokens} {t('pricing.packs.tokens_label')}</strong>
                                     </p>
                                     <AppLink
-                                        to="/register"
+                                        to={`/register${window.location.search}`}
                                         className={`mt-6 flex items-center justify-center rounded-full h-11 px-6 text-sm font-bold transition-colors ${
                                             i === 1
                                                 ? "bg-amber-500 text-white hover:bg-amber-600"
@@ -258,7 +258,7 @@ export default function Pricing() {
                                             </p>
                                         )}
                                         <AppLink
-                                            to="/register"
+                                            to={`/register${window.location.search}`}
                                             className={`mt-8 flex items-center justify-center rounded-full h-13 px-8 bg-gradient-to-r ${accent.btn} text-white font-bold text-base shadow-lg hover:shadow-xl hover:opacity-90 transition-all`}
                                         >
                                             {t('pricing.subscriptions.start_with')} {plan.name}

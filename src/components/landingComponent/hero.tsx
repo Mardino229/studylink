@@ -107,7 +107,7 @@ const HeroContent = memo(function HeroContent({ dark }: { dark: boolean }) {
                 className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
             >
                 <AppLink
-                    to="/register"
+                    to={`/register${window.location.search}`}
                     className="flex w-full sm:w-auto min-w-[160px] items-center justify-center rounded-full h-14 px-8 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-base font-bold shadow-lg hover:opacity-90 transition-opacity"
                 >
                     {t('hero.cta_primary')}

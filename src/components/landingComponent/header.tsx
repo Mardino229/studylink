@@ -119,7 +119,7 @@ export default function Header() {
             >
                 <div className="container mx-auto flex items-center justify-between p-2 sm:px-6 lg:px-8 py-3">
                     {/* Logo */}
-                    <Link to="/" className="flex items-center gap-3 text-foreground">
+                    <Link to={`/${window.location.search}`} className="flex items-center gap-3 text-foreground">
                         <img src={logo} alt="BlueCurve" className="sm:h-12 h-8 w-auto" />
                          <span className="text-2xl font-bold leading-tight tracking-tighter">BlueCurve</span> 
                     </Link>
@@ -129,7 +129,7 @@ export default function Header() {
                         {NAV_LINKS.map(({ label, hash }) => (
                             <Link
                                 key={hash}
-                                to={{ pathname: "/", hash: hash }}
+                                to={{ pathname: `/`, hash: hash }}
                                 onClick={(e) => handleSmoothClick(e, hash)}
                                 className={linkCls(hash)}
                             >
@@ -144,13 +144,13 @@ export default function Header() {
                         <LanguageSwitcher />
                         <ThemeToggle />
                         <AppLink
-                            to="/login"
+                            to={`/login${window.location.search}`}
                             className="hidden sm:inline-block text-base font-medium text-foreground/70 hover:text-foreground transition-colors"
                         >
                             {t('nav.login')}
                         </AppLink>
                         <AppLink
-                            to="/register"
+                            to={`/register${window.location.search}`} 
                             className="hidden md:flex items-center justify-center rounded-full h-10 px-5 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-bold shadow hover:opacity-90 transition-opacity"
                         >
                             {t('nav.get_started')}
@@ -187,7 +187,7 @@ export default function Header() {
                             {NAV_LINKS.map(({ label, hash }) => (
                                 <Link
                                     key={hash}
-                                    to={{ pathname: "/", hash: hash }}
+                                    to={{ pathname: `/`, hash: hash }}
                                     
                                     className={`block text-base ${isActive(hash) ? "text-foreground font-semibold" : "text-foreground/70"} hover:text-foreground transition-colors`}
                                 >
@@ -195,15 +195,15 @@ export default function Header() {
                                 </Link>
                             ))}
                             <div className="pt-2 flex flex-col items-center gap-4 border-t border-border">
-                                <AppLink to="/login" className="text-base text-foreground/70 hover:text-foreground" onClick={() => setMobileOpen(false)}>
+                                <AppLink to={`/login${window.location.search}`} className="text-base text-foreground/70 hover:text-foreground" onClick={() => setMobileOpen(false)}>
                                     {t('nav.login')}
                                 </AppLink>
                                 <AppLink
-                                    to="/register"
+                                    to={`/register${window.location.search}`}
                                     className="inline-flex items-center justify-center rounded-full h-10 px-5 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-semibold shadow"
                                     onClick={() => setMobileOpen(false)}
                                 >
-                                    {t('nav.get_started')}
+                                    {t('nav.get_started')} 
                                 </AppLink>
                             </div>
                         </div>

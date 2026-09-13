@@ -35,6 +35,7 @@ jobs:
             VITE_API_URL=${{ secrets.VITE_API_URL }}
             VITE_LANDING_DOMAIN=${{ secrets.VITE_LANDING_DOMAIN }}
             VITE_APP_DOMAIN=${{ secrets.VITE_APP_DOMAIN }}
+            VITE_GA_MEASUREMENT_ID=${{ secrets.VITE_GA_MEASUREMENT_ID }}
 
   deploy:
     needs: build-and-push

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,6 +20,14 @@ export default function RegisterForm() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
     const register = useRegister();
+    const [searchParams] = useSearchParams();
+    const [acquisitionSource, setAcquisitionSource] = useState<string>("web");
+
+    // Capture utm_source once on mount and persist across navigation
+    useEffect(() => {
+        const utm = searchParams.get("utm_source");
+        if (utm) setAcquisitionSource(utm);
+    }, [searchParams]);
 
     const registerSchema = z.object({
         email: z.email({ message: tErr('email.invalid') }).refine(
@@ -48,7 +56,7 @@ export default function RegisterForm() {
     });
 
     const onSubmit = (data: RegisterFormRequest) => {
-        register.mutate(data);
+        register.mutate({ ...data, acquisition_source: acquisitionSource });
     };
 
     return (
@@ -121,11 +129,11 @@ export default function RegisterForm() {
                     </Button>
                     <p className="text-center text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
                         {t('register.terms_prefix')}{" "}
-                        <Link to="/terms" target="_blank" className="font-medium text-[var(--primary-color)] hover:underline">
+                        <Link to={`/terms${window.location.search}`} target="_blank" className="font-medium text-[var(--primary-color)] hover:underline">
                             {t('register.terms_link')}
                         </Link>{" "}
-                        {t('register.terms_and')}{" "}
-                        <Link to="/privacy" target="_blank" className="font-medium text-[var(--primary-color)] hover:underline">
+                        {t('register.terms_and')}{" "}  
+                        <Link to={`/privacy${window.location.search}`} target="_blank" className="font-medium text-[var(--primary-color)] hover:underline">
                             {t('register.privacy_link')}
                         </Link>.
                     </p>
@@ -133,7 +141,7 @@ export default function RegisterForm() {
             </Form>
             <p className="mt-8 text-center text-sm text-gray-500 dark:text-gray-300">
                 {t('register.already_account')}{" "}
-                <Link className="font-semibold leading-6 text-[var(--primary-color)] hover:text-indigo-500" to="/login">
+                <Link className="font-semibold leading-6 text-[var(--primary-color)] hover:text-indigo-500" to={`/login${window.location.search}`}>
                     {t('register.log_in')}
                 </Link>
             </p>

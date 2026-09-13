@@ -5,9 +5,9 @@ import Chart from "react-apexcharts";
 import type { ApexOptions } from "apexcharts";
 import ComponentCard from "../../components/common/ComponentCard.tsx";
 import Select from "../../components/form/Select.tsx";
-import { useRevenueReport, useSubscriptionsReport, useReportsSummary } from "../../utils/reports.ts";
+import { useRevenueReport, useSubscriptionsReport, useReportsSummary, useAcquisitionReport } from "../../utils/reports.ts";
 import type { Period } from "../../utils/reports.ts";
-import { TrendingUp, TrendingDown, Users, CreditCard, Zap, BadgeCheck } from "lucide-react";
+import { TrendingUp, TrendingDown, Users, CreditCard, BadgeCheck, Share2 } from "lucide-react";
 
 // ── KPI tile ────────────────────────────────────────────────────────
 function KpiTile({
@@ -62,6 +62,7 @@ export default function Reports() {
     const { data: revenue, isLoading: loadingRevenue } = useRevenueReport(period);
     const { data: subs, isLoading: loadingSubs } = useSubscriptionsReport(period);
     const { data: summary, isLoading: loadingSummary } = useReportsSummary();
+    const { data: acquisition, isLoading: loadingAcquisition } = useAcquisitionReport();
 
     const periodOptions = [
         { value: "3m",  label: "3 mois"  },
@@ -182,6 +183,56 @@ export default function Reports() {
                     <ChartSkeleton height={280} />
                 ) : (
                     <Chart options={subsOptions} series={subsSeries} type="bar" height={280} />
+                )}
+            </ComponentCard>
+
+            {/* ── Acquisition chart ── */}
+            <ComponentCard
+                title={`Origine des inscriptions${acquisition ? ` — ${acquisition.total} au total` : ""}`}
+            >
+                {loadingAcquisition ? (
+                    <ChartSkeleton height={280} />
+                ) : acquisition && acquisition.counts.length > 0 ? (
+                    <div className="flex flex-col gap-6 lg:flex-row lg:items-center">
+                        <div className="flex-1 min-w-0">
+                            <Chart
+                                options={{
+                                    chart: { type: "donut", toolbar: { show: false }, background: "transparent" },
+                                    labels: acquisition.counts.map(c => c.key),
+                                    legend: { position: "bottom" },
+                                    dataLabels: { enabled: true, formatter: (val: number) => `${val.toFixed(1)} %` },
+                                    tooltip: { y: { formatter: (v: number) => `${v} inscription${v !== 1 ? "s" : ""}` } },
+                                    colors: ["#3b82f6", "#f97316", "#a855f7", "#10b981", "#6b7280", "#ef4444", "#eab308"],
+                                    theme: { mode: "light" },
+                                } satisfies ApexOptions}
+                                series={acquisition.counts.map(c => c.value)}
+                                type="donut"
+                                height={280}
+                            />
+                        </div>
+                        <div className="flex-shrink-0 lg:w-64">
+                            <ul className="space-y-2">
+                                {acquisition.counts.map(entry => {
+                                    const pct = acquisition.total > 0
+                                        ? ((entry.value / acquisition.total) * 100).toFixed(1)
+                                        : "0.0";
+                                    return (
+                                        <li key={entry.key} className="flex items-center justify-between rounded-lg border border-gray-100 dark:border-gray-800 px-3 py-2 text-sm">
+                                            <span className="flex items-center gap-2 font-medium capitalize text-gray-700 dark:text-gray-200">
+                                                <Share2 size={13} className="text-gray-400" />
+                                                {entry.key}
+                                            </span>
+                                            <span className="text-gray-500 dark:text-gray-400">
+                                                {entry.value} <span className="text-xs">({pct} %)</span>
+                                            </span>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </div>
+                    </div>
+                ) : (
+                    <p className="py-10 text-center text-sm text-gray-400">Aucune donnée disponible.</p>
                 )}
             </ComponentCard>
         </div>

@@ -8,6 +8,7 @@ import { CheckCircle2 } from "lucide-react";
 export default function Cta() {
     const { t } = useTranslation('landing');
     const bullets = t('cta.bullets', { returnObjects: true }) as string[];
+    
 
     const fireConfetti = useCallback(() => {
         import("canvas-confetti").then(({ default: confetti }) => {
@@ -63,7 +64,7 @@ export default function Cta() {
 
                     <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                         <AppLink
-                            to="/register"
+                            to={`/register${window.location.search}`}
                             onClick={fireConfetti}
                             className="flex w-full sm:w-auto min-w-[180px] items-center justify-center rounded-full h-14 px-8 bg-white text-blue-600 text-base font-bold shadow-lg hover:bg-white/90 hover:shadow-xl transition-all duration-300"
                         >

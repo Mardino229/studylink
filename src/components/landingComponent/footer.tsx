@@ -23,13 +23,13 @@ export default function Footer() {
                             <ul className="mt-4 space-y-2">
                                 <li><Link className="hover:text-foreground transition-colors" to={{ pathname: "/", hash: "#key-features" }}>{t('footer.features')}</Link></li>
                                 <li><Link className="hover:text-foreground transition-colors" to={{ pathname: "/", hash: "#pricing" }}>{t('footer.pricing')}</Link></li>
-                                <li><AppLink className="hover:text-foreground transition-colors" to="/login">{t('footer.login')}</AppLink></li>
+                                <li><AppLink className="hover:text-foreground transition-colors" to={`/login${window.location.search}`}>{t('footer.login')}</AppLink></li>
                             </ul>
                         </div>
                         <div>
                             <h3 className="text-base font-semibold text-foreground">{t('footer.company')}</h3>
                             <ul className="mt-4 space-y-2">
-                                <li><Link className="hover:text-foreground transition-colors" to="/about">{t('footer.about')}</Link></li>
+                                <li><Link className="hover:text-foreground transition-colors" to={`/about${window.location.search}`}>{t('footer.about')}</Link></li>
                                 <li><Link className="hover:text-foreground transition-colors" to={{ pathname: "/", hash: "#faq" }}>{t('footer.faq')}</Link></li>
                                 <li><a className="hover:text-foreground transition-colors" href="mailto:contact@bluecurvespace.com">{t('footer.contact')}</a></li>
                             </ul>
@@ -37,8 +37,8 @@ export default function Footer() {
                         <div>
                             <h3 className="text-base font-semibold text-foreground">{t('footer.legal')}</h3>
                             <ul className="mt-4 space-y-2">
-                                <li><Link className="hover:text-foreground transition-colors" to="/privacy">{t('footer.privacy')}</Link></li>
-                                <li><Link className="hover:text-foreground transition-colors" to="/terms">{t('footer.terms')}</Link></li>
+                                <li><Link className="hover:text-foreground transition-colors" to={`/privacy${window.location.search}`}> {t('footer.privacy')}</Link></li>
+                                <li><Link className="hover:text-foreground transition-colors" to={`/terms${window.location.search}`}> {t('footer.terms')}</Link></li>
                             </ul>
                         </div>
                     </div>

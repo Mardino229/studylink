@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAxiosPrivate } from "../hoooks/useAxiosPrivate";
+import type { AcquisitionReport } from "./type";
 
 export type Period = "3m" | "6m" | "12m";
 
@@ -121,3 +122,53 @@ export const useReportsSummary = () => {
         staleTime: 2 * 60_000,
     });
 };
+
+export const useAcquisitionReport = () => {
+    const axiosPrivate = useAxiosPrivate();
+    return useQuery({
+        queryKey: ["admin-reports-acquisition"],
+        queryFn: async () => {
+            const res = await axiosPrivate.get<{ data: AcquisitionReport }>(
+                `/admin/reports/acquisition`
+            );
+            return res.data.data;
+        },
+        staleTime: 5 * 60_000,
+    });
+};
+
+export interface VisitorDaily {
+    date: string;
+    active_users: number;
+    sessions: number;
+}
+
+export interface VisitorSource {
+    source: string;
+    users: number;
+}
+
+export interface VisitorReport {
+    period: string;
+    active_users: number;
+    sessions: number;
+    new_users: number;
+    engagement_rate: number;
+    daily: VisitorDaily[];
+    sources: VisitorSource[];
+}
+
+export const useVisitorReport = (days: number = 28) => {
+    const axiosPrivate = useAxiosPrivate();
+    return useQuery({
+        queryKey: ["admin-reports-visitors", days],
+        queryFn: async () => {
+            const res = await axiosPrivate.get<{ data: VisitorReport }>(
+                `/admin/reports/visitors?days=${days}`
+            );
+            return res.data.data;
+        },
+        staleTime: 5 * 60_000,
+    });
+};
+

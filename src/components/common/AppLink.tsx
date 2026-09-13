@@ -18,7 +18,7 @@ export function AppLink({ to, children, className, onClick }: AppLinkProps) {
                 target="_blank"
                 rel="noreferrer"
                 className={className}
-                onClick={onClick}
+                onClick={onClick} 
             >
                 {children}
             </a>
