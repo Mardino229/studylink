@@ -100,7 +100,9 @@ export default function BulkUploadModal({ isOpen, onClose, uploadExam, validateE
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Step 3 — Global section
+    // Step 3 — Global values
+    const [globalLanguage, setGlobalLanguage] = useState<'fr' | 'en' | ''>('');
+    const [globalType, setGlobalType] = useState<ExamType | ''>('');
     const [globalSection, setGlobalSection] = useState('');
 
     // Upload state
@@ -113,6 +115,8 @@ export default function BulkUploadModal({ isOpen, onClose, uploadExam, validateE
         setStep('context');
         setCtx({ course_id: '', academic_year: '', session: '' });
         setRows([]);
+        setGlobalLanguage('');
+        setGlobalType('');
         setGlobalSection('');
         setIsUploading(false);
         setUploadDone(false);
@@ -158,7 +162,17 @@ export default function BulkUploadModal({ isOpen, onClose, uploadExam, validateE
 
     const setSolutionFile = (id: string, file: File | null) => updateRow(id, 'solutionFile', file);
 
-    // Apply global section to all rows
+    // Apply global values to all rows
+    const applyGlobalLanguage = () => {
+        if (!globalLanguage) return;
+        setRows((prev) => prev.map((r) => ({ ...r, language: globalLanguage })));
+    };
+
+    const applyGlobalType = () => {
+        if (!globalType) return;
+        setRows((prev) => prev.map((r) => ({ ...r, exam_type: globalType })));
+    };
+
     const applyGlobalSection = () => {
         if (!globalSection.trim()) return;
         setRows((prev) => prev.map((r) => ({ ...r, section: globalSection.trim() })));
@@ -414,24 +428,77 @@ export default function BulkUploadModal({ isOpen, onClose, uploadExam, validateE
                         {/* Context recap */}
                         <ContextBadge ctx={ctx} />
 
-                        {/* Global section */}
-                        <div className="flex items-center gap-3">
-                            <label className="shrink-0 text-xs font-medium text-gray-500 dark:text-gray-400">
-                                Section globale (optionnel) :
-                            </label>
-                            <input
-                                value={globalSection}
-                                onChange={(e) => setGlobalSection(e.target.value)}
-                                placeholder="ex. A"
-                                className="w-24 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                            />
-                            <button
-                                onClick={applyGlobalSection}
-                                disabled={!globalSection.trim()}
-                                className="rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-200 disabled:opacity-40 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-                            >
-                                Appliquer à toutes
-                            </button>
+                        {/* Global values bar */}
+                        <div className="flex flex-wrap items-center gap-3 rounded-xl bg-gray-50/80 p-3 text-xs dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800">
+                            <span className="font-semibold text-gray-700 dark:text-gray-300">Appliquer à toutes :</span>
+
+                            {/* Langue */}
+                            <div className="flex items-center gap-1.5">
+                                <span className="text-gray-500 dark:text-gray-400">Langue</span>
+                                <select
+                                    value={globalLanguage}
+                                    onChange={(e) => setGlobalLanguage(e.target.value as 'fr' | 'en' | '')}
+                                    disabled={isUploading || uploadDone}
+                                    className="rounded-lg border border-gray-200 bg-white px-2 py-1 text-xs outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                                >
+                                    <option value="">—</option>
+                                    <option value="fr">FR</option>
+                                    <option value="en">EN</option>
+                                </select>
+                                <button
+                                    onClick={applyGlobalLanguage}
+                                    disabled={!globalLanguage || isUploading || uploadDone}
+                                    className="rounded-lg border border-gray-200 bg-white px-2 py-1 text-xs font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-40 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                                >
+                                    Appliquer
+                                </button>
+                            </div>
+
+                            <div className="h-4 w-px bg-gray-200 dark:bg-gray-700" />
+
+                            {/* Type */}
+                            <div className="flex items-center gap-1.5">
+                                <span className="text-gray-500 dark:text-gray-400">Type</span>
+                                <select
+                                    value={globalType}
+                                    onChange={(e) => setGlobalType(e.target.value as ExamType | '')}
+                                    disabled={isUploading || uploadDone}
+                                    className="rounded-lg border border-gray-200 bg-white px-2 py-1 text-xs outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                                >
+                                    <option value="">—</option>
+                                    {TYPE_OPTIONS.map((t) => (
+                                        <option key={t} value={t}>{t}</option>
+                                    ))}
+                                </select>
+                                <button
+                                    onClick={applyGlobalType}
+                                    disabled={!globalType || isUploading || uploadDone}
+                                    className="rounded-lg border border-gray-200 bg-white px-2 py-1 text-xs font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-40 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                                >
+                                    Appliquer
+                                </button>
+                            </div>
+
+                            <div className="h-4 w-px bg-gray-200 dark:bg-gray-700" />
+
+                            {/* Section */}
+                            <div className="flex items-center gap-1.5">
+                                <span className="text-gray-500 dark:text-gray-400">Section</span>
+                                <input
+                                    value={globalSection}
+                                    onChange={(e) => setGlobalSection(e.target.value)}
+                                    placeholder="ex. A"
+                                    disabled={isUploading || uploadDone}
+                                    className="w-16 rounded-lg border border-gray-200 bg-white px-2 py-1 text-xs outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                                />
+                                <button
+                                    onClick={applyGlobalSection}
+                                    disabled={!globalSection.trim() || isUploading || uploadDone}
+                                    className="rounded-lg border border-gray-200 bg-white px-2 py-1 text-xs font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-40 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                                >
+                                    Appliquer
+                                </button>
+                            </div>
                         </div>
 
                         {/* Table */}
