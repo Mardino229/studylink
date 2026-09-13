@@ -524,7 +524,7 @@ export default function AdminExamLibrary() {
                         )}
                         <input value={examForm.section} onChange={(e) => setExamForm(p => ({ ...p, section: e.target.value }))} placeholder="Section (ex: A) — optionnel" className={inputCls} />
                     </div>
-                    <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+                    <label className="flex hidden items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
                         <input type="checkbox" checked={examForm.is_solution_paid} onChange={(e) => setExamForm(p => ({ ...p, is_solution_paid: e.target.checked }))} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
                         Corrigé payant (2 jetons)
                     </label>
