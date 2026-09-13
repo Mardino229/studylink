@@ -4,6 +4,7 @@ import {
     Eye, FileText, Filter, Plus, Trash2, Upload, X, XCircle,
 } from 'lucide-react';
 import CourseCombobox from '../../components/ui/CourseCombobox';
+import BulkUploadModal from '../../components/ui/BulkUploadModal';
 import { useNavigate } from 'react-router-dom';
 import {
     useGetCourses, useGetExams,
@@ -51,6 +52,9 @@ export default function AdminExamLibrary() {
     const rejectSolution = useRejectSolution();
     const validateExamFile = useValidateExamFile();
     const rejectExamFile = useRejectExamFile();
+
+    // Bulk upload modal
+    const [bulkModal, setBulkModal] = useState(false);
 
     const [examFilters, setExamFilters] = useState<{
         course_id: string; session: string; exam_type: string;
@@ -192,11 +196,16 @@ export default function AdminExamLibrary() {
 
             <PageMeta title="Admin   Bibliothèque d'épreuves" description="Gestion de la bibliothèque d'épreuves" />
             <PageBreadcrumb pageTitle="Bibliothèque d'épreuves" />
-            <div className="flex justify-end">
+            <div className="flex items-center justify-end gap-2">
                 {tab === 'exams' && (
-                    <button onClick={() => setExamModal(true)} className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 sm:w-auto">
-                        <Plus size={16} />Nouvelle épreuve
-                    </button>
+                    <>
+                        <button onClick={() => setBulkModal(true)} className="inline-flex items-center justify-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2.5 text-sm font-semibold text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-950/30 dark:text-blue-400 dark:hover:bg-blue-950/50 sm:w-auto">
+                            <Upload size={16} />Import en masse
+                        </button>
+                        <button onClick={() => setExamModal(true)} className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 sm:w-auto">
+                            <Plus size={16} />Nouvelle épreuve
+                        </button>
+                    </>
                 )}
                 {tab === 'courses' && (
                     <button onClick={() => setCourseModal(true)} className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 sm:w-auto">
@@ -657,6 +666,14 @@ export default function AdminExamLibrary() {
                 onConfirm={() => { if (deleteExamId) { deleteExam.mutate(deleteExamId); setDeleteExamId(null); } }} onCancel={() => setDeleteExamId(null)} />
             <ConfirmModal isOpen={!!deleteCourseId} title="Supprimer le cours" message="Ce cours sera supprimé. Les épreuves associées ne seront pas supprimées." confirmLabel="Supprimer" cancelLabel="Annuler"
                 onConfirm={() => { if (deleteCourseId) { deleteCourse.mutate(deleteCourseId); setDeleteCourseId(null); } }} onCancel={() => setDeleteCourseId(null)} />
+
+            {/* ── Modal : Bulk upload ── */}
+            <BulkUploadModal
+                isOpen={bulkModal}
+                onClose={() => setBulkModal(false)}
+                uploadExam={uploadExam}
+                validateExam={validateExam}
+            />
 
         </div>
     );
