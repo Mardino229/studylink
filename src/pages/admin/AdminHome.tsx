@@ -11,7 +11,9 @@ import { useGetAdminDashboard } from "../../utils/admin.ts";
 import { useVisitorReport } from "../../utils/reports.ts";
 
 export default function AdminHome() {
+  const [visitorDays, setVisitorDays] = useState<number>(28);
   const { data, isLoading, isError } = useGetAdminDashboard();
+  const { data: visitorData, isLoading: loadingVisitors } = useVisitorReport(visitorDays);
 
   if (isLoading) {
     return (
@@ -56,8 +58,6 @@ export default function AdminHome() {
     tooltip: { enabled: true },
   };
 
-  const [visitorDays, setVisitorDays] = useState<number>(28);
-  const { data: visitorData, isLoading: loadingVisitors } = useVisitorReport(visitorDays);
 
   const visitorDaysOptions = [
     { value: "7", label: "7 derniers jours" },
