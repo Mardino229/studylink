@@ -150,7 +150,7 @@ export default function AdminExamLibrary() {
                 type_number: examForm.type_number ? Number(examForm.type_number) : undefined,
                 section: examForm.section.trim() || undefined,
                 is_solution_paid: examForm.is_solution_paid,
-                language: examForm.language,
+                language: examForm.language as 'fr' | 'en',
             },
             { onSuccess: () => { setExamModal(false); setExamForm({ course_id: '', academic_year: '', session: '', exam_type: '', type_number: '', section: '', is_solution_paid: true, language: '' as 'fr' | 'en' | '' }); setExamFile(null); setExamSolutionFile(null); } }
         );
@@ -522,6 +522,11 @@ export default function AdminExamLibrary() {
                         {examForm.exam_type && examForm.exam_type !== 'Final' && (
                             <input type="number" value={examForm.type_number} onChange={(e) => setExamForm(p => ({ ...p, type_number: e.target.value }))} placeholder={`N° de ${examForm.exam_type} *`} min={1} max={20} className={inputCls} />
                         )}
+                        <select value={examForm.language} onChange={(e) => setExamForm(p => ({ ...p, language: e.target.value as 'fr' | 'en' | '' }))} className={selectCls}>
+                            <option value="">  Langue *  </option>
+                            <option value="fr">Français</option>
+                            <option value="en">English</option>
+                        </select>
                         <input value={examForm.section} onChange={(e) => setExamForm(p => ({ ...p, section: e.target.value }))} placeholder="Section (ex: A) — optionnel" className={inputCls} />
                     </div>
                     <label className="flex hidden items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
@@ -538,7 +543,7 @@ export default function AdminExamLibrary() {
                             <input type="file" accept=".pdf,image/*" onChange={(e) => setExamSolutionFile(e.target.files?.[0] ?? null)} className={fileCls} />
                         </div>
                     </div>
-                    <ModalButtons onCancel={() => setExamModal(false)} onConfirm={handleUploadExam} loading={uploadExam.isPending} disabled={(!examFile && !examSolutionFile) || (!!examForm.exam_type && examForm.exam_type !== 'Final' && !examForm.type_number)} label="Uploader" />
+                    <ModalButtons onCancel={() => setExamModal(false)} onConfirm={handleUploadExam} loading={uploadExam.isPending} disabled={(!examFile && !examSolutionFile) || (!!examForm.exam_type && examForm.exam_type !== 'Final' && !examForm.type_number) || !examForm.language} label="Uploader" />
                 </div>
             </Modal>
 

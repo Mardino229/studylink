@@ -24,10 +24,7 @@ export default function LoginForm() {
     const [rememberMe, setRememberMe] = useState(false);
 
     const loginSchema = z.object({
-        email: z.email({ message: tErr('email.invalid') }).nonempty(tErr('email.required')).refine(
-            (email) => email.toLowerCase().endsWith('@uottawa.ca'),
-            { message: tErr('email.invalid') }
-        ),
+        email: z.email({ message: tErr('email.invalid') }).nonempty(tErr('email.required')),
         password: z.string()
     });
 
