@@ -13,7 +13,7 @@ import { useVisitorReport } from "../../utils/reports.ts";
 export default function AdminHome() {
   const [visitorDays, setVisitorDays] = useState<number>(28);
   const { data, isLoading, isError } = useGetAdminDashboard();
-  const { data: visitorData, isLoading: loadingVisitors } = useVisitorReport(visitorDays);
+  const { data: visitorData, isLoading: loadingVisitors,  } = useVisitorReport(visitorDays);
 
   if (isLoading) {
     return (

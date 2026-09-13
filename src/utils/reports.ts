@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAxiosPrivate } from "../hoooks/useAxiosPrivate";
 import type { AcquisitionReport } from "./type";
+import { toast } from "sonner";
 
 export type Period = "3m" | "6m" | "12m";
 
@@ -160,11 +161,12 @@ export interface VisitorReport {
 
 export const useVisitorReport = (days: number = 28) => {
     const axiosPrivate = useAxiosPrivate();
+    const safeDays = Math.max(1, Math.min(365, Math.trunc(days)));
     return useQuery({
-        queryKey: ["admin-reports-visitors", days],
+        queryKey: ["admin-reports-visitors", safeDays],
         queryFn: async () => {
             const res = await axiosPrivate.get<{ data: VisitorReport }>(
-                `/admin/reports/visitors?days=${days}`
+                `/admin/reports/visitors?days=${safeDays}`
             );
             return res.data.data;
         },
