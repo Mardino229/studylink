@@ -148,7 +148,7 @@ const WorkspaceNotebook: React.FC = () => {
         { id: 'flashcards', label: 'Flashcards', icon: Layers },
         { id: 'quizzes', label: t('notebook.tab_quizzes'), icon: HelpCircle },
         { id: 'podcasts', label: 'Podcasts', icon: Mic },
-        { id: 'mindmaps', label: 'Cartes', icon: GitBranch },
+        { id: 'mindmaps', label: t('notebook.tab_mindmaps'), icon: GitBranch },
         { id: 'chat', label: 'Chat', icon: MessageSquare },
     ] as const;
 
