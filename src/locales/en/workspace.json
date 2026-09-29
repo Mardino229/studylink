@@ -179,7 +179,7 @@
     "cancel": "Cancel",
     "url_invalid": "Invalid URL. Use a youtube.com or youtu.be link.",
     "processing_note": "Importing analyses your document to extract themes. This may take a moment depending on the file length.",
-    "handwriting_warning": "Poorly handwritten documents may be misinterpreted by the AI.",
+    "handwriting_warning": "Poorly handwritten documents may be misinterpreted.",
     "free_limit_reached": "Free limit reached",
     "free_limit_msg": "You already have 1 free source in this notebook. Top up tokens or upgrade to a subscription to import more sources.",
     "cost_file": "1 token / file",
