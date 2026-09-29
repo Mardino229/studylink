@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useUploadSource, useGetSources, useDeleteSource, useAddYoutubeSource } from '../../utils/workspace';
-import { FileIcon, FileText, ImageIcon, UploadCloudIcon, CheckCircleIcon, LoaderIcon, Trash2, Link2, XCircleIcon, Info, Coins, LockIcon, Sparkles } from 'lucide-react';
+import { FileIcon, FileText, ImageIcon, UploadCloudIcon, CheckCircleIcon, LoaderIcon, Trash2, Link2, XCircleIcon, Info, Coins, LockIcon, Sparkles, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useBilling } from '../../context/BillingContext';
 
@@ -393,6 +393,12 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
                                         : ''
                                     : t('sources.file_types_hint')}
                             </span>
+                            {!fileUploadDisabled && (
+                                <span className="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-amber-600/90 dark:text-amber-400/90">
+                                    <AlertTriangle size={12} className="shrink-0" />
+                                    {t('sources.handwriting_warning')}
+                                </span>
+                            )}
                             <input
                                 type="file"
                                 multiple
@@ -556,9 +562,15 @@ const SourceUploader: React.FC<SourceUploaderProps> = ({ notebookId }) => {
                 {/* Import processing note */}
                 <div className="flex items-start gap-2 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 px-3 py-2.5">
                     <Info size={14} className="mt-0.5 shrink-0 text-amber-500" />
-                    <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
-                        {t('sources.processing_note')}
-                    </p>
+                    <div className="space-y-1 text-xs leading-relaxed">
+                        <p className="text-amber-700 dark:text-amber-400">
+                            {t('sources.processing_note')}
+                        </p>
+                        <p className="flex items-center gap-1 font-medium text-amber-800 dark:text-amber-300">
+                            <AlertTriangle size={12} className="shrink-0 text-amber-500" />
+                            {t('sources.handwriting_warning')}
+                        </p>
+                    </div>
                 </div>
 
                 {/* Processing banners — one per file */}

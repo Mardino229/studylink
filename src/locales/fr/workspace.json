@@ -179,6 +179,7 @@
     "cancel": "Annuler",
     "url_invalid": "URL invalide. Utilisez un lien youtube.com ou youtu.be.",
     "processing_note": "L'importation analyse votre document pour en extraire les thèmes. Cela peut prendre quelques instants selon la taille du fichier.",
+    "handwriting_warning": "Les documents manuscrits ou mal écrits à la main risquent d'être mal interprétés par l'IA.",
     "free_limit_reached": "Limite gratuite atteinte",
     "free_limit_msg": "Vous avez déjà 1 source gratuite dans ce notebook. Rechargez des jetons ou passez à un abonnement pour importer davantage de sources.",
     "cost_file": "1 jeton / fichier",
