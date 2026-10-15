@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "../../ui/table";
 import Badge from "../../ui/badge/Badge";
 import Button from "../../ui/button/Button.tsx";
-import { Eye, CheckCircle2, RotateCcw } from "lucide-react";
+import { Eye, CheckCircle2, RotateCcw, X } from "lucide-react";
 import type { SupportTicket, TicketStatus } from "../../../utils/support";
 
 const TYPE_LABELS: Record<string, string> = {
@@ -38,6 +38,7 @@ export default function FeedbacksTable({
     isUpdating = false,
 }: FeedbacksTableProps) {
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedMessage, setSelectedMessage] = useState<{ email: string; message: string } | null>(null);
 
     const filtered = useMemo(() => {
         return tickets.filter((t) => {
@@ -98,7 +99,20 @@ export default function FeedbacksTable({
                                                 </span>
                                             </TableCell>
                                             <TableCell className="px-5 py-4">
-                                                <p className="text-sm text-gray-700 dark:text-gray-300 truncate max-w-xs">{t.message}</p>
+                                                <div className="flex items-center gap-1.5 max-w-xs">
+                                                    <p className="text-sm text-gray-700 dark:text-gray-300 truncate min-w-0">
+                                                        {t.message}
+                                                    </p>
+                                                    {t.message.length > 100 && (
+                                                        <button
+                                                            onClick={() => setSelectedMessage({ email: t.email, message: t.message })}
+                                                            title="Voir le message complet"
+                                                            className="shrink-0 text-xs font-semibold text-gray-400 hover:text-brand-500 dark:hover:text-brand-400 transition-colors leading-none"
+                                                        >
+                                                            …
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </TableCell>
                                             <TableCell className="px-5 py-4">
                                                 <Badge size="sm" color={badge.color}>{badge.label}</Badge>
@@ -171,6 +185,35 @@ export default function FeedbacksTable({
                     </>
                 )}
             </div>
+
+            {/* ── Message modal ── */}
+            {selectedMessage && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+                    onClick={() => setSelectedMessage(null)}
+                >
+                    <div
+                        className="relative w-full max-w-lg rounded-2xl bg-white dark:bg-gray-900 shadow-xl p-6"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="flex items-start justify-between gap-4 mb-4">
+                            <div>
+                                <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-0.5">Message de</p>
+                                <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">{selectedMessage.email}</p>
+                            </div>
+                            <button
+                                onClick={() => setSelectedMessage(null)}
+                                className="shrink-0 rounded-lg p-1 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
+                        <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
+                            {selectedMessage.message}
+                        </p>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
