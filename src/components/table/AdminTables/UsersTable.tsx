@@ -147,7 +147,7 @@ export default function UsersTable({
                                                         title="Supprimer le compte"
                                                     >
                                                         <Trash2 className="size-5" />
-                                                    </button>
+                                                    </button> 
                                                 </div>
                                             </TableCell>
                                         </TableRow>
