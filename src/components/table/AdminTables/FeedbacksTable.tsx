@@ -103,7 +103,7 @@ export default function FeedbacksTable({
                                                     <p className="text-sm text-gray-700 dark:text-gray-300 truncate min-w-0">
                                                         {t.message}
                                                     </p>
-                                                    {t.message.length > 100 && (
+                                                    {t.message.length > 60 && (
                                                         <button
                                                             onClick={() => setSelectedMessage({ email: t.email, message: t.message })}
                                                             title="Voir le message complet"
