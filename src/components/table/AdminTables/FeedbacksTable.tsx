@@ -109,7 +109,7 @@ export default function FeedbacksTable({
                                                             title="Voir le message complet"
                                                             className="shrink-0 text-xs font-semibold text-gray-400 hover:text-brand-500 dark:hover:text-brand-400 transition-colors leading-none"
                                                         >
-                                                            …
+                                                            Voir plus
                                                         </button>
                                                     )}
                                                 </div>
