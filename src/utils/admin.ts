@@ -42,6 +42,34 @@ export const useGetAdminUsers = (skip: number = 0, limit: number = 100) => {
     });
 };
 
+export const useDeleteAdminUser = () => {
+    const axiosPrivate = useAxiosPrivate();
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (userId: string) => {
+            const response = await axiosPrivate.delete<{ success: boolean; message: string }>(
+                `/admin/users/${userId}`
+            );
+            return response.data;
+        },
+        onSuccess: (data) => {
+            queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+            toast.success(data.message || "Utilisateur supprimé avec succès");
+        },
+        onError: (error: any) => {
+            const status = error?.response?.status;
+            const detail = error?.response?.data?.detail;
+            if (status === 404) {
+                toast.error("Utilisateur introuvable.");
+            } else if (status === 403) {
+                toast.error("Action non autorisée.");
+            } else {
+                toast.error(detail || "Erreur lors de la suppression.");
+            }
+        },
+    });
+};
+
 // --- Plans ---
 
 export const useGetAdminPlans = () => {

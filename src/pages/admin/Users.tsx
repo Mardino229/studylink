@@ -1,20 +1,23 @@
 import { useState } from "react";
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
-import { toast } from "sonner";
 import ComponentCard from "../../components/common/ComponentCard.tsx";
 import Select from "../../components/form/Select.tsx";
 import UsersTable from "../../components/table/AdminTables/UsersTable.tsx";
-import { useGetAdminUsers } from "../../utils/admin";
+import { useGetAdminUsers, useDeleteAdminUser } from "../../utils/admin";
 import { Loader2 } from "lucide-react";
+import type { AdminUser } from "../../utils/type.ts";
+import ConfirmModal from "../../components/ui/ConfirmModal.tsx";
 
 export default function Users() {
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<string>("all");
   const [byPage, setByPage] = useState(10);
   const [skip] = useState(0);
+  const [userToDelete, setUserToDelete] = useState<AdminUser | null>(null);
 
-  const { data, isLoading, isError } = useGetAdminUsers(skip, 500); // Fetching more for client-side filtering/paging in this simple version
+  const { data, isLoading, isError } = useGetAdminUsers(skip, 500);
+  const deleteUser = useDeleteAdminUser();
 
   const statusOptions = [
     { value: "all", label: "Tous les statuts" },
@@ -29,10 +32,14 @@ export default function Users() {
     { value: 50, label: "50" },
   ];
 
-  const setUserStatus = (id: string, next: boolean) => {
-    // In a real app, this would be a mutation: useUpdateUserStatus.mutate({ id, is_active: next })
-    toast.info("La mise à jour du statut n'est pas encore implémentée côté API", {
-      description: `ID: ${id}, Nouveau statut: ${next ? "Actif" : "Inactif"}`
+  const handleDeleteRequest = (user: AdminUser) => {
+    setUserToDelete(user);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!userToDelete) return;
+    deleteUser.mutate(userToDelete.id, {
+      onSettled: () => setUserToDelete(null),
     });
   };
 
@@ -93,10 +100,24 @@ export default function Users() {
             searchTerm={q}
             statusFilter={status}
             itemsPerPage={byPage}
-            onSetStatus={setUserStatus}
+            onSetStatus={() => {}}
+            onDeleteUser={handleDeleteRequest}
+            isDeletingUser={deleteUser.isPending}
           />
         )}
       </ComponentCard>
+
+      <ConfirmModal
+        isOpen={!!userToDelete}
+        title="Supprimer le compte ?"
+        message={`Le compte de ${userToDelete?.email ?? ""} sera supprimé définitivement. Cette action est irréversible.`}
+        confirmLabel="Supprimer"
+        cancelLabel="Annuler"
+        confirmVariant="danger"
+        isLoading={deleteUser.isPending}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setUserToDelete(null)}
+      />
     </div>
   );
 }

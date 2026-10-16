@@ -9,7 +9,7 @@ import Badge from "../../ui/badge/Badge";
 import { useState, useMemo } from "react";
 import Button from "../../ui/button/Button.tsx";
 import { type AdminUser } from "../../../utils/type";
-import { Eye } from "lucide-react";
+import { Eye, Trash2 } from "lucide-react";
 import { Modal } from "../../ui/modal/index.tsx";
 
 interface UsersTableProps {
@@ -18,6 +18,8 @@ interface UsersTableProps {
     itemsPerPage?: number;
     users: AdminUser[];
     onSetStatus: (id: string, next: boolean) => void;
+    onDeleteUser: (user: AdminUser) => void;
+    isDeletingUser?: boolean;
 }
 
 export default function UsersTable({
@@ -25,6 +27,8 @@ export default function UsersTable({
     statusFilter = "all",
     itemsPerPage = 10,
     users,
+    onDeleteUser,
+    isDeletingUser = false,
 }: UsersTableProps) {
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
@@ -136,6 +140,14 @@ export default function UsersTable({
                                                     >
                                                         <Eye className="size-5" />
                                                     </button>
+                                                    <button
+                                                        onClick={() => onDeleteUser(u)}
+                                                        disabled={isDeletingUser}
+                                                        className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors disabled:opacity-50"
+                                                        title="Supprimer le compte"
+                                                    >
+                                                        <Trash2 className="size-5" />
+                                                    </button>
                                                 </div>
                                             </TableCell>
                                         </TableRow>
@@ -238,7 +250,18 @@ export default function UsersTable({
                         </div>
                     </div>
 
-                    <div className="flex justify-end pt-4">
+                    <div className="flex justify-between gap-3 pt-4 border-t border-gray-100 dark:border-white/[0.05]">
+                        <button
+                            onClick={() => {
+                                if (selectedUser) onDeleteUser(selectedUser);
+                                setSelectedUser(null);
+                            }}
+                            disabled={isDeletingUser}
+                            className="flex items-center gap-2 rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:border-red-500/30 dark:text-red-400 dark:hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                        >
+                            <Trash2 size={15} />
+                            Supprimer le compte
+                        </button>
                         <Button
                             variant="primary"
                             onClick={() => setSelectedUser(null)}
