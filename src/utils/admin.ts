@@ -7,6 +7,9 @@ import type {
     SubscriptionPlanBilingual,
     PaginatedSubscriptions,
     SubscriptionPlanRequest,
+    GrantSubscriptionsRequest,
+    GrantSubscriptionsResponseData,
+    RevokeManualSubscriptionsResponseData,
     Announcement,
     AnnouncementRequest,
     AdminDashboardResponse
@@ -226,6 +229,66 @@ export const useGetAdminSubscriptions = (skip: number = 0, limit: number = 100) 
                 `/admin/subscriptions?skip=${skip}&limit=${limit}`
             );
             return response.data.data;
+        },
+    });
+};
+
+export const useGrantSubscriptionsByRegistrationOrder = () => {
+    const axiosPrivate = useAxiosPrivate();
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (data: GrantSubscriptionsRequest) => {
+            const response = await axiosPrivate.post<{
+                success: boolean;
+                message: string;
+                data: GrantSubscriptionsResponseData;
+            }>("/admin/subscriptions/grant-by-registration-order", data);
+            return response.data;
+        },
+        onSuccess: (data) => {
+            queryClient.invalidateQueries({ queryKey: ["admin", "subscriptions"] });
+            queryClient.invalidateQueries({ queryKey: ["admin", "reports"] });
+            queryClient.invalidateQueries({ queryKey: ["admin", "dashboard"] });
+            toast.success(data.message || "Abonnements attribués avec succès");
+        },
+        onError: (error: any) => {
+            toast.error(
+                error.response?.data?.detail ||
+                error.response?.data?.message ||
+                "Erreur lors de l'attribution des abonnements"
+            );
+        },
+    });
+};
+
+export const useRevokeManualSubscriptions = () => {
+    const axiosPrivate = useAxiosPrivate();
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async () => {
+            const response = await axiosPrivate.post<{
+                success: boolean;
+                message: string;
+                data: RevokeManualSubscriptionsResponseData;
+            }>("/admin/subscriptions/revoke-manual");
+            return response.data;
+        },
+        onSuccess: (data) => {
+            queryClient.invalidateQueries({ queryKey: ["admin", "subscriptions"] });
+            queryClient.invalidateQueries({ queryKey: ["admin", "transactions"] });
+            queryClient.invalidateQueries({ queryKey: ["admin", "reports"] });
+            queryClient.invalidateQueries({ queryKey: ["admin", "dashboard"] });
+            toast.success(
+                data.message ||
+                `${data.data?.total ?? 0} abonnement(s) manuel(s) supprimé(s)`
+            );
+        },
+        onError: (error: any) => {
+            toast.error(
+                error.response?.data?.detail ||
+                error.response?.data?.message ||
+                "Erreur lors de la révocation des abonnements manuels"
+            );
         },
     });
 };

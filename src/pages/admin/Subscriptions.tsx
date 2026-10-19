@@ -3,14 +3,18 @@ import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
 import ComponentCard from "../../components/common/ComponentCard.tsx";
 import Select from "../../components/form/Select.tsx";
+import Button from "../../components/ui/button/Button.tsx";
 import SubscriptionsTable from "../../components/table/AdminTables/SubscriptionsTable.tsx";
 import { useGetAdminSubscriptions } from "../../utils/admin";
+import ManualSubscriptionsModal from "../../components/admin/ManualSubscriptionsModal.tsx";
+import { ListOrdered } from "lucide-react";
 
 export default function Subscriptions() {
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<string>("all");
   const [byPage, setByPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isManualModalOpen, setIsManualModalOpen] = useState(false);
 
   const skip = (currentPage - 1) * byPage;
 
@@ -49,9 +53,19 @@ export default function Subscriptions() {
   }
 
   return (
-    <div>
+    <div className="space-y-6">
       <PageMeta title="Admin - Abonnements" description="Gestion des abonnements" />
-      <PageBreadcrumb pageTitle="Abonnements" />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <PageBreadcrumb pageTitle="Abonnements" />
+        <Button
+          variant="primary"
+          size="sm"
+          startIcon={<ListOrdered size={16} />}
+          onClick={() => setIsManualModalOpen(true)}
+        >
+          Attribuer par ordre d'inscription
+        </Button>
+      </div>
 
       <ComponentCard title="Liste des abonnements">
         <div className="flex flex-col gap-4 mb-4 md:flex-row md:items-center md:justify-between">
@@ -97,6 +111,11 @@ export default function Subscriptions() {
           onPageChange={setCurrentPage}
         />
       </ComponentCard>
+
+      <ManualSubscriptionsModal
+        isOpen={isManualModalOpen}
+        onClose={() => setIsManualModalOpen(false)}
+      />
     </div>
   );
 }

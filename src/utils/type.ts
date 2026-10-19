@@ -152,6 +152,37 @@ export interface PaginatedSubscriptions {
     limit: number;
 }
 
+export interface GrantSubscriptionCreatedItem {
+    position: number;
+    user_id: string;
+    subscription_id: string;
+    start_date?: string;
+    end_date?: string;
+}
+
+export interface GrantSubscriptionSkippedActiveItem {
+    position: number;
+    user_id: string;
+}
+
+export interface GrantSubscriptionsResponseData {
+    created: GrantSubscriptionCreatedItem[];
+    skipped_active: GrantSubscriptionSkippedActiveItem[];
+    missing_positions: number[];
+}
+
+export interface GrantSubscriptionsRequest {
+    registration_positions: number[];
+    plan_name: string;
+    billing_type: "monthly" | "annual";
+}
+
+export interface RevokeManualSubscriptionsResponseData {
+    revoked: string[];
+    deleted_transactions: number;
+    total: number;
+}
+
 export interface Transaction {
     id: string;
     user_id: string;
