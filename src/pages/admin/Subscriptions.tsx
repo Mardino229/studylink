@@ -57,14 +57,14 @@ export default function Subscriptions() {
       <PageMeta title="Admin - Abonnements" description="Gestion des abonnements" />
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <PageBreadcrumb pageTitle="Abonnements" />
-        {/*<Button
+        <Button
           variant="primary"
           size="sm"
           startIcon={<ListOrdered size={16} />}
           onClick={() => setIsManualModalOpen(true)}
         >
           Attribuer par ordre d'inscription
-        </Button>*/}
+        </Button>
       </div>
 
       <ComponentCard title="Liste des abonnements">
